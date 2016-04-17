@@ -4,7 +4,7 @@ module.exports = {
 	test : {
 		appid : 'wxe5e454c5dff8c7b2',
 		token : 'Hibanana',
-		encodingAESKey : 'YOUR encodingAESKey',
+		encodingAESKey : '',
 	},
 	bqsq : {
 		appid : 'your appid',
