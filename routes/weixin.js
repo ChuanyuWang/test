@@ -22,7 +22,7 @@ var config = {
 router.use('/check', wechat(config, function (req, res, next) {
 		// 微信输入信息都在req.weixin上
 		var message = req.weixin;
-        console.log("message is " + JSON.stringify(message, null, 4))
+        console.log("message is " + JSON.stringify(message, null, 4));
 		if (message.FromUserName === 'diaosi') {
 			// 回复屌丝(普通回复)
 			res.reply('hehe');
