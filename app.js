@@ -9,7 +9,10 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/user');
-var weixin = require('./routes/weixin');
+
+// route different public account
+var mygirl = require('./routes/mygirl');
+var bqsq = require('./routes/bqsq');
 
 var app = express();
 
@@ -33,7 +36,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
-app.use('/weixin', weixin);
+app.use('/mygirl',mygirl);
+app.use('/test', bqsq);
+app.use('/bqsq', bqsq);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
