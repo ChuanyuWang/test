@@ -17,16 +17,16 @@ router.get('/check', function (req, res) {
 	var tmpArr = new Array(token, timestamp, nonce);
 	// sort and join as string
     var content = tmpArr.sort().join('');
-	console.log(content);
+	console.log("content is " + content);
 
     // generate sha1 
 	var crypto = require('crypto');
 	var shasum = crypto.createHash('sha1');
 	shasum.update(content);
 	var d = shasum.digest('hex');
-
+    console.log("d is " + d);
 	if (signature == d) {
-		res.send(d);
+		res.send(req.query.echostr);
 	} else {
         res.status(403).send('Weixin authorization fails');
     }
