@@ -13,6 +13,7 @@
     "express": "^4.13.3",
     "forever": "^0.15.1",
     "jade": "^1.11.0",
+    "log4js": "^0.6.35",
     "morgan": "^1.6.1",
     "serve-favicon": "^2.3.0",
     "wechat": "^2.0.3",

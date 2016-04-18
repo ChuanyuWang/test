@@ -25,8 +25,8 @@ router.use('/weixin', wechat(config.test, function (req, res, next) {
 			});
 		}
 
-		res.reply('A message is received as below \n' + JSON.stringify(message, null, 4));
 		console.log("A message is received: " + JSON.stringify(message, null, 4));
+		res.reply('A message is received as below \n' + JSON.stringify(message, null, 4));
 	}));
 
 function sendMsg(api, openid, content) {

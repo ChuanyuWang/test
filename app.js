@@ -1,11 +1,11 @@
-
-
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var config = require('./config.js');
+var log4js = require('log4js');
 
 var routes = require('./routes/index');
 var users = require('./routes/user');
@@ -20,8 +20,11 @@ var env = process.env.NODE_ENV || 'development';
 app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
-// view engine setup
+// set the logging
+log4js.configure(config.log4js);
+log4js.getLogger().setLevel("TRACE");
 
+// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
