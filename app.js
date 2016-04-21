@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var flash = require('connect-flash');
+var passport = require('passport');
 var config = require('./config.js');
 var log4js = require('log4js');
 
@@ -13,6 +15,12 @@ var users = require('./routes/user');
 // route different public account
 var mygirl = require('./routes/mygirl');
 var bqsq = require('./routes/bqsq');
+
+
+//setup database
+var db = require("./db");
+
+
 
 var app = express();
 
@@ -24,9 +32,20 @@ app.locals.ENV_DEVELOPMENT = env == 'development';
 log4js.configure(config.log4js);
 log4js.getLogger().setLevel("TRACE");
 
+// passport config
+var Account = require('./account');
+var LocalStrategy = require('passport-local').Strategy;
+passport.use(new LocalStrategy(Account.authenticate()));
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.locals.pretty = true; // output the pretty html for consistency 
+
+app.use(db.connect());
+
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(logger('dev'));
@@ -36,7 +55,14 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(require('express-session')({ secret: 'keyboard dog', resave: false, saveUninitialized: false }));
 
+// Initialize Passport and restore authentication state, if any, from the session.
+app.use(passport.initialize());
+app.use(flash());
+app.use(passport.session());
+
+// add router
 app.use('/', routes);
 app.use('/users', users);
 app.use('/mygirl',mygirl);

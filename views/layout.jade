@@ -2,12 +2,44 @@ doctype html
 html(lang='en')
   head
     meta(charset='UTF-8')
-    meta(name='viewport', content='width=device-width')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='description', content='mini on-line store')
+    meta(name='author', content='Chuanyu.Wang@hotmail.com')
     title= title
     block css
-      link(rel='stylesheet', href='/css/style.css')
+      link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
+      link(rel='icon', href='favicon.ico')
     block js
       if ENV_DEVELOPMENT
         script(src='http://localhost:35729/livereload.js')
   body
+    block navbar
+      nav.navbar.navbar-inverse.navbar-fixed-top
+        div.container
+          div.navbar-header
+            button.navbar-toggle.collapsed(type='button', data-toggle='collapse',data-target='#navbar', aria-expanded='false', aria-controls='navbar')
+              span.sr-only Toogle navigation
+              span.icon-bar
+              span.icon-bar
+              span.icon-bar
+            a.navbar-brand(href='#')= project
+          div#navbar.navbar-collapse.collapse
+            block navlist
+            if !user
+              form.navbar-form.navbar-right(role='form', action='/login',method='post')
+                div.form-group
+                  input.form-control(type='text', name='username',placeholder='邮箱')
+                div.form-group
+                  input.form-control(type='password',name='password',placeholder='密码')
+                button.btn.btn-success(type='submit') 登陆
+            else
+              form.navbar-form.navbar-right(role='form', action='/logout',method='get')
+                button.btn.btn-danger(type='submit') 注销
+              p.navbar-text.navbar-right= user.username
     block content
+      if errorMsg && errorMsg.length > 0
+        div.container
+          div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
+              
+    script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', integrity='sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS', crossorigin='anonymous')

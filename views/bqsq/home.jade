@@ -1,0 +1,36 @@
+extends ../layout
+
+block navlist
+  ul.nav.navbar-nav
+    li.active
+      a(href='#') 课程表
+    li
+      a(href='/bqsq/member') 会员
+
+append js
+  script(src='/components/requirejs/require.js',data-main="/js/main")
+
+block content
+  div.container(style={'padding-top': '50px'})
+    table#cls_table.table.table-bordered(style={'margin-top': '15px'})
+        thead
+          tr
+            th 时间
+            th 星期一
+            th 星期二
+            th 星期三
+            th 星期四
+            th 星期五
+            th 星期六
+            th 星期日
+        tbody
+          tr
+            td 上午
+          tr
+            td 下午
+          tr
+            td 晚上
+
+        
+     
+    
