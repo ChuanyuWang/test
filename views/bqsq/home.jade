@@ -1,4 +1,4 @@
-extends ../layout
+extends ../index
 
 block navlist
   ul.nav.navbar-nav
@@ -10,7 +10,7 @@ block navlist
 append js
   script(src='/components/requirejs/require.js',data-main="/js/main")
 
-block content
+block page
   div.container(style={'padding-top': '50px'})
     table#cls_table.table.table-bordered(style={'margin-top': '15px'})
         thead
