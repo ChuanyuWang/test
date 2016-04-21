@@ -7,6 +7,7 @@ var config = require('../config.js');
 /* GET users listing. */
 router.get('/home', function (req, res) {
     if (!req.user) {
+        req.flash('error', '用户未登陆或连接超时');
         res.redirect('/');
     } else {
         res.render('bqsq/home', {
@@ -19,6 +20,7 @@ router.get('/home', function (req, res) {
 
 router.get('/member', function (req, res) {
     if (!req.user) {
+        req.flash('error', '用户未登陆或连接超时');
         res.redirect('/');
     } else {
         res.render('bqsq/member', {

@@ -10,6 +10,7 @@ var logger = require('log4js').getLogger();
 router.get('/', function (req, res) {
     if (!req.user) {
         res.render('index', {
+            title : '登陆',
             project : '欢迎',
             errorMsg : req.flash('error')
         });
@@ -20,7 +21,7 @@ router.get('/', function (req, res) {
 
 router.post('/login', passport.authenticate('local', {
         failureRedirect : '/',
-        failureFlash : true
+        failureFlash : '用户名或密码不正确'
     }), function (req, res) {
     // If this function gets called, authentication was successful.
     // 'req.user' contains the authenticated user.
