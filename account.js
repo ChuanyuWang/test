@@ -10,13 +10,10 @@ var conn = mongoose.createConnection(config.uri, config.options);
 
 var Account = new Schema({
     username: String,
-    password: String
+    password: String,
+    tenant: String,
+    displayName: String
 });
-
-Account.methods.tenant = function () {
-    //TODO, parse the user name and return the xx part , e.g. yezhi@xx.com
-    return 'qq';
-}
 
 Account.plugin(passportLocalMongoose);
 

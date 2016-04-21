@@ -3,6 +3,7 @@ var passport = require('passport');
 var router = express.Router();
 var Account = require('../account');
 var classes = require("../models/classes");
+var logger = require('log4js').getLogger();
 
 /* GET home page. */
 
@@ -13,61 +14,29 @@ router.get('/', function (req, res) {
             errorMsg : req.flash('error')
         });
     } else {
-        //TODO res.redirect('/' + user.tenant + '/home');
-        console.log("req.user is " + req.user);
-        res.redirect('/' + 'bqsq' + '/home');
+        navigateToUserHome(req, res);
     }
 });
-/*
-router.get('/login', function (req, res) {
-//console.error("login with previous error: " + req.flash('error'));
-//console.error("login with previous error: " + req.flash('error'));
-res.render('login', {
-user : req.user,
-error : req.flash('error')
-});
-});
 
 router.post('/login', passport.authenticate('local', {
-failureRedirect : '/login',
-failureFlash : true
-}), function (req, res, next) {
-req.session.save(function (err) {
-if (err) {
-return next(err);
-}
-res.redirect('/');
-});
-});
- */
-
-router.post('/login', passport.authenticate('local', {
-        successRedirect : '/',
         failureRedirect : '/',
         failureFlash : true
-    }));
+    }), function (req, res) {
+    // If this function gets called, authentication was successful.
+    // 'req.user' contains the authenticated user.
+
+    logger.info("User >>%s<< login", req.user.username);
+    navigateToUserHome(req, res);
+});
 
 router.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
 });
 
-router.get('/index', function (req, res) {
-    res.render('index', {
-        title : 'Express'
-    });
-});
-
-function getUserTenant(user) {
-    return user.tenant;
-}
-
-function authentication(req, res) {
-    console.log("req.user is " + req.user);
-    console.log("req.session.user is " + req.session.user);
-    if (!req.user) {
-        return res.redirect('/login');
-    }
+function navigateToUserHome(req, res) {
+    //TODO res.redirect('/' + user.tenant + '/home');
+    res.redirect('/' + 'bqsq' + '/home');
 }
 
 module.exports = router;

@@ -64,7 +64,7 @@ function isAuthenticated(req, res, next) {
     if (req.user) {
         next()
     } else {
-        res.status(403).send('Unauthenticated Request');
+        res.status(401).send('Unauthorized Request');
     }
 };
 
