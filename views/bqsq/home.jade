@@ -12,6 +12,13 @@ append js
 
 block page
   div.container(style={'padding-top': '50px'})
+    div.row(style={'margin-top': '15px'})
+      div.col-md-1.pull-left
+        button.btn.btn-primary.pull-left 上一周
+      div.col-md-2.col-md-offset-4
+        p= new Date()
+      div.col-md-1.pull-right
+        button.btn.btn-primary.pull-right 下一周
     table#cls_table.table.table-bordered(style={'margin-top': '15px'})
         thead
           tr
@@ -26,10 +33,31 @@ block page
         tbody
           tr
             td 上午
+            td
+            td
+            td
+            td
+            td
+            td
+            td
           tr
             td 下午
+            td
+            td
+            td
+            td
+            td
+            td
+            td
           tr
             td 晚上
+            td
+            td
+            td
+            td
+            td
+            td
+            td
 
         
      
