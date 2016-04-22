@@ -31,6 +31,14 @@ router.get('/member', function (req, res) {
     }
 });
 
+router.get('/booking', function (req, res) {
+    res.render('bqsq/booking', {
+            title : '会员约课',
+            user : req.user,
+            project : '大Q小q'
+        });
+});
+
 router.post('/api/classes', isAuthenticated, function (req, res) {
     res.status(200);
 });
