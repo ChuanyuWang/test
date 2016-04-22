@@ -49,6 +49,15 @@ router.use('/weixin', wechat(config.test, function (req, res, next) {
                     sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
                 }
             });
+        } else if (message.MsgType == 'event' && message.Event == 'CLICK' && message.EventKey == 'zhaobin') {
+            // 回复招兵买马(图文回复)
+            res.reply([{
+                        title : '大Q小q绘本馆招兵买马',
+                        description : '本司招聘故事会讲师等各类兼职，加入我们的大家庭，为孩子建立一片真善美的天空，为自己保留一片纯净的土壤。',
+                        picurl : 'https://mmbiz.qlogo.cn/mmbiz/B2YQzKx0nCBrVmica7VKGc67GJeZ3A3KfoMG1e1I4fPibCb2QDD8KUic8CyJWpsD2u4bD14xkUUz1SdOMnu9vBfyQ/0?wx_fmt=jpeg',
+                        url : 'http://mp.weixin.qq.com/s?__biz=MzAxODg0MTU5MQ==&mid=502713725&idx=1&sn=b0016b6893aa768ce9205b9b583a3710'
+                    }
+                ]);
         }
 
         console.log("A message is received: " + JSON.stringify(message, null, 4));
