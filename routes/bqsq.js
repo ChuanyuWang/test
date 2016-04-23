@@ -4,39 +4,34 @@ var wechat = require('wechat');
 var API = require('wechat-api');
 var config = require('../config.js');
 
+var CURRENT_TENANT = {
+    name : 'bqsq',
+    displayName : '大Q小q'
+};
+
 /* GET users listing. */
-router.get('/home', function (req, res) {
-    if (!req.user) {
-        req.flash('error', '用户未登陆或连接超时');
-        res.redirect('/');
-    } else {
-        res.render('bqsq/home', {
-            title : '课程表',
-            user : req.user,
-            project : '大Q小q'
-        });
-    }
+router.get('/home', checkTenantUser, function (req, res) {
+    res.render('bqsq/home', {
+        title : '课程表',
+        user : req.user,
+        project : CURRENT_TENANT.displayName
+    });
 });
 
-router.get('/member', function (req, res) {
-    if (!req.user) {
-        req.flash('error', '用户未登陆或连接超时');
-        res.redirect('/');
-    } else {
-        res.render('bqsq/member', {
-            title : '会员',
-            user : req.user,
-            project : '大Q小q'
-        });
-    }
+router.get('/member', checkTenantUser, function (req, res) {
+    res.render('bqsq/member', {
+        title : '会员',
+        user : req.user,
+        project : CURRENT_TENANT.displayName
+    });
 });
 
 router.get('/booking', function (req, res) {
     res.render('bqsq/booking', {
-            title : '会员约课',
-            user : req.user,
-            project : '大Q小q'
-        });
+        title : '会员约课',
+        user : req.user,
+        project : CURRENT_TENANT.displayName
+    });
 });
 
 router.post('/api/classes', isAuthenticated, function (req, res) {
@@ -78,6 +73,17 @@ function sendMsg(api, openid, content) {
         console.log("err is " + err + " and result is " + result + " res is " + res);
     });
 };
+
+function checkTenantUser(req, res, next) {
+    if (!req.user) {
+        req.flash('error', '用户未登陆或连接超时');
+        res.redirect('/');
+    } else if (req.user.tenant != CURRENT_TENANT.name) {
+        res.redirect('/' + req.user.tenant + '/home');
+    } else {
+        next();
+    }
+}
 
 function isAuthenticated(req, res, next) {
     if (req.user) {
