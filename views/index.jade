@@ -25,7 +25,7 @@ block content
         else
           form.navbar-form.navbar-right(role='form', action='/logout',method='get')
             button.btn.btn-danger(type='submit') 注销
-          p.navbar-text.navbar-right= user.username
+          p.navbar-text.navbar-right= user.displayName
 
   if errorMsg && errorMsg.length > 0
     div.container

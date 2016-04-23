@@ -2,12 +2,7 @@ var express = require('express');
 var router = express.Router();
 var wechat = require('wechat');
 var API = require('wechat-api');
-var config = require('../config.js');
-
-var CURRENT_TENANT = {
-    name : 'bqsq',
-    displayName : '大Q小q'
-};
+var config = require('../config.js').test;
 
 var visited_user_list = new Array();
 
@@ -16,7 +11,7 @@ router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title : '课程表',
         user : req.user,
-        project : CURRENT_TENANT.displayName
+        project : config.name
     });
 });
 
@@ -24,7 +19,7 @@ router.get('/member', checkTenantUser, function (req, res) {
     res.render('bqsq/member', {
         title : '会员',
         user : req.user,
-        project : CURRENT_TENANT.displayName
+        project : config.name
     });
 });
 
@@ -32,7 +27,7 @@ router.get('/booking', function (req, res) {
     res.render('bqsq/booking', {
         title : '会员约课',
         user : req.user,
-        project : CURRENT_TENANT.displayName
+        project : config.name
     });
 });
 
@@ -43,7 +38,7 @@ router.get('/api/classes', function (req, res) {
 });
 
 router.post('/api/sendText', function (req, res) {
-    var api = new API(config.test.appid, config.test.appsecret);
+    var api = new API(config.appid, config.appsecret);
     var user = visited_user_list.pop();
     /*
     user = {
@@ -71,19 +66,19 @@ router.get('/api/currentuser', function (req, res) {
 
 // Weichat =============================================================
 
-router.use('/weixin', wechat(config.test, function (req, res, next) {
+router.use('/weixin', wechat(config, function (req, res, next) {
         // 微信输入信息都在req.weixin上
         var message = req.weixin;
 
         // test getting user info
         if (message.MsgType == 'event' && message.Event == "VIEW") {
-            var api = new API(config.test.appid, config.test.appsecret);
+            var api = new API(config.appid, config.appsecret);
             api.getUser(message.FromUserName, function (err, user, res) {
                 console.log("get user info is done with " + JSON.stringify(user, null, 4));
                 console.log("err is " + err + " and user is " + user + " res is " + res);
                 if (!err && user) {
                     visited_user_list.push(user);
-                    sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
+                    //sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
                 }
             });
         } else if (message.MsgType == 'event' && message.Event == 'CLICK' && message.EventKey == 'zhaobin') {
@@ -114,7 +109,7 @@ function checkTenantUser(req, res, next) {
     if (!req.user) {
         req.flash('error', '用户未登陆或连接超时');
         res.redirect('/');
-    } else if (req.user.tenant != CURRENT_TENANT.name) {
+    } else if (req.user.tenant != config.tenant) {
         res.redirect('/' + req.user.tenant + '/home');
     } else {
         next();

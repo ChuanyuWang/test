@@ -30,6 +30,8 @@ module.exports = {
         appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
         token : 'Hibanana',
         encodingAESKey : '',
+        tenant : "test",
+        name : '大Q小q'
     },
     bqsq : {
         appid : 'your appid',

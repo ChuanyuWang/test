@@ -36,8 +36,7 @@ router.get('/logout', function (req, res) {
 });
 
 function navigateToUserHome(req, res) {
-    //TODO res.redirect('/' + user.tenant + '/home');
-    res.redirect('/' + 'bqsq' + '/home');
+    res.redirect('/' + req.user.tenant + '/home');
 }
 
 module.exports = router;
