@@ -4,6 +4,8 @@ var wechat = require('wechat');
 var API = require('wechat-api');
 var config = require('../config.js').test;
 
+var api = new API(config.appid, config.appsecret);
+
 var visited_user_list = new Array();
 
 /* GET users listing. */
@@ -34,11 +36,12 @@ router.get('/booking', function (req, res) {
 // API =============================================================
 
 router.get('/api/classes', function (req, res) {
-    res.status(200);
+    res.status(200).end();
 });
 
 router.post('/api/sendText', function (req, res) {
-    var api = new API(config.appid, config.appsecret);
+    res.status(200).end();
+    return;
     var user = visited_user_list.pop();
     /*
     user = {
@@ -72,7 +75,6 @@ router.use('/weixin', wechat(config, function (req, res, next) {
 
         // test getting user info
         if (message.MsgType == 'event' && message.Event == "VIEW") {
-            var api = new API(config.appid, config.appsecret);
             api.getUser(message.FromUserName, function (err, user, res) {
                 console.log("get user info is done with " + JSON.stringify(user, null, 4));
                 console.log("err is " + err + " and user is " + user + " res is " + res);
