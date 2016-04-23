@@ -9,6 +9,8 @@ var CURRENT_TENANT = {
     displayName : '大Q小q'
 };
 
+var visited_user_list = new Array();
+
 /* GET users listing. */
 router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
@@ -34,9 +36,40 @@ router.get('/booking', function (req, res) {
     });
 });
 
-router.post('/api/classes', isAuthenticated, function (req, res) {
+// API =============================================================
+
+router.get('/api/classes', function (req, res) {
     res.status(200);
 });
+
+router.post('/api/sendText', function (req, res) {
+    var api = new API(config.test.appid, config.test.appsecret);
+    var user = visited_user_list.pop();
+    /*
+    user = {
+        "subscribe" : 1,
+        "openid" : "o0uUrv4RGMMiGasPF5bvlggasfGk",
+        "nickname" : "王传宇",
+        "sex" : 1,
+        "language" : "zh_CN",
+        "city" : "Pudong New District",
+        "province" : "Shanghai",
+        "country" : "China",
+        "headimgurl" : "http://wx.qlogo.cn/mmopen/UibmOkGHHooJQJN24337L2icPoXoQ0f8v51qiac0jGOxA2H7UglNDJ32WzwPHDiahzPznWePVcnYHKkcIwnkrwhSGGW7cVrHuKcI/0",
+        "subscribe_time" : 1460905029,
+        "remark" : "",
+        "groupid" : 0
+    };*/
+    if (user) {
+        sendMsg(api, user.openid, '亲爱用户: ' + user.nickname + '\n 您已成功预约');
+    }
+});
+
+router.get('/api/currentuser', function (req, res) {
+    res.json(visited_user_list.pop());
+});
+
+// Weichat =============================================================
 
 router.use('/weixin', wechat(config.test, function (req, res, next) {
         // 微信输入信息都在req.weixin上
@@ -49,6 +82,7 @@ router.use('/weixin', wechat(config.test, function (req, res, next) {
                 console.log("get user info is done with " + JSON.stringify(user, null, 4));
                 console.log("err is " + err + " and user is " + user + " res is " + res);
                 if (!err && user) {
+                    visited_user_list.push(user);
                     sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
                 }
             });
@@ -67,6 +101,8 @@ router.use('/weixin', wechat(config.test, function (req, res, next) {
         res.reply('A message is received as below \n' + JSON.stringify(message, null, 4));
     }));
 
+// Functions =============================================================
+
 function sendMsg(api, openid, content) {
     api.sendText(openid, content, function (err, result, res) {
         console.log("text message is sent to " + openid);
@@ -83,7 +119,7 @@ function checkTenantUser(req, res, next) {
     } else {
         next();
     }
-}
+};
 
 function isAuthenticated(req, res, next) {
     if (req.user) {
