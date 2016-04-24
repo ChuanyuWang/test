@@ -3,7 +3,9 @@ var router = express.Router();
 var wechat = require('wechat');
 var API = require('wechat-api');
 var config = require('../config.js').test;
-
+//setup database
+var db = require("../db").get(config.tenant);
+var classes = require("../models/classes")(db);
 var api = new API(config.appid, config.appsecret);
 
 var visited_user_list = new Array();
@@ -36,7 +38,29 @@ router.get('/booking', function (req, res) {
 // API =============================================================
 
 router.get('/api/classes', function (req, res) {
-    res.status(200).end();
+    console.log("get classes with query %j", req.query);
+    var classes = db.collection("classes");
+    var query = {
+        date : {
+            $lte : new Date()
+        }
+    };
+    classes.find(query, function (err, docs) {
+        //console.log("typeof docs is" + typeof(docs.date));
+        console.log("get class with result %j", docs);
+        res.json(docs);
+    });
+    //res.status(200).end();
+});
+
+router.post('/api/classes', function (req, res) {
+    classes.insert(req.body, function (err, docs) {
+        console.log("typeof docs.date is" + typeof(docs.date));
+        console.log("class is added %j", docs);
+        res.json(docs);
+    });
+
+    //res.status(200).end();
 });
 
 router.post('/api/sendText', function (req, res) {
@@ -45,21 +69,23 @@ router.post('/api/sendText', function (req, res) {
     var user = visited_user_list.pop();
     /*
     user = {
-        "subscribe" : 1,
-        "openid" : "o0uUrv4RGMMiGasPF5bvlggasfGk",
-        "nickname" : "王传宇",
-        "sex" : 1,
-        "language" : "zh_CN",
-        "city" : "Pudong New District",
-        "province" : "Shanghai",
-        "country" : "China",
-        "headimgurl" : "http://wx.qlogo.cn/mmopen/UibmOkGHHooJQJN24337L2icPoXoQ0f8v51qiac0jGOxA2H7UglNDJ32WzwPHDiahzPznWePVcnYHKkcIwnkrwhSGGW7cVrHuKcI/0",
-        "subscribe_time" : 1460905029,
-        "remark" : "",
-        "groupid" : 0
+    "subscribe" : 1,
+    "openid" : "o0uUrv4RGMMiGasPF5bvlggasfGk",
+    "nickname" : "王传宇",
+    "sex" : 1,
+    "language" : "zh_CN",
+    "city" : "Pudong New District",
+    "province" : "Shanghai",
+    "country" : "China",
+    "headimgurl" : "http://wx.qlogo.cn/mmopen/UibmOkGHHooJQJN24337L2icPoXoQ0f8v51qiac0jGOxA2H7UglNDJ32WzwPHDiahzPznWePVcnYHKkcIwnkrwhSGGW7cVrHuKcI/0",
+    "subscribe_time" : 1460905029,
+    "remark" : "",
+    "groupid" : 0
     };*/
     if (user) {
         sendMsg(api, user.openid, '亲爱用户: ' + user.nickname + '\n 您已成功预约');
+    } else {
+        console.error("No user found, the message sending fails");
     }
 });
 

@@ -23,6 +23,12 @@ module.exports = {
             },
             user : 'admin',
             pass : '39fe4847-6ecb-431c-9647-23160a80db54'
+        },
+        getURI : function(database){
+            if (!database || database.length == 0) {
+                throw "Database is missing";
+            }
+            return "mongodb://admin:39fe4847-6ecb-431c-9647-23160a80db54@localhost/" + database + "?authSource=admin"
         }
     },
     test : {

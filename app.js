@@ -17,10 +17,6 @@ var mygirl = require('./routes/mygirl');
 var bqsq = require('./routes/bqsq');
 
 
-//setup database
-var db = require("./db");
-
-
 
 var app = express();
 
@@ -44,7 +40,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.locals.pretty = true; // output the pretty html for consistency 
 
-app.use(db.connect());
+//app.use(db.connect());
 
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));

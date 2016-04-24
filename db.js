@@ -1,8 +1,5 @@
 var mongojs = require('mongojs');
-
-var state = {
-    db : null,
-}
+var config = require('./config').mongodb;
 
 var database = {};
 
@@ -19,12 +16,8 @@ database.connect = function () {
     };
 };
 
-database._connect = function () {
-    if (state.db) {
-        return;
-    }
-
-    var uri = "mongodb://admin:pass@localhost/abc?authSource=admin";
+database._connect = function (database) {
+    var uri = config.getURI(database);
     var db = mongojs(uri);
 
     db.on('error', function (err) {
@@ -36,11 +29,23 @@ database._connect = function () {
         console.log('database connected');
     })
 
-    state.db = db;
+    return db;
 }
 
-database.get = function () {
-    return state.db
+database.get = function (tenant) {
+    var uri = config.getURI(tenant);
+    var db = mongojs(uri);
+
+    db.on('error', function (err) {
+        console.log('database error', err);
+        state.db = null;
+    })
+
+    db.on('connect', function () {
+        console.log('database connected');
+    })
+
+    return db;
 }
 
 database.close = function (done) {
