@@ -17,12 +17,10 @@
                 foo : "hello world"
             }, function (data) {
                 console.log("booking successfully");
-                //div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
                 var infobar = $("#info");
                 infobar.append("<div class='alter alert-success' role='alert'>预定成功</div>")
             }).fail(function (err) {
                 console.error(err);
-                //div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
                 var infobar = $("#info");
                 infobar.append("<div class='alter alert-danger' role='alert'>预定失败</div>")
             });
