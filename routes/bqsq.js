@@ -38,19 +38,23 @@ router.get('/booking', function (req, res) {
 // API =============================================================
 
 router.get('/api/classes', function (req, res) {
-    console.log("get classes with query %j", req.query);
+    //console.log("get classes with query %j", req.query);
+    if (!req.query.from || !req.query.to) {
+        res.status(500).send("Missing param 'from' or 'to'");
+    }
+    
     var classes = db.collection("classes");
     var query = {
         date : {
-            $lte : new Date()
+            $gte : new Date(req.query.from),
+            $lt : new Date(req.query.to)
         }
     };
     classes.find(query, function (err, docs) {
         //console.log("typeof docs is" + typeof(docs.date));
-        console.log("get class with result %j", docs);
+        console.log("find classes with result %j", docs);
         res.json(docs);
     });
-    //res.status(200).end();
 });
 
 router.post('/api/classes', function (req, res) {

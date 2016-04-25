@@ -16,11 +16,11 @@ append pagjs
 block page
   div.container(style={'padding-top': '50px'})
     div.row(style={'margin-top': '15px'})
-      div.col-md-1.pull-left
+      div.col-sm-1.pull-left
         button#previous_week.btn.btn-primary.pull-left.btn-sm 上一周
-      div#currentWeekRange.col-md-4.col-md-offset-3(style={'text-align':'center','line-height':'30px'})
+      div#currentWeekRange.col-sm-4.col-sm-offset-3(style={'text-align':'center','line-height':'30px'})
         //p#currentWeekRange= new Date()
-      div.col-md-1.pull-right
+      div.col-sm-1.pull-right
         button#next_week.btn.btn-primary.pull-right.btn-sm 下一周
     table#cls_table.table.table-bordered.table-hover(style={'margin-top': '15px'})
         thead#schedule_header
@@ -49,21 +49,21 @@ block page
               td
                 p
                 div.btn-group.btn-group-xs.pull-right
-                  button#add_cls.btn.btn-default +
+                  button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
           tr#evening
             td 晚上
             each val in [1, 2, 3, 4, 5, 6, 7]
               td
                 p
                 div.btn-group.btn-group-xs.pull-right
-                  button#add_cls.btn.btn-default +
+                  button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
   
   div#cls_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel')
     div.modal-dialog(role="document")
       div.modal-content
         div.modal-header
           button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true")&times
+            span(aria-hidden="true") &times
           h4#myModalLabel.modal-title 添加课程
         div.modal-body
           form.form-horizontal
