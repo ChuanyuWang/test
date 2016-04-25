@@ -76,7 +76,7 @@
         moment.locale('zh-CN');
         currentMonday = getMonday(moment());
         updateWeekInfo(currentMonday);
-        //clearSchedule();
+        updateSchedule();
     };
 
     function getMonday(date) {
@@ -130,6 +130,7 @@
             data : JSON.stringify(classItem),
             success : function (data) {
                 console.log("add class successfully");
+                displayClass(classItem);
             },
             error : function (err) {
                 console.error(err.responseText);
@@ -139,10 +140,33 @@
     };
 
     function displayClass(item) {
-        //TODO
+        var date = moment(item.date);
+        var colIndex = (date.day() == 0) ? 7 : date.day();
+        if (date.hour() < 12) {
+            var rowIndex = 1;
+        } else if (date.hour() < 18) {
+            var rowIndex = 2;
+        } else {
+            var rowIndex = 3;
+        }
+        //#cls_table tbody tr:nth-child(1) td:nth-child(2)
+        colIndex = colIndex + 1; // append the first column
+        var cell = $('#cls_table tbody tr:nth-child(' + rowIndex + ') td:nth-child(' + colIndex + ')');
+        cell.data('id', item._id);
+        cell.find('p').text(item.name);
+        cell.find('.btn-group').empty();
+        cell.find('.btn-group').append('<button class="btn btn-primary">查看 </button>');
+        cell.find('.btn-primary').append('<span class="badge">' + item.reservation + '</span>');
+        cell.find('.btn-group').append('<button class="btn btn-danger">删除</button>');
+        if (item.reservation > 0) {
+            cell.addClass('success');
+        } else {
+            cell.addClass('info');
+        }
     };
 
     function updateSchedule(control) {
+        clearSchedule();
         var begin = moment(currentMonday);
         var end = moment(currentMonday).add(7, 'days');
         $.ajax("api/classes", {
@@ -153,8 +177,8 @@
                 to : end.toISOString()
             },
             success : function (data) {
-                for (var item in data) {
-                    displayClass(item);
+                for (var i=0; i<data.length; i++) {
+                    displayClass(data[i]);
                 }
             },
             error : function (jqXHR, status, err) {
