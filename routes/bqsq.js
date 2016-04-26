@@ -38,6 +38,21 @@ router.get('/booking', function (req, res) {
 
 // API =============================================================
 
+router.get('/api/members', function (req, res) {
+    //console.log("get members with query %j", req.query);
+    var classes = db.collection("members");
+    var query = {};
+    classes.find(query, function (err, docs) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        }
+        console.log("find members with result %j", docs);
+        res.json(docs);
+    });
+});
+
 router.get('/api/classes', function (req, res) {
     //console.log("get classes with query %j", req.query);
     if (!req.query.from || !req.query.to) {

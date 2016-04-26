@@ -6,8 +6,35 @@ block navlist
       a(href='home') 课程表
     li.active
       a(href='#') 会员
+      
+append css
+  link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
+
+append pagjs
+  script(src='/components/moment/min/moment-with-locales.min.js')
+  script(src='/components/bootbox.js/bootbox.js')
+  //script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js')
+  //script(src='/components/requirejs/require.js',data-main="/js/main")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src='/js/member.js')
 
 block page
-  h1= title
-  p can you see me?
-    
+  div.container(style={'padding-top': '58px'})
+    table#member_table(data-toggle="table",data-showRefresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='20',data-search='true',data-striped='true',data-url='api/members',data-showColumns='true')
+      thead
+        tr
+          th(data-checkbox='true')
+          th(data-field='_id',data-visible='false') ID
+          th(data-field='name',data-sortable='true') 宝宝名字
+          th(data-field='contact') 联系方式
+          th(data-field='birth',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
+          th(data-field='storyPoint') 故事会次数
+          th(data-field='eventPoint') 主题活动次数
+          th(data-field='expire',data-formatter='dateFormatter',data-sortable='true') 有效期至
+          th(data-field='since',data-formatter='dateFormatter') 登记时间
+          th(data-field='note') 备注
+  script(type='text/javascript').
+    function dateFormatter(value) {
+        return moment(value).format('ll');
+    };
