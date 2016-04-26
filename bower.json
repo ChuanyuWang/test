@@ -8,6 +8,7 @@
   ],
   "dependencies": {
     "requirejs": "~2.2.0",
-    "moment": "^2.13.0"
+    "moment": "^2.13.0",
+    "bootbox.js": "bootbox#~4.4.0"
   }
 }

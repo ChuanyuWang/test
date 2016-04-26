@@ -20,41 +20,20 @@
                 var rowIndex = $("#cls_table tr").index(button.closest('tr'));
                 var colIndex = $("#cls_table td").index(button.closest('td')) % 8;
             }
-            var recipient = button.data('whatever'); // Extract info from data-* attributes
+            // var recipient = button.data('whatever'); // Extract info from data-* attributes
             // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
             // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
             var modal = $(this);
-            modal.find('#cls_name').val("");
+            modal.find('#cls_name').val("").focus();
             modal.find('#cls_capacity').val(8);
             modal.find('#cls_date').text(generateDate(rowIndex, colIndex, currentMonday).format('lll'));
         });
 
-        $('#create_cls').click(function (event) {
-            var modal = $(this).closest('.modal');
-            var hasError = false;
-            // validate the input
-            var classItem = {
-                reservation : 0
-            };
-            classItem.name = modal.find('#cls_name').val();
-            if (!classItem.name || classItem.name.length == 0) {
-                modal.find('#cls_name').closest(".form-group").addClass("has-error");
-                hasError = true;
-            } else {
-                modal.find('#cls_name').closest(".form-group").removeClass("has-error");
-            }
-            // get date
-            classItem.date = moment(modal.find('#cls_date').text(), 'lll');
-            // get type
-            classItem.type = modal.find('.active input').data('value');
-            // get capacity
-            classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
-
-            if (!hasError) {
-                modal.modal('hide');
-                addNewClass(classItem);
-            }
+        $('#cls_dlg').on('shown.bs.modal', function (event) {
+            $(this).find('#cls_name').focus(); // focus on the class name input control
         });
+
+        $('#create_cls').click(handleAddNewClass);
 
         $('#previous_week').click(function (event) {
             $("this").prop("disabled", true);
@@ -71,9 +50,12 @@
         });
     });
 
+    // Functions =============================================================
+
     function init() {
         console.log("welcome~~~");
         moment.locale('zh-CN');
+        bootbox.setLocale('zh_CN');
         currentMonday = getMonday(moment());
         updateWeekInfo(currentMonday);
         updateSchedule();
@@ -122,6 +104,33 @@
         }
         return temp;
     };
+    
+    function handleAddNewClass(event) {
+        var modal = $(this).closest('.modal');
+        var hasError = false;
+        // validate the input
+        var classItem = {
+            reservation : 0
+        };
+        classItem.name = modal.find('#cls_name').val();
+        if (!classItem.name || classItem.name.length == 0) {
+            modal.find('#cls_name').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#cls_name').closest(".form-group").removeClass("has-error");
+        }
+        // get date
+        classItem.date = moment(modal.find('#cls_date').text(), 'lll');
+        // get type
+        classItem.type = modal.find('.active input').data('value');
+        // get capacity
+        classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+
+        if (!hasError) {
+            modal.modal('hide');
+            addNewClass(classItem);
+        }
+    };
 
     function addNewClass(classItem) {
         $.ajax("api/classes", {
@@ -129,11 +138,10 @@
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(classItem),
             success : function (data) {
-                console.log("add class successfully");
-                displayClass(classItem);
+                displayClass(data);
             },
-            error : function (err) {
-                console.error(err.responseText);
+            error : function (jqXHR, status, err) {
+                console.error(jqXHR.responseText);
             },
             dataType : "json"
         });
@@ -149,7 +157,7 @@
         } else {
             var rowIndex = 3;
         }
-        //#cls_table tbody tr:nth-child(1) td:nth-child(2)
+
         colIndex = colIndex + 1; // append the first column
         var cell = $('#cls_table tbody tr:nth-child(' + rowIndex + ') td:nth-child(' + colIndex + ')');
         cell.data('id', item._id);
@@ -158,11 +166,50 @@
         cell.find('.btn-group').append('<button class="btn btn-primary">查看 </button>');
         cell.find('.btn-primary').append('<span class="badge">' + item.reservation + '</span>');
         cell.find('.btn-group').append('<button class="btn btn-danger">删除</button>');
+        cell.find('.btn-danger').click(handleRemoveClass);
         if (item.reservation > 0) {
             cell.addClass('success');
         } else {
             cell.addClass('info');
         }
+    };
+    
+    function handleRemoveClass(event) {
+        var cell = $(this).closest('td');
+        var item_id = cell.data('id');
+
+        bootbox.confirm("删除此课程吗？", function(result) {
+            if (!result) { // user cancel
+                return ;
+            }
+
+            $.ajax("api/classes/" + item_id, {
+                type : "DELETE",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify({dummy:1}),
+                success : function (data) {
+                    cell.data('id', undefined);
+                    cell.find('p').empty();
+                    cell.find('.btn-group').empty();
+                    cell.find('.btn-group').append('<button class="btn btn-default" data-toggle="modal" data-target="#cls_dlg">+</button>');
+                    cell.removeClass('success');
+                    cell.removeClass('info');
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseText);
+                },
+                complete : function(jqXHR, status) {
+                    //TODO
+                },
+                dataType : "json"
+            });
+        });
+    };
+
+    function removeClass(id, elm) {
+        var cell = $(this).closest('td');
+        var item_id = cell.data('id');
+        console.log(item_id);
     };
 
     function updateSchedule(control) {
@@ -203,7 +250,6 @@
          </td>').replaceAll("#cls_table tbody td+td");
     };
 
-    // Functions =============================================================
     function getParam(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var param = window.location.search.substr(1).match(reg);

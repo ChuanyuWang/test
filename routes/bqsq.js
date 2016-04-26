@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var wechat = require('wechat');
 var API = require('wechat-api');
+var mongojs = require('mongojs');
 var config = require('../config.js').test;
 //setup database
 var db = require("../db").get(config.tenant);
@@ -40,9 +41,9 @@ router.get('/booking', function (req, res) {
 router.get('/api/classes', function (req, res) {
     //console.log("get classes with query %j", req.query);
     if (!req.query.from || !req.query.to) {
-        res.status(500).send("Missing param 'from' or 'to'");
+        res.status(400).send("Missing param 'from' or 'to'");
     }
-    
+
     var classes = db.collection("classes");
     var query = {
         date : {
@@ -51,7 +52,11 @@ router.get('/api/classes', function (req, res) {
         }
     };
     classes.find(query, function (err, docs) {
-        //console.log("typeof docs is" + typeof(docs.date));
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        }
         console.log("find classes with result %j", docs);
         res.json(docs);
     });
@@ -59,12 +64,31 @@ router.get('/api/classes', function (req, res) {
 
 router.post('/api/classes', function (req, res) {
     classes.insert(req.body, function (err, docs) {
-        console.log("typeof docs.date is" + typeof(docs.date));
-        console.log("class is added %j", docs);
-        res.json(docs);
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        } else {
+            console.log("class is added %j", docs);
+            res.json(docs);
+        }
     });
+});
 
-    //res.status(200).end();
+router.delete ('/api/classes/:classID', function (req, res) {
+    var classes = db.collection("classes");
+    classes.remove({
+        _id : mongojs.ObjectId(req.params.classID)
+    }, function (err, doc) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        } else {
+            console.log("class %s is deteled", req.params.classID);
+            res.json({});
+        }
+    });
 });
 
 router.post('/api/sendText', function (req, res) {
