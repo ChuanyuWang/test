@@ -9,49 +9,13 @@ append pagjs
 
 block page
   div.container(style={'padding-top': '50px'})
-    ul#mytab.nav.nav-list(role='tablist')
-      //li.active(role='presentation')
-      li.active
-        a(href="#home",aria-controls="home",role="tab",data-toggle="tab") Home
-      //li(role='presentation')
-      li
-        a(href="#home2",aria-controls="home2",role="tab",data-toggle="tab") Home2
+    ul.nav.nav-tabs(role='tablist')
+      li.active(role='presentation')
+        a(href="#home",role='tab',data-toggle='tab') Home
+      li(role='presentation')
+        a(href="#home",role2='tab',data-toggle='tab') Home2
     div.tab-content
       div.tab-pane.active(role="tabpanel",id="home")
         p ABC
       div.tab-pane(role="tabpanel",id="home2")
         p ABC
-
-  div#cls_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
-    div.modal-dialog(role="document")
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 添加课程
-        div.modal-body
-          form.form-horizontal
-            div.form-group
-              label.control-label.col-sm-2(for='cls_name') 课程名称:
-              div.col-sm-10
-                input#cls_name.form-control(type='text',placeholder='课程描述')
-            div.form-group
-              label.control-label.col-sm-2(for='cls_type') 课程类型:
-              div.btn-group.col-sm-10(data-toggle='buttons')
-                label.btn.btn-primary.active
-                  input#radio1(type='radio',name='cls_type',value='story')
-                  |故事会
-                label.btn.btn-primary
-                  input#radio2(type='radio',name='cls_type',value='event')
-                  |主题活动
-            div.form-group
-              label.control-label.col-sm-2 时间:
-              div.col-sm-10
-                p#cls_date.form-control-static 2016年5月1日 上午
-            div.form-group
-              label.control-label.col-sm-2(for='cls_capacity') 最大人数:
-              div.col-sm-2
-                input#cls_capacity.form-control(type='number',name='cls_capacity',min='1')
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#create_cls.btn.btn-success(type="button") 添加
