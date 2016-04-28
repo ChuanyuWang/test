@@ -7,6 +7,7 @@ var config = require('../config.js').test;
 //setup database
 var db = require("../db").get(config.tenant);
 var classes = require("../models/classes")(db);
+var members = require("../models/members")(db);
 var api = new API(config.appid, config.appsecret);
 
 var visited_user_list = new Array();
@@ -40,9 +41,9 @@ router.get('/booking', function (req, res) {
 
 router.get('/api/members', function (req, res) {
     //console.log("get members with query %j", req.query);
-    var classes = db.collection("members");
+    var members = db.collection("members");
     var query = {};
-    classes.find(query, function (err, docs) {
+    members.find(query, function (err, docs) {
         if (err) {
             res.status(500).json({
                 'err' : err
@@ -50,6 +51,19 @@ router.get('/api/members', function (req, res) {
         }
         console.log("find members with result %j", docs);
         res.json(docs);
+    });
+});
+
+router.post('/api/members', function (req, res) {
+    members.insert(req.body, function (err, docs) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        } else {
+            console.log("member is added %j", docs);
+            res.json(docs);
+        }
     });
 });
 

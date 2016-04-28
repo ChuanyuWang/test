@@ -11,6 +11,28 @@
         //});
 
         init();
+        
+        $('#member_dlg').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            if (button.data('action') == "add") {
+                // create a new member
+                var modal = $(this);
+                modal.find('h4').text("添加会员");
+                modal.find('input[name=name]').val("");
+                modal.find('input[name=contact]').val("");
+                //TODO, reset the birth date picker
+                modal.find('input[name=story_point]').val("10");
+                modal.find('input[name=event_point]').val("0");
+                //TODO, reset the expire date picker
+                modal.find('input[name=note]').val("");
+            }
+        });
+        
+        $('#member_dlg').on('shown.bs.modal', function (event) {
+            $(this).find('input[name=name]').focus(); // focus on the member name input control
+        });
+        
+        $('#add_member').click(handleAddNewMember);
     });
 
     // Functions =============================================================
@@ -18,8 +40,73 @@
     function init() {
         moment.locale('zh-CN');
         bootbox.setLocale('zh_CN');
+        $('#birth_date').datetimepicker({
+            format : 'll',
+            locale : 'zh-CN',
+            defaultDate : moment()
+        });
+        $('#expire_date').datetimepicker({
+            format : 'll',
+            locale : 'zh-CN',
+            defaultDate : moment().add(3, 'years')
+        });
         //$('.bootstrap-table').bootstrapTable({'striped':true, 'search':true});
         //$('.bootstrap-table').bootstrapTable('refresh');
+    };
+    
+    function handleAddNewMember(event) {
+        var modal = $(this).closest('.modal');
+        var hasError = false;
+        // validate the input
+        var newMember = {
+            since : moment()
+        };
+        newMember.name = modal.find('input[name=name]').val();
+        if (!newMember.name || newMember.name.length == 0) {
+            modal.find('input[name=name]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
+        }
+        
+        newMember.contact = modal.find('input[name=contact]').val();
+        if (!newMember.contact || newMember.contact.length == 0) {
+            modal.find('input[name=contact]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('input[name=contact]').closest(".form-group").removeClass("has-error");
+        }
+        
+        // get birth date
+        newMember.birthday = modal.find('#birth_date').data("DateTimePicker").date();
+        // get type
+        newMember.expire = modal.find('#expire_date').data("DateTimePicker").date();
+        // get available story point
+        newMember.storyPoint = Number.parseInt(modal.find('input[name=story_point]').val());
+        // get available event point
+        newMember.eventPoint = Number.parseInt(modal.find('input[name=event_point]').val());
+        newMember.note = modal.find('textarea[name=note]').val().trim();
+
+        if (!hasError) {
+            modal.modal('hide');
+            addNewMember(newMember);
+        }
+    };
+    
+    function addNewMember(classItem) {
+        $.ajax("api/members", {
+            type : "POST",
+            contentType : "application/json; charset=utf-8",
+            data : JSON.stringify(classItem),
+            success : function (data) {
+                //TODO, insert data to table
+                //appendMember(data);
+            },
+            error : function (jqXHR, status, err) {
+                console.error(jqXHR.responseText);
+            },
+            dataType : "json"
+        });
     };
 
     function getParam(name) {

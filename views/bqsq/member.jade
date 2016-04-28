@@ -9,6 +9,7 @@ block navlist
       
 append css
   link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
+  link(rel="stylesheet",href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")
 
 append pagjs
   script(src='/components/moment/min/moment-with-locales.min.js')
@@ -17,23 +18,82 @@ append pagjs
   //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
   script(src='/js/member.js')
 
 block page
   div.container(style={'padding-top': '58px'})
-    table#member_table(data-toggle="table",data-showRefresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='20',data-search='true',data-striped='true',data-url='api/members',data-showColumns='true')
+    //div#toolbar.btn-group(role='group')
+    div#toolbar.btn-group(role='group')
+      button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
+      //button.btn.btn-primary(type='button') 查看
+      button.btn.btn-danger(type='button') 删除
+    table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='20',data-search='true',data-striped='true',data-url='api/members',data-show-columns='true',data-toolbar='#toolbar')
       thead
         tr
           th(data-checkbox='true')
           th(data-field='_id',data-visible='false') ID
-          th(data-field='name',data-sortable='true') 宝宝名字
+          th(data-field='name',data-sortable='true') 宝宝姓名
           th(data-field='contact') 联系方式
           th(data-field='birth',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
           th(data-field='storyPoint') 故事会次数
           th(data-field='eventPoint') 主题活动次数
           th(data-field='expire',data-formatter='dateFormatter',data-sortable='true') 有效期至
           th(data-field='since',data-formatter='dateFormatter') 登记时间
-          th(data-field='note') 备注
+          th(data-field='note',data-visible='false') 备注
+  - var space = ' '
+
+  div#member_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
+    div.modal-dialog(role="document")
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 添加会员
+        div.modal-body
+          form.form-horizontal
+            div.form-group
+              label.control-label.col-sm-2(for='member_name') 宝宝姓名:
+              div.col-sm-10
+                input.form-control(type='text',name='name',placeholder='宝宝姓名')
+            div.form-group
+              label.control-label.col-sm-2(for='member_contact') 联系方式:
+              div.col-sm-10
+                input.form-control(type='text',name='contact',placeholder='135xxx')
+            div.form-group
+              label.control-label.col-sm-2(for='birth_date') 宝宝生日:
+              div.col-sm-4
+                div#birth_date.input-group.date
+                  input.form-control(text='text')
+                  span.input-group-addon
+                    span.glyphicon.glyphicon-calendar
+            div.form-group
+              label.control-label.col-sm-2(for='story_point') 故事会:
+              div.col-sm-4
+                div.input-group
+                  input.form-control(type='number',name='story_point',min='0',style={'width':'70px'})
+                  p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 次(剩余)
+            div.form-group
+              label.control-label.col-sm-2(for='event_point') 主题活动:
+              div.col-sm-4
+                div.input-group
+                  input.form-control(type='number',name='event_point',min='0',style={'width':'70px'})
+                  p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 次(剩余)
+            div.form-group
+              label.control-label.col-sm-2(for='expire_date') 有效期至:
+              div.col-sm-4
+                div#expire_date.input-group.date
+                  input.form-control(text='text')
+                  span.input-group-addon
+                    span.glyphicon.glyphicon-calendar
+            div.form-group
+              label.control-label.col-sm-2(for='note') 备注:
+              div.col-sm-10
+                textarea.form-control(rows='3', name='note')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_member.btn.btn-success(type="button") 添加
+
   script(type='text/javascript').
     function dateFormatter(value) {
         return moment(value).format('ll');

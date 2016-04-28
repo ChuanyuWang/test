@@ -24,7 +24,7 @@
             // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
             // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
             var modal = $(this);
-            modal.find('#cls_name').val("").focus();
+            modal.find('#cls_name').val("");
             modal.find('#cls_capacity').val(8);
             modal.find('#cls_date').text(generateDate(rowIndex, colIndex, currentMonday).format('lll'));
         });
@@ -122,7 +122,7 @@
         // get date
         classItem.date = moment(modal.find('#cls_date').text(), 'lll');
         // get type
-        classItem.type = modal.find('.active input').data('value');
+        classItem.type = modal.find('.active input').val();
         // get capacity
         classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
 
