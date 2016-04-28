@@ -33,6 +33,7 @@
         });
         
         $('#add_member').click(handleAddNewMember);
+        $('#del_member').click(handleDeleteMember);
     });
 
     // Functions =============================================================
@@ -50,10 +51,8 @@
             locale : 'zh-CN',
             defaultDate : moment().add(3, 'years')
         });
-        //$('.bootstrap-table').bootstrapTable({'striped':true, 'search':true});
-        //$('.bootstrap-table').bootstrapTable('refresh');
     };
-    
+
     function handleAddNewMember(event) {
         var modal = $(this).closest('.modal');
         var hasError = false;
@@ -99,8 +98,7 @@
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(classItem),
             success : function (data) {
-                //TODO, insert data to table
-                //appendMember(data);
+                $('#member_table').bootstrapTable('insertRow', {index: 0, row: data});
             },
             error : function (jqXHR, status, err) {
                 console.error(jqXHR.responseText);
@@ -109,9 +107,35 @@
         });
     };
 
-    function getParam(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var param = window.location.search.substr(1).match(reg);
-        return param ? param[2] : undefined;
+    function handleDeleteMember(event) {
+        var items = $('#member_table').bootstrapTable('getSelections');
+        if (items.length == 0) {
+            bootbox.alert('请先选择一个会员');
+            return;
+        }
+
+        bootbox.confirm("删除选中会员吗？", function(result) {
+            if (!result) { // user cancel
+                return ;
+            }
+            // delete all selected members one by one, and update the table
+            $.each(items, function(index, item){
+                $.ajax("api/members/" + item._id, {
+                    type : "DELETE",
+                    contentType : "application/json; charset=utf-8",
+                    data : JSON.stringify({dummy:1}),
+                    success : function (data) {
+                        $('#member_table').bootstrapTable('removeByUniqueId', item._id);
+                    },
+                    error : function (jqXHR, status, err) {
+                        console.error(jqXHR.responseText);
+                    },
+                    complete : function(jqXHR, status) {
+                        //TODO
+                    },
+                    dataType : "json"
+                });
+            });
+        });
     };
 })(jQuery);

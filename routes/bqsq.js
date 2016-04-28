@@ -43,7 +43,7 @@ router.get('/api/members', function (req, res) {
     //console.log("get members with query %j", req.query);
     var members = db.collection("members");
     var query = {};
-    members.find(query, function (err, docs) {
+    members.find(query).sort({since: -1}, function (err, docs) {
         if (err) {
             res.status(500).json({
                 'err' : err
@@ -63,6 +63,22 @@ router.post('/api/members', function (req, res) {
         } else {
             console.log("member is added %j", docs);
             res.json(docs);
+        }
+    });
+});
+
+router.delete('/api/members/:memberID', function (req, res) {
+    var members = db.collection("members");
+    members.remove({
+        _id : mongojs.ObjectId(req.params.memberID)
+    }, function (err, doc) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        } else {
+            console.log("member %s is deteled", req.params.memberID);
+            res.json({});
         }
     });
 });
@@ -104,7 +120,7 @@ router.post('/api/classes', function (req, res) {
     });
 });
 
-router.delete ('/api/classes/:classID', function (req, res) {
+router.delete('/api/classes/:classID', function (req, res) {
     var classes = db.collection("classes");
     classes.remove({
         _id : mongojs.ObjectId(req.params.classID)
