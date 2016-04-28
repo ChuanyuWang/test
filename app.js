@@ -10,11 +10,12 @@ var config = require('./config.js');
 var log4js = require('log4js');
 
 var routes = require('./routes/index');
-var users = require('./routes/user');
+//var users = require('./routes/user');
 
 // route different public account
 var mygirl = require('./routes/mygirl');
 var bqsq = require('./routes/bqsq');
+var admin = require('./routes/admin');
 
 
 
@@ -60,10 +61,11 @@ app.use(passport.session());
 
 // add router
 app.use('/', routes);
-app.use('/users', users);
+//app.use('/users', users);
 app.use('/mygirl',mygirl);
 app.use('/test', bqsq);
 app.use('/bqsq', bqsq);
+app.use('/admin', admin);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
