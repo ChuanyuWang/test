@@ -20,10 +20,10 @@
                 modal.find('h4').text("添加会员");
                 modal.find('input[name=name]').val("");
                 modal.find('input[name=contact]').val("");
-                //TODO, reset the birth date picker
+                modal.find('#birth_date').data('DateTimePicker').date(null);
                 modal.find('input[name=story_point]').val("10");
                 modal.find('input[name=event_point]').val("0");
-                //TODO, reset the expire date picker
+                modal.find('#expire_date').data('DateTimePicker').date(moment().add(3, 'years'));
                 modal.find('input[name=note]').val("");
             }
         });
