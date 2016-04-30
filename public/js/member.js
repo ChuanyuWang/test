@@ -2,14 +2,6 @@
 
     // DOM Ready =============================================================
     $(document).ready(function () {
-        // enable jQuery UI tooltip
-        //$(document).tooltip();
-
-        // populate task list & initialize table
-        //require(['taskManager'], function (taskManager) {
-        //    taskManager.populateList('#tasklist');
-        //});
-
         init();
         
         $('#member_dlg').on('show.bs.modal', function (event) {

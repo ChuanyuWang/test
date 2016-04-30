@@ -138,6 +138,27 @@ router.delete('/api/classes/:classID', isAuthenticated, function (req, res) {
         }
     });
 });
+/* booking a class by member
+
+req.body = {
+    openid : "o0uUrv4RGMMiGasPF5bvlggasfGk", (optional)
+    name : "宝宝1", 
+    contact : "13500000000", 
+    classID : "5716630aa012576d0371e888"
+}
+*/
+router.post('/api/booking', function (req, res) {
+    members.find(req.body, function (err, docs) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        } else {
+            console.log("member is added %j", docs);
+            res.json(docs);
+        }
+    });
+});
 
 router.post('/api/sendText', function (req, res) {
     res.status(200).end();

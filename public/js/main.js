@@ -79,6 +79,13 @@
         var Sunday = moment(Monday).add(6, "days");
         var info = Monday.format('ll') + ' 至 ' + Sunday.format('ll');
         $('#currentWeekRange').text(info);
+
+        // add the date info in header
+        var items = $('#cls_table thead tr th+th');
+        $.each(items, function(index, item) {
+            var temp = moment(Monday).add(index, 'days');
+            $(item).html(temp.format('dddd') + '<br>' + temp.format('MMMDo'));
+        });
     };
 
     function generateDate(rowIndex, colIndex, currentMonday) {
@@ -149,6 +156,7 @@
 
     function displayClass(item) {
         var date = moment(item.date);
+        // day is 0 if it's Sunday
         var colIndex = (date.day() == 0) ? 7 : date.day();
         if (date.hour() < 12) {
             var rowIndex = 1;

@@ -4,13 +4,34 @@ block append css
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
 
 block content
-  h1= title
-  p= counter
-  button#book.btn.btn-primary(style={'margin-left':'15px'}) 预约
-  div#info.container(style={'margin':'7px'})
-  div#user.container(style={'margin':'7px'})
+  div.container
+    div.row
+      p= counter
+      div#info.container(style={'margin':'7px'})
+      div#user.container(style={'margin':'7px'})
+    div.row(style={'margin-top': '7px'})
+      div.col-xs-1.pull-left
+        button#previous_week.btn.btn-primary.pull-left.btn-xs 上一周
+      div#currentWeekRange.col-xs-6.col-xs-offset-2(style={'text-align':'center','line-height':'22px'})
+        //p#currentWeekRange= new Date()
+      div.col-xs-1.pull-right
+        button#next_week.btn.btn-primary.pull-right.btn-xs 下一周
+    table#book_table.table.table-bordered.table-hover(style={'margin-top': '7px'})
+        thead
+          tr
+            th(style='min-width:60px') 日期
+            th 上午
+            th 下午
+        tbody
+          each val in ['一', '二', '三', '四', '五', '六', '日']
+            tr
+              td= val
+              td
+              td
   
   script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
   //script(src='/components/requirejs/require.js',data-main="/js/booking")
   script(src='/js/booking.js')
   script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', integrity='sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS', crossorigin='anonymous')
+  script(src='/components/moment/min/moment-with-locales.min.js')
+  script(src='/components/bootbox.js/bootbox.js')
