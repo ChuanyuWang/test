@@ -11,6 +11,10 @@
         //    taskManager.populateList('#tasklist');
         //});
         console.log("welcome~~~");
+        
+        $.getJSON("/bqsq/api/currentuser", function(data) {
+            console.log("get user from server %j", data);
+        });
 
         $('#book').click(function (event) {
             $.post("api/sendText", {

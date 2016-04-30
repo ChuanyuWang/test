@@ -30,6 +30,8 @@ router.get('/member', checkTenantUser, function (req, res) {
 });
 
 router.get('/booking', function (req, res) {
+    console.log("user open booking page");
+    console.log("currentuser is %j", visited_user_list);
     res.render('bqsq/booking', {
         title : '会员约课',
         user : req.user,
@@ -163,6 +165,7 @@ router.post('/api/sendText', function (req, res) {
 });
 
 router.get('/api/currentuser', function (req, res) {
+    console.log("client get the current booking user %j", visited_user_list);
     res.json(visited_user_list.pop());
 });
 
@@ -174,8 +177,9 @@ router.use('/weixin', wechat(config, function (req, res, next) {
 
         // test getting user info
         if (message.MsgType == 'event' && message.Event == "VIEW") {
+            console.log("user click the booking button");
             api.getUser(message.FromUserName, function (err, user, res) {
-                console.log("get user info is done with " + JSON.stringify(user, null, 4));
+                console.log("get user info successfully from Weichat with " + JSON.stringify(user, null, 4));
                 console.log("err is " + err + " and user is " + user + " res is " + res);
                 if (!err && user) {
                     visited_user_list.push(user);
