@@ -30,7 +30,7 @@ router.get('/member', checkTenantUser, function (req, res) {
 });
 
 router.get('/booking', function (req, res) {
-    console.log("user open booking page");
+    console.log("user open booking page with header %j", req.headers);
     console.log("currentuser is %j", visited_user_list);
     res.render('bqsq/booking', {
         title : '会员约课',
