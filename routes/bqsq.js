@@ -12,6 +12,8 @@ var api = new API(config.appid, config.appsecret);
 
 var visited_user_list = new Array();
 
+var counter = 1;
+
 /* GET users listing. */
 router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
@@ -30,12 +32,11 @@ router.get('/member', checkTenantUser, function (req, res) {
 });
 
 router.get('/booking', function (req, res) {
-    console.log("user open booking page with header %j", req.headers);
+    console.log("user open booking page %d with header %j", counter, req.headers);
     console.log("currentuser is %j", visited_user_list);
     res.render('bqsq/booking', {
         title : '会员约课',
-        user : req.user,
-        project : config.name
+        counter : counter++
     });
 });
 

@@ -5,8 +5,10 @@ block append css
 
 block content
   h1= title
+  p= counter
   button#book.btn.btn-primary(style={'margin-left':'15px'}) 预约
   div#info.container(style={'margin':'7px'})
+  div#user.container(style={'margin':'7px'})
   
   script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
   //script(src='/components/requirejs/require.js',data-main="/js/booking")

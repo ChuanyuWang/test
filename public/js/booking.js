@@ -14,7 +14,15 @@
         
         $.getJSON("/bqsq/api/currentuser", function(data) {
             console.log("get user from server %j", data);
-        });
+
+            if (data) {
+                var infobar = $("#user");
+                infobar.append("<div class='alter alert-info' role='alert'>" + data.nickname + "</div>");
+            }
+        }).fail(function() {
+            var infobar = $("#user");
+            infobar.append("<div class='alter alert-info' role='alert'>no user</div>");
+          });
 
         $('#book').click(function (event) {
             $.post("api/sendText", {
