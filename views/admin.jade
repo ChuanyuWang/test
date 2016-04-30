@@ -11,11 +11,30 @@ block page
   div.container(style={'padding-top': '50px'})
     ul.nav.nav-tabs(role='tablist')
       li.active(role='presentation')
-        a(href="#home",role='tab',data-toggle='tab') Home
+        a(href="#users",role='tab',data-toggle='tab') Users
       li(role='presentation')
-        a(href="#home",role2='tab',data-toggle='tab') Home2
+        a(href="#todo",role='tab',data-toggle='tab') TODO
     div.tab-content
-      div.tab-pane.active(role="tabpanel",id="home")
-        p ABC
-      div.tab-pane(role="tabpanel",id="home2")
-        p ABC
+      div.tab-pane.active(role="tabpanel",id="users")
+          form.form-horizontal(style={'padding':'11px'},role='form',action="admin/createUser",method="post")
+            div.form-group
+              label.control-label.col-sm-2(for='cls_name') User Name:
+              div.col-sm-10
+                input.form-control(type='text',placeholder='',name='user')
+            div.form-group
+              label.control-label.col-sm-2(for='cls_name') Password:
+              div.col-sm-10
+                input.form-control(type='password',placeholder='',name='password')
+            div.form-group
+              label.control-label.col-sm-2(for='cls_name') Tenant:
+              div.col-sm-10
+                input.form-control(type='text',placeholder='',name='tenant')
+            div.form-group
+              label.control-label.col-sm-2(for='cls_name') Display Name:
+              div.col-sm-10
+                input.form-control(type='text',placeholder='',name='display')
+            div.form-group
+              div.col-sm-offset-2.col-sm-10
+                button.btn.btn-default(type='submit') Create User
+      div.tab-pane(role="tabpanel",id="todo")
+        p to be done
