@@ -39,7 +39,7 @@ router.get('/booking', function (req, res) {
 
 // API =============================================================
 
-router.get('/api/members', function (req, res) {
+router.get('/api/members', isAuthenticated, function (req, res) {
     //console.log("get members with query %j", req.query);
     var members = db.collection("members");
     var query = {};
@@ -54,7 +54,7 @@ router.get('/api/members', function (req, res) {
     });
 });
 
-router.post('/api/members', function (req, res) {
+router.post('/api/members', isAuthenticated, function (req, res) {
     members.insert(req.body, function (err, docs) {
         if (err) {
             res.status(500).json({
@@ -67,7 +67,7 @@ router.post('/api/members', function (req, res) {
     });
 });
 
-router.delete('/api/members/:memberID', function (req, res) {
+router.delete('/api/members/:memberID', isAuthenticated, function (req, res) {
     var members = db.collection("members");
     members.remove({
         _id : mongojs.ObjectId(req.params.memberID)
@@ -107,7 +107,7 @@ router.get('/api/classes', function (req, res) {
     });
 });
 
-router.post('/api/classes', function (req, res) {
+router.post('/api/classes', isAuthenticated, function (req, res) {
     classes.insert(req.body, function (err, docs) {
         if (err) {
             res.status(500).json({
@@ -120,7 +120,7 @@ router.post('/api/classes', function (req, res) {
     });
 });
 
-router.delete('/api/classes/:classID', function (req, res) {
+router.delete('/api/classes/:classID', isAuthenticated, function (req, res) {
     var classes = db.collection("classes");
     classes.remove({
         _id : mongojs.ObjectId(req.params.classID)
@@ -218,7 +218,7 @@ function checkTenantUser(req, res, next) {
 };
 
 function isAuthenticated(req, res, next) {
-    if (req.user) {
+    if (req.user && req.user.tenant == config.tenant) {
         next()
     } else {
         res.status(401).send('Unauthorized Request');

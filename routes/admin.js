@@ -34,7 +34,7 @@ function checkTenantUser(req, res, next) {
 };
 
 function isAuthenticated(req, res, next) {
-    if (req.user.username == 'chuanyu') { // special user as administrator
+    if (req.user && req.user.username == 'chuanyu') { // special user as administrator
         next()
     } else {
         res.status(401).send('Unauthorized Request');
