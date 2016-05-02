@@ -15,9 +15,8 @@ var routes = require('./routes/index');
 // route different public account
 var mygirl = require('./routes/mygirl');
 var bqsq = require('./routes/bqsq');
+var test = require('./routes/test');
 var admin = require('./routes/admin');
-
-
 
 var app = express();
 
@@ -61,11 +60,12 @@ app.use(passport.session());
 
 // add router
 app.use('/', routes);
-//app.use('/users', users);
-app.use('/mygirl',mygirl);
-app.use('/test', bqsq);
-app.use('/bqsq', bqsq);
 app.use('/admin', admin);
+
+// add each tenant
+app.use('/mygirl',mygirl);
+app.use('/test', test);
+app.use('/bqsq', bqsq);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -81,6 +81,7 @@ app.use(function(req, res, next) {
 
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
+        console.error(err);
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
