@@ -78,8 +78,29 @@
         });
     };
     
+    // append a class for booking at the end of page
     function displayClass(item) {
+        var list = $('#main');
+        console.log('display class: ', item);
         var date = moment(item.date);
+        
+        var tmp = date.format('MMMDo');
+        var lastRow = list.find('div.class-row:last-child');
+        if (!lastRow || lastRow.find('.date-col p').text().indexOf(tmp) == -1) {
+            // TODO, add separator bar
+            
+            // append a new class row
+            lastRow = list.append('<div class="row class-row">' + 
+            '<div class="col-xs-2 date-col"><p>' + tmp + '<br>' + 
+            date.format('dddd') + '</p></div><div class="col-xs-10 content-col"></div></div>');
+        }
+
+        // insert a class at this row
+        lastRow.find('.content-col').append('<div><div class="cls-col"><p>' + 
+            item.name + '</p><p class="cls-tip">' + date.format() + 
+            '</p></div><div class="book-col"><button class="btn btn-primary btn-md book-btn">预订</button><button class="btn btn-primary btn-md remain-btn">剩余<span class="badge remain-span">4</span></button></div></div>');
+            
+        /*
         // day is 0 if it's Sunday
         var rowIndex = (date.day() == 0) ? 7 : date.day();
         if (date.hour() < 12) {
@@ -99,6 +120,7 @@
         } else {
             cell.addClass('info');
         }
+        */
     };
     
     function updateSchedule(control) {

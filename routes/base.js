@@ -78,7 +78,7 @@ router.get('/api/classes', function (req, res) {
             $lt : new Date(req.query.to)
         }
     };
-    classes.find(query, function (err, docs) {
+    classes.find(query).sort({date: 1}, function (err, docs) {
         if (err) {
             res.status(500).json({
                 'err' : err
