@@ -18,11 +18,17 @@
   margin-right:-7px;
 }
 
+.class-separator {
+  border-top : darkgray solid 1px;
+  margin : 0 -7px 3px -7px;
+}
+
 .date-col {
   padding-left:9px;
   padding-right:0px;
   color : #2b2b2b;
   font-size:12px;
+  min-width:50px;
 }
 
 .content-col {
@@ -57,9 +63,13 @@
   max-width : 60px;
 }
 
-.book-btn {
+.finish-btn {
   float:right;
   margin-top:3px;
+}
+
+.book-btn {
+  .finish-btn;
   padding-bottom:3px;
   border-bottom-left-radius:0px;
   border-bottom-right-radius:0px;
@@ -70,7 +80,7 @@
   float:right;
   padding:0px;
   width:54px;
-  background-color:#f0ad4e;
+  background-color:#f0ad4e !important;
   border-top-left-radius:0px;
   border-top-right-radius:0px;
   opacity:1    !important; // remain button is disabled by default, keep the opacity as 1 for better visual
