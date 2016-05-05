@@ -19,6 +19,39 @@ block content
       div(style='float:left;padding-left:3px')
         button#next_week.btn.btn-default.btn-xs 下一周
       div#currentWeekRange(style={'float':'right','line-height':'22px','color':'#2b2b2b', 'padding-right':'9px'})
+      
+  div#book_dlg.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 预约课程
+        div.modal-body
+          form.form-horizontal
+            div.form-group.form-group-sm(style='margin-bottom:9px')
+              label.control-label-sm.col-xs-3 时间:
+              div.col-xs-9
+                p.form-control-static 2016年6月1日 下午 3点
+            div.form-group.form-group-sm
+              label.control-label-sm.col-xs-3 内容:
+              div.col-xs-9
+                p.form-control-static(style='height:auto') 点击推事件用户点击click类型按钮后点击推事件用户点击click类型按钮后
+            div.form-group.form-group-sm
+              label.control-label-sm.col-xs-3(for='name') 宝宝姓名:
+              div.col-xs-9
+                input#name.form-control(type='text',placeholder='宝宝注册时用的名称')
+            div.form-group.form-group-sm
+              label.control-label-sm.col-xs-3(for='contact') 联系方式:
+              div.col-xs-9
+                input#contact.form-control(type='text',placeholder='135xxx')
+            div.form-group.form-group-sm
+              label.control-label-sm.col-xs-3(for='quantity') 人数:
+              div.col-xs-3
+                input#quantity.form-control(type='number',name='quantity',min='1')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#book_ok.btn.btn-success(type="button") 预约
 
   script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
   //script(src='/components/requirejs/require.js',data-main="/js/booking")

@@ -29,6 +29,25 @@
                 infobar.append("<div class='alter alert-danger' role='alert'>预定失败</div>")
             });
         });
+        
+        $('#book_dlg').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            
+            if (button.text() == "+") {
+                // create a new class
+                var rowIndex = $("#cls_table tr").index(button.closest('tr'));
+                var colIndex = $("#cls_table td").index(button.closest('td')) % 8;
+            }
+            // var recipient = button.data('whatever'); // Extract info from data-* attributes
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this);
+            //modal.find('#name').val("");
+            //modal.find('#contact').val("");
+            modal.find('#quantity').val(1);
+        });
+        
+        $('#book_ok').click(handleBookOK);
 
         $('#previous_week').click(function (event) {
             $("this").prop("disabled", true);
@@ -84,6 +103,33 @@
             $(item).html(temp.format('dddd') + '<br>' + temp.format('MMMD'));
         });
     };
+    
+    function handleBookOK(event) {
+        var modal = $(this).closest('.modal');
+        var hasError = false;
+        // validate the input
+        var classItem = {
+            reservation : 0
+        };
+        classItem.name = modal.find('#cls_name').val();
+        if (!classItem.name || classItem.name.length == 0) {
+            modal.find('#cls_name').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#cls_name').closest(".form-group").removeClass("has-error");
+        }
+        // get date
+        classItem.date = moment(modal.find('#cls_date').text(), 'lll');
+        // get type
+        classItem.type = modal.find('.active input').val();
+        // get capacity
+        classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+
+        if (!hasError) {
+            modal.modal('hide');
+            addNewClass(classItem);
+        }
+    };
 
     // append a class for booking at the end of page
     function displayClass(item) {
@@ -116,11 +162,11 @@
         
         var remaining = item.capacity - item.reservation;
         if (date < moment().subtract(1, 'hours')) {
-            // the class or event is finished two hours ago
+            // the class or event is finished one hours ago
             var btn_book = '<button class="btn btn-default btn-md finish-btn" disabled="disabled">结束</button>';
             var btn_tip = '';
         } else if (remaining > 0) {
-            var btn_book = '<button class="btn btn-primary btn-md book-btn">预约</button>';
+            var btn_book = '<button class="btn btn-primary btn-md book-btn" data-toggle="modal" data-target="#book_dlg">预约</button>';
             var btn_tip = '<button class="btn btn-primary btn-md remain-btn" disabled="disabled">剩余<span class="badge remain-span">' + remaining + '</span></button>';
         } else {
             var btn_book = '<button class="btn btn-danger btn-md book-btn">已满</button>';
