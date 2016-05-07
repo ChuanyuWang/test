@@ -18,3 +18,6 @@ table is from
 
 datetime format is from 
 [Moment](http://momentjs.com/)
+
+popup dialog is from 
+[Bootbox.js](http://bootboxjs.com/)

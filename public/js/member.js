@@ -50,7 +50,8 @@
         var hasError = false;
         // validate the input
         var newMember = {
-            since : moment()
+            since : moment(),
+            point : {}
         };
         newMember.name = modal.find('input[name=name]').val();
         if (!newMember.name || newMember.name.length == 0) {
@@ -73,9 +74,9 @@
         // get type
         newMember.expire = modal.find('#expire_date').data("DateTimePicker").date();
         // get available story point
-        newMember.storyPoint = Number.parseInt(modal.find('input[name=story_point]').val());
+        newMember.point['story'] = Number.parseInt(modal.find('input[name=story_point]').val());
         // get available event point
-        newMember.eventPoint = Number.parseInt(modal.find('input[name=event_point]').val());
+        newMember.point['event'] = Number.parseInt(modal.find('input[name=event_point]').val());
         newMember.note = modal.find('textarea[name=note]').val().trim();
 
         if (!hasError) {
