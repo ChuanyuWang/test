@@ -32,11 +32,11 @@ block content
             div.form-group.form-group-sm(style='margin-bottom:9px')
               label.control-label-sm.col-xs-3 时间:
               div.col-xs-9
-                p.form-control-static 2016年6月1日 下午 3点
+                p#time.form-control-static
             div.form-group.form-group-sm
               label.control-label-sm.col-xs-3 内容:
               div.col-xs-9
-                p.form-control-static(style='height:auto') 点击推事件用户点击click类型按钮后点击推事件用户点击click类型按钮后
+                p#content.form-control-static(style='height:auto')
             div.form-group.form-group-sm
               label.control-label-sm.col-xs-3(for='name') 宝宝姓名:
               div.col-xs-9
@@ -48,10 +48,29 @@ block content
             div.form-group.form-group-sm
               label.control-label-sm.col-xs-3(for='quantity') 人数:
               div.col-xs-3
-                input#quantity.form-control(type='number',name='quantity',min='1')
+                input#quantity.form-control(type='number',name='quantity',min='1',step='1')
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#book_ok.btn.btn-success(type="button") 预约
+          
+  div#error_dlg.modal(tabindex='-1',data-backdrop='true')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 预约失败
+        div.modal-body
+          p#message
+            small
+          p
+            small 客服电话: 
+              a(href='tel:13661622231') 136 6162 2231
+            br
+            small 门店地址: 
+              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+        div.modal-footer
+          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
 
   script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
   //script(src='/components/requirejs/require.js',data-main="/js/booking")

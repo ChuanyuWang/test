@@ -1,4 +1,9 @@
 (function ($) {
+    // local cache for class or event
+    window.cls_cache = {};
+    //window._cur_user = {_id:'', openid : [], booked : []};
+    // open id of Weichat user
+    window._openid = undefined;
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -32,11 +37,13 @@
         
         $('#book_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
-            
-            if (button.text() == "+") {
-                // create a new class
-                var rowIndex = $("#cls_table tr").index(button.closest('tr'));
-                var colIndex = $("#cls_table td").index(button.closest('td')) % 8;
+            var item_id = button.closest('.book-col').data('id');
+            var item = cls_cache[item_id];
+            if (!item) {
+                alert("网络异常，请刷新重试");
+                event.preventDefault();
+                console.error("Can't get the class or event item with id %s", item_id);
+                return;
             }
             // var recipient = button.data('whatever'); // Extract info from data-* attributes
             // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
@@ -45,6 +52,9 @@
             //modal.find('#name').val("");
             //modal.find('#contact').val("");
             modal.find('#quantity').val(1);
+            modal.find('#time').text(moment(item.date).format('lll'));
+            modal.find('#content').text(item.name);
+            modal.find('#book_ok').data('id', item._id);
         });
         
         $('#book_ok').click(handleBookOK);
@@ -106,29 +116,86 @@
     
     function handleBookOK(event) {
         var modal = $(this).closest('.modal');
+        var item_id = $(this).data('id');
+        var item = cls_cache[item_id];
+        if (!item) {
+            alert("网络异常，请刷新重试");
+            event.preventDefault();
+            console.error("Can't get the class or event item with id %s", item_id);
+            return;
+        }
         var hasError = false;
         // validate the input
-        var classItem = {
-            reservation : 0
+        var bookInfo = {
+            classid : item_id
         };
-        classItem.name = modal.find('#cls_name').val();
-        if (!classItem.name || classItem.name.length == 0) {
-            modal.find('#cls_name').closest(".form-group").addClass("has-error");
+        bookInfo.name = modal.find('#name').val().trim();
+        if (!bookInfo.name || bookInfo.name.length == 0) {
+            modal.find('#name').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
-            modal.find('#cls_name').closest(".form-group").removeClass("has-error");
+            modal.find('#name').closest(".form-group").removeClass("has-error");
         }
-        // get date
-        classItem.date = moment(modal.find('#cls_date').text(), 'lll');
-        // get type
-        classItem.type = modal.find('.active input').val();
-        // get capacity
-        classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+        // get contact
+        bookInfo.contact = modal.find('#contact').val().trim();
+        if (!bookInfo.contact || bookInfo.contact.length == 0) {
+            modal.find('#contact').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#contact').closest(".form-group").removeClass("has-error");
+        }
+        // get quantity
+        bookInfo.quantity = Number.parseInt(modal.find('#quantity').val());
 
         if (!hasError) {
             modal.modal('hide');
-            addNewClass(classItem);
+            addNewBook(bookInfo);
         }
+    };
+    
+    function addNewBook(bookInfo) {
+        $.ajax("api/booking", {
+            type : "POST",
+            contentType : "application/json; charset=utf-8",
+            data : JSON.stringify(bookInfo),
+            success : function (data) {
+                console.log("book successfully with ", bookInfo);
+                // update cache
+                cls_cache[data._id] = data;
+                // TODO, update the button status
+                var remaining = data.capacity - data.reservation;
+                var book_col = $(".book-col[data-id=" + bookInfo.classid + "]");
+                book_col.find("span").text(remaining);
+                if (remaining <= 0) {
+                    book_col.find("button").removeClass('btn-primary').addClass('btn-danger');
+                    book_col.find(".book-btn").text("已满").attr('data-toggle', null).attr('data-target', null);
+                }
+                
+                bootbox.dialog({
+                    title : "预约成功",
+                    message : "请于" + moment(data.date).format('lll') + "准时参加",
+                    locale : "zh_CN",
+                    onEscape : true,
+                    backdrop : true,
+                    size : "small",
+                    buttons : {
+                        success : {
+                            label : "确定",
+                            className : "btn-success"
+                        }
+                    }
+                });
+            },
+            error : function (jqXHR, status, err) {
+                displayError(jqXHR.responseJSON, bookInfo);
+            },
+            dataType : "json"
+        });
+    };
+    
+    function displayError(error, bookInfo) {
+        $('#error_dlg').find("p#message small").text(error.message);
+        $('#error_dlg').modal('show');
     };
 
     // append a class for booking at the end of page
@@ -175,12 +242,12 @@
         
         lastRow = list.find('div.class-row:last-child');
         lastRow.find('.content-col').append(
-          '<div data-id="' + item._id + '">' +
+          '<div>' +
             '<div class="cls-col">' + 
                 cls_col + 
                 cls_tip + 
             '</div>' + 
-            '<div class="book-col">' + 
+            '<div class="book-col" data-id="' + item._id + '">' + 
                 btn_book + 
                 btn_tip + 
             '</div>' +
@@ -200,6 +267,8 @@
             },
             success : function (data) {
                 for (var i = 0; i < data.length; i++) {
+                    //cache every displayed class or event
+                    cls_cache[data[i]._id] = data[i];
                     displayClass(data[i]);
                 }
                 if (!data.length) {

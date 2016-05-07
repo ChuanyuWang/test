@@ -21,3 +21,6 @@ datetime format is from
 
 popup dialog is from 
 [Bootbox.js](http://bootboxjs.com/)
+
+map name card is from 
+[Baidu Map](http://api.map.baidu.com/mapCard/)
