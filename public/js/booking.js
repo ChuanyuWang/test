@@ -21,20 +21,6 @@
             infobar.append("<div class='alter alert-info' role='alert'>no user</div>");
         });
 
-        $('#book').click(function (event) {
-            $.post("api/sendText", {
-                foo : "hello world"
-            }, function (data) {
-                console.log("booking successfully");
-                var infobar = $("#info");
-                infobar.append("<div class='alter alert-success' role='alert'>预定成功</div>")
-            }).fail(function (err) {
-                console.error(err);
-                var infobar = $("#info");
-                infobar.append("<div class='alter alert-danger' role='alert'>预定失败</div>")
-            });
-        });
-        
         $('#book_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             var item_id = button.closest('.book-col').data('id');
@@ -49,8 +35,6 @@
             // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
             // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
             var modal = $(this);
-            //modal.find('#name').val("");
-            //modal.find('#contact').val("");
             modal.find('#quantity').val(1);
             modal.find('#time').text(moment(item.date).format('lll'));
             modal.find('#content').text(item.name);
@@ -62,32 +46,30 @@
         $('#previous_week').click(function (event) {
             $("this").prop("disabled", true);
             currentMonday.subtract(7, 'days');
-            //updateWeekInfo(currentMonday);
             updateSchedule($("this"));
         });
 
         $('#next_week').click(function (event) {
             $("this").prop("disabled", true);
             currentMonday.add(7, 'days');
-            //updateWeekInfo(currentMonday);
             updateSchedule($("this"));
         });
         
         $('#current_week').click(function (event) {
             $("this").prop("disabled", true);
             currentMonday = getMonday(moment());
-            //updateWeekInfo(currentMonday);
             updateSchedule($("this"));
         });
     });
+    
+    // Functions =============================================================
 
     function init() {
         console.log("welcome~~~");
         moment.locale('zh-CN');
-        bootbox.setLocale('zh_CN');
+        //bootbox.setLocale('zh_CN');
         $('#currentWeekRange').text(moment().format('[今天] MMMDo'));
         currentMonday = getMonday(moment());
-        updateWeekInfo(currentMonday);
         updateSchedule();
     };
 
@@ -105,15 +87,6 @@
         return _date;
     };
 
-    function updateWeekInfo(Monday) {
-        // update the date in the first column
-        var items = $('#book_table tbody tr td:nth-child(1)');
-        $.each(items, function (index, item) {
-            var temp = moment(Monday).add(index, 'days');
-            $(item).html(temp.format('dddd') + '<br>' + temp.format('MMMD'));
-        });
-    };
-    
     function handleBookOK(event) {
         var modal = $(this).closest('.modal');
         var item_id = $(this).data('id');
@@ -146,6 +119,12 @@
         }
         // get quantity
         bookInfo.quantity = Number.parseInt(modal.find('#quantity').val());
+        if (!bookInfo.quantity) {
+            modal.find('#quantity').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#quantity').closest(".form-group").removeClass("has-error");
+        }
 
         if (!hasError) {
             modal.modal('hide');
@@ -159,32 +138,20 @@
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(bookInfo),
             success : function (data) {
-                console.log("book successfully with ", bookInfo);
+                //console.log("book successfully with ", bookInfo);
                 // update cache
-                cls_cache[data._id] = data;
+                var classInfo = data['class'];
+                cls_cache[classInfo._id] = classInfo;
                 // TODO, update the button status
-                var remaining = data.capacity - data.reservation;
+                var remaining = classInfo.capacity - classInfo.reservation;
                 var book_col = $(".book-col[data-id=" + bookInfo.classid + "]");
                 book_col.find("span").text(remaining);
                 if (remaining <= 0) {
                     book_col.find("button").removeClass('btn-primary').addClass('btn-danger');
                     book_col.find(".book-btn").text("已满").attr('data-toggle', null).attr('data-target', null);
                 }
-                
-                bootbox.dialog({
-                    title : "预约成功",
-                    message : "请于" + moment(data.date).format('lll') + "准时参加",
-                    locale : "zh_CN",
-                    onEscape : true,
-                    backdrop : true,
-                    size : "small",
-                    buttons : {
-                        success : {
-                            label : "确定",
-                            className : "btn-success"
-                        }
-                    }
-                });
+
+                displaySuccess(data['member'], classInfo);
             },
             error : function (jqXHR, status, err) {
                 displayError(jqXHR.responseJSON, bookInfo);
@@ -194,8 +161,15 @@
     };
     
     function displayError(error, bookInfo) {
-        $('#error_dlg').find("p#message small").text(error.message);
+        $('#error_dlg').find("p#message").text(error.message);
         $('#error_dlg').modal('show');
+    };
+    
+    function displaySuccess(member, classInfo) {
+        var message = "请于" + moment(classInfo.date).format('lll') + "准时参加";
+        message += '<br>' + '会员剩余次数：' + member.point[classInfo.type];
+        $('#success_dlg').find("p#message").html(message);
+        $('#success_dlg').modal('show');
     };
 
     // append a class for booking at the end of page
@@ -299,12 +273,5 @@
         // remove all classes and separators
         $('.class-row,.class-separator').remove();
         $('.alert-warning').remove();
-    };
-
-    // Functions =============================================================
-    function getParam(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var param = window.location.search.substr(1).match(reg);
-        return param ? param[2] : undefined;
     };
 })(jQuery);

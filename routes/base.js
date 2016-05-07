@@ -134,6 +134,7 @@ classID : "5716630aa012576d0371e888"
 router.post('/api/booking', function (req, res) {
     if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
         res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
+        return;
     }
     var members = req.db.collection("members");
     var user_query = {
@@ -183,7 +184,7 @@ router.post('/api/booking', function (req, res) {
             if (!cls) {
                 res.status(400).json({
                     'code' : 2002,
-                    'message' : "can't find class with id: " + req.body.classid,
+                    'message' : "没有找到指定课程，请刷新重试",
                     'err' : err
                 })
                 return;
@@ -255,7 +256,10 @@ function createNewBook(req, res, user, cls, quantity) {
             user.point[cls.type] -= quantity;
             members.update({_id:user._id}, {$set: {point: user.point}});
             //return the status of booking class
-            res.json(cls);
+            res.json({
+                class : cls,
+                member : user
+            });
         });
     });
 };

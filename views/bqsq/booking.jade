@@ -7,10 +7,6 @@ block content
   div#main.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
       img.img-responsive.center-block(src='/img/logo.png')
-    div.row(style='margin-left:-7px;margin-right:-7px')
-      p= counter
-      div#info.container(style={'margin':'7px'})
-      div#user.container(style={'margin':'7px'})
     div.row(style='margin:7px -7px 3px -7px')
       div(style='float:left;padding-left:9px')
         button#previous_week.btn.btn-default.btn-xs 上一周
@@ -47,13 +43,13 @@ block content
                 input#contact.form-control(type='text',placeholder='135xxx')
             div.form-group.form-group-sm
               label.control-label-sm.col-xs-3(for='quantity') 人数:
-              div.col-xs-3
+              div.col-xs-4
                 input#quantity.form-control(type='number',name='quantity',min='1',step='1')
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#book_ok.btn.btn-success(type="button") 预约
           
-  div#error_dlg.modal(tabindex='-1',data-backdrop='true')
+  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
     div.modal-dialog.modal-sm
       div.modal-content
         div.modal-header
@@ -62,7 +58,6 @@ block content
           h4#myModalLabel.modal-title 预约失败
         div.modal-body
           p#message
-            small
           p
             small 客服电话: 
               a(href='tel:13661622231') 136 6162 2231
@@ -72,9 +67,21 @@ block content
         div.modal-footer
           button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
 
+  div#success_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 预约成功
+        div.modal-body
+          p#message
+        div.modal-footer
+          button#success_ok.btn.btn-success(type="button",data-dismiss="modal") 确定
+
   script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
   //script(src='/components/requirejs/require.js',data-main="/js/booking")
   script(src='/js/booking.js')
   script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', integrity='sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS', crossorigin='anonymous')
   script(src='/components/moment/min/moment-with-locales.min.js')
-  script(src='/components/bootbox.js/bootbox.js')
+  //script(src='/components/bootbox.js/bootbox.js')
