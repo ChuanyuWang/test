@@ -7,9 +7,14 @@ block navlist
     li
       a(href='member') 会员
 
+append css
+  link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
+
 append pagjs
   script(src='/components/moment/min/moment-with-locales.min.js')
   script(src='/components/bootbox.js/bootbox.js')
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-zh-CN.min.js")
   //script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src='/js/main.js')
@@ -82,7 +87,7 @@ block page
             div.form-group
               label.control-label.col-sm-2 时间:
               div.col-sm-10
-                p#cls_date.form-control-static 2016年5月1日 上午
+                p#cls_date.form-control-static
             div.form-group
               label.control-label.col-sm-2(for='cls_capacity') 最大人数:
               div.col-sm-2
@@ -90,3 +95,56 @@ block page
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#create_cls.btn.btn-success(type="button") 添加
+
+  div#view_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 查看课程
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2(for='cls_name') 课程名称:
+              div.col-sm-10
+                input#cls_name.form-control(type='text',placeholder='课程描述')
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 课程类型:
+              div.col-sm-10
+                p#cls_type.form-control-static
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 时间:
+              div.col-sm-10
+                p#cls_date.form-control-static
+            div.form-group
+              label.control-label.col-sm-2(for='cls_capacity') 最大人数:
+              div.col-sm-2
+                input#cls_capacity.form-control(type='number',name='cls_capacity',min='1')
+          table#member_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-sort-name='date',data-unique-id="_id")
+            thead
+              tr
+                //th(data-field='_id',data-visible='false') ID
+                th(data-field='date',data-formatter='dateFormatter',data-sortable='true') 预约时间
+                th(data-field='userName',data-sortable='true') 宝宝姓名
+                th(data-field='contact') 联系方式
+                th(data-field='quantity') 预约人数
+                th(data-title='取消',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteBook')
+        script(type='text/javascript').
+            function dateFormatter(value) {
+                if (value) {
+                    return moment(value).format('ll');
+                } else {
+                    return undefined;
+                }
+            };
+            function deleteFormatter(value) {
+                return [
+                    '<a class="remove text-danger" href="javascript:void(0)" title="取消">',
+                    '<i class="glyphicon glyphicon-remove"></i>',
+                    '</a>'
+                ].join('');
+            };
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#create_cls.btn.btn-success(type="button") 修改

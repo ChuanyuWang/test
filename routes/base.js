@@ -31,7 +31,8 @@ router.get('/api/members', isAuthenticated, function (req, res) {
         if (err) {
             res.status(500).json({
                 'err' : err
-            })
+            });
+            return;
         }
         console.log("find members with result %j", docs);
         res.json(docs);
@@ -94,7 +95,8 @@ router.get('/api/classes', function (req, res) {
         if (err) {
             res.status(500).json({
                 'err' : err
-            })
+            });
+            return;
         }
         console.log("find classes with result %j", docs);
         res.json(docs);
@@ -128,6 +130,83 @@ router.delete ('/api/classes/:classID', isAuthenticated, function (req, res) {
             console.log("class %s is deteled", req.params.classID);
             res.json({});
         }
+    });
+});
+
+router.get('/api/booking', function (req, res) {
+    if (!req.query.classid) {
+        res.status(400).send("Missing param 'classid'");
+        return;
+    }
+
+    var booking = req.db.collection("booking");
+    booking.find({
+        classid : req.query.classid
+    }).sort({date:-1}, function(err, docs){
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+            return;
+        }
+
+        if (!docs || docs.length == 0) {
+            res.status(400).json({
+                'code' : 2008,
+                'message' : "未找到预约信息",
+                'err' : err
+            })
+            return;
+        }
+        console.log("find booking of class %s: %j", req.query.classid, docs);
+        
+        var query_member = [];
+        for (var i = 0; i < docs.length; i++) {
+            var memberid = mongojs.ObjectId(docs[i].memberid);
+            query_member.push(memberid);
+        }
+
+        // query all the members who books this class
+        var members = req.db.collection("members");
+        members.find({
+            _id : {
+                "$in" : query_member
+            }
+        }, function (err, users) {
+            if (err) {
+                res.status(500).json({
+                    'err' : err
+                })
+                return;
+            }
+            console.log("find members who books class %s: %j", req.query.classid, users);
+            
+            // Find all the valid booking which member exists
+            var book_items = [];
+            for (var i=0;i<docs.length;i++) {
+                for (var j=0;j<users.length;j++) {
+                    if (docs[i].memberid == users[j]._id.toString()) {
+                        docs[i].userName = users[j].name;
+                        docs[i].contact = users[j].contact;
+                        book_items.push(docs[i]);
+                        break;
+                    }
+                }
+            }
+            
+            for (var i=0;i<users.length;i++) {
+                for (var j=0;j<docs.length;j++) {
+                    if (users[i]._id.toString() == docs[j].memberid) {
+                        users[i].quantity = docs[j].quantity;
+                        users[i].bookDate = docs[j].date;
+                        users[i].bookingid = docs[j]._id.toString();
+                        break;
+                    }
+                }
+            }
+            
+            res.json(book_items);
+        });
     });
 });
 /* booking a class by member
@@ -225,7 +304,7 @@ router.post('/api/booking', function (req, res) {
 function createNewBook(req, res, user, cls, quantity) {
     var booking = req.db.collection("booking");
     var query = {
-        memeberid : user._id.toString(),
+        memberid : user._id.toString(),
         classid : cls._id.toString()
     };
     booking.findOne(query, function (err, doc) {

@@ -145,7 +145,7 @@
                 // TODO, update the button status
                 var remaining = classInfo.capacity - classInfo.reservation;
                 var book_col = $(".book-col[data-id=" + bookInfo.classid + "]");
-                book_col.find("span").text(remaining);
+                book_col.find("span").text(remaining < 0 ? 0 : remaining);
                 if (remaining <= 0) {
                     book_col.find("button").removeClass('btn-primary').addClass('btn-danger');
                     book_col.find(".book-btn").text("已满").attr('data-toggle', null).attr('data-target', null);

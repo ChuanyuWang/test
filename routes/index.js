@@ -10,8 +10,8 @@ var logger = require('log4js').getLogger();
 router.get('/', function (req, res) {
     if (!req.user) {
         res.render('index', {
-            title : '登陆',
-            project : '欢迎',
+            title : '约课',
+            project : '约课',
             errorMsg : req.flash('error')
         });
     } else {

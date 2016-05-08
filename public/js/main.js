@@ -1,16 +1,14 @@
 (function ($) {
+    // local cache for class or event
+    window.cls_cache = {};
+    
+    var TYPE_NAME = {
+        story : '故事会',
+        event : '主题活动'
+    }
 
     // DOM Ready =============================================================
     $(document).ready(function () {
-
-        // enable jQuery UI tooltip
-        //$(document).tooltip();
-
-        // populate task list & initialize table
-        //require(['taskManager'], function (taskManager) {
-        //    taskManager.populateList('#tasklist');
-        //});
-
         init();
 
         $('#cls_dlg').on('show.bs.modal', function (event) {
@@ -145,6 +143,8 @@
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(classItem),
             success : function (data) {
+                // update the cache
+                cls_cache[data._id] = data;
                 displayClass(data);
             },
             error : function (jqXHR, status, err) {
@@ -172,6 +172,7 @@
         cell.find('p').text(item.name);
         cell.find('.btn-group').empty();
         cell.find('.btn-group').append('<button class="btn btn-primary">查看 </button>');
+        cell.find('.btn-primary').click(handleViewClass);
         cell.find('.btn-primary').append('<span class="badge">' + item.reservation + '</span>');
         cell.find('.btn-group').append('<button class="btn btn-danger">删除</button>');
         cell.find('.btn-danger').click(handleRemoveClass);
@@ -182,6 +183,35 @@
         }
     };
     
+    function handleViewClass(event) {
+        var cell = $(this).closest('td');
+        var class_id = cell.data('id');
+        var class_item = cls_cache[class_id];
+        
+        if (!class_item) {
+            console.error("Can't find the class info with id: " + class_id);
+            return;
+        }
+        
+        var modal = $('#view_dlg');
+        modal.find('#cls_name').val(class_item.name);
+        modal.find('#cls_type').text(TYPE_NAME[class_item.type]);
+        modal.find('#cls_date').text(moment(class_item.date).format('lll'));
+        modal.find('#cls_capacity').val(class_item.capacity);
+        
+        modal.find('#member_table').bootstrapTable('removeAll');
+        modal.find('#member_table').bootstrapTable('refresh', {url:'api/booking', query:{classid:class_id}});
+        $('#view_dlg').modal('show');
+    };
+
+    // event handler defined in home.jade file for removing booking item
+    window.handleDeleteBook = {
+        'click .remove' : function (e, value, row, index) {
+            // TODO
+            alert('You click like action, row: ' + JSON.stringify(row));
+        }
+    };
+
     function handleRemoveClass(event) {
         var cell = $(this).closest('td');
         var item_id = cell.data('id');
@@ -196,6 +226,8 @@
                 contentType : "application/json; charset=utf-8",
                 data : JSON.stringify({dummy:1}),
                 success : function (data) {
+                    // update the cache
+                    cls_cache[item_id] = undefined;
                     cell.data('id', undefined);
                     cell.find('p').empty();
                     cell.find('.btn-group').empty();
@@ -233,6 +265,8 @@
             },
             success : function (data) {
                 for (var i=0; i<data.length; i++) {
+                    // update the cache
+                    cls_cache[data[i]._id] = data[i];
                     displayClass(data[i]);
                 }
             },
