@@ -39,10 +39,17 @@ router.get('/api/members', isAuthenticated, function (req, res) {
 });
 
 router.post('/api/members', isAuthenticated, function (req, res) {
+    if (!req.body.name || !req.body.contact) {
+        res.status(400).send("Missing param 'name' or 'contact'");
+        return;
+    }
+    
     var members = require("../models/members")(req.db);
     members.insert(req.body, function (err, docs) {
         if (err) {
             res.status(500).json({
+                'code' : err.code,
+                'message' : err.message,
                 'err' : err
             })
         } else {
@@ -71,6 +78,7 @@ router.delete ('/api/members/:memberID', isAuthenticated, function (req, res) {
 router.get('/api/classes', function (req, res) {
     if (!req.query.from || !req.query.to) {
         res.status(400).send("Missing param 'from' or 'to'");
+        return;
     }
 
     var classes = req.db.collection("classes");

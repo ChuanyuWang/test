@@ -94,7 +94,17 @@
                 $('#member_table').bootstrapTable('insertRow', {index: 0, row: data});
             },
             error : function (jqXHR, status, err) {
-                console.error(jqXHR.responseText);
+                bootbox.dialog({
+                    message : jqXHR.responseJSON.message,
+                    title : "添加会员失败",
+                    buttons : {
+                        danger : {
+                            label : "确定",
+                            className : "btn-danger",
+                        }
+                    }
+                });
+                //console.error(jqXHR);
             },
             dataType : "json"
         });
