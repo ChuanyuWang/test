@@ -11,6 +11,7 @@
     $(document).ready(function () {
         init();
 
+        // reset dialog status when add a new class or event
         $('#cls_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             if (button.text() == "+") {
@@ -18,9 +19,6 @@
                 var rowIndex = $("#cls_table tr").index(button.closest('tr'));
                 var colIndex = $("#cls_table td").index(button.closest('td')) % 8;
             }
-            // var recipient = button.data('whatever'); // Extract info from data-* attributes
-            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
             var modal = $(this);
             modal.find('#cls_name').val("");
             modal.find('#cls_capacity').val(8);
@@ -31,8 +29,11 @@
             $(this).find('#cls_name').focus(); // focus on the class name input control
         });
 
+        // listen to the action button on modal dialogs
         $('#create_cls').click(handleAddNewClass);
+        $('#modify_cls').click(handleModifyClass);
 
+        // listen to the previous week and next week button
         $('#previous_week').click(function (event) {
             $("this").prop("disabled", true);
             currentMonday.subtract(7, 'days');
@@ -59,6 +60,7 @@
         updateSchedule();
     };
 
+    // Get the Monday of specific date, each week starts from Monday
     function getMonday(date) {
         var _date = moment(date);
         var dayofweek = _date.day();
@@ -130,6 +132,12 @@
         classItem.type = modal.find('.active input').val();
         // get capacity
         classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+        if (isNaN(classItem.capacity) || classItem.capacity <= 0) {
+            modal.find('#cls_capacity').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#cls_capacity').closest(".form-group").removeClass("has-error");
+        }
 
         if (!hasError) {
             modal.modal('hide');
@@ -198,17 +206,87 @@
         modal.find('#cls_type').text(TYPE_NAME[class_item.type]);
         modal.find('#cls_date').text(moment(class_item.date).format('lll'));
         modal.find('#cls_capacity').val(class_item.capacity);
-        
+
+        // cache the class ID on member table
+        modal.find('#member_table').data('classid', class_id);
         modal.find('#member_table').bootstrapTable('removeAll');
         modal.find('#member_table').bootstrapTable('refresh', {url:'api/booking', query:{classid:class_id}});
         $('#view_dlg').modal('show');
+    };
+    
+    function handleModifyClass(event) {
+        var modal = $(this).closest('.modal');
+        var hasError = false;
+        // validate the input
+        var classItem = {};
+        classItem.name = modal.find('#cls_name').val();
+        if (!classItem.name || classItem.name.length == 0) {
+            modal.find('#cls_name').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#cls_name').closest(".form-group").removeClass("has-error");
+        }
+        // get capacity
+        classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+        if (isNaN(classItem.capacity) || classItem.capacity <= 0) {
+            modal.find('#cls_capacity').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('#cls_capacity').closest(".form-group").removeClass("has-error");
+        }
+
+        if (!hasError) {
+            var class_id = modal.find('#member_table').data('classid');
+            $.ajax("api/classes/" + class_id, {
+                type : "PUT",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify(classItem),
+                success : function (data) {
+                    //close the dialog
+                    modal.modal('hide');
+                    // update the cache
+                    var class_item = cls_cache[class_id];
+                    class_item.name = classItem.name;
+                    class_item.capacity = classItem.capacity;
+                    // update the class schedule
+                    displayClass(class_item);
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseJSON);
+                },
+                complete : function(jqXHR, status) {
+                    //TODO
+                },
+                dataType : "json"
+            });
+        }
     };
 
     // event handler defined in home.jade file for removing booking item
     window.handleDeleteBook = {
         'click .remove' : function (e, value, row, index) {
-            // TODO
-            alert('You click like action, row: ' + JSON.stringify(row));
+            var class_id = $(e.target).closest('table').data('classid');
+            
+            $.ajax("api/booking/" + class_id, {
+                type : "DELETE",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify({memberid:row.member}),
+                success : function (data) {
+                    // update the cache
+                    var class_item = cls_cache[class_id];
+                    class_item.reservation -= row.quantity;
+                    // update the class schedule
+                    displayClass(class_item);
+                    $('#member_table').bootstrapTable('removeByUniqueId', row.member);
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseJSON);
+                },
+                complete : function(jqXHR, status) {
+                    //TODO
+                },
+                dataType : "json"
+            });
         }
     };
 
@@ -236,7 +314,16 @@
                     cell.removeClass('info');
                 },
                 error : function (jqXHR, status, err) {
-                    console.error(jqXHR.responseText);
+                    bootbox.dialog({
+                        message : jqXHR.responseJSON.message,
+                        title : "删除失败",
+                        buttons : {
+                            danger : {
+                                label : "确定",
+                                className : "btn-danger",
+                            }
+                        }
+                    });
                 },
                 complete : function(jqXHR, status) {
                     //TODO
@@ -244,12 +331,6 @@
                 dataType : "json"
             });
         });
-    };
-
-    function removeClass(id, elm) {
-        var cell = $(this).closest('td');
-        var item_id = cell.data('id');
-        console.log(item_id);
     };
 
     function updateSchedule(control) {

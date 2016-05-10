@@ -121,11 +121,11 @@ block page
               label.control-label.col-sm-2(for='cls_capacity') 最大人数:
               div.col-sm-2
                 input#cls_capacity.form-control(type='number',name='cls_capacity',min='1')
-          table#member_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-sort-name='date',data-unique-id="_id")
+          table#member_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-sort-name='date',data-unique-id="member")
             thead
               tr
                 //th(data-field='_id',data-visible='false') ID
-                th(data-field='date',data-formatter='dateFormatter',data-sortable='true') 预约时间
+                th(data-field='bookDate',data-formatter='dateFormatter',data-sortable='true') 预约时间
                 th(data-field='userName',data-sortable='true') 宝宝姓名
                 th(data-field='contact') 联系方式
                 th(data-field='quantity') 预约人数
@@ -147,4 +147,4 @@ block page
             };
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#create_cls.btn.btn-success(type="button") 修改
+          button#modify_cls.btn.btn-success(type="button") 修改
