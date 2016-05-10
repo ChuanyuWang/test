@@ -119,7 +119,7 @@
         }
         // get quantity
         bookInfo.quantity = Number.parseInt(modal.find('#quantity').val());
-        if (!bookInfo.quantity) {
+        if (isNaN(bookInfo.quantity) || bookInfo.quantity <= 0) {
             modal.find('#quantity').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
