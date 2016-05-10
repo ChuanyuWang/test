@@ -69,11 +69,24 @@ router.delete ('/api/members/:memberID', isAuthenticated, function (req, res) {
             res.status(500).json({
                 'err' : err
             });
-        } else {
+        } 
+        if (result.n == 1) {
             console.log("member %s is deteled", req.params.memberID);
             //TODO, remove the user's booking info
-            res.json(result);
+            var classes = req.db.collection("classes");
+            classes.update({
+                "booking.member" : req.params.memberID
+            }, {
+                $pull : {
+                    "booking" : {
+                        member : req.params.memberID
+                    }
+                }
+            });
+        } else {
+            console.error("member %s fails to be deteled", req.params.memberID);
         }
+        res.json(result);
     });
 });
 
@@ -402,7 +415,7 @@ router.delete ('/api/booking/:classID', isAuthenticated, function (req, res) {
                     $inc : point
                 });
             }
-            res.json({});
+            res.json(result);
         });
     });
 });
