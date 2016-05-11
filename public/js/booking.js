@@ -223,9 +223,9 @@
         // insert a class in last row
         var cls_col = '<p>' + item.name + '</p>';
         if (item.type == "story") {
-            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始<span class="cls-story">故事会</span></p>';
+            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始 <span class="cls-story">故事会</span></p>';
         } else if (item.type == "event") {
-            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始<span class="cls-event">主题活动</span></p>';
+            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始 <span class="cls-event">主题活动</span></p>';
         } else {
             var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始</p>';
         }
