@@ -13,18 +13,21 @@
     // DOM Ready =============================================================
     $(document).ready(function () {
         init();
-
-        $.getJSON("api/currentuser", function (data) {
-            console.log("get user from server %j", data);
-
-            if (data) {
-                var infobar = $("#user");
-                infobar.append("<div class='alter alert-info' role='alert'>" + data.nickname + "</div>");
-            }
-        }).fail(function () {
-            var infobar = $("#user");
-            infobar.append("<div class='alter alert-info' role='alert'>no user</div>");
-        });
+        
+        // try to get the openid of weixin user
+        if (!getCurrentUser()) {
+            
+            $.ajax("api/currentuser", {
+                type : "GET",
+                data : {
+                    timeKey : getTimeKey()
+                },
+                success : function (data) {
+                    _openid = data.openid; // could be null
+                },
+                dataType : "json"
+            });
+        }
 
         $('#book_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
@@ -175,6 +178,28 @@
         message += '<br>会员' + TYPE_NAME[classInfo.type] + '剩余' + member.point[classInfo.type] + '次';
         $('#success_dlg').find("p#message").html(message);
         $('#success_dlg').modal('show');
+        
+        // send a message to user through weixin
+        if (_openid) {
+            var msg = {
+                openid : _openid,
+                message : "亲爱的会员，您已成功预约" + moment(classInfo.date).format('MMMDoah:mm') 
+                    + "的" + TYPE_NAME[classInfo.type] + "，请准时参加\n" + TYPE_NAME[classInfo.type] +
+                    "剩余次数：" + member.point[classInfo.type]
+            }
+            $.ajax("api/sendText", {
+                type : "POST",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify(msg),
+                success : function (data) {
+                    //TODO
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseText);
+                },
+                dataType : "json"
+            });
+        }
     };
 
     // append a class for booking at the end of page

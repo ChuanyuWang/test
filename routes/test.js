@@ -5,6 +5,7 @@ var wechat = require('wechat');
 var API = require('wechat-api');
 //var config = require('../config.js').test;
 
+//[{time:1462976508, openid:"o0uUrv4RGMMiGasPF5bvlggasfGk"}]
 var visited_user_list = new Array();
 var counter = 1;
 
@@ -31,46 +32,57 @@ router.use(function (req, res, next) {
 });
 
 router.get('/booking', function (req, res) {
+    var timeKey = parseInt(Date.now()/1000);
+    
+    function findUserOpenID(user) {
+        return timeKey - user.time <= 1;
+    }
+    
+    var user = visited_user_list.find(findUserOpenID);
+    visited_user_list = []; // important, clear the array
+
+    // find the match key in visited_user_list, if not f
     console.log("user open booking page %d with header %j", counter, req.headers);
     console.log("current date time is " + Date.now());
     console.log("currentuser is %j", visited_user_list);
     res.render('bqsq/booking', {
         title : '会员约课',
         counter : counter++,
-        openid : 123
+        timeKey : timeKey,
+        openid : user ? user.openid : undefined
     });
 });
 
 router.post('/api/sendText', function (req, res) {
-    res.status(200).end();
-    return;
-    var user = visited_user_list.pop();
-    /*
-    user = {
-    "subscribe" : 1,
-    "openid" : "o0uUrv4RGMMiGasPF5bvlggasfGk",
-    "nickname" : "王传宇",
-    "sex" : 1,
-    "language" : "zh_CN",
-    "city" : "Pudong New District",
-    "province" : "Shanghai",
-    "country" : "China",
-    "headimgurl" : "http://wx.qlogo.cn/mmopen/UibmOkGHHooJQJN24337L2icPoXoQ0f8v51qiac0jGOxA2H7UglNDJ32WzwPHDiahzPznWePVcnYHKkcIwnkrwhSGGW7cVrHuKcI/0",
-    "subscribe_time" : 1460905029,
-    "remark" : "",
-    "groupid" : 0
-    };*/
-    if (user) {
-        sendMsg(api, user.openid, '亲爱用户: ' + user.nickname + '\n 您已成功预约');
-    } else {
-        console.error("No user found, the message sending fails");
+    if (!req.body.openid || !req.body.message) {
+        res.status(400).send("Missing param 'openid' or 'message'");
+        return;
     }
+    
+    api.sendText(openid, content, function (err, result) {
+        if (err) {
+            console.error("send text message to %s fails with error %j", openid, err);
+            res.status(500).send(err);
+        } else {
+            console.log("text message is sent successfully with result %j", result);
+            res.end();
+        }
+    });
 });
 
 router.get('/api/currentuser', function (req, res) {
-    console.log("client get the current booking user %j", visited_user_list);
-    console.log("current date time is " + Date.now());
-    res.json(visited_user_list.pop());
+    if (!req.query.timeKey) {
+        res.status(400).send("Missing param 'timeKey'");
+        return;
+    }
+    var timeKey = parseInt(req.query.timeKey);
+    function findUserOpenID(user) {
+        return Math.abs(user.time - time) <= 1;
+    }
+    
+    var user = visited_user_list.find(findUserOpenID);
+    console.log("Get the current weixin user %j", user);
+    res.json(user || {});
 });
 
 // Weichat =============================================================
@@ -78,18 +90,43 @@ router.get('/api/currentuser', function (req, res) {
 router.use('/weixin', wechat(tenant, function (req, res, next) {
     // 微信输入信息都在req.weixin上
     var message = req.weixin;
-
+    console.log("A weixin message is received: %j", message);
+    
     // test getting user info
     if (message.MsgType == 'event' && message.Event == "VIEW") {
-        console.log("user click the booking button");
-        api.getUser(message.FromUserName, function (err, user) {
-            console.log("get user info successfully from Weichat with " + JSON.stringify(user, null, 4));
-            console.log("current date time is " + Date.now());
-            if (!err && user) {
-                visited_user_list.push(user);
-                //sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
-            }
-        });
+        if (message.EventKey.indexOf('http://www.bookingme.cc') > -1) {
+            console.log("user open page %s", message.EventKey);
+            // user open some page from our web site, we need to cache user's openID for further usage
+            visited_user_list.push({
+                time: parseInt(message.CreateTime),
+                openid : message.FromUserName
+            });
+            /*
+            api.getUser(message.FromUserName, function (err, user) {
+                
+                user1 = {
+                    "subscribe" : 1,
+                    "openid" : "o0uUrv4RGMMiGasPF5bvlggasfGk",
+                    "nickname" : "王传宇",
+                    "sex" : 1,
+                    "language" : "zh_CN",
+                    "city" : "Pudong New District",
+                    "province" : "Shanghai",
+                    "country" : "China",
+                    "headimgurl" : "http://wx.qlogo.cn/mmopen/UibmOkGHHooJQJN24337L2icPoXoQ0f8v51qiac0jGOxA2H7UglNDJ32WzwPHDiahzPznWePVcnYHKkcIwnkrwhSGGW7cVrHuKcI/0",
+                    "subscribe_time" : 1460905029,
+                    "remark" : "",
+                    "groupid" : 0
+                };
+                console.log("get user info successfully from Weichat with " + JSON.stringify(user, null, 4));
+                console.log("current date time is " + Date.now());
+                if (!err && user) {
+                    visited_user_list.push(user);
+                    //sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
+                }
+            });
+            */
+        }
     } else if (message.MsgType == 'event' && message.Event == 'CLICK' && message.EventKey == 'zhaobin') {
         // 回复招兵买马(图文回复)
         res.reply([{
@@ -99,20 +136,15 @@ router.use('/weixin', wechat(tenant, function (req, res, next) {
                     url : 'http://mp.weixin.qq.com/s?__biz=MzAxODg0MTU5MQ==&mid=502713725&idx=1&sn=b0016b6893aa768ce9205b9b583a3710'
                 }
             ]);
+        return;
     }
-
-    console.log("A message is received: " + JSON.stringify(message, null, 4));
-    res.reply('A message is received as below \n' + JSON.stringify(message, null, 4));
+    //TODO, only reply the message under development env
+    //res.reply('A message is received as below \n' + JSON.stringify(message, null, 4));
+    res.reply();
 }));
 
 // Functions =============================================================
 
-function sendMsg(api, openid, content) {
-    api.sendText(openid, content, function (err, result, res) {
-        console.log("text message is sent to " + openid);
-        console.log("err is " + err + " and result is " + result + " res is " + res);
-    });
-};
 
 // Route other request to base router ====================================
 

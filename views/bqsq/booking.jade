@@ -4,6 +4,13 @@ block prepend css
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
 
 block content
+  script(type='text/javascript').
+    function getCurrentUser() {
+        return #{openid}
+    };
+    function getTimeKey() {
+        return #{timeKey}
+    };
   div#main.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
       img.img-responsive.center-block(src='/img/logo.png')
