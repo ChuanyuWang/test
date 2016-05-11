@@ -14,8 +14,8 @@
         init();
         
         // try to get the openid of weixin user
-        var openid = getCurrentUser();
-        if (!openid || openid.length == 0) {
+        window._openid = getCurrentUser();
+        if (!_openid || _openid.length == 0) {
             $.ajax("api/currentuser", {
                 type : "GET",
                 data : {
