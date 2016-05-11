@@ -183,7 +183,7 @@
             var msg = {
                 openid : _openid,
                 message : "亲爱的会员，您已成功预约" + moment(classInfo.date).format('MMMDoah:mm') 
-                    + "的" + TYPE_NAME[classInfo.type] + "，请准时参加\n" + TYPE_NAME[classInfo.type] +
+                    + "的" + TYPE_NAME[classInfo.type] + "，请准时参加。\n" + TYPE_NAME[classInfo.type] +
                     "剩余次数：" + member.point[classInfo.type]
             }
             $.ajax("api/sendText", {

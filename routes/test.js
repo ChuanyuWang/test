@@ -56,9 +56,9 @@ router.post('/api/sendText', function (req, res) {
         return;
     }
     
-    api.sendText(openid, content, function (err, result) {
+    api.sendText(req.body.openid, req.body.message, function (err, result) {
         if (err) {
-            console.error("send text message to %s fails with error %j", openid, err);
+            console.error("send text message to %s fails with error %j", req.body.openid, err);
             res.status(500).send(err);
         } else {
             console.log("text message is sent successfully with result %j", result);
