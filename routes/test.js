@@ -32,6 +32,7 @@ router.use(function (req, res, next) {
 
 router.get('/booking', function (req, res) {
     console.log("user open booking page %d with header %j", counter, req.headers);
+    console.log("current date time is " + Date.now());
     console.log("currentuser is %j", visited_user_list);
     res.render('bqsq/booking', {
         title : '会员约课',
@@ -68,6 +69,7 @@ router.post('/api/sendText', function (req, res) {
 
 router.get('/api/currentuser', function (req, res) {
     console.log("client get the current booking user %j", visited_user_list);
+    console.log("current date time is " + Date.now());
     res.json(visited_user_list.pop());
 });
 
@@ -80,14 +82,9 @@ router.use('/weixin', wechat(tenant, function (req, res, next) {
     // test getting user info
     if (message.MsgType == 'event' && message.Event == "VIEW") {
         console.log("user click the booking button");
-        api.getUser(message.FromUserName, function (err, user, res) {
-            console.log("arguments length is %s", arguments.length);
-            console.log(arguments[0]);
-            console.log(arguments[1]);
-            console.log(arguments[2]);
-            console.log(arguments[3]);
+        api.getUser(message.FromUserName, function (err, user) {
             console.log("get user info successfully from Weichat with " + JSON.stringify(user, null, 4));
-            //console.log("err is %j and user is %j res is %j", err, user, res);
+            console.log("current date time is " + Date.now());
             if (!err && user) {
                 visited_user_list.push(user);
                 //sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
