@@ -1,7 +1,6 @@
 (function ($) {
     // local cache for class or event
     window.cls_cache = {};
-    //window._cur_user = {_id:'', openid : [], booked : []};
     // open id of Weichat user
     window._openid = undefined;
     
@@ -15,8 +14,8 @@
         init();
         
         // try to get the openid of weixin user
+        /*
         if (!getCurrentUser()) {
-            
             $.ajax("api/currentuser", {
                 type : "GET",
                 data : {
@@ -28,6 +27,7 @@
                 dataType : "json"
             });
         }
+        */
 
         $('#book_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal

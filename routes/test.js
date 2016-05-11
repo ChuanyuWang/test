@@ -41,10 +41,7 @@ router.get('/booking', function (req, res) {
     var user = visited_user_list.find(findUserOpenID);
     visited_user_list = []; // important, clear the array
 
-    // find the match key in visited_user_list, if not f
-    console.log("user open booking page %d with header %j", counter, req.headers);
-    console.log("current date time is " + Date.now());
-    console.log("currentuser is %j", visited_user_list);
+    console.log("open booking page with user %j", user);
     res.render('bqsq/booking', {
         title : '会员约课',
         counter : counter++,
