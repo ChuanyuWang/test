@@ -14,7 +14,7 @@
     $(document).ready(function () {
         init();
 
-        $.getJSON("/bqsq/api/currentuser", function (data) {
+        $.getJSON("api/currentuser", function (data) {
             console.log("get user from server %j", data);
 
             if (data) {
