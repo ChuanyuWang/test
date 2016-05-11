@@ -14,8 +14,8 @@
         init();
         
         // try to get the openid of weixin user
-        /*
-        if (!getCurrentUser()) {
+        var openid = getCurrentUser();
+        if (!openid || openid.length == 0) {
             $.ajax("api/currentuser", {
                 type : "GET",
                 data : {
@@ -27,7 +27,6 @@
                 dataType : "json"
             });
         }
-        */
 
         $('#book_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal

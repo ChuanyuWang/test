@@ -6,10 +6,10 @@ block prepend css
 block content
   script(type='text/javascript').
     function getCurrentUser() {
-        return #{openid}
+        return '#{openid}';
     };
     function getTimeKey() {
-        return #{timeKey}
+        return #{timeKey};
     };
   div#main.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')

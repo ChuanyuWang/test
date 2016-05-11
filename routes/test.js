@@ -46,7 +46,7 @@ router.get('/booking', function (req, res) {
         title : '会员约课',
         counter : counter++,
         timeKey : timeKey,
-        openid : user ? user.openid : undefined
+        openid : user ? user.openid : ''
     });
 });
 
