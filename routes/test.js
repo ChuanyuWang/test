@@ -35,7 +35,8 @@ router.get('/booking', function (req, res) {
     console.log("currentuser is %j", visited_user_list);
     res.render('bqsq/booking', {
         title : '会员约课',
-        counter : counter++
+        counter : counter++,
+        openid : 123
     });
 });
 
@@ -80,8 +81,13 @@ router.use('/weixin', wechat(tenant, function (req, res, next) {
     if (message.MsgType == 'event' && message.Event == "VIEW") {
         console.log("user click the booking button");
         api.getUser(message.FromUserName, function (err, user, res) {
+            console.log("arguments length is %s", arguments.length);
+            console.log(arguments[0]);
+            console.log(arguments[1]);
+            console.log(arguments[2]);
+            console.log(arguments[3]);
             console.log("get user info successfully from Weichat with " + JSON.stringify(user, null, 4));
-            console.log("err is " + err + " and user is " + user + " res is " + res);
+            //console.log("err is %j and user is %j res is %j", err, user, res);
             if (!err && user) {
                 visited_user_list.push(user);
                 //sendMsg(api, message.FromUserName, 'A message is received as below \n' + JSON.stringify(message, null, 4))
