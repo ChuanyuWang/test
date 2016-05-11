@@ -4,6 +4,11 @@
     //window._cur_user = {_id:'', openid : [], booked : []};
     // open id of Weichat user
     window._openid = undefined;
+    
+    var TYPE_NAME = {
+        story : '故事会',
+        event : '主题活动'
+    }
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -36,7 +41,7 @@
             // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
             var modal = $(this);
             modal.find('#quantity').val(1);
-            modal.find('#time').text(moment(item.date).format('lll'));
+            modal.find('#time').text(moment(item.date).format('MMMDoah:mm'));
             modal.find('#content').text(item.name);
             modal.find('#book_ok').data('id', item._id);
         });
@@ -166,8 +171,8 @@
     };
     
     function displaySuccess(member, classInfo) {
-        var message = "请于" + moment(classInfo.date).format('lll') + "准时参加";
-        message += '<br>' + '会员剩余次数：' + member.point[classInfo.type];
+        var message = "请于" + moment(classInfo.date).format('MMMDoah:mm') + "准时参加";
+        message += '<br>会员' + TYPE_NAME[classInfo.type] + '剩余' + member.point[classInfo.type] + '次';
         $('#success_dlg').find("p#message").html(message);
         $('#success_dlg').modal('show');
     };
