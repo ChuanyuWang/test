@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var bqsq = require('./base');
+var base = require('./base');
 var wechat = require('wechat');
 var API = require('wechat-api');
 //var config = require('../config.js').test;
@@ -145,6 +145,6 @@ router.use('/weixin', wechat(tenant, function (req, res, next) {
 
 // Route other request to base router ====================================
 
-router.use(bqsq);
+router.use(base);
 
 module.exports = router;
