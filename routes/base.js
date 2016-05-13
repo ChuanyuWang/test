@@ -72,15 +72,35 @@ router.delete ('/api/members/:memberID', isAuthenticated, function (req, res) {
         } 
         if (result.n == 1) {
             console.log("member %s is deteled", req.params.memberID);
-            //TODO, remove the user's booking info
+
             var classes = req.db.collection("classes");
-            classes.update({
+            classes.find({
                 "booking.member" : req.params.memberID
-            }, {
-                $pull : {
-                    "booking" : {
-                        member : req.params.memberID
+            }, function (err, docs) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    var bulk = classes.initializeOrderedBulkOp();
+                    for (var i = 0; i < docs.length; i++) {
+                        var cls_item = docs[i];
+                        // find the booking quantity of member
+                        var quantity = getMemberBookQuantity(cls_item, req.params.memberID);
+                        bulk.find({
+                            _id : cls_item._id
+                        }).update({
+                            $inc : {
+                                reservation : -quantity
+                            },
+                            $pull : {
+                                "booking" : {
+                                    member : req.params.memberID
+                                }
+                            }
+                        });
                     }
+                    bulk.execute(function (err, result) {
+                        console.log("remove member's all booking %j", result);
+                    });
                 }
             });
         } else {
@@ -463,6 +483,19 @@ function createNewBook(req, res, user, cls, quantity) {
             member : user
         });
     });
+};
+
+function getMemberBookQuantity(class_doc, member_id) {
+    if (!class_doc || !class_doc.booking) {
+        return NaN;
+    }
+    // find the booking quantity of member
+    for (var i=0;i<class_doc.booking.length;i++) {
+        if (class_doc.booking[i].member == member_id) {
+            return class_doc.booking[i].quantity;
+        }
+    }
+    return NaN;
 };
 
 function checkTenantUser(req, res, next) {
