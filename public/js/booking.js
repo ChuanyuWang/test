@@ -75,7 +75,7 @@
         console.log("welcome~~~");
         moment.locale('zh-CN');
         //bootbox.setLocale('zh_CN');
-        $('#currentWeekRange').text(moment().format('[今天] MMMDo'));
+        //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
         currentMonday = getMonday(moment());
         updateSchedule();
     };

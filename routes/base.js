@@ -24,6 +24,12 @@ router.get('/member', checkTenantUser, function (req, res) {
     });
 });
 
+router.get('/mybooking', function (req, res) {
+    res.render('bqsq/mybooking', {
+        title : '我的课程'
+    });
+});
+
 // API =============================================================
 
 router.use('/api/classes', classes);

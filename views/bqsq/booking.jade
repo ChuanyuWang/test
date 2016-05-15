@@ -18,10 +18,11 @@ block content
       div(style='float:left;padding-left:9px')
         button#previous_week.btn.btn-default.btn-xs 上一周
       div(style='float:left;padding-left:3px')
-        button#current_week.btn.btn-default.btn-xs 今天
+        button#current_week.btn.btn-default.btn-xs 本周
       div(style='float:left;padding-left:3px')
         button#next_week.btn.btn-default.btn-xs 下一周
-      div#currentWeekRange(style={'float':'right','line-height':'22px','color':'#2b2b2b', 'padding-right':'9px'})
+      div(style='float:right;padding-right:9px')
+        a#showMyBooking.btn.btn-success.btn-xs(href='mybooking') 我的课程
       
   div#book_dlg.modal(tabindex='-1',data-backdrop='static')
     div.modal-dialog.modal-sm
