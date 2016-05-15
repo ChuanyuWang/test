@@ -1,0 +1,62 @@
+extends ../layout
+
+block prepend css
+  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css', integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7', crossorigin='anonymous')
+
+block content
+  div#main.container(style='padding-left:7px;padding-right:7px')
+    div.row(style='margin-left:-7px;margin-right:-7px')
+      img.img-responsive.center-block(src='/img/logo.png')
+    div.row(style='margin:7px -7px 3px -7px')
+      div(style='float:left;padding-left:9px')
+        button#show_reservation.btn.btn-default.btn-xs 预约课程
+      div(style='float:left;padding-left:3px')
+        button#show_history.btn.btn-default.btn-xs 历史课程
+      div(style='float:right;padding-right:9px')
+        a#showMyBooking.btn.btn-danger.btn-xs(href='booking') 查看课表
+      
+  div#login_dlg.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 会员登录
+        div.modal-body
+          form.form-horizontal
+            div.form-group.form-group-sm
+              label.control-label-sm.col-xs-3(for='name') 宝宝姓名:
+              div.col-xs-9
+                input#name.form-control(type='text',placeholder='宝宝注册时用的名称')
+            div.form-group.form-group-sm
+              label.control-label-sm.col-xs-3(for='contact') 联系方式:
+              div.col-xs-9
+                input#contact.form-control(type='text',placeholder='135xxx')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#login_ok.btn.btn-success(type="button") 确定
+          
+  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 登录失败
+        div.modal-body
+          p#message
+          p
+            small 客服电话: 
+              a(href='tel:13661622231') 136 6162 2231
+            br
+            small 门店地址: 
+              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+        div.modal-footer
+          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
+
+  script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
+  //script(src='/components/requirejs/require.js',data-main="/js/booking")
+  script(src='/js/mybooking.js')
+  script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js', integrity='sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS', crossorigin='anonymous')
+  script(src='/components/moment/min/moment-with-locales.min.js')
+  //script(src='/components/bootbox.js/bootbox.js')
