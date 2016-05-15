@@ -16,6 +16,11 @@ router.get('/', function (req, res) {
             $lt : new Date(req.query.to)
         }
     };
+    
+    // get all classes booked by this member
+    if (req.query.memberid) {
+        query['booking.member'] = requ.query.memberid;
+    }
     classes.find(query).sort({
         date : 1
     }, function (err, docs) {

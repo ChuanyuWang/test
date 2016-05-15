@@ -6,6 +6,12 @@ router.get('/', isAuthenticated, function (req, res) {
     //console.log("get members with query %j", req.query);
     var members = req.db.collection("members");
     var query = {};
+    if (req.query.name) {
+        query['name'] = req.query.name;
+    }
+    if (req.query.contact) {
+        query['contact'] = req.query.contact;
+    }
     members.find(query).sort({
         since : -1
     }, function (err, docs) {

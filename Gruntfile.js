@@ -34,6 +34,7 @@ module.exports = function (grunt) {
           'bin/www',
           'app.js',
           'routes/*.js',
+          'routes/api/*.js',
           'models/*.js'
         ],
         tasks: ['develop', 'delayed-livereload']
