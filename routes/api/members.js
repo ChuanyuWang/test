@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 
-router.get('/', isAuthenticated, function (req, res) {
+router.get('/', function (req, res) {
     //console.log("get members with query %j", req.query);
     var members = req.db.collection("members");
     var query = {};

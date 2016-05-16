@@ -161,10 +161,10 @@
 
     // append a class for booking at the end of page
     function displayClass(item) {
-        var list = $('#main');
+        var list = $('.tab-content .active');
         var date = moment(item.date);
 
-        var tmp = date.format('MMMDo');
+        var tmp = date.format('M/D');
         var lastRow = list.find('div.class-row:last-child');
         if (!lastRow || lastRow.find('.date-col p').text().indexOf(tmp) == -1) {
             // add separator bar
@@ -172,7 +172,7 @@
             // append a new class row
             list.append('<div class="row class-row">' +
                             '<div class="col-xs-2 date-col">' + 
-                                '<p>' + tmp + '<br>' + date.format('dddd') + '</p>' + 
+                                '<p>' + tmp + '<br><small>' + date.format('ddd') + '</small></p>' + 
                             '</div>' + 
                             '<div class="col-xs-10 content-col"></div>' + 
                         '</div>');
@@ -213,6 +213,52 @@
                 btn_tip + 
             '</div>' +
           '</div>');
+    };
+    
+    // callback(memberid | null)
+    function getMemberID(callback) {
+        if (localStorage._memberid) {
+            callback(memberid);
+        } else if (localStorage._name && localStorage._contact) {
+            $.ajax("api/members", {
+                type : "GET",
+                //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+                data : {
+                    name : localStorage._name,
+                    contact : localStorage._contact
+                },
+                success : function (data) {
+                    if (data && data.length > 0) {
+                        localStorage._memberid = data[0]._id;
+                        callback(data[0]._id);
+                    }
+                    else {
+                        callback(null);
+                    }
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseText);
+                    callback(null);
+                },
+                complete : function (jqXHR, status) {
+                    if (control) {
+                        control.prop("disabled", false);
+                    }
+                },
+                dataType : "json"
+            });
+        } else {
+            // can't retrieve the member id
+            callback(null);
+        }
+    };
+    
+    function showMyBooking() {
+        getMemberID(function(memberid){
+            if (!memberid) {
+                //TODO, show the dialog to retrieve memberid
+            }
+        });
     };
 
     function updateSchedule(memberid, isHistory, control) {

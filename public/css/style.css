@@ -50,9 +50,16 @@
 .date-col {
   padding-left: 9px;
   padding-right: 0px;
+  padding-top: 2px;
   color: #2b2b2b;
-  font-size: 12px;
+  font-size: 18px;
   min-width: 50px;
+  text-align: center;
+  line-height: 1;
+}
+.date-col small {
+  font-size: 12px;
+  color: #808080;
 }
 .content-col {
   padding-left: 7px;

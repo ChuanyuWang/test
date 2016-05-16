@@ -206,7 +206,7 @@
         var list = $('#main');
         var date = moment(item.date);
 
-        var tmp = date.format('MMMDo');
+        var tmp = date.format('M/D');
         var lastRow = list.find('div.class-row:last-child');
         if (!lastRow || lastRow.find('.date-col p').text().indexOf(tmp) == -1) {
             // add separator bar
@@ -214,7 +214,7 @@
             // append a new class row
             list.append('<div class="row class-row">' +
                             '<div class="col-xs-2 date-col">' + 
-                                '<p>' + tmp + '<br>' + date.format('dddd') + '</p>' + 
+                                '<p>' + tmp + '<br><small>' + date.format('ddd') + '</small></p>' + 
                             '</div>' + 
                             '<div class="col-xs-10 content-col"></div>' + 
                         '</div>');

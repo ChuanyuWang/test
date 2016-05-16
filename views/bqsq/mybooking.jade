@@ -7,6 +7,40 @@ block content
   div#main.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
       img.img-responsive.center-block(src='/img/logo.png')
+    form.form-horizontal(style='margin-top:15px;display:none',role='form')
+        div.form-group.form-group-sm
+          div.col-xs-12
+            p.form-control-static(style='color:#808080;text-align:center') 请输入小朋友姓名和联系方式来查看预约课程
+        div.form-group.form-group-sm
+          label.control-label-sm.col-xs-3(for='cls_name') 姓名:
+          div.col-xs-9
+            input.form-control(type='text',placeholder='小朋友注册时用的姓名',name='name')
+        div.form-group.form-group-sm
+          label.control-label-sm.col-xs-3(for='cls_name') 联系方式:
+          div.col-xs-9
+            input.form-control(type='text',placeholder='135xxx',name='contact')
+        div.form-group
+          div.col-xs-offset-3.col-xs-9
+            button.btn.btn-primary 查看预约
+    div.row(style='margin:7px -7px 3px -7px')
+      p.pull-left 你好，<b>包天艾</b>小朋友
+      button.btn.btn-default.btn-xs.pull-right 注销
+    div.row(style='margin:7px -7px 3px -7px')
+      p
+        span.glyphicon.glyphicon-user
+        包天艾
+
+    ul.nav.nav-tabs(role='tablist')
+      li.active(role='presentation')
+        a.btn-xs(href="#users",role='tab',data-toggle='tab',style='padding:3px 7px') 预约课程
+      li(role='presentation')
+        a.btn-xs(href="#todo",role='tab',data-toggle='tab',style='padding:3px 7px') 历史课程
+    div.tab-content
+      div.tab-pane.active(role="tabpanel",id="users")
+          
+      div.tab-pane(role="tabpanel",id="todo")
+        p to be done
+    
     div.row(style='margin:7px -7px 3px -7px')
       div(style='float:left;padding-left:9px')
         button#show_reservation.btn.btn-default.btn-xs 预约课程
@@ -14,7 +48,6 @@ block content
         button#show_history.btn.btn-default.btn-xs 历史课程
       div(style='float:right;padding-right:9px')
         a#showMyBooking.btn.btn-danger.btn-xs(href='booking') 查看课表
-      
   div#login_dlg.modal(tabindex='-1',data-backdrop='static')
     div.modal-dialog.modal-sm
       div.modal-content
