@@ -87,18 +87,18 @@
   width: 20%;
   max-width: 60px;
 }
-.finish-btn {
+.book-col .finish-btn {
   float: right;
   margin-top: 3px;
 }
-.book-btn {
+.book-col .book-btn {
   float: right;
   margin-top: 3px;
   padding-bottom: 3px;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
-.remain-btn {
+.book-col .remain-btn {
   font-size: 12px;
   float: right;
   padding: 0px;
@@ -108,8 +108,12 @@
   border-top-right-radius: 0px;
   opacity: 1    !important;
 }
-.remain-span {
+.book-col .remain-btn .remain-span {
   padding: 2px;
   margin-left: 1px;
   color: #f0ad4e   !important;
+}
+.book-col .cls-status {
+  text-align: right;
+  font-weight: bold;
 }

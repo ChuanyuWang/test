@@ -27,6 +27,17 @@
                 dataType : "json"
             });
         }
+        
+        $('.nav-tabs a').click(function (e) {
+            var type = $(e.target).attr('href');
+            if (type == '#future') {
+                showMyBooking(false, type);
+            } else if (type == '#history') {
+                showMyBooking(true, type);
+            }
+            //e.preventDefault();
+            //$(this).tab('show');
+        });
 
         $('#login_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
@@ -48,7 +59,7 @@
             modal.find('#book_ok').data('id', item._id);
         });
         
-        $('#login_ok').click(handleLoginOK);
+        $('#login .btn').click(handleLoginOK);
 
         $('#show_reservation').click(function (event) {
             $("this").prop("disabled", true);
@@ -71,7 +82,14 @@
         //bootbox.setLocale('zh_CN');
         //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
         currentMonday = getMonday(moment());
-        updateSchedule();
+        
+        getMemberID(function(memberid){
+            if (!memberid) {
+                toggleLoginForm(true);
+            } else {
+                updateSchedule();
+            }
+        });
     };
 
     function getMonday(date) {
@@ -89,39 +107,29 @@
     };
 
     function handleLoginOK(event) {
-        var modal = $(this).closest('.modal');
-        var item_id = $(this).data('id');
-        var item = cls_cache[item_id];
-        if (!item) {
-            alert("网络异常，请刷新重试");
-            event.preventDefault();
-            console.error("Can't get the class or event item with id %s", item_id);
-            return;
-        }
+        event.preventDefault();
+        var modal = $(this).closest('.form-horizontal');
         var hasError = false;
         // validate the input
-        var bookInfo = {
-            classid : item_id
-        };
-        bookInfo.name = modal.find('#name').val().trim();
-        if (!bookInfo.name || bookInfo.name.length == 0) {
-            modal.find('#name').closest(".form-group").addClass("has-error");
+        var userInfo = {};
+        userInfo.name = modal.find('input[name=name]').val().trim();
+        if (!userInfo.name || userInfo.name.length == 0) {
+            modal.find('input[name=name]').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
-            modal.find('#name').closest(".form-group").removeClass("has-error");
+            modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
         }
         // get contact
-        bookInfo.contact = modal.find('#contact').val().trim();
-        if (!bookInfo.contact || bookInfo.contact.length == 0) {
-            modal.find('#contact').closest(".form-group").addClass("has-error");
+        userInfo.contact = modal.find('input[name=contact]').val().trim();
+        if (!userInfo.contact || userInfo.contact.length == 0) {
+            modal.find('input[name=contact]').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
-            modal.find('#contact').closest(".form-group").removeClass("has-error");
+            modal.find('input[name=contact]').closest(".form-group").removeClass("has-error");
         }
 
         if (!hasError) {
-            modal.modal('hide');
-            addNewBook(bookInfo);
+            addNewBook(userInfo);
         }
     };
     
@@ -180,25 +188,19 @@
 
         // insert a class in last row
         var cls_col = '<p>' + item.name + '</p>';
+        var cls_tip = '<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>';
         if (item.type == "story") {
-            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始 <span class="cls-story">故事会</span></p>';
+            cls_tip += date.format('HH:mm') + '开始 <span class="cls-story">故事会</span></p>';
         } else if (item.type == "event") {
-            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始 <span class="cls-event">主题活动</span></p>';
+            cls_tip += date.format('HH:mm') + '开始 <span class="cls-event">主题活动</span></p>';
         } else {
-            var cls_tip = '<p class="cls-tip">' + date.format('HH:mm') + '开始</p>';
+            cls_tip += date.format('HH:mm') + '开始</p>';
         }
-        
-        var remaining = item.capacity - item.reservation;
-        if (date < moment().subtract(1, 'hours')) {
-            // the class or event is finished one hours ago
-            var btn_book = '<button class="btn btn-default btn-md finish-btn" disabled="disabled">结束</button>';
-            var btn_tip = '';
-        } else if (remaining > 0) {
-            var btn_book = '<button class="btn btn-primary btn-md book-btn" data-toggle="modal" data-target="#book_dlg">预约</button>';
-            var btn_tip = '<button class="btn btn-primary btn-md remain-btn" disabled="disabled">剩余<span class="badge remain-span">' + remaining + '</span></button>';
+
+        if (date > moment()) {
+            var btn_tip = '<p class="cls-status text-danger">(未上)</p>';
         } else {
-            var btn_book = '<button class="btn btn-danger btn-md book-btn">已满</button>';
-            var btn_tip = '<button class="btn btn-danger btn-md remain-btn" disabled="disabled">剩余<span class="badge remain-span">0</span></button>';
+            var btn_tip = '<p class="cls-status text-info">(已上)</p>';
         }
         
         lastRow = list.find('div.class-row:last-child');
@@ -209,7 +211,6 @@
                 cls_tip + 
             '</div>' + 
             '<div class="book-col" data-id="' + item._id + '">' + 
-                btn_book + 
                 btn_tip + 
             '</div>' +
           '</div>');
@@ -253,15 +254,33 @@
         }
     };
     
-    function showMyBooking() {
+    function toggleLoginForm(isShow) {
+        // display the login form for user to input name and contact
+        if (isShow) {
+            $('#user_info').hide();
+            $('#main .nav-tabs').hide();
+            $('#main .tab-content').hide();
+            $('#main form').show();
+        } else {
+            $('#main form').hide();
+            $('#user_info').show();
+            $('#main .nav-tabs').show();
+            $('#main .tab-content').show();
+        }
+    };
+    
+    function showMyBooking(isHistory, tab_id) {
         getMemberID(function(memberid){
             if (!memberid) {
-                //TODO, show the dialog to retrieve memberid
+                toggleLoginForm(true);
+            } else {
+                // query the booking info
+                updateSchedule(memberid, isHistory, tab_id);
             }
         });
     };
 
-    function updateSchedule(memberid, isHistory, control) {
+    function updateSchedule(memberid, isHistory, tab_id) {
         clearSchedule();
         if (isHistory) {
             var begin = moment(0);
@@ -292,9 +311,7 @@
                 console.error(jqXHR.responseText);
             },
             complete : function (jqXHR, status) {
-                if (control) {
-                    control.prop("disabled", false);
-                }
+                //TODO
             },
             dataType : "json"
         });

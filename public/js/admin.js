@@ -5,9 +5,9 @@
         init();
 
         $('.nav-tabs a').click(function (e) {
-            e.preventDefault();
-            $(this).tab('show');
-        })
+            //e.preventDefault();
+            //$(this).tab('show');
+        });
     });
 
     // Functions =============================================================
@@ -15,8 +15,6 @@
     function init() {
         console.log("welcome~~~");
         //moment.locale('zh-CN');
-        bootbox.setLocale('zh_CN');
-
-        //$('#myTab a:last').tab('show');
+        //bootbox.setLocale('zh_CN');
     };
 })(jQuery);
