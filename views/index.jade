@@ -32,13 +32,14 @@ block content
       div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
 
   block page
-    div.jumbotron(style={'padding-top' : '50px'})
+    div.jumbotron(style='padding-top:50px')
       div.container
         h1 欢迎访问
         p 这是一个在线课程预订的后台管理界面，用户可以在微信公众号中自助预约课程，网站相关功能仍在建设中
         p
           a.btn.btn-primary.btn-lg(role='button') 敬请期待
-          
+  //keep the content above the footer area
+  div(style='height:60px')
   footer.footer
     div.container
       p.text-muted
