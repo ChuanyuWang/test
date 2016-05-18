@@ -38,13 +38,13 @@
                 console.error("Can't get the class or event item with id %s", item_id);
                 return;
             }
-            // var recipient = button.data('whatever'); // Extract info from data-* attributes
-            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            
             var modal = $(this);
             modal.find('#quantity').val(1);
             modal.find('#time').text(moment(item.date).format('MMMDoah:mm'));
             modal.find('#content').text(item.name);
+            modal.find('#name').val(localStorage._name);
+            modal.find('#contact').val(localStorage._contact);
             modal.find('#book_ok').data('id', item._id);
         });
         
@@ -135,6 +135,8 @@
 
         if (!hasError) {
             modal.modal('hide');
+            localStorage._name = bookInfo.name;
+            localStorage._contact = bookInfo.contact;
             addNewBook(bookInfo);
         }
     };

@@ -17,12 +17,15 @@ router.get('/', function (req, res) {
         }
     };
     
+    // be defaul the sort is 'asc'
+    var sort = req.query.order == 'desc' ? -1 : 1;
+    
     // get all classes booked by this member
     if (req.query.memberid) {
-        query['booking.member'] = requ.query.memberid;
+        query['booking.member'] = req.query.memberid;
     }
     classes.find(query).sort({
-        date : 1
+        date : sort
     }, function (err, docs) {
         if (err) {
             res.status(500).json({

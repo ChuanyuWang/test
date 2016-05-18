@@ -29,49 +29,21 @@
         }
         
         $('.nav-tabs a').click(function (e) {
-            var type = $(e.target).attr('href');
-            if (type == '#future') {
-                showMyBooking(false, type);
-            } else if (type == '#history') {
-                showMyBooking(true, type);
-            }
+            // delay the update until DOM tree status refresh
+            setTimeout(function(){
+                showMyBooking();
+            });
             //e.preventDefault();
             //$(this).tab('show');
         });
-
-        $('#login_dlg').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var item_id = button.closest('.book-col').data('id');
-            var item = cls_cache[item_id];
-            if (!item) {
-                alert("网络异常，请刷新重试");
-                event.preventDefault();
-                console.error("Can't get the class or event item with id %s", item_id);
-                return;
-            }
-            // var recipient = button.data('whatever'); // Extract info from data-* attributes
-            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-            var modal = $(this);
-            modal.find('#quantity').val(1);
-            modal.find('#time').text(moment(item.date).format('MMMDoah:mm'));
-            modal.find('#content').text(item.name);
-            modal.find('#book_ok').data('id', item._id);
+        
+        $('#user_info .btn-danger').click(function (e) {
+            clearSchedule();
+            localStorage._memberid = undefined;
+            toggleLoginForm(true);
         });
         
         $('#login .btn').click(handleLoginOK);
-
-        $('#show_reservation').click(function (event) {
-            $("this").prop("disabled", true);
-            currentMonday.subtract(7, 'days');
-            updateSchedule($("this"));
-        });
-
-        $('#show_history').click(function (event) {
-            $("this").prop("disabled", true);
-            currentMonday.add(7, 'days');
-            updateSchedule($("this"));
-        });
     });
     
     // Functions =============================================================
@@ -81,86 +53,58 @@
         moment.locale('zh-CN');
         //bootbox.setLocale('zh_CN');
         //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
-        currentMonday = getMonday(moment());
         
-        getMemberID(function(memberid){
-            if (!memberid) {
-                toggleLoginForm(true);
-            } else {
-                updateSchedule();
-            }
-        });
-    };
-
-    function getMonday(date) {
-        var _date = moment(date);
-        var dayofweek = _date.day();
-        // the Monday of this week
-        if (dayofweek == 0) { // today is Sunday
-            _date.day(-6);
-        } else {
-            _date.day(1);
-        }
-        //set the time to the very beginning of day
-        _date.hours(0).minutes(0).seconds(0).milliseconds(0);
-        return _date;
+        toggleLoginForm(true);
     };
 
     function handleLoginOK(event) {
         event.preventDefault();
-        var modal = $(this).closest('.form-horizontal');
+
+        var loginForm = $(this).closest('form');
         var hasError = false;
         // validate the input
         var userInfo = {};
-        userInfo.name = modal.find('input[name=name]').val().trim();
+        userInfo.name = loginForm.find('input[name=name]').val().trim();
         if (!userInfo.name || userInfo.name.length == 0) {
-            modal.find('input[name=name]').closest(".form-group").addClass("has-error");
+            loginForm.find('input[name=name]').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
-            modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
+            loginForm.find('input[name=name]').closest(".form-group").removeClass("has-error");
         }
         // get contact
-        userInfo.contact = modal.find('input[name=contact]').val().trim();
+        userInfo.contact = loginForm.find('input[name=contact]').val().trim();
         if (!userInfo.contact || userInfo.contact.length == 0) {
-            modal.find('input[name=contact]').closest(".form-group").addClass("has-error");
+            loginForm.find('input[name=contact]').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
-            modal.find('input[name=contact]').closest(".form-group").removeClass("has-error");
+            loginForm.find('input[name=contact]').closest(".form-group").removeClass("has-error");
         }
 
         if (!hasError) {
-            addNewBook(userInfo);
-        }
-    };
-    
-    function displayError(error, bookInfo) {
-        $('#error_dlg').find("p#message").text(error.message);
-        $('#error_dlg').modal('show');
-    };
-    
-    function displaySuccess(member, classInfo) {
-        var message = "请于" + moment(classInfo.date).format('MMMDoah:mm') + "准时参加";
-        message += '<br>会员' + TYPE_NAME[classInfo.type] + '剩余' + member.point[classInfo.type] + '次';
-        $('#success_dlg').find("p#message").html(message);
-        $('#success_dlg').modal('show');
-        
-        // send a message to user through weixin
-        if (_openid) {
-            var msg = {
-                openid : _openid,
-                message : "亲爱的会员，您已成功预约" + moment(classInfo.date).format('MMMDoah:mm') 
-                    + "的" + TYPE_NAME[classInfo.type] + "，请准时参加。\n" + TYPE_NAME[classInfo.type] +
-                    "剩余次数：" + member.point[classInfo.type]
-            }
-            $.ajax("api/sendText", {
-                type : "POST",
-                contentType : "application/json; charset=utf-8",
-                data : JSON.stringify(msg),
+            $.ajax("api/members", {
+                type : "GET",
+                //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+                data : userInfo,
                 success : function (data) {
-                    //TODO
+                    if (data && data.length > 0) {
+                        localStorage._memberid = data[0]._id;
+                        localStorage._name = data[0].name;
+                        localStorage._contact = data[0].contact;
+                        toggleLoginForm(false);
+                        updateUserInfo(data[0]);
+                        showMyBooking();
+                    } else {
+                        // handle login fail
+                        $('#error_dlg').find("p#message").text('没有找到会员信息，请核对您的姓名和联系方式，如有问题请联系客服');
+                        $('#error_dlg').modal('show');
+                    }
                 },
                 error : function (jqXHR, status, err) {
+                    // handle login error
                     console.error(jqXHR.responseText);
+                },
+                complete : function (jqXHR, status) {
+                    //TODO
                 },
                 dataType : "json"
             });
@@ -169,11 +113,14 @@
 
     // append a class for booking at the end of page
     function displayClass(item) {
+        // append the content to current active panel
         var list = $('.tab-content .active');
         var date = moment(item.date);
 
         var tmp = date.format('M/D');
+        // get the last class row
         var lastRow = list.find('div.class-row:last-child');
+        // check if the next class is in the same day
         if (!lastRow || lastRow.find('.date-col p').text().indexOf(tmp) == -1) {
             // add separator bar
             list.append('<div class="class-separator"></div>');
@@ -216,42 +163,8 @@
           '</div>');
     };
     
-    // callback(memberid | null)
-    function getMemberID(callback) {
-        if (localStorage._memberid) {
-            callback(memberid);
-        } else if (localStorage._name && localStorage._contact) {
-            $.ajax("api/members", {
-                type : "GET",
-                //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-                data : {
-                    name : localStorage._name,
-                    contact : localStorage._contact
-                },
-                success : function (data) {
-                    if (data && data.length > 0) {
-                        localStorage._memberid = data[0]._id;
-                        callback(data[0]._id);
-                    }
-                    else {
-                        callback(null);
-                    }
-                },
-                error : function (jqXHR, status, err) {
-                    console.error(jqXHR.responseText);
-                    callback(null);
-                },
-                complete : function (jqXHR, status) {
-                    if (control) {
-                        control.prop("disabled", false);
-                    }
-                },
-                dataType : "json"
-            });
-        } else {
-            // can't retrieve the member id
-            callback(null);
-        }
+    function updateUserInfo(user) {
+        $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友');
     };
     
     function toggleLoginForm(isShow) {
@@ -260,7 +173,11 @@
             $('#user_info').hide();
             $('#main .nav-tabs').hide();
             $('#main .tab-content').hide();
+            // initialize the default value from local storage
+            $('#main form input[name=name]').val(localStorage._name);
+            $('#main form input[name=contact]').val(localStorage._contact);
             $('#main form').show();
+            $('#main form input[name=name]').focus();
         } else {
             $('#main form').hide();
             $('#user_info').show();
@@ -270,33 +187,31 @@
     };
     
     function showMyBooking(isHistory, tab_id) {
-        getMemberID(function(memberid){
-            if (!memberid) {
-                toggleLoginForm(true);
-            } else {
-                // query the booking info
-                updateSchedule(memberid, isHistory, tab_id);
-            }
-        });
+        var type = $('.nav-tabs .active a').attr('href');
+        if (type == '#future') {
+            updateSchedule(localStorage._memberid, false);
+        } else if (type == '#history') {
+            updateSchedule(localStorage._memberid, true);
+        }
     };
 
-    function updateSchedule(memberid, isHistory, tab_id) {
+    function updateSchedule(memberid, isHistory) {
         clearSchedule();
+        var query = {
+            memberid : memberid
+        }
         if (isHistory) {
-            var begin = moment(0);
-            var end = moment();
+            query.from = moment(0).toISOString();
+            query.to = moment().toISOString();
+            query.order = 'desc';
         } else { // show the booking in one year
-            var begin = moment();
-            var end = moment(begin).add(1, 'years');
+            query.from = moment().toISOString();
+            query.to = moment().add(1, 'years').toISOString();
         }
         $.ajax("api/classes", {
             type : "GET",
             //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-            data : {
-                from : begin.toISOString(),
-                to : end.toISOString(),
-                memberid : memberid
-            },
+            data : query,
             success : function (data) {
                 for (var i = 0; i < data.length; i++) {
                     //cache every displayed class or event
@@ -304,7 +219,7 @@
                     displayClass(data[i]);
                 }
                 if (!data.length) {
-                    displayNoClassWarning(begin);
+                    displayNoClassWarning();
                 }
             },
             error : function (jqXHR, status, err) {
@@ -317,10 +232,9 @@
         });
     };
     
-    function displayNoClassWarning(Monday) {
+    function displayNoClassWarning() {
         var list = $('#main');
-        // add separator bar
-        list.append('<div class="class-separator"></div>');
+
         // append a warning bar
         list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>没有找到预约课程</div>");
     };
