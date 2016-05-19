@@ -16,7 +16,34 @@
                 modal.find('input[name=story_point]').val("10");
                 modal.find('input[name=event_point]').val("0");
                 modal.find('#expire_date').data('DateTimePicker').date(moment().add(3, 'years'));
-                modal.find('input[name=note]').val("");
+                modal.find('textarea[name=note]').val("");
+                modal.find('#edit_member').hide();
+                modal.find('#add_member').show();
+            } else if (button.data('action') == "edit") {
+                //Don't show the dialog if user select nothing
+                var items = $('#member_table').bootstrapTable('getSelections');
+                if (items.length != 1) {
+                    bootbox.alert('请选择一个会员(不支持多选)');
+                    event.preventDefault();
+                    return;
+                }
+                // edit existed member
+                var modal = $(this);
+                modal.find('h4').text("查看会员");
+                
+                //get member data
+                var user = items[0];
+                modal.find('input[name=name]').val(user.name);
+                modal.find('input[name=contact]').val(user.contact);
+                modal.find('#birth_date').data('DateTimePicker').date(user.birthday);
+                modal.find('input[name=story_point]').val(user.point.story);
+                modal.find('input[name=event_point]').val(user.point.event);
+                modal.find('#expire_date').data('DateTimePicker').date(user.expire);
+                modal.find('textarea[name=note]').val(user.note);
+                
+                modal.find('#add_member').hide();
+                modal.find('#edit_member').show();
+                modal.find('#edit_member').data('id', user._id);
             }
         });
         
@@ -25,6 +52,7 @@
         });
         
         $('#add_member').click(handleAddNewMember);
+        $('#edit_member').click(handleEditMember);
         $('#del_member').click(handleDeleteMember);
     });
 
@@ -44,25 +72,20 @@
             defaultDate : moment().add(3, 'years')
         });
     };
-
-    function handleAddNewMember(event) {
-        var modal = $(this).closest('.modal');
+    
+    function validateInput(modal, memberInfo){
         var hasError = false;
-        // validate the input
-        var newMember = {
-            since : moment(),
-            point : {}
-        };
-        newMember.name = modal.find('input[name=name]').val();
-        if (!newMember.name || newMember.name.length == 0) {
+        
+        memberInfo.name = modal.find('input[name=name]').val();
+        if (!memberInfo.name || memberInfo.name.length == 0) {
             modal.find('input[name=name]').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
             modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
         }
         
-        newMember.contact = modal.find('input[name=contact]').val();
-        if (!newMember.contact || newMember.contact.length == 0) {
+        memberInfo.contact = modal.find('input[name=contact]').val();
+        if (!memberInfo.contact || memberInfo.contact.length == 0) {
             modal.find('input[name=contact]').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
@@ -70,26 +93,51 @@
         }
         
         // get birth date
-        newMember.birthday = modal.find('#birth_date').data("DateTimePicker").date();
+        memberInfo.birthday = modal.find('#birth_date').data("DateTimePicker").date();
         // get type
-        newMember.expire = modal.find('#expire_date').data("DateTimePicker").date();
+        memberInfo.expire = modal.find('#expire_date').data("DateTimePicker").date();
         // get available story point
-        newMember.point['story'] = Number.parseInt(modal.find('input[name=story_point]').val());
+        memberInfo.point['story'] = Number.parseInt(modal.find('input[name=story_point]').val());
         // get available event point
-        newMember.point['event'] = Number.parseInt(modal.find('input[name=event_point]').val());
-        newMember.note = modal.find('textarea[name=note]').val().trim();
+        memberInfo.point['event'] = Number.parseInt(modal.find('input[name=event_point]').val());
+        memberInfo.note = modal.find('textarea[name=note]').val().trim();
+        
+        return hasError;
+    };
 
-        if (!hasError) {
+    function handleAddNewMember(event) {
+        var modal = $(this).closest('.modal');
+        var newMember = {
+            since : moment(),
+            point : {}
+        };
+        
+        // validate the input
+        if (!validateInput(modal, newMember)) {
             modal.modal('hide');
             addNewMember(newMember);
         }
     };
     
-    function addNewMember(classItem) {
+    function handleEditMember(event) {
+        var modal = $(this).closest('.modal');
+        var id = modal.find('#edit_member').data('id');
+        var existMember = {
+            point : {}
+        };
+        
+        // validate the input
+        if (!validateInput(modal, existMember)) {
+            modal.modal('hide');
+            editMember(id, existMember);
+        }
+    };
+    
+    function addNewMember(member) {
         $.ajax("api/members", {
             type : "POST",
             contentType : "application/json; charset=utf-8",
-            data : JSON.stringify(classItem),
+            data : JSON.stringify(member),
             success : function (data) {
                 $('#member_table').bootstrapTable('insertRow', {index: 0, row: data});
             },
@@ -109,6 +157,32 @@
             dataType : "json"
         });
     };
+    
+    function editMember(id, member) {
+        $.ajax("api/members/" + id, {
+            type : "PUT",
+            contentType : "application/json; charset=utf-8",
+            data : JSON.stringify(member),
+            success : function (data) {
+                $('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: member});
+            },
+            error : function (jqXHR, status, err) {
+                bootbox.dialog({
+                    message : jqXHR.responseJSON.message,
+                    title : "修改会员失败",
+                    buttons : {
+                        danger : {
+                            label : "确定",
+                            className : "btn-danger",
+                        }
+                    }
+                });
+                //console.error(jqXHR);
+            },
+            dataType : "json"
+        });
+    };
+
 
     function handleDeleteMember(event) {
         var items = $('#member_table').bootstrapTable('getSelections');

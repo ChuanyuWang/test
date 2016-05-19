@@ -26,6 +26,27 @@ router.get('/', function (req, res) {
     });
 });
 
+router.put('/:memberID', isAuthenticated, function (req, res) {
+    var members = req.db.collection("members");
+    members.update({
+        _id : mongojs.ObjectId(req.params.memberID)
+    }, {
+        $set : req.body
+    }, function (err, result) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            })
+        } 
+        if (result.n == 1) {
+            console.log("member %s is updated by %j", req.params.memberID, req.body);
+        } else {
+            console.error("member %s update fail by %s", req.params.memberID, req.body);
+        }
+        res.json(result);
+    });
+});
+
 router.post('/', isAuthenticated, function (req, res) {
     if (!req.body.name || !req.body.contact) {
         res.status(400).send("Missing param 'name' or 'contact'");
