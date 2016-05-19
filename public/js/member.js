@@ -35,10 +35,10 @@
                 var user = items[0];
                 modal.find('input[name=name]').val(user.name);
                 modal.find('input[name=contact]').val(user.contact);
-                modal.find('#birth_date').data('DateTimePicker').date(moment(user.birthday));
+                modal.find('#birth_date').data('DateTimePicker').date(user.birthday ? moment(user.birthday):null);
                 modal.find('input[name=story_point]').val(user.point.story);
                 modal.find('input[name=event_point]').val(user.point.event);
-                modal.find('#expire_date').data('DateTimePicker').date(moment(user.expire));
+                modal.find('#expire_date').data('DateTimePicker').date(user.expire ? moment(user.expire):null);
                 modal.find('textarea[name=note]').val(user.note);
                 
                 modal.find('#add_member').hide();
