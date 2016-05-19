@@ -28,6 +28,18 @@ router.get('/', function (req, res) {
 
 router.put('/:memberID', isAuthenticated, function (req, res) {
     var members = req.db.collection("members");
+
+    // make sure the datetime object is stored as ISODate
+    if (req.body && req.body.birthday) {
+        req.body.birthday = new Date(req.body.birthday);
+    }
+    if (req.body && req.body.expire) {
+        req.body.expire = new Date(req.body.expire);
+    }
+    if (req.body && req.body.since) {
+        req.body.since = new Date(req.body.since);
+    }
+
     members.update({
         _id : mongojs.ObjectId(req.params.memberID)
     }, {
