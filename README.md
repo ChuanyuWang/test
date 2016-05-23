@@ -32,3 +32,9 @@ map name card is from
 [Baidu Map](http://api.map.baidu.com/mapCard/)
 
 Check the support input values at [link](https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/InputTypes.html)
+
+Use below CDN
+* http://www.bootcdn.cn/
+* http://cdn.code.baidu.com/
+* http://libs.useso.com/
+* http://lib.sinaapp.com/
