@@ -7,7 +7,7 @@
     var TYPE_NAME = {
         story : '故事会',
         event : '主题活动'
-    }
+    };
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -125,7 +125,7 @@
             modal.find('#contact').closest(".form-group").removeClass("has-error");
         }
         // get quantity
-        bookInfo.quantity = Number.parseInt(modal.find('#quantity').val());
+        bookInfo.quantity = parseInt(modal.find('#quantity').val());
         if (isNaN(bookInfo.quantity) || bookInfo.quantity <= 0) {
             modal.find('#quantity').closest(".form-group").addClass("has-error");
             hasError = true;
@@ -135,8 +135,16 @@
 
         if (!hasError) {
             modal.modal('hide');
-            localStorage._name = bookInfo.name;
-            localStorage._contact = bookInfo.contact;
+            try {
+                localStorage._name = bookInfo.name;
+                localStorage._contact = bookInfo.contact;
+            }catch (oException) {
+                if(oException.name == 'QuotaExceededError'){
+                    console.error('超出本地存储限额！');
+                    //clear the local storage
+                    localStorage.clear();
+                }
+            }
             addNewBook(bookInfo);
         }
     };

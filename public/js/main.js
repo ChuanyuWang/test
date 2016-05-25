@@ -131,7 +131,7 @@
         // get type
         classItem.type = modal.find('.active input').val();
         // get capacity
-        classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+        classItem.capacity = parseInt(modal.find('#cls_capacity').val());
         if (isNaN(classItem.capacity) || classItem.capacity <= 0) {
             modal.find('#cls_capacity').closest(".form-group").addClass("has-error");
             hasError = true;
@@ -227,7 +227,7 @@
             modal.find('#cls_name').closest(".form-group").removeClass("has-error");
         }
         // get capacity
-        classItem.capacity = Number.parseInt(modal.find('#cls_capacity').val());
+        classItem.capacity = parseInt(modal.find('#cls_capacity').val());
         if (isNaN(classItem.capacity) || classItem.capacity <= 0) {
             modal.find('#cls_capacity').closest(".form-group").addClass("has-error");
             hasError = true;

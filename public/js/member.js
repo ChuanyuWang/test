@@ -96,10 +96,11 @@
         memberInfo.birthday = modal.find('#birth_date').data("DateTimePicker").date();
         // get type
         memberInfo.expire = modal.find('#expire_date').data("DateTimePicker").date();
+        //TODO, handle NaN number
         // get available story point
-        memberInfo.point['story'] = Number.parseInt(modal.find('input[name=story_point]').val());
+        memberInfo.point['story'] = parseInt(modal.find('input[name=story_point]').val());
         // get available event point
-        memberInfo.point['event'] = Number.parseInt(modal.find('input[name=event_point]').val());
+        memberInfo.point['event'] = parseInt(modal.find('input[name=event_point]').val());
         memberInfo.note = modal.find('textarea[name=note]').val().trim();
         
         return hasError;
