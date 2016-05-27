@@ -246,9 +246,11 @@ router.delete ('/:classID', isAuthenticated, function (req, res) {
 });
 
 function createNewBook(req, res, user, cls, quantity) {
-    var booking = req.db.collection("booking");
-
-    var newbooking = {member:user._id.toString(), quantity : quantity, bookDate : new Date()};
+    var newbooking = {
+        member : user._id.toString(),
+        quantity : quantity,
+        bookDate : new Date()
+    };
     var classes = req.db.collection("classes");
     classes.findAndModify({
         query : {
@@ -274,15 +276,16 @@ function createNewBook(req, res, user, cls, quantity) {
         }
 
         var members = req.db.collection("members");
-        user.point[doc.type] -= quantity;
+        
+        var point = {};
+        point["point." + doc.type] = -quantity;
         members.update({
             _id : user._id
         }, {
-            $set : {
-                point : user.point
-            }
+            $inc : point
         });
         //return the status of booking class
+        user.point[doc.type] -= quantity;
         res.json({
             class : doc,
             member : user
