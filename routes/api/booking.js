@@ -113,10 +113,10 @@ router.post('/', function (req, res) {
         }
         console.log("member is found %j", doc);
 
-        if (doc.expire < new Date()) {
+        if (doc.expire && doc.expire < new Date()) {
             res.status(400).json({
                 'code' : 2005,
-                'message' : "会员有效期已过，如果有问题，欢迎来电或到店咨询",
+                'message' : "会员有效期已过，如有问题，欢迎来电或到店咨询",
                 'err' : err
             });
             return;
@@ -143,6 +143,15 @@ router.post('/', function (req, res) {
                 return;
             }
             console.log("class is found %j", cls);
+
+            if (doc.expire && doc.expire < cls.date) {
+                res.status(400).json({
+                    'code' : 2010,
+                    'message' : "您的会员有效期至" + doc.expire.toLocaleDateString() + "，无法预约，如有问题，欢迎来电或到店咨询",
+                    'err' : err
+                });
+                return;
+            }
 
             if (cls.capacity - cls.reservation < req.body.quantity) {
                 var remaining = cls.capacity - cls.reservation;
@@ -172,7 +181,7 @@ router.post('/', function (req, res) {
             if (doc.point[cls.type] < req.body.quantity) {
                 res.status(400).json({
                     'code' : 2004,
-                    'message' : "您的可用次数不足，无法预约，如果有问题，欢迎来电或到店咨询",
+                    'message' : "您的可用次数不足，无法预约，如有问题，欢迎来电或到店咨询",
                     'err' : err
                 });
                 return;
