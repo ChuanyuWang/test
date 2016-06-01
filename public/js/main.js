@@ -47,6 +47,13 @@
             updateWeekInfo(currentMonday);
             updateSchedule($("this"));
         });
+
+        $('#current_week').click(function (event) {
+            $("this").prop("disabled", true);
+            currentMonday = getMonday(moment());
+            updateWeekInfo(currentMonday);
+            updateSchedule($("this"));
+        });
     });
 
     // Functions =============================================================
@@ -76,10 +83,6 @@
     };
 
     function updateWeekInfo(Monday) {
-        var Sunday = moment(Monday).add(6, "days");
-        var info = Monday.format('ll') + ' 至 ' + Sunday.format('ll');
-        $('#currentWeekRange').text(info);
-
         // add the date info in header
         var items = $('#cls_table thead tr th+th');
         $.each(items, function(index, item) {

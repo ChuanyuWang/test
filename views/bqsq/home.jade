@@ -22,12 +22,12 @@ append pagjs
 block page
   div.container(style={'padding-top': '50px'})
     div.row(style={'margin-top': '15px'})
-      div.col-sm-1.pull-left
-        button#previous_week.btn.btn-primary.pull-left.btn-sm 上一周
-      div#currentWeekRange.col-sm-4.col-sm-offset-3(style={'text-align':'center','line-height':'30px'})
-        //p#currentWeekRange= new Date()
-      div.col-sm-1.pull-right
-        button#next_week.btn.btn-primary.pull-right.btn-sm 下一周
+      div.col-sm-4
+        button#previous_week.btn.btn-primary.btn-sm 上一周
+        button#current_week.btn.btn-primary.btn-sm 本周
+        button#next_week.btn.btn-primary.btn-sm 下一周
+      //div.col-sm-1
+      //div#currentWeekRange.col-sm-4.col-sm-offset-3(style={'text-align':'center','line-height':'30px'})
     table#cls_table.table.table-bordered.table-hover(style={'margin-top': '15px'})
         thead#schedule_header
           tr
