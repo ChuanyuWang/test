@@ -54,6 +54,11 @@
             updateWeekInfo(currentMonday);
             updateSchedule($("this"));
         });
+        
+        // handle user change the classroom
+        $('#chooseRoom li a').click(function (event) {
+            alert('教室功能未开放');
+        });
     });
 
     // Functions =============================================================

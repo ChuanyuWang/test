@@ -26,8 +26,15 @@ block page
         button#previous_week.btn.btn-primary.btn-sm 上一周
         button#current_week.btn.btn-primary.btn-sm 本周
         button#next_week.btn.btn-primary.btn-sm 下一周
-      //div.col-sm-1
-      //div#currentWeekRange.col-sm-4.col-sm-offset-3(style={'text-align':'center','line-height':'30px'})
+      div.col-sm-2.pull-right
+        div#chooseRoom.btn-group(style='float:right')
+          button.btn.btn-default.btn-sm.dropdown-toggle(type='button',data-toggle='dropdown') <默认> 
+            span.caret
+          ul.dropdown-menu
+            li.divider(role='separator')
+            li
+              a(href='#') <创建教室>
+        span(style='float:right;line-height:30px') 教室: 
     table#cls_table.table.table-bordered.table-hover(style={'margin-top': '15px'})
         thead#schedule_header
           tr
