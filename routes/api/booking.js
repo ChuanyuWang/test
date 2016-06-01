@@ -303,7 +303,7 @@ function createNewBook(req, res, user, cls, quantity) {
 };
 
 function isAuthenticated(req, res, next) {
-    if (req.user && req.user.tenant == req.tenant.tenant) {
+    if (req.user && req.user.tenant == req.tenant.name) {
         next()
     } else {
         res.status(401).send('Unauthorized Request');

@@ -8,16 +8,17 @@ var API = require('wechat-api');
 var visited_user_list = new Array();
 var counter = 1;
 
+//TODO, the tenant info of 'req.user.tenant' should get from database
 var tenant = {
     appid : 'wxe5e454c5dff8c7b2',
     appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
     token : 'Hibanana',
     encodingAESKey : '',
-    tenant : 'bqsq',
-    name : '大Q小q'
+    name : 'bqsq',
+    displayName : '大Q小q'
 };
 //setup database
-var db = require("../db").get(tenant.tenant);
+var db = require("../db").get(tenant.name);
 
 var api = new API(tenant.appid, tenant.appsecret);
 

@@ -12,7 +12,7 @@ router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title : '课程表',
         user : req.user,
-        project : req.tenant.name
+        project : req.tenant.displayName
     });
 });
 
@@ -20,7 +20,7 @@ router.get('/member', checkTenantUser, function (req, res) {
     res.render('bqsq/member', {
         title : '会员',
         user : req.user,
-        project : req.tenant.name
+        project : req.tenant.displayName
     });
 });
 
@@ -40,7 +40,7 @@ function checkTenantUser(req, res, next) {
     if (!req.user) {
         req.flash('error', '用户未登陆或连接超时');
         res.redirect('/');
-    } else if (req.user.tenant != req.tenant.tenant) {
+    } else if (req.user.tenant != req.tenant.name) {
         res.redirect('/' + req.user.tenant + '/home');
     } else {
         next();

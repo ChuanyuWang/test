@@ -9,22 +9,29 @@ var API = require('wechat-api');
 var visited_user_list = new Array();
 var counter = 1;
 
-//setup database
-
+//TODO, the tenant info of 'req.user.tenant' should get from database
 var tenant = {
     appid : 'wxe5e454c5dff8c7b2',
     appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
     token : 'Hibanana',
     encodingAESKey : '',
-    tenant : 'test',
-    name : '大Q小q'
+    name : 'test',
+    displayName : '大Q小q',
+    classType : {
+        story : '故事会',
+        event : '主题活动'
+    },
+    classroom : [{name:'五彩城'},{name:'恒大'}]
 };
-var db = require("../db").get(tenant.tenant);
+var db = require("../db").get(tenant.name);
 
 var api = new API(tenant.appid, tenant.appsecret);
 
 // all requests to this router will append tenant info
 router.use(function (req, res, next) {
+    if (!tenant) {
+        //TODO, load tenant info from database and initialize db and api object
+    }
     req.tenant = tenant;
     req.db = db;
     req.api = api;

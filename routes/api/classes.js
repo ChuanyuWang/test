@@ -102,7 +102,7 @@ router.delete ('/:classID', isAuthenticated, function (req, res) {
 });
 
 function isAuthenticated(req, res, next) {
-    if (req.user && req.user.tenant == req.tenant.tenant) {
+    if (req.user && req.user.tenant == req.tenant.name) {
         next()
     } else {
         res.status(401).send('Unauthorized Request');
