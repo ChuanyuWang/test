@@ -24,6 +24,14 @@ router.get('/member', checkTenantUser, function (req, res) {
     });
 });
 
+router.get('/setting', checkTenantUser, function (req, res) {
+    res.render('bqsq/setting', {
+        title : '设置',
+        user : req.user,
+        project : req.tenant.displayName
+    });
+});
+
 router.get('/mybooking', function (req, res) {
     res.render('bqsq/mybooking', {
         title : '我的课程'

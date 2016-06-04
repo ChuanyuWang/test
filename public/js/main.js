@@ -56,8 +56,10 @@
         });
         
         // handle user change the classroom
-        $('#chooseRoom li a').click(function (event) {
+        $('#chooseRoom').change(function (event) {
             alert('教室功能未开放');
+            var index =$(this).find("option:selected").index();
+            var val =$(this).find("option:selected").val();
         });
     });
 
@@ -69,7 +71,25 @@
         bootbox.setLocale('zh_CN');
         currentMonday = getMonday(moment());
         updateWeekInfo(currentMonday);
+        initClassRoomList();
         updateSchedule();
+    };
+    
+    function initClassRoomList() {
+        //TODO
+        var hasAvailableClassRoom = true;
+        if (!hasAvailableClassRoom) {
+            // show a single button to create class room
+            $('#create_cls_panel').show();
+        } else {
+            // show class schedule according to the first classroom
+            $('#cls_table').show();
+        }
+    };
+    
+    function getCurrentClassRoom() {
+        var classroom = $('#chooseRoom').find("option:selected").val();
+        return classroom;
     };
 
     // Get the Monday of specific date, each week starts from Monday
@@ -140,7 +160,7 @@
         classItem.type = modal.find('.active input').val();
         // get capacity
         classItem.capacity = parseInt(modal.find('#cls_capacity').val());
-        if (isNaN(classItem.capacity) || classItem.capacity <= 0) {
+        if (isNaN(classItem.capacity) || classItem.capacity < 0) {
             modal.find('#cls_capacity').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {
@@ -236,7 +256,7 @@
         }
         // get capacity
         classItem.capacity = parseInt(modal.find('#cls_capacity').val());
-        if (isNaN(classItem.capacity) || classItem.capacity <= 0) {
+        if (isNaN(classItem.capacity) || classItem.capacity < 0) {
             modal.find('#cls_capacity').closest(".form-group").addClass("has-error");
             hasError = true;
         } else {

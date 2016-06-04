@@ -6,6 +6,8 @@ block navlist
       a(href='home') 课程表
     li.active
       a(href='#') 会员
+    li
+      a(href='setting') 设置
       
 append css
   link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
@@ -23,7 +25,6 @@ append pagjs
 
 block page
   div.container(style={'padding-top': '58px'})
-    //div#toolbar.btn-group(role='group')
     div#toolbar.btn-group(role='group')
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
       button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 查看
