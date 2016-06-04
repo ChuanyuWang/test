@@ -6,6 +6,8 @@ block navlist
       a(href='#') 课程表
     li
       a(href='member') 会员
+    li
+      a(href='setting') 设置
 
 append css
   link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
@@ -27,15 +29,12 @@ block page
         button#current_week.btn.btn-primary.btn-sm 本周
         button#next_week.btn.btn-primary.btn-sm 下一周
       div.col-sm-2.pull-right
-        div#chooseRoom.btn-group(style='float:right')
-          button.btn.btn-default.btn-sm.dropdown-toggle(type='button',data-toggle='dropdown') <默认> 
-            span.caret
-          ul.dropdown-menu
-            li.divider(role='separator')
-            li
-              a(href='#') <创建教室>
-        span(style='float:right;line-height:30px') 教室: 
-    table#cls_table.table.table-bordered.table-hover(style={'margin-top': '15px'})
+        select#chooseRoom.form-control.input-sm(style='float:right')
+        //span(style='float:right;line-height:30px') 教室: 
+    div#create_cls_panel.row(style='margin-top:15px;display:none')
+      div.col-sm-12(style='height:200px;background-color:#eee')
+        button.btn.btn-success(style='margin:83px auto;display:block') 创建教室
+    table#cls_table.table.table-bordered.table-hover(style='margin-top:15px;display:none')
         thead#schedule_header
           tr
             th 时间
@@ -98,7 +97,7 @@ block page
             div.form-group
               label.control-label.col-sm-2(for='cls_capacity') 最大人数:
               div.col-sm-2
-                input#cls_capacity.form-control(type='number',name='cls_capacity',min='1')
+                input#cls_capacity.form-control(type='number',name='cls_capacity',min='0')
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#create_cls.btn.btn-success(type="button") 添加
