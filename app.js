@@ -76,12 +76,34 @@ app.use(function(req, res, next) {
 
 /// error handlers
 
+// log error to std or err or file for persistent
+app.use(function(err, req, res, next) {
+    console.error(err);
+    if (err.innerError) {
+        console.error(" is caused by ");
+        console.error(err.innerError);
+    }
+    next(err);
+});
+
+// handle client error and return an error object
+app.use(function(err, req, res, next) {
+    if (req.xhr) {
+        res.status(err.status || 500);
+        res.send({
+            message : err.message,
+            code : err.code
+        });
+    } else {
+        next(err);
+    }
+});
+
 // development error handler
 // will print stacktrace
 
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
-        console.error(err);
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -102,5 +124,19 @@ app.use(function(err, req, res, next) {
     });
 });
 
+// load database connection string
+if (app.get('env') === 'development') {
+    app.locals.getURI = function(database) {
+        return "mongodb://admin:39fe4847-6ecb-431c-9647-23160a80db54@localhost/" + database + "?authSource=admin";
+    };
+}
+
+if (app.get('env') === 'production') {
+    // TODO, load the connection string from local config.js file
+    var connectionURL = "mongodb://admin:39fe4847-6ecb-431c-9647-23160a80db54@localhost/";
+    app.locals.getURI = function(database) {
+        return connectionURL + database + "?authSource=admin";
+    };
+}
 
 module.exports = app;

@@ -48,7 +48,8 @@ router.put('/:memberID', isAuthenticated, function (req, res) {
         if (err) {
             res.status(500).json({
                 'err' : err
-            })
+            });
+            return;
         } 
         if (result.n == 1) {
             console.log("member %s is updated by %j", req.params.memberID, req.body);
@@ -89,6 +90,7 @@ router.delete ('/:memberID', isAuthenticated, function (req, res) {
             res.status(500).json({
                 'err' : err
             });
+            return;
         } 
         if (result.n == 1) {
             console.log("member %s is deteled", req.params.memberID);
