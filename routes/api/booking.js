@@ -84,7 +84,7 @@ contact : "13500000000",
 classID : "5716630aa012576d0371e888"
 }
  */
-router.post('/', function (req, res) {
+router.post('/', function (req, res, next) {
     if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
         res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
         return;
@@ -97,19 +97,16 @@ router.post('/', function (req, res) {
     // find the user who want to book a class
     members.findOne(user_query, function (err, doc) {
         if (err) {
-            res.status(500).json({
-                'err' : err
-            });
-            return;
+            var error = new Error('Find member fails');
+            error.innerError = err;
+            return next(error);
         }
 
         if (!doc) {
-            res.status(400).json({
-                'code' : 2001,
-                'message' : "未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询",
-                'err' : err
-            });
-            return;
+            var error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
+            error.status = 400;
+            error.code = 2001;
+            return next(error);
         }
         console.log("member is found %j", doc);
 
