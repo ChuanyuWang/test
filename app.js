@@ -78,7 +78,7 @@ app.use(function(req, res, next) {
 
 // log error to std or err or file for persistent
 app.use(function(err, req, res, next) {
-    console.error(err);
+    console.error(err.stack);
     if (err.innerError) {
         console.error(" is caused by ");
         console.error(err.innerError);
