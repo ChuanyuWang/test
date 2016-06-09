@@ -37,12 +37,12 @@ database.get = function (tenant) {
     var db = mongojs(uri);
 
     db.on('error', function (err) {
-        console.log('database error', err);
+        console.log('database error: ' + tenant, err);
         state.db = null;
     })
 
     db.on('connect', function () {
-        console.log('database connected');
+        console.log('database connected: ' + tenant);
     })
 
     return db;

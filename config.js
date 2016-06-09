@@ -1,5 +1,5 @@
 module.exports = {
-    //secret : 'e284d26a4c30dddb295b6dbade703732',
+    
     port : 7004,
     log4js : {
         appenders : [{
@@ -46,6 +46,7 @@ module.exports = {
     },
     mygirl : {
         appid : 'wx44ade48e4f86c081',
+        appsecret : 'e284d26a4c30dddb295b6dbade703732',
         token : 'Hibanana',
         encodingAESKey : 'SIA3ze7mGjCEpvTlhp5n3OjjRrD8QAPcHQDpklRp4uE'
     }
