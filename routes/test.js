@@ -21,7 +21,7 @@ var tenant = {
         story : '故事会',
         event : '主题活动'
     },
-    classroom : [{name:'五彩城'},{name:'恒大'}]
+    classroom : []
 };
 var db = require("../db").get(tenant.name);
 

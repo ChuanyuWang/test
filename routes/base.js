@@ -6,6 +6,7 @@ var mongojs = require('mongojs');
 var classes = require('./api/classes');
 var members = require('./api/members');
 var booking = require('./api/booking');
+var setting = require('./api/setting');
 
 /* GET users listing. */
 router.get('/home', checkTenantUser, function (req, res) {
@@ -43,6 +44,7 @@ router.get('/mybooking', function (req, res) {
 router.use('/api/classes', classes);
 router.use('/api/members', members);
 router.use('/api/booking', booking);
+router.use('/api/setting', setting);
 
 function checkTenantUser(req, res, next) {
     if (!req.user) {

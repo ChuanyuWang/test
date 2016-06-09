@@ -31,15 +31,43 @@ block page
       li.active(role='presentation')
         a(href="#classroom",role='tab',data-toggle='tab') 教室
     div.tab-content
-      div.tab-pane.active(role="tabpanel",id="classroom")
-        p 暂未开放
+      div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
+        div#toolbar.btn-group(role='group')
+          button.btn.btn-success(type='button',data-toggle='modal',data-target='#clsroom_dlg', data-action='add') 添加
+        table#classroom_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-unique-id="id",data-show-refresh='true',data-toolbar='#toolbar',data-url='api/setting/classroom')
+            thead
+              tr
+                th(data-field='id',data-sortable='true') 教室ID
+                th(data-field='name') 教室名字
+                th(data-title='删除',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteClassroom')
       div.tab-pane(role="tabpanel",id="general")
         p 暂未开放
     script(type='text/javascript').
         function deleteFormatter(value) {
             return [
-                '<a class="remove text-danger" href="javascript:void(0)" title="取消">',
+                '<a class="remove text-danger" href="javascript:void(0)" title="删除">',
                 '<i class="glyphicon glyphicon-remove"></i>',
                 '</a>'
             ].join('');
         };
+  div#clsroom_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
+    div.modal-dialog(role="document")
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 添加教室
+        div.modal-body
+          form.form-horizontal
+            div.form-group
+              label.control-label.col-sm-2(for='classroom_id') 教室ID:
+              div.col-sm-10
+                input#classroom_id.form-control(type='text',name='id',placeholder='英文字母a到z')
+            div.form-group
+              label.control-label.col-sm-2(for='classroom_name') 教室名字:
+              div.col-sm-10
+                input#classroom_name.form-control(type='text',name='name',placeholder='教室名字')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_room.btn.btn-success(type="button") 添加
+          //button#edit_member.btn.btn-success(type="button") 修改
