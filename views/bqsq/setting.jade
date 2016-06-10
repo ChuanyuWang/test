@@ -40,7 +40,7 @@ block page
                 th(data-field='id',data-sortable='true') 教室ID
                 th(data-field='name') 教室名字
                 th(data-title='删除',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteClassroom')
-      div.tab-pane(role="tabpanel",id="general")
+      div.tab-pane(role="tabpanel",id="general",style="padding:7px")
         p 暂未开放
     script(type='text/javascript').
         function deleteFormatter(value) {
@@ -62,7 +62,7 @@ block page
             div.form-group
               label.control-label.col-sm-2(for='classroom_id') 教室ID:
               div.col-sm-10
-                input#classroom_id.form-control(type='text',name='id',placeholder='英文字母a到z')
+                input#classroom_id.form-control(type='text',name='id',placeholder='英文字母或数字')
             div.form-group
               label.control-label.col-sm-2(for='classroom_name') 教室名字:
               div.col-sm-10

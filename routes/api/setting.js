@@ -56,9 +56,9 @@ router.route('/classroom/:roomID')
         error.status = 400;
         return next(error);
     }
-    var namePattern = /^[a-z]+$/; // only lower letters
+    var namePattern = /^[a-z0-9]+$/; // only letter or number
     if (!namePattern.test(req.params.roomID)) {
-        var error = new Error("教室ID包含非法字符，仅支持小写字母z到a");
+        var error = new Error("教室ID包含非法字符，支持小写字母或数字");
         error.status = 400;
         return next(error);
     }
@@ -105,6 +105,7 @@ router.route('/classroom/:roomID')
 })
 .delete (function (req, res) {
     //TODO, Delete a classroom
+    next(new Error('not implemented'));
 })
 .put(function (req, res) {
     //TODO, handle the error in error handle middleware 
