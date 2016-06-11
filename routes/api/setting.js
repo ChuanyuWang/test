@@ -1,27 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
+var util = require('../../util');
 
 var config_db = null;
-
-// initialize the 'config' database for setting request
+// initialize the 'config' database for setting router
 router.use(function (req, res, next) {
-    if (!config_db) {
-        // setting of each teant all in one 'config' database, 
-        // create the database connection at the first time
-        var uri = req.app.locals.getURI('config');
-        var db = mongojs(uri);
-
-        db.on('error', function (err) {
-            console.error('connect database "config" error', err);
-            state.db = null;
-        })
-        db.on('connect', function () {
-            console.log('database "config" connected');
-        })
-        // cache for setting router
-        config_db = db;
-    }
+    config_db = config_db || util.connect(req.app.locals.getURI('config'));
     next();
 });
 
