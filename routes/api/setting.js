@@ -10,7 +10,7 @@ router.use(function (req, res, next) {
     next();
 });
 
-router.get('/classroom', function(req, res, next) {
+router.get('/classrooms', function(req, res, next) {
     // get the tenant name from url, as this api is used public
     var tenant = req.baseUrl.split("/")[1];
     config_db.collection('tenants').findOne({
@@ -32,17 +32,15 @@ router.get('/classroom', function(req, res, next) {
     });
 });
 
-router.route('/classroom/:roomID')
-.all(isAuthenticated)
-.post(function (req, res, next) {
+router.post('/classrooms', isAuthenticated, function(req, res, next) {
     //var newRoom = {id:'abc', name:''};
-    if (req.body.id != req.params.roomID) {
-        var error = new Error("the classroom ID is not the same in body and url");
+    if (!req.body.id) {
+        var error = new Error("classroom ID is not defined");
         error.status = 400;
         return next(error);
     }
     var namePattern = /^[a-z0-9]+$/; // only letter or number
-    if (!namePattern.test(req.params.roomID)) {
+    if (!namePattern.test(req.body.id)) {
         var error = new Error("教室ID包含非法字符，支持小写字母或数字");
         error.status = 400;
         return next(error);
@@ -51,7 +49,7 @@ router.route('/classroom/:roomID')
     var tenants = config_db.collection('tenants');
     tenants.findOne({
         name : req.user.tenant,
-        'classroom.id' : req.params.roomID
+        'classroom.id' : req.body.id
     }, function(err, doc) {
         if (doc) {
             var error = new Error("创建教室失败，教室ID重复");
@@ -87,13 +85,20 @@ router.route('/classroom/:roomID')
             res.send(result);
         });
     });
+});
+
+router.route('/classrooms/:roomID')
+.all(isAuthenticated)
+.get(function(req, res){
+    //TODO, get a classroom
+    next(new Error('not implemented'));
 })
 .delete (function (req, res) {
     //TODO, Delete a classroom
     next(new Error('not implemented'));
 })
 .put(function (req, res) {
-    //TODO, handle the error in error handle middleware 
+    //TODO, update a classroom
     next(new Error('not implemented'));
 });
 

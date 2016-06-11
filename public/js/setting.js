@@ -59,7 +59,7 @@
     };
     
     function addNewClassroom(room) {
-        $.ajax("api/setting/classroom/" + room.id, {
+        $.ajax("api/setting/classrooms", {
             type : "POST",
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(room),

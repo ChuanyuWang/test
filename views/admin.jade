@@ -1,10 +1,13 @@
 extends index
 
+append css
+  link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
+
 append pagjs
-  //script(src='/components/moment/min/moment-with-locales.min.js')
-  //script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js')
-  //script(src='/components/bootbox.js/bootbox.js')
+  //script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")  //script(src='/components/bootbox.js/bootbox.js')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-zh-CN.min.js")
   script(src='/js/admin.js')
 
 block page
@@ -13,7 +16,7 @@ block page
       li.active(role='presentation')
         a(href="#users",role='tab',data-toggle='tab') Users
       li(role='presentation')
-        a(href="#todo",role='tab',data-toggle='tab') TODO
+        a(href="#tenants",role='tab',data-toggle='tab') Tenants
     div.tab-content
       div.tab-pane.active(role="tabpanel",id="users")
           form.form-horizontal(style={'padding':'11px'},role='form',action="createUser",method="post")
@@ -36,5 +39,49 @@ block page
             div.form-group
               div.col-sm-offset-2.col-sm-10
                 button.btn.btn-default(type='submit') Create User
-      div.tab-pane(role="tabpanel",id="todo")
-        p to be done
+      div.tab-pane(role="tabpanel",id="tenants")
+        div#toolbar.btn-group(role='group')
+          button.btn.btn-success(type='button',data-toggle='modal',data-target='#tenant_dlg', data-action='add') 添加
+        table#tenant_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-unique-id="name",data-show-refresh='true',data-toolbar='#toolbar',data-url='api/tenants')
+            thead
+              tr
+                th(data-field='name',data-sortable='true') name
+                th(data-field='displayName') Display Name
+                th(data-field='classroom',data-formatter='objectFormatter') Classroom
+                th(data-title='删除',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteTenant')
+    script(type='text/javascript').
+        function objectFormatter(value) {
+            if (typeof(value) == 'object') {
+                return JSON.stringify(value, null, "  ");
+            } else {
+                value + '';
+            }
+        };
+        function deleteFormatter(value) {
+            return [
+                '<a class="remove text-danger" href="javascript:void(0)" title="删除">',
+                '<i class="glyphicon glyphicon-remove"></i>',
+                '</a>'
+            ].join('');
+        };
+  div#tenant_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
+    div.modal-dialog(role="document")
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title Create Tenant
+        div.modal-body
+          form.form-horizontal
+            div.form-group
+              label.control-label.col-sm-3(for='name') Name:
+              div.col-sm-9
+                input#name.form-control(type='text',name='name',placeholder='only letters')
+            div.form-group
+              label.control-label.col-sm-3(for='displayName') Display name:
+              div.col-sm-9
+                input#displayName.form-control(type='text',name='displayName',placeholder='display name')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") Cancel
+          button#add_tenant.btn.btn-success(type="button") Create
+          //button#edit_member.btn.btn-success(type="button") 修改
