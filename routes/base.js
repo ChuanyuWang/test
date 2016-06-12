@@ -13,7 +13,8 @@ router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title : '课程表',
         user : req.user,
-        navTitle : req.tenant.displayName
+        navTitle : req.tenant.displayName,
+        classroom : req.tenant.classroom ? req.tenant.classroom : []
     });
 });
 

@@ -57,9 +57,7 @@
         
         // handle user change the classroom
         $('#chooseRoom').change(function (event) {
-            alert('教室功能未开放');
-            var index =$(this).find("option:selected").index();
-            var val =$(this).find("option:selected").val();
+            updateSchedule();
         });
     });
 
@@ -76,9 +74,7 @@
     };
     
     function initClassRoomList() {
-        //TODO
-        var hasAvailableClassRoom = true;
-        if (!hasAvailableClassRoom) {
+        if (!getCurrentClassRoom()) {
             // show a single button to create class room
             $('#create_cls_panel').show();
         } else {
@@ -88,8 +84,11 @@
     };
     
     function getCurrentClassRoom() {
-        var classroom = $('#chooseRoom').find("option:selected").val();
-        return classroom;
+        var classroom = $('#chooseRoom option:selected');
+        if (classroom.length == 1) {
+            return classroom.val();
+        }
+        return null;
     };
 
     // Get the Monday of specific date, each week starts from Monday
@@ -166,6 +165,8 @@
         } else {
             modal.find('#cls_capacity').closest(".form-group").removeClass("has-error");
         }
+        // get classroom
+        classItem.classroom = getCurrentClassRoom();
 
         if (!hasError) {
             modal.modal('hide');
@@ -365,7 +366,11 @@
         clearSchedule();
         var begin = moment(currentMonday);
         var end = moment(currentMonday).add(7, 'days');
-        $.ajax("api/classes", {
+        var url = 'api/classes';
+        if (getCurrentClassRoom()) {
+            url += "?classroom=" + getCurrentClassRoom();
+        }
+        $.ajax(url, {
             type : "GET",
             //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
             data : {

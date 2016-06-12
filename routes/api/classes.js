@@ -14,7 +14,8 @@ router.get('/', function (req, res) {
         date : {
             $gte : new Date(req.query.from),
             $lt : new Date(req.query.to)
-        }
+        },
+        classroom : req.query.classroom ? req.query.classroom : null
     };
     
     // be defaul the sort is 'asc'

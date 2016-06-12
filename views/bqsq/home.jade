@@ -30,7 +30,8 @@ block page
         button#next_week.btn.btn-primary.btn-sm 下一周
       div.col-sm-2.pull-right
         select#chooseRoom.form-control.input-sm(style='float:right')
-          option 五彩城店
+          - each room in classroom
+            option(value=room.id)= room.name
         //span(style='float:right;line-height:30px') 教室: 
     div#create_cls_panel.row(style='margin-top:15px;display:none')
       div.col-sm-12(style='height:200px;background-color:#eee')
