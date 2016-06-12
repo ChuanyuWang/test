@@ -366,16 +366,13 @@
         clearSchedule();
         var begin = moment(currentMonday);
         var end = moment(currentMonday).add(7, 'days');
-        var url = 'api/classes';
-        if (getCurrentClassRoom()) {
-            url += "?classroom=" + getCurrentClassRoom();
-        }
-        $.ajax(url, {
+        $.ajax('api/classes', {
             type : "GET",
             //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
             data : {
                 from : begin.toISOString(),
-                to : end.toISOString()
+                to : end.toISOString(),
+                classroom : getCurrentClassRoom()
             },
             success : function (data) {
                 for (var i=0; i<data.length; i++) {
@@ -409,6 +406,6 @@
     function getParam(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var param = window.location.search.substr(1).match(reg);
-        return param ? param[2] : undefined;
+        return param ? decodeURI(param[2]) : undefined;
     };
 })(jQuery);

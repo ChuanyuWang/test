@@ -4,6 +4,7 @@
     // open id of Weichat user
     window._openid = undefined;
     
+    var classroom = null;
     var TYPE_NAME = {
         story : '故事会',
         event : '主题活动'
@@ -77,6 +78,7 @@
         //bootbox.setLocale('zh_CN');
         //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
         currentMonday = getMonday(moment());
+        classroom = getParam('classroom');
         updateSchedule();
     };
 
@@ -277,7 +279,8 @@
             //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
             data : {
                 from : begin.toISOString(),
-                to : end.toISOString()
+                to : end.toISOString(),
+                classroom : classroom
             },
             success : function (data) {
                 for (var i = 0; i < data.length; i++) {
@@ -313,5 +316,11 @@
         // remove all classes and separators
         $('.class-row,.class-separator').remove();
         $('.alert-warning').remove();
+    };
+    
+    function getParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var param = window.location.search.substr(1).match(reg);
+        return param ? decodeURI(param[2]) : null;
     };
 })(jQuery);
