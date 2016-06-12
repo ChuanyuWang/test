@@ -15,7 +15,7 @@ router.get('/home', checkTenantUser, function (req, res) {
     res.render('admin',{
         title : '控制台',
         user : req.user,
-        project : "控制台"
+        navTitle : "控制台"
     });
 });
 

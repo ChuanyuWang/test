@@ -11,7 +11,7 @@ router.get('/', function (req, res) {
     if (!req.user) {
         res.render('index', {
             title : '约课',
-            project : '约课',
+            navTitle : '约课',
             errorMsg : req.flash('error')
         });
     } else {

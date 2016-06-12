@@ -13,7 +13,7 @@ router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title : '课程表',
         user : req.user,
-        project : req.tenant.displayName
+        navTitle : req.tenant.displayName
     });
 });
 
@@ -21,7 +21,7 @@ router.get('/member', checkTenantUser, function (req, res) {
     res.render('bqsq/member', {
         title : '会员',
         user : req.user,
-        project : req.tenant.displayName
+        navTitle : req.tenant.displayName
     });
 });
 
@@ -29,7 +29,7 @@ router.get('/setting', checkTenantUser, function (req, res) {
     res.render('bqsq/setting', {
         title : '设置',
         user : req.user,
-        project : req.tenant.displayName
+        navTitle : req.tenant.displayName
     });
 });
 
