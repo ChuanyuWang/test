@@ -3,8 +3,6 @@
     window.cls_cache = {};
     // open id of Weichat user
     window._openid = undefined;
-    
-    var classroom = null;
     var TYPE_NAME = {
         story : '故事会',
         event : '主题活动'
@@ -78,8 +76,30 @@
         //bootbox.setLocale('zh_CN');
         //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
         currentMonday = getMonday(moment());
-        classroom = getParam('classroom');
+        // select the specific classroom in the dropdown list
+        var room = getParam('classroom');
+        if (room) {
+            var option_ele = $('#chooseRoom option[value=' + room.trim() + ']');
+            if (option_ele.length == 1) {
+                option_ele.prop('selected', true);
+            }
+        }
+        document.title = '会员约课-' + $('#chooseRoom option:selected').text();
+        // handle user change the classroom after set the selected option
+        $('#chooseRoom').change(function (event) {
+            // update the title
+            document.title = '会员约课-' + $(this).find('option:selected').text();
+            updateSchedule();
+        });
         updateSchedule();
+    };
+    
+    function getCurrentClassRoom() {
+        var classroom = $('#chooseRoom option:selected');
+        if (classroom.length == 1) {
+            return classroom.val();
+        }
+        return null;
     };
 
     function getMonday(date) {
@@ -280,7 +300,7 @@
             data : {
                 from : begin.toISOString(),
                 to : end.toISOString(),
-                classroom : classroom
+                classroom : getCurrentClassRoom()
             },
             success : function (data) {
                 for (var i = 0; i < data.length; i++) {

@@ -58,7 +58,7 @@ router.use(function (req, res, next) {
 
 router.get('/booking', function (req, res) {
     var timeKey = parseInt(Date.now()/1000);
-    
+
     function findUserOpenID(user) {
         return timeKey - user.time <= 1;
     }
@@ -71,7 +71,8 @@ router.get('/booking', function (req, res) {
         title : '会员约课',
         counter : counter++,
         timeKey : timeKey,
-        openid : user ? user.openid : ''
+        openid : user ? user.openid : '',
+        classroom : req.tenant.classroom
     });
 });
 
@@ -166,7 +167,6 @@ router.use('/weixin', wechat(tenant, function (req, res, next) {
 }));
 
 // Functions =============================================================
-
 
 // Route other request to base router ====================================
 
