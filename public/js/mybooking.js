@@ -4,6 +4,8 @@
     // open id of Weichat user
     window._openid = undefined;
     
+    var memberid = undefined;
+    
     var TYPE_NAME = {
         story : '故事会',
         event : '主题活动'
@@ -39,7 +41,11 @@
         
         $('#user_info .btn-danger').click(function (e) {
             clearSchedule();
-            localStorage._memberid = undefined;
+            try {
+                localStorage._memberid = memberid = undefined;
+            }catch (oException) {
+                // the private browsing is on, access to localStorage cause exception on iOS
+            }
             toggleLoginForm(true);
         });
         
@@ -87,9 +93,18 @@
                 data : userInfo,
                 success : function (data) {
                     if (data && data.length > 0) {
-                        localStorage._memberid = data[0]._id;
-                        localStorage._name = data[0].name;
-                        localStorage._contact = data[0].contact;
+                        try {
+                            // cache the member id in global variable before access localStorage
+                            localStorage._memberid = memberid = data[0]._id;
+                            localStorage._name = data[0].name;
+                            localStorage._contact = data[0].contact;
+                        }catch (oException) {
+                            if(oException.name == 'QuotaExceededError'){
+                                console.error('超出本地存储限额！');
+                                //clear the local storage
+                                localStorage.clear();
+                            }
+                        }
                         toggleLoginForm(false);
                         updateUserInfo(data[0]);
                         showMyBooking();
@@ -135,14 +150,19 @@
 
         // insert a class in last row
         var cls_col = '<p>' + item.name + '</p>';
-        var cls_tip = '<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>';
+
+        var cls_type = "";
         if (item.type == "story") {
-            cls_tip += date.format('HH:mm') + '开始 <span class="cls-story">故事会</span></p>';
+            cls_type = '<span class="cls-story">故事会</span>';
         } else if (item.type == "event") {
-            cls_tip += date.format('HH:mm') + '开始 <span class="cls-event">主题活动</span></p>';
-        } else {
-            cls_tip += date.format('HH:mm') + '开始</p>';
+            cls_type = '<span class="cls-event">主题活动</span>';
         }
+
+        var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
+                        date.format('HH:mm') + ' ',
+                        cls_type + ' ',
+                        getClassroomName(item.classroom),
+                        '</p>'].join('');
 
         if (date > moment()) {
             var btn_tip = '<p class="cls-status text-danger">(未上)</p>';
@@ -189,9 +209,9 @@
     function showMyBooking(isHistory, tab_id) {
         var type = $('.nav-tabs .active a').attr('href');
         if (type == '#future') {
-            updateSchedule(localStorage._memberid, false);
+            updateSchedule(memberid, false);
         } else if (type == '#history') {
-            updateSchedule(localStorage._memberid, true);
+            updateSchedule(memberid, true);
         }
     };
 
@@ -237,6 +257,16 @@
 
         // append a warning bar
         list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>没有找到预约课程</div>");
+    };
+    
+    function getClassroomName(roomID) {
+        var roomList = getClassroomList();
+        for (var i=0; i<roomList.length;i++) {
+            if (roomID == roomList[i].id) {
+                return roomList[i].name;
+            }
+        }
+        return "";
     };
 
     function clearSchedule() {

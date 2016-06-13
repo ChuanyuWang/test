@@ -36,7 +36,8 @@ router.get('/setting', checkTenantUser, function (req, res) {
 
 router.get('/mybooking', function (req, res) {
     res.render('bqsq/mybooking', {
-        title : '我的课程'
+        title : '我的课程',
+        classroom : JSON.stringify(req.tenant.classroom ? req.tenant.classroom : [])
     });
 });
 

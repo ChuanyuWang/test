@@ -14,12 +14,16 @@ router.get('/', function (req, res) {
         date : {
             $gte : new Date(req.query.from),
             $lt : new Date(req.query.to)
-        },
-        classroom : req.query.classroom ? req.query.classroom : null
+        }
     };
     
     // be defaul the sort is 'asc'
     var sort = req.query.order == 'desc' ? -1 : 1;
+
+    // query specific classroom
+    if (req.query.hasOwnProperty('classroom')) {
+        query['classroom'] = req.query.classroom ? req.query.classroom : null;
+    }
     
     // get all classes booked by this member
     if (req.query.memberid) {
