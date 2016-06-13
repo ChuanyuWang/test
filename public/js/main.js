@@ -20,8 +20,8 @@
                 var colIndex = $("#cls_table td").index(button.closest('td')) % 8;
             }
             var modal = $(this);
-            modal.find('#cls_name').val("");
-            modal.find('#cls_capacity').val(8);
+            modal.find('#cls_name').val("").closest(".form-group").removeClass("has-error");
+            modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
             modal.find('#cls_date').text(generateDate(rowIndex, colIndex, currentMonday).format('lll'));
         });
 
@@ -231,10 +231,10 @@
         }
         
         var modal = $('#view_dlg');
-        modal.find('#cls_name').val(class_item.name);
+        modal.find('#cls_name').val(class_item.name).closest(".form-group").removeClass("has-error");
         modal.find('#cls_type').text(TYPE_NAME[class_item.type]);
         modal.find('#cls_date').text(moment(class_item.date).format('lll'));
-        modal.find('#cls_capacity').val(class_item.capacity);
+        modal.find('#cls_capacity').val(class_item.capacity).closest(".form-group").removeClass("has-error");
 
         // cache the class ID on member table
         modal.find('#member_table').data('classid', class_id);
