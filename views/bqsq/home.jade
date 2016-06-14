@@ -11,12 +11,14 @@ block navlist
 
 append css
   link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css")
+  link(rel="stylesheet",href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")
 
 append pagjs
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   script(src='/components/bootbox.js/bootbox.js')
   script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
   //script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src='/js/main.js')
@@ -95,7 +97,11 @@ block page
             div.form-group
               label.control-label.col-sm-2 时间:
               div.col-sm-10
-                p#cls_date.form-control-static
+                p#cls_date.form-control-static(style="width:100px;float:left")
+                div#cls_time.input-group.date(style="width:150px;float:left")
+                  input.form-control(type="text")
+                  span.input-group-addon
+                    span.glyphicon.glyphicon-time
             div.form-group
               label.control-label.col-sm-2(for='cls_capacity') 最大人数:
               div.col-sm-2

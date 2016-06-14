@@ -22,7 +22,9 @@
             var modal = $(this);
             modal.find('#cls_name').val("").closest(".form-group").removeClass("has-error");
             modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
-            modal.find('#cls_date').text(generateDate(rowIndex, colIndex, currentMonday).format('lll'));
+            var defaultDate = generateDate(rowIndex, colIndex, currentMonday)
+            modal.find('#cls_date').text(defaultDate.format('ll'));
+            modal.find('#cls_time').data('DateTimePicker').date(defaultDate);
         });
 
         $('#cls_dlg').on('shown.bs.modal', function (event) {
@@ -67,6 +69,10 @@
         console.log("welcome~~~");
         moment.locale('zh-CN');
         bootbox.setLocale('zh_CN');
+        $('#cls_time').datetimepicker({
+            locale : 'zh-CN',
+            format: 'LT'
+        });
         currentMonday = getMonday(moment());
         updateWeekInfo(currentMonday);
         initClassRoomList();
@@ -153,8 +159,11 @@
         } else {
             modal.find('#cls_name').closest(".form-group").removeClass("has-error");
         }
-        // get date
-        classItem.date = moment(modal.find('#cls_date').text(), 'lll');
+        // get date/time
+        classItem.date = moment(modal.find('#cls_date').text(), 'll');
+        var time = modal.find('#cls_time').data("DateTimePicker").date();
+        classItem.date.hours(time.hours());
+        classItem.date.minutes(time.minutes());
         // get type
         classItem.type = modal.find('.active input').val();
         // get capacity
