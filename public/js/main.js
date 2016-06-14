@@ -24,7 +24,18 @@
             modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
             var defaultDate = generateDate(rowIndex, colIndex, currentMonday)
             modal.find('#cls_date').text(defaultDate.format('ll'));
-            modal.find('#cls_time').data('DateTimePicker').date(defaultDate);
+            var timePicker = modal.find('#cls_time').data('DateTimePicker').minDate(false).maxDate(false).date(defaultDate);
+            // add the limitation of each slot
+            if (rowIndex == 1) {// morning
+                timePicker.minDate(defaultDate.hour(6).minute(0));
+                timePicker.maxDate(defaultDate.hour(11).minute(59));
+            } else if (rowIndex == 2) { // afternoon
+                timePicker.minDate(defaultDate.hour(12).minute(0));
+                timePicker.maxDate(defaultDate.hour(17).minute(59));
+            } else if (rowIndex == 3) { // evening
+                timePicker.minDate(defaultDate.hour(18).minute(0));
+                timePicker.maxDate(defaultDate.hour(23).minute(59));
+            }
         });
 
         $('#cls_dlg').on('shown.bs.modal', function (event) {
