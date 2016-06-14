@@ -28,6 +28,7 @@ var counter = 1;
 var tenant = null;
 //var api = new API(tenant.appid, tenant.appsecret);
 var api = null;
+//TODO, connect db according to tenant name
 var db = require("../db").get('test');
 
 // all requests to this router will append tenant info

@@ -3,36 +3,62 @@ var router = express.Router();
 var base = require('./base');
 var wechat = require('wechat');
 var API = require('wechat-api');
+var util = require('../util');
 
 //[{time:1462976508, openid:"o0uUrv4RGMMiGasPF5bvlggasfGk"}]
 var visited_user_list = new Array();
 var counter = 1;
 
-//TODO, the tenant info of 'req.user.tenant' should get from database
-var tenant = {
+/* tenant object
+{
     appid : 'wxe5e454c5dff8c7b2',
     appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
     token : 'Hibanana',
     encodingAESKey : '',
     name : 'bqsq',
-    displayName : '大Q小q'
+    displayName : '大Q小q',
+    classType : {
+        story : '故事会',
+        event : '主题活动'
+    },
+    classroom : []
 };
-//setup database
-var db = require("../db").get(tenant.name);
-
-var api = new API(tenant.appid, tenant.appsecret);
+*/
+var tenant = null;
+//var api = new API(tenant.appid, tenant.appsecret);
+var api = null;
+//TODO, connect db according to tenant name
+var db = require("../db").get('bqsq');
 
 // all requests to this router will append tenant info
 router.use(function (req, res, next) {
-    req.tenant = tenant;
     req.db = db;
-    //req.api = api;
-    next();
+    if (!tenant) {
+        //TODO, load tenant info from database and initialize db and api object
+        var tenant_name = req.baseUrl.split("/")[1];
+        config_db = util.connect(req.app.locals.getURI('config'));
+        config_db.collection('tenants').findOne({name:tenant_name}, function(err, doc){
+            if (err || !doc) {
+                var error = new Error("tenant is not created");
+                error.status = 404;
+                return next(error);
+            }
+
+            req.tenant = tenant = doc;
+            req.api = api = new API(tenant.appid, tenant.appsecret);
+            config_db.close();
+            next();
+        });
+    } else {
+        req.tenant = tenant;
+        req.api = api;
+        next();
+    }
 });
 
 router.get('/booking', function (req, res) {
     var timeKey = parseInt(Date.now()/1000);
-    
+
     function findUserOpenID(user) {
         return timeKey - user.time <= 1;
     }
@@ -45,7 +71,8 @@ router.get('/booking', function (req, res) {
         title : '会员约课',
         counter : counter++,
         timeKey : timeKey,
-        openid : user ? user.openid : ''
+        openid : user ? user.openid : '',
+        classroom : req.tenant.classroom
     });
 });
 
