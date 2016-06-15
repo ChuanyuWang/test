@@ -17,8 +17,8 @@
                 // create a new classroom
                 var modal = $(this);
                 modal.find('.modal-title').text("添加教室");
-                modal.find('input[name=id]').val("");
-                modal.find('input[name=name]').val("");
+                modal.find('input[name=id]').val("").closest(".form-group").removeClass("has-error");
+                modal.find('input[name=name]').val("").closest(".form-group").removeClass("has-error");
                 
                 modal.find('#add_room').show();
             } else if (button.data('action') == "edit") {

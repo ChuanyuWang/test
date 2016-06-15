@@ -10,8 +10,8 @@
                 // create a new member
                 var modal = $(this);
                 modal.find('h4').text("添加会员");
-                modal.find('input[name=name]').val("");
-                modal.find('input[name=contact]').val("");
+                modal.find('input[name=name]').val("").closest(".form-group").removeClass("has-error");
+                modal.find('input[name=contact]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(null);
                 modal.find('input[name=story_point]').val("10");
                 modal.find('input[name=event_point]').val("0");
@@ -33,8 +33,8 @@
                 
                 //get member data
                 var user = items[0];
-                modal.find('input[name=name]').val(user.name);
-                modal.find('input[name=contact]').val(user.contact);
+                modal.find('input[name=name]').val(user.name).closest(".form-group").removeClass("has-error");
+                modal.find('input[name=contact]').val(user.contact).closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(user.birthday ? moment(user.birthday):null);
                 modal.find('input[name=story_point]').val(user.point.story);
                 modal.find('input[name=event_point]').val(user.point.event);
