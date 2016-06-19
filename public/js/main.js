@@ -22,6 +22,8 @@
             var modal = $(this);
             modal.find('#cls_name').val("").closest(".form-group").removeClass("has-error");
             modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
+            modal.find('input[name=age_min]').val(24).closest(".form-group").removeClass("has-error");
+            modal.find('input[name=age_max]').val(48).closest(".form-group").removeClass("has-error");
             var defaultDate = generateDate(rowIndex, colIndex, currentMonday)
             modal.find('#cls_date').text(defaultDate.format('ll'));
             var timePicker = modal.find('#cls_time').data('DateTimePicker').minDate(false).maxDate(false).date(defaultDate);
@@ -185,10 +187,40 @@
         } else {
             modal.find('#cls_capacity').closest(".form-group").removeClass("has-error");
         }
+        // get age limitation
+        classItem.age = {min:null,max:null};
+        var input = modal.find('input[name=age_min]');
+        if (input.val()) {
+            classItem.age.min = parseInt(input.val());
+            if (isNaN(classItem.age.min) || classItem.age.min < 0) {
+                input.closest(".form-group").addClass("has-error");
+                hasError = true;
+            } else {
+                input.closest(".form-group").removeClass("has-error");
+            }
+        }
+        
+        var input = modal.find('input[name=age_max]');
+        if (input.val()) {
+            classItem.age.max = parseInt(input.val());
+            if (isNaN(classItem.age.max) || classItem.age.max < 0) {
+                input.closest(".form-group").addClass("has-error");
+                hasError = true;
+            } else {
+                input.closest(".form-group").removeClass("has-error");
+            }
+        }
+        
         // get classroom
         classItem.classroom = getCurrentClassRoom();
 
         if (!hasError) {
+            // switch the age.min and age.max if min is bigger than max
+            if (classItem.age.min!=null && classItem.age.max!=null && classItem.age.min > classItem.age.max) {
+                var temp = classItem.age.max;
+                classItem.age.max = classItem.age.min;
+                classItem.age.min = temp;
+            }
             modal.modal('hide');
             addNewClass(classItem);
         }
@@ -255,6 +287,10 @@
         modal.find('#cls_type').text(TYPE_NAME[class_item.type]);
         modal.find('#cls_date').text(moment(class_item.date).format('lll'));
         modal.find('#cls_capacity').val(class_item.capacity).closest(".form-group").removeClass("has-error");
+        if (class_item.age) {
+            modal.find('input[name=age_min]').val(class_item.age.min).closest(".form-group").removeClass("has-error");
+            modal.find('input[name=age_max]').val(class_item.age.max).closest(".form-group").removeClass("has-error");
+        }
 
         // cache the class ID on member table
         modal.find('#member_table').data('classid', class_id);
@@ -283,8 +319,39 @@
         } else {
             modal.find('#cls_capacity').closest(".form-group").removeClass("has-error");
         }
+        
+        // get age limitation
+        classItem.age = {min:null,max:null};
+        var input = modal.find('input[name=age_min]');
+        if (input.val()) {
+            classItem.age.min = parseInt(input.val());
+            if (isNaN(classItem.age.min) || classItem.age.min < 0) {
+                input.closest(".form-group").addClass("has-error");
+                hasError = true;
+            } else {
+                input.closest(".form-group").removeClass("has-error");
+            }
+        }
+        
+        var input = modal.find('input[name=age_max]');
+        if (input.val()) {
+            classItem.age.max = parseInt(input.val());
+            if (isNaN(classItem.age.max) || classItem.age.max < 0) {
+                input.closest(".form-group").addClass("has-error");
+                hasError = true;
+            } else {
+                input.closest(".form-group").removeClass("has-error");
+            }
+        }
 
         if (!hasError) {
+            // switch the age.min and age.max if min is bigger than max
+            if (classItem.age.min!=null && classItem.age.max!=null && classItem.age.min > classItem.age.max) {
+                var temp = classItem.age.max;
+                classItem.age.max = classItem.age.min;
+                classItem.age.min = temp;
+            }
+            
             var class_id = modal.find('#member_table').data('classid');
             $.ajax("api/classes/" + class_id, {
                 type : "PUT",
@@ -293,10 +360,11 @@
                 success : function (data) {
                     //close the dialog
                     modal.modal('hide');
-                    // update the cache
+                    // update the cache TODO, get new cls from server
                     var class_item = cls_cache[class_id];
                     class_item.name = classItem.name;
                     class_item.capacity = classItem.capacity;
+                    class_item.age = classItem.age;
                     // update the class schedule
                     displayClass(class_item);
                 },

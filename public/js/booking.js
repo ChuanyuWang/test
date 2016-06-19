@@ -254,15 +254,20 @@
 
         // insert a class in last row
         var cls_col = '<p>' + item.name + '</p>';
-        var cls_tip = '<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>';
-        if (item.type == "story") {
-            cls_tip += date.format('HH:mm') + '开始 <span class="cls-story">故事会</span></p>';
-        } else if (item.type == "event") {
-            cls_tip += date.format('HH:mm') + '开始 <span class="cls-event">主题活动</span></p>';
-        } else {
-            cls_tip += date.format('HH:mm') + '开始</p>';
-        }
         
+        var cls_type = "";
+        if (item.type == "story") {
+            cls_type = '<span class="cls-story">故事会</span>';
+        } else if (item.type == "event") {
+            cls_type = '<span class="cls-event">主题活动</span>';
+        }
+
+        var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
+                        date.format('HH:mm') + ' ',
+                        cls_type + ' ',
+                        getAgeLimit(item),
+                        '</p>'].join('');
+
         var remaining = item.capacity - item.reservation;
         if (date < moment().subtract(1, 'hours')) {
             // the class or event is finished one hours ago
@@ -336,6 +341,17 @@
         // remove all classes and separators
         $('.class-row,.class-separator').remove();
         $('.alert-warning').remove();
+    };
+    
+    function getAgeLimit(cls) {
+        if (cls.age && cls.age.min && cls.age.max) {
+            return "年龄" + cls.age.min + "至" + cls.age.max + "月";
+        } else if (cls.age && cls.age.min) {
+            return "年龄大于" + cls.age.min + "月";
+        } else if (cls.age && cls.age.max) {
+            return "年龄小于" + cls.age.max + "月";
+        }
+        return "";
     };
     
     function getParam(name) {

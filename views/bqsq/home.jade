@@ -103,6 +103,14 @@ block page
                   span.input-group-addon
                     span.glyphicon.glyphicon-time
             div.form-group
+              label.control-label.col-sm-2(for='') 年龄:
+              div.col-sm-10
+                div.input-group
+                  input.form-control(type='number',name='age_min',min='0',style={'width':'60px'})
+                  p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
+                  input.form-control(type='number',name='age_max',min='0',style={'width':'60px','margin-left':'3px'})
+                  p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
+            div.form-group
               label.control-label.col-sm-2(for='cls_capacity') 最大人数:
               div.col-sm-2
                 input#cls_capacity.form-control(type='number',name='cls_capacity',min='0')
@@ -131,6 +139,14 @@ block page
               label.control-label.col-sm-2 时间:
               div.col-sm-10
                 p#cls_date.form-control-static
+            div.form-group
+              label.control-label.col-sm-2(for='') 年龄:
+              div.col-sm-10
+                div.input-group
+                  input.form-control(type='number',name='age_min',min='0',style={'width':'60px'})
+                  p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
+                  input.form-control(type='number',name='age_max',min='0',style={'width':'60px','margin-left':'3px'})
+                  p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
             div.form-group
               label.control-label.col-sm-2(for='cls_capacity') 最大人数:
               div.col-sm-2

@@ -183,6 +183,39 @@ router.post('/', function (req, res, next) {
                 });
                 return;
             }
+            
+            // check the age limitation for current member
+            if (cls.age && cls.age.max) {
+                var oldest = new Date(cls.date.getTime());
+                oldest.setHours(0);
+                oldest.setMinutes(0);
+                oldest.setMonth(oldest.getMonth() - cls.age.max);
+                if (doc.birthday < oldest) {
+                    console.log(doc.birthday);
+                    console.log(oldest);
+                    res.status(400).json({
+                        // child is too old
+                        'message' : "小朋友年龄超出指定要求，无法预约，如有问题，欢迎来电或到店咨询",
+                        'err' : err
+                    });
+                    return;
+                }
+            }
+            
+            if (cls.age && cls.age.min) {
+                var youngest = new Date(cls.date.getTime());
+                youngest.setHours(0);
+                youngest.setMinutes(0);
+                youngest.setMonth(youngest.getMonth() - cls.age.min);
+                if (doc.birthday > youngest) {
+                    // child is too young
+                    res.status(400).json({
+                        'message' : "小朋友年龄不到指定要求，无法预约，如有问题，欢迎来电或到店咨询",
+                        'err' : err
+                    });
+                    return;
+                }
+            }
 
             createNewBook(req, res, doc, cls, req.body.quantity);
         });
