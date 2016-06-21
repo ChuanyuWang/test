@@ -223,7 +223,7 @@ router.post('/', function (req, res, next) {
 });
 
 // remove specfic user's booking info
-router.delete ('/:classID', isAuthenticated, function (req, res) {
+router.delete ('/:classID', function (req, res) {
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");
         return;

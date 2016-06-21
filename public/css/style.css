@@ -127,3 +127,16 @@ html {
   font-weight: bold;
   margin-bottom: auto;
 }
+.remove {
+  animation: myfirst 1s;
+}
+@keyframes myfirst {
+  from {
+    opacity: 1 ;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0 ;
+    transform: translateX(400px);
+  }
+}

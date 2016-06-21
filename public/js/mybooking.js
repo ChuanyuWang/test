@@ -281,13 +281,16 @@
                 contentType : "application/json; charset=utf-8",
                 data : JSON.stringify({memberid:member_id}),
                 success : function (data) {
-                    //TODO
+                    $(button_div).closest('div.class-row').addClass("remove").one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+                        $(this).prev('div.class-separator').remove();
+                        $(this).remove();
+                    });
                 },
                 error : function (jqXHR, status, err) {
                     console.error(jqXHR.responseJSON);
                 },
                 complete : function(jqXHR, status) {
-                    //TODO
+                    $('#confirm_dlg').modal('hide');
                 },
                 dataType : "json"
             });

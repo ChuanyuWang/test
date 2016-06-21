@@ -141,3 +141,18 @@ html {
     margin-bottom : auto;
   }
 }
+
+.remove {
+  animation:removeAnimation 1s;
+}
+
+@keyframes removeAnimation {
+   from {
+     opacity: 1 ;
+     transform: translateX( 0 );
+   }
+   to {
+     opacity: 0 ;
+     transform : translateX( 400px );.
+   }
+}
