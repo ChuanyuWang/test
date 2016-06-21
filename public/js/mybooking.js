@@ -165,8 +165,10 @@
                         '</p>'].join('');
 
         if (date > moment()) {
+            var btn_cancel = '<button class="btn btn-danger cancel-btn">取消</button>';
             var btn_tip = '<p class="cls-status text-danger">(未上)</p>';
         } else {
+            var btn_cancel = '';
             var btn_tip = '<p class="cls-status text-info">(已上)</p>';
         }
         
@@ -178,6 +180,7 @@
                 cls_tip + 
             '</div>' + 
             '<div class="book-col" data-id="' + item._id + '">' + 
+                btn_cancel +
                 btn_tip + 
             '</div>' +
           '</div>');
@@ -240,6 +243,12 @@
                 }
                 if (!data.length) {
                     displayNoClassWarning();
+                } else {
+                    // add the cancel listener
+                    $('#future div.book-col .btn-danger').click(function(event){
+                        var class_id = $(this).closest('div.book-col').data('id');
+                        cancelBooking(class_id, memberid, this);
+                    });
                 }
             },
             error : function (jqXHR, status, err) {
@@ -257,6 +266,34 @@
 
         // append a warning bar
         list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>没有找到预约课程</div>");
+    };
+    
+    function cancelBooking(class_id, member_id, button_div) {
+        if (!class_id || !member_id || !button_div) {
+            console.error("fail to cancel booking due to missing parameter");
+            return ;
+        }
+        // remove previous attached 'click' event listener!
+        $('#cancel_ok').off("click");
+        $('#cancel_ok').click(function(event) {
+            $.ajax("api/booking/" + class_id, {
+                type : "DELETE",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify({memberid:member_id}),
+                success : function (data) {
+                    //TODO
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseJSON);
+                },
+                complete : function(jqXHR, status) {
+                    //TODO
+                },
+                dataType : "json"
+            });
+        });
+        
+        $('#confirm_dlg').modal('show');
     };
     
     function getClassroomName(roomID) {
