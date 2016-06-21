@@ -185,7 +185,7 @@ router.post('/', function (req, res, next) {
             }
             
             // check the age limitation for current member
-            if (cls.age && cls.age.max) {
+            if (cls.age && cls.age.max && doc.birthday) {
                 var oldest = new Date(cls.date.getTime());
                 oldest.setHours(0);
                 oldest.setMinutes(0);
@@ -202,7 +202,7 @@ router.post('/', function (req, res, next) {
                 }
             }
             
-            if (cls.age && cls.age.min) {
+            if (cls.age && cls.age.min && doc.birthday) {
                 var youngest = new Date(cls.date.getTime());
                 youngest.setHours(0);
                 youngest.setMinutes(0);
