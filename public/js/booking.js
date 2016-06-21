@@ -271,14 +271,14 @@
         var remaining = item.capacity - item.reservation;
         if (date < moment().subtract(1, 'hours')) {
             // the class or event is finished one hours ago
-            var btn_book = '<button class="btn btn-default btn-md finish-btn" disabled="disabled">结束</button>';
+            var btn_book = '<button class="btn btn-default finish-btn" disabled="disabled">结束</button>';
             var btn_tip = '';
         } else if (remaining > 0) {
-            var btn_book = '<button class="btn btn-primary btn-md book-btn" data-toggle="modal" data-target="#book_dlg">预约</button>';
-            var btn_tip = '<button class="btn btn-primary btn-md remain-btn" disabled="disabled">剩余<span class="badge remain-span">' + remaining + '</span></button>';
+            var btn_book = '<button class="btn btn-primary book-btn" data-toggle="modal" data-target="#book_dlg">预约</button>';
+            var btn_tip = '<button class="btn btn-primary remain-btn" disabled="disabled">剩余<span class="badge remain-span">' + remaining + '</span></button>';
         } else {
-            var btn_book = '<button class="btn btn-danger btn-md book-btn">已满</button>';
-            var btn_tip = '<button class="btn btn-danger btn-md remain-btn" disabled="disabled">剩余<span class="badge remain-span">0</span></button>';
+            var btn_book = '<button class="btn btn-danger book-btn">已满</button>';
+            var btn_tip = '<button class="btn btn-danger remain-btn" disabled="disabled">剩余<span class="badge remain-span">0</span></button>';
         }
         
         lastRow = list.find('div.class-row:last-child');
