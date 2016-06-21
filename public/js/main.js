@@ -142,7 +142,7 @@
         switch (rowIndex) {
         case 1: // morning
             temp.hours(10);
-            temp.minutes(30);
+            temp.minutes(00);
             break;
         case 2: // afternoon
             temp.hours(16);
