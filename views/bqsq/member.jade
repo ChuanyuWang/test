@@ -91,9 +91,31 @@ block page
               div.col-sm-10
                 textarea.form-control(rows='3', name='note')
         div.modal-footer
+          button#view_history.btn.btn-primary.pull-left(type="button") 历史课程
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_member.btn.btn-success(type="button") 添加
           button#edit_member.btn.btn-success(type="button") 修改
+
+  div#history_member.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 会员历史课程
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 宝宝姓名:
+              div.col-sm-10
+                p#name.form-control-static
+          table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
+            thead
+              tr
+                //th(data-field='_id',data-visible='false') ID
+                th(data-field='name') 课程名称
+                th(data-field='type',data-formatter='typeFormatter') 课程类型
+                th(data-field='date',data-formatter='dateFormatter',data-sortable='true') 课程日期
 
   script(type='text/javascript').
     function dateFormatter(value) {
@@ -101,5 +123,13 @@ block page
             return moment(value).format('ll');
         } else {
             return undefined;
+        }
+    };
+    function typeFormatter(value) {
+        //TODO, remove the Hardcode
+        if (value == 'story') {
+            return '故事会';
+        } else if (value == 'event') {
+            return '主题活动';
         }
     };

@@ -18,6 +18,7 @@
                 modal.find('#expire_date').data('DateTimePicker').date(moment().add(3, 'years'));
                 modal.find('textarea[name=note]').val("");
                 modal.find('#edit_member').hide();
+                modal.find('#view_history').hide();
                 modal.find('#add_member').show();
             } else if (button.data('action') == "edit") {
                 //Don't show the dialog if user select nothing
@@ -42,6 +43,7 @@
                 modal.find('textarea[name=note]').val(user.note);
                 
                 modal.find('#add_member').hide();
+                modal.find('#view_history').show();
                 modal.find('#edit_member').show();
                 modal.find('#edit_member').data('id', user._id);
             }
@@ -54,6 +56,7 @@
         $('#add_member').click(handleAddNewMember);
         $('#edit_member').click(handleEditMember);
         $('#del_member').click(handleDeleteMember);
+        $('#view_history').click(handleMemberHistory);
     });
 
     // Functions =============================================================
@@ -184,6 +187,29 @@
         });
     };
 
+    function handleMemberHistory(event) {
+        var view_dlg = $(this).closest('.modal');
+        var member_id = view_dlg.find('#edit_member').data('id');
+        var member_name = view_dlg.find('input[name=name]').val();
+        view_dlg.modal('hide');
+
+        var history_dlg = $('#history_member');
+        history_dlg.find('#name').text(member_name);
+        // refresh the class list of this member
+        var begin = moment(0);
+        var end = moment().add(10, 'years');
+        history_dlg.find('table').bootstrapTable('refresh', {
+            url : 'api/classes',
+            query : {
+                memberid : member_id,
+                from : begin.toISOString(),
+                to : end.toISOString(),
+                order : 'desc'
+            }
+        });
+
+        history_dlg.modal('show');
+    };
 
     function handleDeleteMember(event) {
         var items = $('#member_table').bootstrapTable('getSelections');
