@@ -5,7 +5,7 @@
     var TYPE_NAME = {
         story : '故事会',
         event : '主题活动'
-    }
+    };
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -47,6 +47,7 @@
         // listen to the action button on modal dialogs
         $('#create_cls').click(handleAddNewClass);
         $('#modify_cls').click(handleModifyClass);
+        $('#add_book').click(handleAddBooking);
 
         // listen to the previous week and next week button
         $('#previous_week').click(function (event) {
@@ -299,6 +300,28 @@
         $('#view_dlg').modal('show');
     };
     
+    function handleAddBooking(event) {
+        var view_dlg = $(this).closest('.modal');
+        var class_id = view_dlg.find('#member_table').data('classid');
+        view_dlg.modal('hide');
+        
+        var class_item = cls_cache[class_id];
+        if (!class_item) {
+            console.error("Can't find the class info with id: " + class_id);
+            return;
+        }
+        
+        // set the class id
+        var book_dlg = $('#search_member');
+        book_dlg.find('table').data('classid', class_id);
+        book_dlg.find('#cls_name').text(class_item.name);
+        book_dlg.find('#quantity').val(1).closest(".form-group").removeClass("has-error");;
+		// refresh the member list
+        book_dlg.find('table').bootstrapTable('refresh', {url:'api/members'});
+
+        book_dlg.modal('show');
+    };
+    
     function handleModifyClass(event) {
         var modal = $(this).closest('.modal');
         var hasError = false;
@@ -395,6 +418,7 @@
                     // update the class schedule
                     displayClass(class_item);
                     $('#member_table').bootstrapTable('removeByUniqueId', row.member);
+                    showSuccessMsg("成功取消预约");
                 },
                 error : function (jqXHR, status, err) {
                     console.error(jqXHR.responseJSON);
@@ -411,6 +435,7 @@
         var cell = $(this).closest('td');
         var item_id = cell.data('id');
 
+        //TODO, make this confirm as danger style
         bootbox.confirm("删除此课程吗？", function(result) {
             if (!result) { // user cancel
                 return ;
@@ -429,6 +454,7 @@
                     cell.find('.btn-group').append('<button class="btn btn-default" data-toggle="modal" data-target="#cls_dlg">+</button>');
                     cell.removeClass('success');
                     cell.removeClass('info');
+                    showSuccessMsg("删除成功");
                 },
                 error : function (jqXHR, status, err) {
                     bootbox.dialog({
@@ -448,6 +474,52 @@
                 dataType : "json"
             });
         });
+    };
+    
+    // event handler defined in home.jade file for removing booking item
+    window.handleAddBook = {
+        'click .book' : function (e, value, row, index) {
+            var class_id = $(e.target).closest('table').data('classid');
+            var bookInfo = {
+                classid : class_id,
+                name: row.name,
+                contact: row.contact
+            };
+            
+            // get quantity
+            var modal = $(e.target).closest('.modal');
+            bookInfo.quantity = parseInt(modal.find('#quantity').val());
+            if (isNaN(bookInfo.quantity) || bookInfo.quantity <= 0) {
+                modal.find('#quantity').closest(".form-group").addClass("has-error");
+                return;
+            } else {
+                modal.find('#quantity').closest(".form-group").removeClass("has-error");
+            }
+            
+            $.ajax("api/booking/", {
+                type : "POST",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify(bookInfo),
+                success : function (data) {
+                    // update the cache
+                    var classInfo = data['class'];
+                    cls_cache[classInfo._id] = classInfo;
+                    // update the class schedule
+                    displayClass(classInfo);
+                    showSuccessMsg("预约成功");
+                    $(e.target).closest('tr').addClass("disappear").one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+                        $('#search_member table').bootstrapTable('removeByUniqueId', row._id);
+                    });
+                },
+                error : function (jqXHR, status, err) {
+                    showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+                },
+                complete : function(jqXHR, status) {
+                    //TODO
+                },
+                dataType : "json"
+            });
+        }
     };
 
     function updateSchedule(control) {
@@ -479,6 +551,18 @@
             },
             dataType : "json"
         });
+    };
+
+    function showSuccessMsg(msg) {
+        var alert_bar = $('#alert_bar').removeClass('alert-danger').addClass("alert-success");
+        alert_bar.find('span').text(msg);
+        alert_bar.finish().show().fadeOut(2000);
+    };
+
+    function showErrorMsg(msg) {
+        var alert_bar = $('#alert_bar').removeClass('alert-success').addClass("alert-danger");
+        alert_bar.find('span').text(msg);
+        alert_bar.finish().show().fadeOut(2000);
     };
 
     function clearSchedule() {

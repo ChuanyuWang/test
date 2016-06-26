@@ -175,5 +175,42 @@ block page
                 ].join('');
             };
         div.modal-footer
+          button#add_book.btn.btn-primary.pull-left(type="button") 预约
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#modify_cls.btn.btn-success(type="button") 修改
+  div#search_member.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 添加预约
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 课程名称:
+              div.col-sm-10
+                p#cls_name.form-control-static
+            div#toolset.form-group(style='margin-bottom:0px')
+              label.control-label.col-sm-2(for='quantity') 人数:
+              div.col-sm-2
+                input#quantity.form-control(type='number',name='quantity',min='1',step='1')
+          table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='left')
+            thead
+              tr
+                //th(data-field='_id',data-visible='false') ID
+                th(data-field='name',data-sortable='true') 宝宝姓名
+                th(data-field='contact') 联系方式
+                th(data-field='point.story',data-sortable='true') 故事会次数
+                th(data-field='point.event',data-sortable='true') 主题活动次数
+                th(data-title='预约',data-align='center',data-formatter='addBookFormatter',data-events='handleAddBook')
+        script(type='text/javascript').
+            function addBookFormatter(value) {
+                return [
+                    '<a class="book text-primary" href="javascript:void(0)" title="预约">',
+                    '<i class="glyphicon glyphicon-plus-sign"></i>',
+                    '</a>'
+                ].join('');
+            };
+  div#alert_bar.bb-alert.alert-danger.alert(style='display:none')
+    span >some message<
