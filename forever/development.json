@@ -3,7 +3,8 @@
     "uid": "eshop",
     "append": true,
     "watch": false,
-    "script": "bin/www",
-    "minUptime": "5000",
-    "spinSleepTime": "2000"
+    "script": "bin/www"
+    // minUptime and spinSleepTime are not options
+    //"minUptime": 5000,
+    //"spinSleepTime": 2000
 }
