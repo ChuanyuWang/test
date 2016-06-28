@@ -2,11 +2,30 @@
 var app = require('../app');
 
 if (app.get('env') === 'production') {
-    app.set('port', process.env.PORT || 80);
+    var https = require('https');
+    var fs = require('fs');
+
+    var hskey = fs.readFileSync('bin/112444696190859.key');
+    var hscert = fs.readFileSync('bin/112444696190859.pem')
+    var options = {
+        key: hskey,
+        cert: hscert
+    };
+    
+    app.set('port', process.env.PORT || 443);
+    var server = https.createServer(options, app).listen(app.get('port'), function() {
+      console.log('Express server listening on port ' + server.address().port);
+    });
 } else {
+    var http = require('http');
     app.set('port', process.env.PORT || 3000);
+    var server = http.createServer(app).listen(app.get('port'), function() {
+      console.log('Express server listening on port ' + server.address().port);
+    });
 }
 
+/*
 var server = app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + server.address().port);
 });
+*/
