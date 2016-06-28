@@ -507,7 +507,7 @@
                     // update the class schedule
                     displayClass(classInfo);
                     showSuccessMsg("预约成功");
-                    $(e.target).closest('tr').addClass("disappear").one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+                    $(e.target).closest('tr').hide(600, function() {
                         $('#search_member table').bootstrapTable('removeByUniqueId', row._id);
                     });
                 },
