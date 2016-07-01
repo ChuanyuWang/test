@@ -281,9 +281,9 @@
                 contentType : "application/json; charset=utf-8",
                 data : JSON.stringify({memberid:member_id}),
                 success : function (data) {
-                    $(button_div).closest('div.class-row').addClass("remove").one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
-                        $(this).prev('div.class-separator').remove();
-                        $(this).remove();
+                $(button_div).closest('div.class-row').hide(600, function(){
+                        $(button_div).closest('div.class-row').prev('div.class-separator').remove();
+                        $(button_div).closest('div.class-row').remove();
                     });
                 },
                 error : function (jqXHR, status, err) {

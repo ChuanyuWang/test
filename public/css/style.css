@@ -128,9 +128,9 @@ html {
   margin-bottom: auto;
 }
 .remove {
-  animation: myfirst 1s;
+  animation: removeAnimation 1s;
 }
-@keyframes myfirst {
+@keyframes removeAnimation {
   from {
     opacity: 1 ;
     transform: translateX(0);
