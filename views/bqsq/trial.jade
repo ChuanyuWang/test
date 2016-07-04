@@ -1,0 +1,68 @@
+extends ../layout
+
+block prepend css
+  link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css")
+block content
+  div#main.container
+    div.row
+      img.center-block(src='/img/logo-2x.png',style="width:200px")
+    form#opportunity
+      div.form-group(style='margin-bottom:auto')
+        p.form-control-static(style='color:#808080;text-align:center')
+          small 请填写小朋友的姓名和联系方式，客服会在收到申请后第一时间联系您
+      div.form-group
+        label.control-label 宝宝姓名:
+        input.form-control(type='text',name='name',placeholder='宝宝姓名',autofocus)
+      div.form-group
+        label.control-label 联系方式::
+        input.form-control(type='text',name='contact',placeholder='135xxx')
+      div.form-group
+        label.control-label 宝宝生日:
+        input.form-control(type='date',name='birth')
+      div.form-group
+        label.control-label 感兴趣的内容:
+        textarea.form-control(rows='2',name='remark',placeholder='选填')
+    button#reg_btn.btn.btn-primary(style="display:block;margin:0 auto") 提交
+
+  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 提交失败
+        div.modal-body
+          p#message
+          p(style='color:#808080')
+            small 客服电话: 
+              a(href='tel:13661622231') 136 6162 2231
+            br
+            small 门店地址: 
+              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+        div.modal-footer
+          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
+
+  div#success_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 提交成功
+        div.modal-body
+          p#message 您的信息已经成功提交，我们的客服人员会在第一时间联系您
+          p(style='color:#808080')
+            small 客服电话: 
+              a(href='tel:13661622231') 136 6162 2231
+            br
+            small 门店地址: 
+              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+        div.modal-footer
+          button#success_ok.btn.btn-success(type="button",data-dismiss="modal") 确定
+
+  //script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
+  script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
+  //script(src='/components/requirejs/require.js',data-main="/js/trial")
+  script(src="//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js")
+  //script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  script(src='/js/trial.js')
