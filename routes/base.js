@@ -27,6 +27,14 @@ router.get('/member', checkTenantUser, function (req, res) {
     });
 });
 
+router.get('/opportunity', checkTenantUser, function (req, res) {
+    res.render('bqsq/opportunity', {
+        title : '试听',
+        user : req.user,
+        navTitle : req.tenant.displayName
+    });
+});
+
 router.get('/setting', checkTenantUser, function (req, res) {
     res.render('bqsq/setting', {
         title : '设置',
