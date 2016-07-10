@@ -31,7 +31,7 @@ block page
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
       button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 查看
       button#del_member.btn.btn-danger(type='button') 删除
-    table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='api/members',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id")
+    table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id")
       thead
         tr
           th(data-checkbox='true')
@@ -134,4 +134,22 @@ block page
         } else if (value == 'event') {
             return '主题活动';
         }
+    };
+    function highlightExpire(row, index) {
+        if (row.expire) {
+            var expire = new Date(row.expire);
+            // highlight the row if member is expired
+            if (expire < new Date()) {
+                return {
+                    classes: 'danger'
+                };
+            }
+            // highlight the row if member has no point
+            if (row.point && row.point.story <= 0) {
+                return {
+                    classes: 'danger'
+                };
+            }
+        }
+        return {};
     };
