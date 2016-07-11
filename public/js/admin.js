@@ -65,6 +65,30 @@
         }
     };
     
+    window.handleUpgradeTenant = {
+        'click .upgrade' : function (e, value, row, index) {
+            //alert("暂不支持");
+            console.log(value);
+            console.log(row);
+            var body = {
+                tenant : row.name
+            }
+            $.ajax("api/upgrade", {
+                type : "POST",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify(body),
+                success : function (data) {
+                    //TODO, refresh the tenant table
+                    alert(row.name + " is upgraded successfully");
+                },
+                error : function (jqXHR, status, err) {
+                    alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+                },
+                dataType : "json"
+            });
+        }
+    };
+    
     function createTenant(tenant) {
         $.ajax("api/tenants", {
             type : "POST",

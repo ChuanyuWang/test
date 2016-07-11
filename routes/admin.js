@@ -47,7 +47,7 @@ router.get('/api/tenants', isAuthenticated, function(req, res, next) {
 // create the tenant
 router.post('/api/tenants', isAuthenticated, function(req, res, next) {
     if (!req.body.name) {
-        var error = new Error("tenamt name is not defined");
+        var error = new Error("tenant name is not defined");
         error.status = 400;
         return next(error);
     }
@@ -70,13 +70,36 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
 
         tenants.insert(req.body, function (err, doc){
             if (err) {
-                var error = new Error("create tenamt fails");
+                var error = new Error("create tenant fails");
                 error.innerError = err;
                 return next(error);
             }
             console.log("tenant %j is created", req.body);
             res.send(doc);
         });
+    });
+});
+
+// upgrade the tenant
+router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
+    if (!req.body.tenant) {
+        var error = new Error("tenant name is not defined");
+        error.status = 400;
+        return next(error);
+    }
+    config_db.collection("tenants").findOne({name:req.body.tenant}, function(err, doc){
+        if (err) {
+            var error = new Error("Find tenant fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("Find tenant %j", doc);
+        
+        if (!doc.version) {
+            //TODO, upgrade from the very beginning
+        }
+        
+        res.send(doc);
     });
 });
 

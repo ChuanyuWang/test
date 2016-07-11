@@ -47,8 +47,10 @@ block page
               tr
                 th(data-field='name',data-sortable='true') name
                 th(data-field='displayName') Display Name
+                th(data-field='version') Version
                 th(data-field='classroom',data-formatter='objectFormatter') Classroom
-                th(data-title='删除',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteTenant')
+                th(data-title='Uprade',data-align='center',data-formatter='upgradeFormatter',data-events='handleUpgradeTenant')
+                th(data-title='Delete',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteTenant')
     script(type='text/javascript').
         function objectFormatter(value) {
             if (typeof(value) == 'object') {
@@ -59,8 +61,15 @@ block page
         };
         function deleteFormatter(value) {
             return [
-                '<a class="remove text-danger" href="javascript:void(0)" title="删除">',
+                '<a class="remove text-danger" href="javascript:void(0)" title="Delete">',
                 '<i class="glyphicon glyphicon-remove"></i>',
+                '</a>'
+            ].join('');
+        };
+        function upgradeFormatter(value) {
+            return [
+                '<a class="upgrade text-success" href="javascript:void(0)" title="Uprade">',
+                '<i class="glyphicon glyphicon-circle-arrow-up"></i>',
                 '</a>'
             ].join('');
         };
