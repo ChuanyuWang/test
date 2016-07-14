@@ -96,12 +96,80 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
         console.log("Find tenant %j", doc);
         
         if (!doc.version) {
-            //TODO, upgrade from the very beginning
+            upgradeFromZero(req, res, next, doc.name);
+            doc.version = 1;
+            config_db.collection("tenants").save(doc, function(err, doc){
+                if (err) {
+                    return next(new Error("save tenant version fails"));
+                }
+                //TODO, send the complete message when all data update
+                res.send("Tenant update to 1.0");
+            });
+        } else {
+            res.send("Tenant is already update to date");
         }
-        
-        res.send(doc);
     });
 });
+
+function upgradeFromZero(req, res, next, tenant_name) {
+    //TODO, close the connection when all data update done
+    tenant_db = util.connect(req.app.locals.getURI(tenant_name));
+
+    var members = tenant_db.collection('members');
+    members.find({}).forEach(function(err, doc){
+        if (err) {
+            console.error(err);
+        } else {
+            if (doc && doc.point && !doc.hasOwnProperty('credit')) {
+                doc.credit = 0;
+                if (!isNaN(doc.point.story)) doc.credit += doc.point.story;
+                if (!isNaN(doc.point.event)) doc.credit += doc.point.event * 2;
+                members.save(doc);
+            }
+        }
+    });
+    
+    var classes = tenant_db.collection('classes');
+    classes.find({}).forEach(function(err, doc){
+        if (err) {
+            console.error(err);
+        } else {
+            if (doc && doc.type && !doc.hasOwnProperty('cost')) {
+                doc.cost = 0;
+                if (doc.type == 'story') doc.cost = 1;
+                if (doc.type == 'event') doc.cost = 2;
+                classes.save(doc);
+            }
+        }
+    });
+    
+    /*
+    members.find({}, function(err, docs){
+        if (err) {
+            var error = new Error('Query all members fails with error');
+            error.innerError = err;
+            return next(error);
+        } else {
+            for (var i=0;i< docs.length; i++){
+                var member = docs[i];
+                if (member.point && !member.hasOwnProperty('credit')) {
+                    member.credit = 0;
+                    if (!isNaN(member.point.story)) member.credit += member.point.story;
+                    if (!isNaN(member.point.event)) member.credit += member.point.event * 2;
+                    members.save(member);
+                }
+            }
+            
+            if (doc && doc.point && !doc.hasOwnProperty('credit')) {
+                doc.credit = 0;
+                if (!isNaN(doc.point.story)) doc.credit += doc.point.story;
+                if (!isNaN(doc.point.event)) doc.credit += doc.point.event * 2;
+                members.save(doc);
+            }
+        }
+    });
+    */
+};
 
 function checkTenantUser(req, res, next) {
     if (!req.user) {
