@@ -24,7 +24,7 @@
                 //Don't show the dialog if user select nothing
                 var items = $('#member_table').bootstrapTable('getSelections');
                 if (items.length != 1) {
-                    bootbox.alert('请选择一个会员(不支持多选)');
+                    bootbox.alert('请选择一个会员');
                     event.preventDefault();
                     return;
                 }
@@ -213,8 +213,8 @@
 
     function handleDeleteMember(event) {
         var items = $('#member_table').bootstrapTable('getSelections');
-        if (items.length == 0) {
-            bootbox.alert('请先选择一个会员');
+        if (items.length != 1) {
+            bootbox.alert('请选择一个会员');
             return;
         }
 
