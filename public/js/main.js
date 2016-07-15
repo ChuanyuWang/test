@@ -267,8 +267,10 @@
         cell.find('.btn-group').append('<button class="btn btn-danger">删除</button>');
         cell.find('.btn-danger').click(handleRemoveClass);
         if (item.reservation > 0) {
+            cell.removeClass("info");
             cell.addClass('success');
         } else {
+            cell.removeClass("success");
             cell.addClass('info');
         }
     };
