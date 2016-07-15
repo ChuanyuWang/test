@@ -149,17 +149,6 @@ router.post('/', function (req, res, next) {
                 });
                 return;
             }
-
-            if (cls.capacity - cls.reservation < req.body.quantity) {
-                var remaining = cls.capacity - cls.reservation;
-                remaining = remaining < 0 ? 0 : remaining;
-                res.status(400).json({
-                    'code' : 2003,
-                    'message' : "名额不足，剩余 " + remaining + " 人",
-                    'err' : err
-                });
-                return;
-            }
             
             //check duplicate booking
             if (cls.booking && cls.booking.length > 0) {
@@ -173,6 +162,17 @@ router.post('/', function (req, res, next) {
                         return;
                     }
                 }
+            }
+
+            if (cls.capacity - cls.reservation < req.body.quantity) {
+                var remaining = cls.capacity - cls.reservation;
+                remaining = remaining < 0 ? 0 : remaining;
+                res.status(400).json({
+                    'code' : 2003,
+                    'message' : "名额不足，剩余 " + remaining + " 人",
+                    'err' : err
+                });
+                return;
             }
 
             if (doc.point[cls.type] < req.body.quantity) {
