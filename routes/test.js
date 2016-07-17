@@ -18,10 +18,7 @@ var counter = 1;
     encodingAESKey : '',
     name : 'test',
     displayName : '大Q小q',
-    classType : {
-        story : '故事会',
-        event : '主题活动'
-    },
+    version : 1,
     classroom : []
 };
 */

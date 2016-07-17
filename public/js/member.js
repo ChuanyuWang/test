@@ -13,8 +13,7 @@
                 modal.find('input[name=name]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('input[name=contact]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(null);
-                modal.find('input[name=story_point]').val("10");
-                modal.find('input[name=event_point]').val("0");
+                modal.find('input[name=credit]').val("10");
                 modal.find('#expire_date').data('DateTimePicker').date(moment().add(3, 'years'));
                 modal.find('textarea[name=note]').val("");
                 modal.find('#edit_member').hide();
@@ -37,8 +36,7 @@
                 modal.find('input[name=name]').val(user.name).closest(".form-group").removeClass("has-error");
                 modal.find('input[name=contact]').val(user.contact).closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(user.birthday ? moment(user.birthday):null);
-                modal.find('input[name=story_point]').val(user.point.story);
-                modal.find('input[name=event_point]').val(user.point.event);
+                modal.find('input[name=credit]').val(user.credit);
                 modal.find('#expire_date').data('DateTimePicker').date(user.expire ? moment(user.expire):null);
                 modal.find('textarea[name=note]').val(user.note);
                 
@@ -97,13 +95,11 @@
         
         // get birth date
         memberInfo.birthday = modal.find('#birth_date').data("DateTimePicker").date();
-        // get type
+        // get expire date
         memberInfo.expire = modal.find('#expire_date').data("DateTimePicker").date();
         //TODO, handle NaN number
-        // get available story point
-        memberInfo.point['story'] = parseInt(modal.find('input[name=story_point]').val());
-        // get available event point
-        memberInfo.point['event'] = parseInt(modal.find('input[name=event_point]').val());
+        // get available credit
+        memberInfo.credit = parseFloat(modal.find('input[name=credit]').val());
         memberInfo.note = modal.find('textarea[name=note]').val().trim();
         
         return hasError;
@@ -112,8 +108,7 @@
     function handleAddNewMember(event) {
         var modal = $(this).closest('.modal');
         var newMember = {
-            since : moment(),
-            point : {}
+            since : moment()
         };
         
         // validate the input
@@ -126,10 +121,8 @@
     function handleEditMember(event) {
         var modal = $(this).closest('.modal');
         var id = modal.find('#edit_member').data('id');
-        var existMember = {
-            point : {}
-        };
-        
+        var existMember = {};
+
         // validate the input
         if (!validateInput(modal, existMember)) {
             modal.modal('hide');

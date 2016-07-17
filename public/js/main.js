@@ -1,11 +1,6 @@
 (function ($) {
     // local cache for class or event
     window.cls_cache = {};
-    
-    var TYPE_NAME = {
-        story : '故事会',
-        event : '主题活动'
-    };
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -21,6 +16,7 @@
             }
             var modal = $(this);
             modal.find('#cls_name').val("").closest(".form-group").removeClass("has-error");
+            modal.find('input[name=cost]').val(1).closest(".form-group").removeClass("has-error");
             modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
             modal.find('input[name=age_min]').val(24).closest(".form-group").removeClass("has-error");
             modal.find('input[name=age_max]').val(48).closest(".form-group").removeClass("has-error");
@@ -178,8 +174,14 @@
         var time = modal.find('#cls_time').data("DateTimePicker").date();
         classItem.date.hours(time.hours());
         classItem.date.minutes(time.minutes());
-        // get type
-        classItem.type = modal.find('.active input').val();
+        // get cost
+        classItem.cost = parseFloat(modal.find('input[name=cost]').val());;
+        if (isNaN(classItem.cost) || classItem.cost < 0) {
+            modal.find('input[name=cost]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('input[name=cost]').closest(".form-group").removeClass("has-error");
+        }
         // get capacity
         classItem.capacity = parseInt(modal.find('#cls_capacity').val());
         if (isNaN(classItem.capacity) || classItem.capacity < 0) {
@@ -287,7 +289,7 @@
         
         var modal = $('#view_dlg');
         modal.find('#cls_name').val(class_item.name).closest(".form-group").removeClass("has-error");
-        modal.find('#cls_type').text(TYPE_NAME[class_item.type]);
+        modal.find('#cls_cost').text(class_item.cost);
         modal.find('#cls_date').text(moment(class_item.date).format('lll'));
         modal.find('#cls_capacity').val(class_item.capacity).closest(".form-group").removeClass("has-error");
         if (class_item.age) {

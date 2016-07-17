@@ -3,13 +3,8 @@
     window.cls_cache = {};
     // open id of Weichat user
     window._openid = undefined;
-    
+
     var memberid = undefined;
-    
-    var TYPE_NAME = {
-        story : '故事会',
-        event : '主题活动'
-    }
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -151,16 +146,15 @@
         // insert a class in last row
         var cls_col = '<p>' + item.name + '</p>';
 
-        var cls_type = "";
-        if (item.type == "story") {
-            cls_type = '<span class="cls-story">故事会</span>';
-        } else if (item.type == "event") {
-            cls_type = '<span class="cls-event">主题活动</span>';
+        if (item.cost && item.cost > 0) {
+            var cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
+        } else {
+            var cls_cost = '<span class="cls-free">公开课</span>';
         }
 
         var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
                         date.format('HH:mm') + ' ',
-                        cls_type + ' ',
+                        cls_cost + ' ',
                         getClassroomName(item.classroom),
                         '</p>'].join('');
 
@@ -184,7 +178,7 @@
     };
     
     function updateUserInfo(user) {
-        $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友');
+        $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友 <small style="color:#808080">剩余课时: ' + user.credit + '</small>');
     };
     
     function toggleLoginForm(isShow) {

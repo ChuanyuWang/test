@@ -88,14 +88,9 @@ block page
               div.col-sm-10
                 input#cls_name.form-control(type='text',placeholder='课程描述',autofocus)
             div.form-group
-              label.control-label.col-sm-2(for='cls_type') 课程类型:
-              div.btn-group.col-sm-10(data-toggle='buttons')
-                label.btn.btn-primary.active
-                  input#radio1(type='radio',name='cls_type',value='story')
-                  |故事会
-                label.btn.btn-primary
-                  input#radio2(type='radio',name='cls_type',value='event')
-                  |主题活动
+              label.control-label.col-sm-2(for='cost') 所须课时:
+              div.col-sm-2
+                input.form-control(type='number',name='cost',min='0',step='0.1')
             div.form-group
               label.control-label.col-sm-2 时间:
               div.col-sm-10
@@ -133,9 +128,9 @@ block page
               div.col-sm-10
                 input#cls_name.form-control(type='text',placeholder='课程描述',autofocus)
             div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 课程类型:
+              label.control-label.col-sm-2 所须课时:
               div.col-sm-10
-                p#cls_type.form-control-static
+                p#cls_cost.form-control-static
             div.form-group(style='margin-bottom:7px')
               label.control-label.col-sm-2 时间:
               div.col-sm-10
@@ -202,8 +197,7 @@ block page
                 //th(data-field='_id',data-visible='false') ID
                 th(data-field='name',data-sortable='true') 宝宝姓名
                 th(data-field='contact') 联系方式
-                th(data-field='point.story',data-sortable='true') 故事会次数
-                th(data-field='point.event',data-sortable='true') 主题活动次数
+                th(data-field='credit',data-sortable='true') 剩余课时
                 th(data-title='预约',data-align='center',data-formatter='addBookFormatter',data-events='handleAddBook')
         script(type='text/javascript').
             function addBookFormatter(value) {

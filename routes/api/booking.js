@@ -175,7 +175,7 @@ router.post('/', function (req, res, next) {
                 return;
             }
 
-            if (doc.point[cls.type] < req.body.quantity) {
+            if (doc.credit < req.body.quantity * cls.cost) {
                 res.status(400).json({
                     'code' : 2004,
                     'message' : "您的可用次数不足，无法预约，如有问题，欢迎来电或到店咨询",
@@ -269,13 +269,10 @@ router.delete ('/:classID', isAuthenticated, function (req, res) {
             }
         }, function (err, result) {
             if (result.n == 1) {
-                var members = req.db.collection("members");
-                var point = {};
-                point["point." + doc.type] = quantity;
-                members.update({
+                req.db.collection("members").update({
                     _id : mongojs.ObjectId(req.body.memberid)
                 }, {
-                    $inc : point
+                    $inc : { credit : doc.cost * quantity}
                 });
             }
             //TODO, return the modified class item
@@ -316,15 +313,13 @@ function createNewBook(req, res, user, cls, quantity) {
 
         var members = req.db.collection("members");
         
-        var point = {};
-        point["point." + doc.type] = -quantity;
         members.update({
             _id : user._id
         }, {
-            $inc : point
+            $inc : {credit : -quantity * doc.cost}
         });
         //return the status of booking class
-        user.point[doc.type] -= quantity;
+        user.credit -= quantity * doc.cost;
         res.json({
             class : doc,
             member : user

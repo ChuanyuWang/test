@@ -3,10 +3,6 @@
     window.cls_cache = {};
     // open id of Weichat user
     window._openid = undefined;
-    var TYPE_NAME = {
-        story : '故事会',
-        event : '主题活动'
-    };
 
     // DOM Ready =============================================================
     $(document).ready(function () {
@@ -206,7 +202,7 @@
     
     function displaySuccess(member, classInfo) {
         var message = "请于" + moment(classInfo.date).format('MMMDoah:mm') + "准时参加";
-        message += '<br>会员' + TYPE_NAME[classInfo.type] + '剩余' + member.point[classInfo.type] + '次';
+        message += '<br>剩余课时' + member.credit + '次';
         $('#success_dlg').find("p#message").html(message);
         $('#success_dlg').modal('show');
         
@@ -215,8 +211,7 @@
             var msg = {
                 openid : _openid,
                 message : "亲爱的会员，您已成功预约" + moment(classInfo.date).format('MMMDoah:mm') 
-                    + "的" + TYPE_NAME[classInfo.type] + "，请准时参加。\n" + TYPE_NAME[classInfo.type] +
-                    "剩余次数：" + member.point[classInfo.type]
+                    + "的课程，请准时参加。\n剩余课时：" + member.credit
             }
             $.ajax("api/sendText", {
                 type : "POST",
@@ -255,16 +250,15 @@
         // insert a class in last row
         var cls_col = '<p>' + item.name + '</p>';
         
-        var cls_type = "";
-        if (item.type == "story") {
-            cls_type = '<span class="cls-story">故事会</span>';
-        } else if (item.type == "event") {
-            cls_type = '<span class="cls-event">主题活动</span>';
+        if (item.cost && item.cost > 0) {
+            var cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
+        } else {
+            var cls_cost = '<span class="cls-free">公开课</span>';
         }
 
         var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
                         date.format('HH:mm') + ' ',
-                        cls_type + ' ',
+                        cls_cost + ' ',
                         getAgeLimit(item),
                         '</p>'].join('');
 
