@@ -3,6 +3,7 @@ var router = express.Router();
 var Account = require('../account');
 var util = require('../util');
 
+var VERSION = 1;
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function (req, res, next) {
@@ -68,6 +69,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
             return next(error);
         }
 
+        req.body.version = VERSION;
         tenants.insert(req.body, function (err, doc){
             if (err) {
                 var error = new Error("create tenant fails");
