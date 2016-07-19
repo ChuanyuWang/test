@@ -72,6 +72,14 @@
             locale : 'zh-CN',
             defaultDate : moment().add(3, 'years')
         });
+
+        $('#member_table').on("page-change.bs.table", function (number, size) {
+            //uncheck all the selected rows to fix the radio column only take effects in one page
+            var items = $('#member_table').bootstrapTable('getSelections');
+            for (var i=0;i<items.length;i++) {
+                $('#member_table').bootstrapTable('uncheckBy', {field:'_id', values:[items[i]._id]});
+            }
+        });
     };
     
     function validateInput(modal, memberInfo){
