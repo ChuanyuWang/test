@@ -3,7 +3,6 @@ var router = express.Router();
 var base = require('./base');
 var wechat = require('wechat');
 var API = require('wechat-api');
-//var config = require('../config.js').test;
 var util = require('../util');
 
 //[{time:1462976508, openid:"o0uUrv4RGMMiGasPF5bvlggasfGk"}]
@@ -25,16 +24,22 @@ var counter = 1;
 var tenant = null;
 //var api = new API(tenant.appid, tenant.appsecret);
 var api = null;
-//TODO, connect db according to tenant name
-var db = require("../db").get('test');
+// single tenant database connection
+var tenant_db = null;
 
 // all requests to this router will append tenant info
 router.use(function (req, res, next) {
-    req.db = db;
-    if (!tenant) {
-        //TODO, load tenant info from database and initialize db and api object
+    // add the tenant database to request object for later usage
+    if (!tenant_db) {
         var tenant_name = req.baseUrl.split("/")[1];
-        config_db = util.connect(req.app.locals.getURI('config'));
+        tenant_db = util.connect(req.app.locals.getURI(tenant_name));
+    }
+    req.db = tenant_db;
+
+    if (!tenant) {
+        //load tenant info from database and initialize db and api object
+        var tenant_name = req.baseUrl.split("/")[1];
+        var config_db = util.connect(req.app.locals.getURI('config'));
         config_db.collection('tenants').findOne({name:tenant_name}, function(err, doc){
             if (err || !doc) {
                 var error = new Error("tenant is not created");
