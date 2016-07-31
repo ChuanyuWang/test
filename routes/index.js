@@ -2,7 +2,6 @@ var express = require('express');
 var passport = require('passport');
 var router = express.Router();
 var Account = require('../account');
-var classes = require("../models/classes");
 var logger = require('log4js').getLogger();
 
 /* GET home page. */

@@ -253,7 +253,7 @@
         if (item.cost && item.cost > 0) {
             var cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
         } else {
-            var cls_cost = '<span class="cls-free">公开课</span>';
+            var cls_cost = '<span class="cls-free">公益活动</span>';
         }
 
         var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
