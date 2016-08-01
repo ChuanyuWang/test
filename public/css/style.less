@@ -127,6 +127,10 @@ html {
       float:right;
       margin-top:3px;
   }
+  .cancel-btn {
+      .finish-btn;
+      opacity : 0.5;
+  }
   .book-btn {
       .finish-btn;
       padding-bottom:3px;
@@ -149,7 +153,23 @@ html {
       }
   }
   .cls-status {
-    text-align : right;
+    text-align : center;
     font-weight : bold;
+    margin-bottom : auto;
   }
+}
+
+.remove {
+  animation:removeAnimation 1s;
+}
+
+@keyframes removeAnimation {
+   from {
+     opacity: 1 ;
+     transform: translateX( 0 );
+   }
+   to {
+     opacity: 0 ;
+     transform : translateX( 400px );
+   }
 }

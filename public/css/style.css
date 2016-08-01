@@ -110,6 +110,11 @@ html {
   float: right;
   margin-top: 3px;
 }
+.book-col .cancel-btn {
+  float: right;
+  margin-top: 3px;
+  opacity: 0.5;
+}
 .book-col .book-btn {
   float: right;
   margin-top: 3px;
@@ -133,6 +138,20 @@ html {
   color: #f0ad4e   !important;
 }
 .book-col .cls-status {
-  text-align: right;
+  text-align: center;
   font-weight: bold;
+  margin-bottom: auto;
+}
+.remove {
+  animation: removeAnimation 1s;
+}
+@keyframes removeAnimation {
+  from {
+    opacity: 1 ;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0 ;
+    transform: translateX(400px);
+  }
 }

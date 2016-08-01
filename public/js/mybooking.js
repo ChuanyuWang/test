@@ -105,6 +105,7 @@
                         showMyBooking();
                     } else {
                         // handle login fail
+                        $('#error_dlg').find("h4").text('登录失败');
                         $('#error_dlg').find("p#message").text('没有找到会员信息，请核对您的姓名和联系方式，如有问题请联系客服');
                         $('#error_dlg').modal('show');
                     }
@@ -159,8 +160,10 @@
                         '</p>'].join('');
 
         if (date > moment()) {
+            var btn_cancel = '<button class="btn btn-danger cancel-btn">取消</button>';
             var btn_tip = '<p class="cls-status text-danger">(未上)</p>';
         } else {
+            var btn_cancel = '';
             var btn_tip = '<p class="cls-status text-info">(已上)</p>';
         }
         
@@ -172,8 +175,10 @@
                 cls_tip + 
             '</div>' + 
             '<div class="book-col" data-id="' + item._id + '">' + 
+                btn_cancel +
                 btn_tip + 
             '</div>' +
+            '<div style="clear:both"></div>' + // add a empty div with clear:both style to make parent div has real height
           '</div>');
     };
     
@@ -234,6 +239,12 @@
                 }
                 if (!data.length) {
                     displayNoClassWarning();
+                } else {
+                    // add the cancel listener
+                    $('#future div.book-col .btn-danger').click(function(event){
+                        var class_id = $(this).closest('div.book-col').data('id');
+                        cancelBooking(class_id, memberid, this);
+                    });
                 }
             },
             error : function (jqXHR, status, err) {
@@ -251,6 +262,59 @@
 
         // append a warning bar
         list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>没有找到预约课程</div>");
+    };
+    
+    function cancelBooking(class_id, member_id, button_div) {
+        if (!class_id || !member_id || !button_div) {
+            console.error("fail to cancel booking due to missing parameter");
+            return ;
+        }
+        
+        // don't allow member to cancel the booking if it's less than 24 hours before begin
+        var cls_item = cls_cache[class_id];
+        var begin_date = moment(cls_item.date);
+        
+        if (moment() > begin_date.subtract(24, 'hours')) {
+            $('#error_dlg').find("h4").text('取消失败');
+            $('#error_dlg').find("p#message").text('不能在课程开始前24小时取消预约，如有问题请联系客服');
+            $('#error_dlg').modal('show');
+            return;
+        }
+
+        // remove previous attached 'click' event listener!
+        $('#cancel_ok').off("click");
+        $('#cancel_ok').click(function(event) {
+            $.ajax("api/booking/" + class_id, {
+                type : "DELETE",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify({memberid:member_id}),
+                success : function (data) {
+                    // check if it's the only class in this day
+                    var count = $(button_div).closest('div.class-row').find('div.content-col > div').length;
+                    if (count == 1) { // the only class in this day
+                        $(button_div).closest('div.class-row').hide(600, function(){
+                            $(button_div).closest('div.class-row').prev('div.class-separator').remove();
+                            $(button_div).closest('div.class-row').remove();
+                        });
+                    } else if (count > 1) {
+                        $(button_div).closest('div.content-col > div').hide(600, function(){
+                            $(button_div).closest('div.content-col > div').remove();
+                        });
+                    } else {
+                        console.error("are you kidding me?");
+                    }
+                },
+                error : function (jqXHR, status, err) {
+                    console.error(jqXHR.responseJSON);
+                },
+                complete : function(jqXHR, status) {
+                    $('#confirm_dlg').modal('hide');
+                },
+                dataType : "json"
+            });
+        });
+        
+        $('#confirm_dlg').modal('show');
     };
     
     function getClassroomName(roomID) {
