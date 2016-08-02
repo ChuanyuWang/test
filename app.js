@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var flash = require('connect-flash');
 var passport = require('passport');
-var config = require('./config.js');
+var config = require('./config');
 var log4js = require('log4js');
 
 var routes = require('./routes/index');
