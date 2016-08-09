@@ -14,7 +14,8 @@
                 modal.find('input[name=contact]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(null);
                 modal.find('input[name=credit]').val("10");
-                modal.find('#expire_date').data('DateTimePicker').date(moment().add(3, 'years'));
+                // the default expire date is 6 months later
+                modal.find('#expire_date').data('DateTimePicker').date(moment().add(6, 'months'));
                 modal.find('textarea[name=note]').val("");
                 modal.find('#edit_member').hide();
                 modal.find('#view_history').hide();
