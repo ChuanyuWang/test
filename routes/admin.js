@@ -107,6 +107,17 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
                 //TODO, send the complete message when all data update
                 res.send("Tenant update to 1.0");
             });
+        } if (doc.version == 1) {
+            // TODO, upgrade
+            upgradeFromOne(req, res, next, doc.name);
+            doc.version = 2;
+            config_db.collection("tenants").save(doc, function(err, doc){
+                if (err) {
+                    return next(new Error("save tenant version fails"));
+                }
+                //TODO, send the complete message when all data update
+                res.send("Tenant update to 2.0");
+            });
         } else {
             res.send("Tenant is already update to date");
         }
@@ -171,6 +182,31 @@ function upgradeFromZero(req, res, next, tenant_name) {
         }
     });
     */
+};
+
+function upgradeFromOne(req, res, next, tenant_name) {
+    //TODO, close the connection when all data update done
+    tenant_db = util.connect(req.app.locals.getURI(tenant_name));
+
+    var members = tenant_db.collection('members');
+    members.find({}).forEach(function(err, doc){
+        if (err) {
+            console.error(err);
+        } else {
+            if (doc && doc.hasOwnProperty('credit') && !doc.hasOwnProperty('membership')) {
+                doc.membership = [];
+                // assign each member a default member card with no limitation
+                var defaultCard = {
+                    type : "ALL",
+                    room : [],
+                    expire : doc.expire,
+                    credit : doc.credit
+                };
+                doc.membership.push(defaultCard);
+                members.save(doc);
+            }
+        }
+    });
 };
 
 function checkTenantUser(req, res, next) {

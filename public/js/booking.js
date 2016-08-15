@@ -201,8 +201,13 @@
     };
     
     function displaySuccess(member, classInfo) {
+        var credit = 0;
+        //TODO, support multi membership card
+        if (member.membership && member.membership.length > 0) {
+            credit = member.membership[0].credit;
+        }
         var message = "请于" + moment(classInfo.date).format('MMMDoah:mm') + "准时参加";
-        message += '<br>剩余课时' + member.credit + '次';
+        message += '<br>剩余课时' + credit + '次';
         $('#success_dlg').find("p#message").html(message);
         $('#success_dlg').modal('show');
         
@@ -211,7 +216,7 @@
             var msg = {
                 openid : _openid,
                 message : "亲爱的会员，您已成功预约" + moment(classInfo.date).format('MMMDoah:mm') 
-                    + "的课程，请准时参加。\n剩余课时：" + member.credit
+                    + "的课程，请准时参加。\n剩余课时：" + credit
             }
             $.ajax("api/sendText", {
                 type : "POST",
@@ -221,7 +226,7 @@
                     //TODO
                 },
                 error : function (jqXHR, status, err) {
-                    console.error(jqXHR.responseText);
+                    console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
                 },
                 dataType : "json"
             });

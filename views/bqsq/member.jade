@@ -10,7 +10,7 @@ block navlist
       a(href='opportunity') 试听
     li
       a(href='setting') 设置
-      
+
 append css
   link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css")
   link(rel="stylesheet",href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")
@@ -29,7 +29,7 @@ block page
   div.container(style={'padding-top': '58px'})
     div#toolbar.btn-group(role='group')
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
-      button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 查看
+      button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 修改
       button#del_member.btn.btn-danger(type='button') 删除
     table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
       thead
@@ -39,8 +39,8 @@ block page
           th(data-field='name',data-sortable='true') 宝宝姓名
           th(data-field='contact') 联系方式
           th(data-field='birthday',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
-          th(data-field='credit',data-sortable='true') 剩余课时
-          th(data-field='expire',data-formatter='dateFormatter',data-sortable='true') 有效期至
+          th(data-field='membership.0.credit',data-sortable='true') 剩余课时
+          th(data-formatter='membershipFormatter',data-events='editMembership') 会员卡
           th(data-field='since',data-formatter='dateFormatter',data-sortable='true') 登记时间
           th(data-field='note',data-visible='false') 备注
 
@@ -54,31 +54,18 @@ block page
         div.modal-body
           form.form-horizontal
             div.form-group
-              label.control-label.col-sm-2(for='member_name') 宝宝姓名:
-              div.col-sm-10
+              label.control-label.col-sm-2(for='name') 宝宝姓名:
+              div.col-sm-4
                 input.form-control(type='text',name='name',placeholder='宝宝姓名')
             div.form-group
-              label.control-label.col-sm-2(for='member_contact') 联系方式:
-              div.col-sm-10
+              label.control-label.col-sm-2(for='contact') 联系方式:
+              div.col-sm-4
                 input.form-control(type='tel',name='contact',placeholder='135xxx')
             div.form-group
-              label.control-label.col-sm-2(for='birth_date') 宝宝生日:
+              label.control-label.col-sm-2(for='birth') 宝宝生日:
               div.col-sm-4
                 div#birth_date.input-group.date
                   input.form-control(text='text',name='brith')
-                  span.input-group-addon
-                    span.glyphicon.glyphicon-calendar
-            div.form-group
-              label.control-label.col-sm-2(for='credit') 课时:
-              div.col-sm-4
-                div.input-group
-                  input.form-control(type='number',name='credit',min='0',step='0.1',style={'width':'70px'})
-                  p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 次(剩余)
-            div.form-group
-              label.control-label.col-sm-2(for='expire_date') 有效期至:
-              div.col-sm-4
-                div#expire_date.input-group.date
-                  input.form-control(text='text')
                   span.input-group-addon
                     span.glyphicon.glyphicon-calendar
             div.form-group
@@ -111,6 +98,48 @@ block page
                 th(data-field='name') 课程名称
                 th(data-field='cost') 所须课时
                 th(data-field='date',data-formatter='dateFormatter',data-sortable='true') 课程日期
+  div#membership_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 会员卡
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 宝宝姓名:
+              div.col-sm-10
+                p#name.form-control-static
+            div.form-group
+              label.control-label.col-sm-2 课时:
+              div.col-sm-4(style="display:inline-flex")
+                input.form-control(type='number',name='credit',min='0',step='0.1',style={'width':'70px'})
+                p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 次(剩余)
+            div.form-group
+              label.control-label.col-sm-2 有效期至:
+              div.col-sm-4
+                div#expire_date.input-group.date
+                  input.form-control(text='text')
+                  span.input-group-addon
+                    span.glyphicon.glyphicon-calendar
+            div.form-group
+              label.control-label.col-sm-2 类型:
+              div.col-sm-4
+                select.form-control(name="card_type")
+                  option(value='ALL') 通用卡
+                  option(value='LIMITED') 限定卡
+            div.form-group
+              label.control-label.col-sm-2 可用教室:
+              div#roomlist.col-sm-10
+                - each room in classroom
+                  div.checkbox
+                    label
+                      input(type="checkbox", value=room.id)
+                      = room.name
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#ok.btn.btn-success(type="button") 确定
 
   script(type='text/javascript').
     function dateFormatter(value) {
@@ -121,6 +150,8 @@ block page
         }
     };
     function highlightExpire(row, index) {
+        //TODO, 
+        return {};
         if (row.expire) {
             var expire = new Date(row.expire);
             // highlight the row if member is expired
@@ -137,4 +168,11 @@ block page
             }
         }
         return {};
+    };
+    function membershipFormatter(value) {
+        return [
+            '<a class="membership text-info" href="javascript:void(0)" title="会员卡">',
+            '<i class="glyphicon glyphicon-credit-card"></i> 会员卡',
+            '</a>'
+        ].join('');
     };

@@ -110,10 +110,16 @@ router.post('/', function (req, res, next) {
         }
         console.log("member is found %j", doc);
 
-        if (doc.expire && doc.expire < new Date()) {
+        //TODO, support multi membership card
+        var membership = null;
+        if (doc.membership && doc.membership.length > 0) {
+            membership = doc.membership[0];
+        }
+
+        if (!membership) {
             res.status(400).json({
-                'code' : 2005,
-                'message' : "会员有效期已过，如有问题，欢迎来电或到店咨询",
+                'code' : 2011,
+                'message' : "您还未办理会员卡，如有问题，欢迎来电或到店咨询",
                 'err' : err
             });
             return;
@@ -141,10 +147,11 @@ router.post('/', function (req, res, next) {
             }
             console.log("class is found %j", cls);
 
-            if (doc.expire && doc.expire < cls.date) {
+            if (membership.expire && membership.expire < cls.date) {
+                //TODO, use client locale date instead of server
                 res.status(400).json({
                     'code' : 2010,
-                    'message' : "您的会员有效期至" + doc.expire.toLocaleDateString() + "，无法预约，如有问题，欢迎来电或到店咨询",
+                    'message' : "您的会员卡有效期至" + membership.expire.toLocaleDateString() + "，无法预约，如有问题，欢迎来电或到店咨询",
                     'err' : err
                 });
                 return;
@@ -175,7 +182,7 @@ router.post('/', function (req, res, next) {
                 return;
             }
 
-            if (doc.credit < req.body.quantity * cls.cost) {
+            if (membership.credit < req.body.quantity * cls.cost) {
                 res.status(400).json({
                     'code' : 2004,
                     'message' : "您的可用次数不足，无法预约，如有问题，欢迎来电或到店咨询",
@@ -269,10 +276,12 @@ router.delete ('/:classID', function (req, res) {
             }
         }, function (err, result) {
             if (result.n == 1) {
+                //TODO, support multi membership card
                 req.db.collection("members").update({
-                    _id : mongojs.ObjectId(req.body.memberid)
+                    _id : mongojs.ObjectId(req.body.memberid),
+                    membership : { $size : 1 }
                 }, {
-                    $inc : { credit : doc.cost * quantity}
+                    $inc : { "membership.0.credit" : doc.cost * quantity}
                 });
             }
             //TODO, return the modified class item
@@ -311,15 +320,23 @@ function createNewBook(req, res, user, cls, quantity) {
             return;
         }
 
-        var members = req.db.collection("members");
+        //TODO, support multi membership card
+        var membership = null;
+        if (user.membership && user.membership.length > 0) {
+            membership = user.membership[0];
         
-        members.update({
-            _id : user._id
-        }, {
-            $inc : {credit : -quantity * doc.cost}
-        });
+            // update the credit value in membership
+            var members = req.db.collection("members");
+            members.update({
+                _id : user._id
+            }, {
+                $inc : {"membership.0.credit" : -quantity * doc.cost}
+            });
+            
+            membership.credit -= quantity * doc.cost;
+        }
+        
         //return the status of booking class
-        user.credit -= quantity * doc.cost;
         res.json({
             class : doc,
             member : user

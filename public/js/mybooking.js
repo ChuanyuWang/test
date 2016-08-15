@@ -183,7 +183,12 @@
     };
     
     function updateUserInfo(user) {
-        $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友 <small style="color:#808080">剩余课时: ' + user.credit + '</small>');
+        var credit = 0;
+        //TODO, support multi membership card
+        if (user.membership && user.membership.length > 0) {
+            credit = user.membership[0].credit;
+        }
+        $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友 <small style="color:#808080">剩余课时: ' + credit + '</small>');
     };
     
     function toggleLoginForm(isShow) {

@@ -197,7 +197,7 @@ block page
                 //th(data-field='_id',data-visible='false') ID
                 th(data-field='name',data-sortable='true') 宝宝姓名
                 th(data-field='contact') 联系方式
-                th(data-field='credit',data-sortable='true') 剩余课时
+                th(data-field='membership.0.credit',data-sortable='true') 剩余课时
                 th(data-title='预约',data-align='center',data-formatter='addBookFormatter',data-events='handleAddBook')
         script(type='text/javascript').
             function addBookFormatter(value) {

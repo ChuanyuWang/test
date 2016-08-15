@@ -29,16 +29,7 @@ router.get('/', function (req, res) {
 router.put('/:memberID', isAuthenticated, function (req, res) {
     var members = req.db.collection("members");
 
-    // make sure the datetime object is stored as ISODate
-    if (req.body && req.body.birthday) {
-        req.body.birthday = new Date(req.body.birthday);
-    }
-    if (req.body && req.body.expire) {
-        req.body.expire = new Date(req.body.expire);
-    }
-    if (req.body && req.body.since) {
-        req.body.since = new Date(req.body.since);
-    }
+    convertDateObject(req.body);
 
     members.update({
         _id : mongojs.ObjectId(req.params.memberID)
@@ -60,24 +51,44 @@ router.put('/:memberID', isAuthenticated, function (req, res) {
     });
 });
 
-router.post('/', isAuthenticated, function (req, res) {
+router.post('/', isAuthenticated, function (req, res, next) {
     if (!req.body.name || !req.body.contact) {
         res.status(400).send("Missing param 'name' or 'contact'");
         return;
     }
     
-    var members = require("../../models/members")(req.db);
-    members.insert(req.body, function (err, docs) {
+    var members = req.db.collection("members");
+    var query = {
+        name : req.body.name,
+        contact : req.body.contact
+    };
+    
+    members.findOne(query, function(err, doc){
         if (err) {
             res.status(500).json({
-                'code' : err.code,
-                'message' : err.message,
                 'err' : err
             })
-        } else {
-            console.log("member is added %j", docs);
-            res.json(docs);
+            return;
         }
+        
+        if (doc) {
+            var error = new Error("会员已经存在");
+            error.code = 2007;
+            next(error);
+            return;
+        }
+        
+        convertDateObject(req.body);
+        members.insert(req.body, function(err, docs){
+            if (err) {
+                res.status(500).json({
+                    'err' : err
+                })
+            } else {
+                console.log("member is added %j", docs);
+                res.json(docs);
+            }
+        });
     });
 });
 
@@ -131,6 +142,29 @@ router.delete ('/:memberID', isAuthenticated, function (req, res) {
         res.json(result);
     });
 });
+
+function convertDateObject(doc) {
+    if (!doc) {
+        return doc;
+    }
+    // make sure the datetime object is stored as ISODate
+    if (doc.birthday) {
+        doc.birthday = new Date(doc.birthday);
+    }
+    if (doc.since) {
+        doc.since = new Date(doc.since);
+    }
+    if (doc.membership && doc.membership.length > 0) {
+        for (var index in doc.membership) {
+            var card = doc.membership[index];
+            if (card && card.expire) {
+                card.expire = new Date(card.expire);
+            }
+        }
+    }
+
+    return doc;
+};
 
 function getMemberBookQuantity(class_doc, member_id) {
     if (!class_doc || !class_doc.booking) {

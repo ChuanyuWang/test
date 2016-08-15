@@ -13,9 +13,6 @@
                 modal.find('input[name=name]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('input[name=contact]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(null);
-                modal.find('input[name=credit]').val("10");
-                // the default expire date is 6 months later
-                modal.find('#expire_date').data('DateTimePicker').date(moment().add(6, 'months'));
                 modal.find('textarea[name=note]').val("");
                 modal.find('#edit_member').hide();
                 modal.find('#view_history').hide();
@@ -37,8 +34,6 @@
                 modal.find('input[name=name]').val(user.name).closest(".form-group").removeClass("has-error");
                 modal.find('input[name=contact]').val(user.contact).closest(".form-group").removeClass("has-error");
                 modal.find('#birth_date').data('DateTimePicker').date(user.birthday ? moment(user.birthday):null);
-                modal.find('input[name=credit]').val(user.credit);
-                modal.find('#expire_date').data('DateTimePicker').date(user.expire ? moment(user.expire):null);
                 modal.find('textarea[name=note]').val(user.note);
                 
                 modal.find('#add_member').hide();
@@ -71,7 +66,7 @@
         $('#expire_date').datetimepicker({
             format : 'll',
             locale : 'zh-CN',
-            defaultDate : moment().add(3, 'years')
+            defaultDate : moment().add(6, 'months')
         });
 
         $('#member_table').on("page-change.bs.table", function (number, size) {
@@ -81,6 +76,16 @@
                 $('#member_table').bootstrapTable('uncheckBy', {field:'_id', values:[items[i]._id]});
             }
         });
+
+        $('#membership_dlg select[name=card_type]').change(function (event) {
+            if ($(this).find('option:selected').val() == 'ALL') {
+                $('#membership_dlg #roomlist input').prop('checked', true);
+                $('#membership_dlg #roomlist input').prop('disabled', true);
+            } else {
+                $('#membership_dlg #roomlist input').prop('disabled', false);
+            }
+        });
+        $('#membership_dlg button#ok').click(editMemberShip);
     };
     
     function validateInput(modal, memberInfo){
@@ -104,11 +109,6 @@
         
         // get birth date
         memberInfo.birthday = modal.find('#birth_date').data("DateTimePicker").date();
-        // get expire date
-        memberInfo.expire = modal.find('#expire_date').data("DateTimePicker").date();
-        //TODO, handle NaN number
-        // get available credit
-        memberInfo.credit = parseFloat(modal.find('input[name=credit]').val());
         memberInfo.note = modal.find('textarea[name=note]').val().trim();
         
         return hasError;
@@ -211,6 +211,110 @@
         });
 
         history_dlg.modal('show');
+    };
+    
+    function editMemberShip(event) {
+        var modal = $(this).closest('.modal');
+        var member_id = modal.data('id');
+        var memberCard = {room : []};
+        
+        var hasError = false;
+        // get credit value
+        memberCard.credit = parseFloat(modal.find('input[name=credit]').val());
+        if (isNaN(memberCard.credit)) {
+            modal.find('input[name=credit]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('input[name=credit]').closest(".form-group").removeClass("has-error");
+        }
+        // get expire date
+        memberCard.expire = modal.find('#expire_date').data("DateTimePicker").date();
+        memberCard.type = modal.find('select[name=card_type] option:selected').val();
+        if (memberCard.type == null) {
+            modal.find('select[name=card_type]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
+            
+        }
+        // get limited classrooms
+        modal.find('#roomlist input:checked').each(function(index, element){
+            memberCard.room.push($(this).val());
+        });
+
+        if (hasError) {
+            return;
+        }
+        $.ajax("api/members/" + member_id, {
+            type : "PUT",
+            contentType : "application/json; charset=utf-8",
+            data : JSON.stringify({"membership" : [memberCard]}),
+            success : function (data) {
+                //TODO, update row of member
+                //$('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: member});
+                modal.modal('hide');
+            },
+            error : function (jqXHR, status, err) {
+                bootbox.dialog({
+                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                    title : "修改会员卡失败",
+                    buttons : {
+                        danger : {
+                            label : "确定",
+                            className : "btn-danger",
+                        }
+                    }
+                });
+                //console.error(jqXHR);
+            },
+            dataType : "json"
+        });
+    };
+    
+    // event handler defined in home.jade file for removing booking item
+    window.editMembership = {
+        'click .membership' : function (e, value, row, index) {
+            var modal = $('#membership_dlg').data('id', row._id);
+
+            if (row.membership && row.membership.length > 0) {
+                var membership = row.membership[0];
+            } else {
+                // ghost card
+                var membership = {
+                    credit : 10,
+                    // the default expire date is 6 months later
+                    expire : moment().add(6, 'months'),
+                    room : [],
+                    type : null
+                };
+            }
+            //modal.find('h4').text("添加会员");
+            modal.find('#name').text(row.name);
+            modal.find('input[name=credit]').val(membership.credit).closest(".form-group").removeClass("has-error");
+            modal.find('#expire_date').data('DateTimePicker').date(membership.expire);
+            modal.find('#roomlist input').prop('disabled', false);
+            modal.find('#roomlist input').prop('checked', false);
+            modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
+            if (membership.type) {
+                modal.find('select[name=card_type] option[value=' + membership.type + ']').prop('selected', true);
+                // update classroom check box
+                switch (membership.type) {
+                    case "ALL":
+                        modal.find('#roomlist input').prop('checked', true);
+                        modal.find('#roomlist input').prop('disabled', true);
+                        break;
+                    case "LIMITED":
+                        for (var index in membership.room) {
+                            modal.find('#roomlist input[value=' + membership.room[index] + ']').prop('checked', true);
+                        }
+                        break;
+                }
+            } else {
+                modal.find('select[name=card_type]').prop('selectedIndex', -1);
+            }
+            
+            $('#membership_dlg').modal('show');
+        }
     };
 
     function handleDeleteMember(event) {

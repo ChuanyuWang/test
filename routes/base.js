@@ -23,7 +23,8 @@ router.get('/member', checkTenantUser, function (req, res) {
     res.render('bqsq/member', {
         title : '会员',
         user : req.user,
-        navTitle : req.tenant.displayName
+        navTitle : req.tenant.displayName,
+        classroom : req.tenant.classroom ? req.tenant.classroom : []
     });
 });
 
