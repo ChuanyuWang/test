@@ -40,7 +40,7 @@ block page
           th(data-field='contact') 联系方式
           th(data-field='birthday',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
           th(data-field='membership.0.credit',data-sortable='true') 剩余课时
-          th(data-formatter='membershipFormatter',data-events='editMembership') 会员卡
+          th(data-field='membership.0',data-formatter='membershipFormatter',data-events='editMembership') 会员卡
           th(data-field='since',data-formatter='dateFormatter',data-sortable='true') 登记时间
           th(data-field='note',data-visible='false') 备注
 
@@ -170,8 +170,19 @@ block page
         return {};
     };
     function membershipFormatter(value) {
+        var color = "text-success";
+        if (value) {
+            // highlight the card if member is expired or has no credit
+            if (new Date(value.expire) < new Date() || value.credit <=0) {
+                color = 'text-danger';
+            }
+        } else {
+            // highlight the card if member has no card
+            color = 'text-muted';
+        }
         return [
-            '<a class="membership text-info" href="javascript:void(0)" title="会员卡">',
+            //TODO, update title according to different color
+            '<a class="membership ' + color + '" href="javascript:void(0)" title="会员卡">',
             '<i class="glyphicon glyphicon-credit-card"></i> 会员卡',
             '</a>'
         ].join('');
