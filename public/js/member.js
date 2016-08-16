@@ -291,7 +291,7 @@
             //modal.find('h4').text("添加会员");
             modal.find('#name').text(row.name);
             modal.find('input[name=credit]').val(membership.credit).closest(".form-group").removeClass("has-error");
-            modal.find('#expire_date').data('DateTimePicker').date(membership.expire);
+            modal.find('#expire_date').data('DateTimePicker').date(moment(membership.expire));
             modal.find('#roomlist input').prop('disabled', false);
             modal.find('#roomlist input').prop('checked', false);
             modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
