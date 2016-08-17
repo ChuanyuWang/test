@@ -249,9 +249,16 @@
             type : "PUT",
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify({"membership" : [memberCard]}),
-            success : function (data) {
-                //TODO, update row of member
-                //$('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: member});
+            success : function (res) {
+                if (res.ok == 1 && res.nModified == 1) {
+                    var row = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
+                    row.membership = row.membership || [];
+                    row.membership[0] = memberCard;
+                    $('#member_table').bootstrapTable('updateByUniqueId', {id: member_id, row: row});
+                } else {
+                    console.error(res);
+                    console.error("Update %s member's card fails", member_id);
+                }
                 modal.modal('hide');
             },
             error : function (jqXHR, status, err) {
