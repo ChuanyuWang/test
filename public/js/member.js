@@ -88,6 +88,7 @@
         $('#membership_dlg button#ok').click(editMemberShip);
     };
     
+    // return true if an error occurs after validation, otherwise return false
     function validateInput(modal, memberInfo){
         var hasError = false;
         
@@ -169,8 +170,13 @@
             type : "PUT",
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(member),
-            success : function (data) {
-                $('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: member});
+            success : function (res) {
+                if (res.ok == 1 && res.nModified == 1) {
+                    $('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: member});
+                } else {
+                    console.error(res);
+                    console.error("Update %s member's info fails", id);
+                }
             },
             error : function (jqXHR, status, err) {
                 bootbox.dialog({
@@ -251,9 +257,7 @@
             data : JSON.stringify({"membership" : [memberCard]}),
             success : function (res) {
                 if (res.ok == 1 && res.nModified == 1) {
-                    var row = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
-                    row.membership = row.membership || [];
-                    row.membership[0] = memberCard;
+                    var row = {"membership" : [memberCard]};
                     $('#member_table').bootstrapTable('updateByUniqueId', {id: member_id, row: row});
                 } else {
                     console.error(res);
