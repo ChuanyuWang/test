@@ -170,6 +170,19 @@ router.post('/', function (req, res, next) {
                     }
                 }
             }
+            
+            //check if the member is limited to some classroom
+            if (membership.type == "LIMITED") {
+                membership.room = membership.room || [];
+                if (membership.room.indexOf(cls.classroom) == -1) {
+                    res.status(400).json({
+                        'code' : 2012,
+                        'message' : "您的会员卡不能预约此店课程，如有问题，欢迎来电或到店咨询",
+                        'err' : err
+                    });
+                    return;
+                }
+            }
 
             if (cls.capacity - cls.reservation < req.body.quantity) {
                 var remaining = cls.capacity - cls.reservation;
