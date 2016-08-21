@@ -40,7 +40,7 @@ block page
           th(data-field='contact') 联系方式
           th(data-field='birthday',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
           th(data-field='membership.0.credit',data-sortable='true') 剩余课时
-          th(data-field='membership.0',data-formatter='membershipFormatter',data-events='editMembership') 会员卡
+          th(data-field='membership.0',data-sortable='true',data-sort-name='membership.0.expire',data-formatter='membershipFormatter',data-events='editMembership') 会员卡
           th(data-field='since',data-formatter='dateFormatter',data-sortable='true') 登记时间
           th(data-field='note',data-visible='false') 备注
 
