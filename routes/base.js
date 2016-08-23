@@ -9,7 +9,6 @@ var booking = require('./api/booking');
 var setting = require('./api/setting');
 var opportunities = require('./api/opportunities');
 
-/* GET users listing. */
 router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title : '课程表',
@@ -20,11 +19,51 @@ router.get('/home', checkTenantUser, function (req, res) {
 });
 
 router.get('/member', checkTenantUser, function (req, res) {
-    res.render('bqsq/member', {
-        title : '会员',
-        user : req.user,
-        navTitle : req.tenant.displayName,
-        classroom : req.tenant.classroom ? req.tenant.classroom : []
+    var members = req.db.collection("members");
+    //TODO, support multi membership card
+    members.aggregate([{
+                $match : {
+                    membership : {
+                        $size : 1
+                    },
+                    "membership.0.expire" : {
+                        $gt : new Date()
+                    },
+                    "membership.0.credit" : {
+                        $gt : 0
+                    }
+                }
+            }, {
+                $unwind : "$membership"
+            }, {
+                $group : {
+                    _id : null,
+                    count : {
+                        $sum : 1 // the count of valid member who is not expire and has remaining credit
+                    },
+                    total : {
+                        $sum : "$membership.credit" // the total of valid members' remaining credit
+                    }
+                }
+            }
+        ], function (err, docs) {
+        if (err)
+            console.error(err);
+
+        var doc = {count:NaN, total:NaN};
+        if (docs && docs.length == 1)
+            doc = docs[0];
+
+        res.render('bqsq/member', {
+            title : '会员',
+            user : req.user,
+            navTitle : req.tenant.displayName,
+            classroom : req.tenant.classroom ? req.tenant.classroom : [],
+            statistics : {
+                count : doc.count,
+                total : doc.total
+            }
+        });
     });
 });
 

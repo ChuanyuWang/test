@@ -43,7 +43,7 @@ block page
           th(data-field='membership.0',data-sortable='true',data-sort-name='membership.0.expire',data-formatter='membershipFormatter',data-events='editMembership') 会员卡
           th(data-field='since',data-formatter='dateFormatter',data-sortable='true') 登记时间
           th(data-field='note',data-visible='false') 备注
-
+    p.small 有效会员: <strong>#{statistics.count}</strong>人<br>剩余课时: <b>#{statistics.total}</b>
   div#member_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content
