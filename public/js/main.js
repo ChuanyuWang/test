@@ -143,7 +143,7 @@
             break;
         case 2: // afternoon
             temp.hours(16);
-            temp.minutes(30);
+            temp.minutes(40);
             break;
         case 3: // evening
             temp.hours(19);
