@@ -206,8 +206,12 @@
         if (member.membership && member.membership.length > 0) {
             credit = member.membership[0].credit;
         }
-        var message = "请于" + moment(classInfo.date).format('MMMDoah:mm') + "准时参加";
-        message += '<br>剩余课时' + credit + '次';
+        var message = "您已预约" + moment(classInfo.date).format('MMMDoah:mm') + "活动，请准时参加";
+        message += '<br>您还剩余' + credit + '课时';
+        if (member.membership && member.membership.length > 0) {
+            message += '，有效期至' + moment(member.membership[0].expire).format('ll');
+        }
+        
         $('#success_dlg').find("p#message").html(message);
         $('#success_dlg').modal('show');
         
@@ -215,9 +219,9 @@
         if (_openid) {
             var msg = {
                 openid : _openid,
-                message : "亲爱的会员，您已成功预约" + moment(classInfo.date).format('MMMDoah:mm') 
-                    + "的课程，请准时参加。\n剩余课时：" + credit
-            }
+                message : "您已预约" + moment(classInfo.date).format('MMMDoah:mm') 
+                    + "的课程，请准时参加。\n您还剩余" + credit + "课时"
+            };
             $.ajax("api/sendText", {
                 type : "POST",
                 contentType : "application/json; charset=utf-8",
