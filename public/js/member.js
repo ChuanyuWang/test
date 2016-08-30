@@ -293,8 +293,8 @@
                 // ghost card
                 var membership = {
                     credit : 10,
-                    // the default expire date is 6 months later
-                    expire : moment().add(6, 'months'),
+                    // the default expire date is 3 months later
+                    expire : moment().add(3, 'months'),
                     room : [],
                     type : null
                 };
