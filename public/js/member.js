@@ -118,7 +118,8 @@
     function handleAddNewMember(event) {
         var modal = $(this).closest('.modal');
         var newMember = {
-            since : moment()
+            since : moment(),
+            membership : []
         };
         
         // validate the input
