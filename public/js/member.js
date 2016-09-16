@@ -329,6 +329,13 @@
         }
     };
 
+    window.customQuery = function(params) {
+        // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
+        var filter = $("#filter_dlg input:checked").val();
+        params.filter = filter;
+        return params;
+    };
+
     function handleDeleteMember(event) {
         var items = $('#member_table').bootstrapTable('getSelections');
         if (items.length != 1) {

@@ -31,7 +31,9 @@ block page
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
       button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 修改
       button#del_member.btn.btn-danger(type='button') 删除
-    table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
+      button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
+        span.glyphicon.glyphicon-filter
+    table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true",data-query-params="customQuery")
       thead
         tr
           th(data-radio='true')
@@ -78,6 +80,32 @@ block page
           button#add_member.btn.btn-success(type="button") 添加
           button#edit_member.btn.btn-success(type="button") 修改
 
+  div#filter_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 会员过滤
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:auto')
+              p.form-control-static(style='color:#808080;text-align:center')
+                small 请选择一个过滤条件，并在更改后点击会员列表右上角的刷新按钮
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 过滤条件:
+              div.col-sm-10
+                div.radio
+                  label
+                    input(type="radio", name="filter", value="null", checked)
+                    显示全部会员
+                - each room in classroom
+                  div.radio
+                    label
+                      input(type="radio", name="filter", value=room.id)
+                      显示只能在<u>#{room.name}</u>消费的会员
+        div.modal-footer
+          button.btn.btn-primary(type="button",data-dismiss="modal") 确定
   div#history_member.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content

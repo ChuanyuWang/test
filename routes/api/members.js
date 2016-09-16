@@ -12,6 +12,13 @@ router.get('/', function (req, res) {
     if (req.query.contact) {
         query['contact'] = req.query.contact;
     }
+    // "null" is the keyword indicate display all members
+    if (req.query.filter && req.query.filter != "null") {
+        //TODO, support multi membership card
+        query["membership"] = { $size : 1 };
+        query["membership.type"] = "LIMITED";
+        query["membership.room"] = [req.query.filter];
+    }
     members.find(query).sort({
         since : -1
     }, function (err, docs) {
