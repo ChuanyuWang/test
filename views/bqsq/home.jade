@@ -43,7 +43,7 @@ block page
     table#cls_table.table.table-bordered.table-hover(style='margin-top:15px;display:none')
         thead#schedule_header
           tr
-            th(style='width:50px;text-align:center') 时间
+            th(style='width:60px;text-align:center') 时间
             th 星期一
             th 星期二
             th 星期三
@@ -52,28 +52,17 @@ block page
             th 星期六
             th 星期日
         tbody
-          tr#morning
-            td(style='text-align:center') 上午
-            each val in [1, 2, 3, 4, 5, 6, 7]
-              td
-                p
-                div.btn-group.btn-group-xs.pull-right
-                  button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
-          tr#afternoon
-            td(style='text-align:center') 下午
-            each val in [1, 2, 3, 4, 5, 6, 7]
-              td
-                p
-                div.btn-group.btn-group-xs.pull-right
-                  button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
-          tr#evening
-            td(style='text-align:center') 晚上
-            each val in [1, 2, 3, 4, 5, 6, 7]
-              td
-                p
-                div.btn-group.btn-group-xs.pull-right
-                  button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
-  
+          -
+            list = ["上午一","上午二","下午一","下午二","晚上一","晚上二"]
+          each item in list
+            tr
+              td(style='text-align:center')= item
+              each val in [1, 2, 3, 4, 5, 6, 7]
+                td
+                  p
+                  div.btn-group.btn-group-xs.pull-right
+                    button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
+
   div#cls_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content

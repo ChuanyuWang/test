@@ -24,13 +24,13 @@
             modal.find('#cls_date').text(defaultDate.format('ll'));
             var timePicker = modal.find('#cls_time').data('DateTimePicker').minDate(false).maxDate(false).date(defaultDate);
             // add the limitation of each slot
-            if (rowIndex == 1) {// morning
+            if (rowIndex == 1 || rowIndex == 2) {// morning
                 timePicker.minDate(defaultDate.hour(6).minute(0));
                 timePicker.maxDate(defaultDate.hour(11).minute(59));
-            } else if (rowIndex == 2) { // afternoon
+            } else if (rowIndex == 3 || rowIndex == 4) { // afternoon
                 timePicker.minDate(defaultDate.hour(12).minute(0));
                 timePicker.maxDate(defaultDate.hour(17).minute(59));
-            } else if (rowIndex == 3) { // evening
+            } else if (rowIndex == 5 || rowIndex == 6) { // evening
                 timePicker.minDate(defaultDate.hour(18).minute(0));
                 timePicker.maxDate(defaultDate.hour(23).minute(59));
             }
@@ -138,14 +138,17 @@
         temp.milliseconds(0);
         switch (rowIndex) {
         case 1: // morning
+        case 2: // morning
             temp.hours(10);
             temp.minutes(00);
             break;
-        case 2: // afternoon
+        case 3: // afternoon
+        case 4: // afternoon
             temp.hours(16);
             temp.minutes(40);
             break;
-        case 3: // evening
+        case 5: // evening
+        case 6: // evening
             temp.hours(19);
             temp.minutes(00);
             break;
@@ -251,14 +254,35 @@
         // day is 0 if it's Sunday
         var colIndex = (date.day() == 0) ? 7 : date.day();
         if (date.hour() < 12) {
-            var rowIndex = 1;
+            var min = 1;
+            var max = 2;
         } else if (date.hour() < 18) {
-            var rowIndex = 2;
+            var min = 3;
+            var max = 4;
         } else {
-            var rowIndex = 3;
+            var min = 5;
+            var max = 6;
+        }
+        colIndex = colIndex + 1; // append the first column
+        var firstEmptyRow = null;
+        for (var i=min;i<=max;i++) {
+            var cell = $('#cls_table tbody tr:nth-child(' + i + ') td:nth-child(' + colIndex + ')');
+            // locate the cell by class's id
+            if (cell.data('id') == item._id) {
+                var rowIndex = i;
+                break;
+            }
+            if (!firstEmptyRow && !cell.data('id')) {
+                firstEmptyRow = i;
+            }
+        }
+        var rowIndex = rowIndex || firstEmptyRow;
+        if (!rowIndex) {
+            console.error("can't find the empty cell to display the class item ", item);
+            showErrorMsg("课表已满，无法显示该课程");
+            return;
         }
 
-        colIndex = colIndex + 1; // append the first column
         var cell = $('#cls_table tbody tr:nth-child(' + rowIndex + ') td:nth-child(' + colIndex + ')');
         cell.data('id', item._id);
         cell.find('p').text(item.name);
@@ -452,7 +476,7 @@
                 success : function (data) {
                     // update the cache
                     cls_cache[item_id] = undefined;
-                    cell.data('id', undefined);
+                    cell.data('id', null);
                     cell.find('p').empty();
                     cell.find('.btn-group').empty();
                     cell.find('.btn-group').append('<button class="btn btn-default" data-toggle="modal" data-target="#cls_dlg">+</button>');
@@ -525,6 +549,19 @@
             });
         }
     };
+    
+    // sort the array of class from Monday to Sunday
+    function sortClass(a, b){
+        if (!a || !b) {
+            return 0;
+        }
+        
+        if (moment(a.date) < moment(b.date)) {
+            return -1;
+        } else {
+            return 1;
+        }
+    };
 
     function updateSchedule(control) {
         clearSchedule();
@@ -539,10 +576,14 @@
                 classroom : getCurrentClassRoom()
             },
             success : function (data) {
-                for (var i=0; i<data.length; i++) {
-                    // update the cache
-                    cls_cache[data[i]._id] = data[i];
-                    displayClass(data[i]);
+                if (data && $.isArray(data)) {
+                    // the data is already sorted in server side as "asc"
+                    //data.sort(sortClass);
+                    for (var i=0; i<data.length; i++) {
+                        // update the cache
+                        cls_cache[data[i]._id] = data[i];
+                        displayClass(data[i]);
+                    }
                 }
             },
             error : function (jqXHR, status, err) {

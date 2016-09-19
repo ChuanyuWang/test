@@ -95,7 +95,7 @@ router.delete ('/:classID', isAuthenticated, function (req, res) {
         }
         if (result.n == 1) {
             console.log("class %s is deteled", req.params.classID);
-            res.json({});
+            res.json(result);
         } else {
             res.status(400).json({
                 'code' : 2008,
