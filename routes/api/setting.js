@@ -94,8 +94,39 @@ router.route('/classrooms/:roomID')
     next(new Error('not implemented'));
 })
 .delete (function (req, res) {
-    //TODO, Delete a classroom
-    next(new Error('not implemented'));
+    var tenants = config_db.collection('tenants');
+    tenants.update({
+        name : req.user.tenant
+    }, {
+        $pull : {
+            classroom : {
+                id : req.params.roomID
+            }
+        }
+    }, function (err, result){
+        if (err) {
+            var error = new Error("删除教室失败");
+            error.innerError = err;
+            return next(error);
+        }
+        
+        if (result.n == 1) {
+            console.log("classroom %j is delete", req.params.roomID);
+            
+            // update the tenant object in cache
+            req.tenant.classroom = req.tenant.classroom || [];
+            for (var i=0;i<req.tenant.classroom.length;i++) {
+                var room = req.tenant.classroom[i];
+                if (room && room.id == req.params.roomID) {
+                    req.tenant.classroom.splice(i, 1);
+                    break;
+                }
+            }
+        } else {
+            console.error("classroom %j fails to be deleted", req.params.roomID);
+        }
+        res.json(result);
+    });
 })
 .put(function (req, res) {
     //TODO, update a classroom
@@ -122,7 +153,7 @@ function migrateFreeClass(room, database) {
 };
 
 function isAuthenticated(req, res, next) {
-    //TODO, only the super admin 'chuanyu' or tenant's admin can modify own tenant's setting
+    //TODO, only the tenant's admin can modify own tenant's setting
     if (req.user && req.user.tenant == req.tenant.name) {
         next()
     } else {

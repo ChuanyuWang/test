@@ -81,12 +81,49 @@
             dataType : "json"
         });
     };
-    
+
     // event handler defined in setting.jade file for removing classroom
     window.handleDeleteClassroom = {
         'click .remove' : function (e, value, row, index) {
-            //TODO, remove a classroom
-            alert("暂不支持，可能影响相关课程和预订");
+            bootbox.confirm({ 
+                message : "确定永久删除此教室吗？<br><small>删除后，教室中的课程将无法显示或预约，并且已经预约的课时也不会返还到会员卡中</small>", 
+                callback : function(result) {
+                    if (!result) { // user cancel
+                        return ;
+                    }
+
+                    $.ajax("api/setting/classrooms/" + row.id, {
+                        type : "DELETE",
+                        contentType : "application/json; charset=utf-8",
+                        data : {},
+                        success : function (data) {
+                            if (data && data.n == 1 && data.ok == 1) {
+                                $('#classroom_table').bootstrapTable('removeByUniqueId', row.id);
+                            } else {
+                                console.error("remove class room " + row.id + " fails");
+                            }
+                        },
+                        error : function (jqXHR, status, err) {
+                            bootbox.dialog({
+                                message : jqXHR.responseJSON.message,
+                                title : "删除教室失败",
+                                buttons : {
+                                    danger : {
+                                        label : "确定",
+                                        className : "btn-danger",
+                                    }
+                                }
+                            });
+                        },
+                        dataType : "json"
+                    });
+                },
+                buttons : {
+                    confirm : {
+                        className : "btn-danger"
+                    }
+                }
+            });
         }
     };
 })(jQuery);
