@@ -116,15 +116,6 @@ router.post('/', function (req, res, next) {
             membership = doc.membership[0];
         }
 
-        if (!membership) {
-            res.status(400).json({
-                'code' : 2011,
-                'message' : "您还未办理会员卡，如有问题，欢迎来电或到店咨询",
-                'err' : err
-            });
-            return;
-        }
-
         // find the class want to book
         var classes = req.db.collection("classes");
         classes.findOne({
@@ -146,6 +137,23 @@ router.post('/', function (req, res, next) {
                 return;
             }
             console.log("class is found %j", cls);
+            
+            // if it's a free course, then it's open for all kinds of membership
+            if (cls.cost == 0 && !membership) {
+                membership = {};
+                membership.expire = new Date(2999,1);
+                membership.credit = 999;
+                membership.type = "ALL";
+            }
+            
+            if (!membership) {
+                res.status(400).json({
+                    'code' : 2011,
+                    'message' : "您还未办理会员卡，如有问题，欢迎来电或到店咨询",
+                    'err' : err
+                });
+                return;
+            }
 
             if (membership.expire && membership.expire < cls.date) {
                 //TODO, use client locale date instead of server
@@ -198,7 +206,7 @@ router.post('/', function (req, res, next) {
             if (membership.credit < req.body.quantity * cls.cost) {
                 res.status(400).json({
                     'code' : 2004,
-                    'message' : "您的可用次数不足，无法预约，如有问题，欢迎来电或到店咨询",
+                    'message' : "您的剩余课时不足，无法预约，如有问题，欢迎来电或到店咨询",
                     'err' : err
                 });
                 return;
