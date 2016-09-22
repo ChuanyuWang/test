@@ -3,7 +3,7 @@ var router = express.Router();
 var Account = require('../account');
 var util = require('../util');
 
-var VERSION = 1;
+var VERSION = 2;
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function (req, res, next) {
