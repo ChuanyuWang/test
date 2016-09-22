@@ -75,7 +75,7 @@ router.get('/booking', function (req, res) {
         counter : counter++,
         timeKey : timeKey,
         openid : user ? user.openid : '',
-        classroom : req.tenant.classroom
+        classroom : req.tenant.classroom ? req.tenant.classroom : []
     });
 });
 
