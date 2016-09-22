@@ -201,13 +201,13 @@
     };
     
     function displaySuccess(member, classInfo) {
-        var credit = 0;
+        var message = "您已预约" + moment(classInfo.date).format('MMMDoah:mm') + "活动，请准时参加";
         //TODO, support multi membership card
+        var credit = 0;
         if (member.membership && member.membership.length > 0) {
             credit = member.membership[0].credit;
+            message += '<br>您还剩余' + credit + '课时';
         }
-        var message = "您已预约" + moment(classInfo.date).format('MMMDoah:mm') + "活动，请准时参加";
-        message += '<br>您还剩余' + credit + '课时';
         if (member.membership && member.membership.length > 0) {
             message += '，有效期至' + moment(member.membership[0].expire).format('ll');
         }
