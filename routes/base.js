@@ -50,7 +50,7 @@ router.get('/member', checkTenantUser, function (req, res) {
         if (err)
             console.error(err);
 
-        var doc = {count:NaN, total:NaN};
+        var doc = {count:0, total:0};
         if (docs && docs.length == 1)
             doc = docs[0];
 
