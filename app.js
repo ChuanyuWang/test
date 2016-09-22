@@ -15,6 +15,7 @@ var routes = require('./routes/index');
 // route different public account
 var mygirl = require('./routes/mygirl');
 var bqsq = require('./routes/bqsq');
+var martin = require('./routes/martin');
 var test = require('./routes/test');
 var admin = require('./routes/admin');
 
@@ -63,7 +64,7 @@ app.use('/admin', admin);
 app.use('/mygirl',mygirl);
 app.use('/test', test);
 app.use('/bqsq', bqsq);
-app.use('/martin', bqsq);
+app.use('/martin', martin);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
