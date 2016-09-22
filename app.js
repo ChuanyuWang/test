@@ -63,6 +63,7 @@ app.use('/admin', admin);
 app.use('/mygirl',mygirl);
 app.use('/test', test);
 app.use('/bqsq', bqsq);
+app.use('/martin', bqsq);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
