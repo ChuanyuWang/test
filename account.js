@@ -12,7 +12,8 @@ var Account = new Schema({
     username: String,
     password: String,
     tenant: String,
-    displayName: String
+    displayName: String,
+    role: String
 });
 
 Account.plugin(passportLocalMongoose);
