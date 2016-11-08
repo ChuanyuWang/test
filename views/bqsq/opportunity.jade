@@ -55,13 +55,13 @@ block page
     function statusFormatter(value) {
         if (value == 'open') {
             return [
-                '<a class="phone text-success" href="javascript:void(0)" title="沟通">',
+                '<a class="phone text-success" href="javascript:void(0)" title="未联系">',
                 '<i class="glyphicon glyphicon-earphone"></i>',
                 '</a>'
             ].join('');
         } else {
             return [
-                '<a class="phone text-danger" href="javascript:void(0)" title="沟通">',
+                '<a class="phone text-danger" href="javascript:void(0)" title="已联系">',
                 '<i class="glyphicon glyphicon-earphone"></i>',
                 '</a>'
             ].join('');
