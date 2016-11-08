@@ -68,7 +68,7 @@
             },
             error : function (jqXHR, status, err) {
                 bootbox.dialog({
-                    message : jqXHR.responseJSON.message,
+                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title : "添加教室失败",
                     buttons : {
                         danger : {
@@ -105,7 +105,7 @@
                         },
                         error : function (jqXHR, status, err) {
                             bootbox.dialog({
-                                message : jqXHR.responseJSON.message,
+                                message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                                 title : "删除教室失败",
                                 buttons : {
                                     danger : {

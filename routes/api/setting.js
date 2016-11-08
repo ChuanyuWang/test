@@ -32,7 +32,7 @@ router.get('/classrooms', function(req, res, next) {
     });
 });
 
-router.post('/classrooms', isAuthenticated, function(req, res, next) {
+router.post('/classrooms', isAuthenticated, requireRole("admin"), function(req, res, next) {
     //var newRoom = {id:'abc', name:''};
     if (!req.body.id) {
         var error = new Error("classroom ID is not defined");
@@ -88,7 +88,7 @@ router.post('/classrooms', isAuthenticated, function(req, res, next) {
 });
 
 router.route('/classrooms/:roomID')
-.all(isAuthenticated)
+.all(isAuthenticated, requireRole("admin"))
 .get(function(req, res){
     //TODO, get a classroom
     next(new Error('not implemented'));
@@ -150,6 +150,18 @@ function migrateFreeClass(room, database) {
         }
         console.log("%d class is/are linked to classroom %s", result.n, room.id);
     });
+};
+
+function requireRole(role) {
+    return function(req, res, next) {
+        if(req.user && req.user.role === role)
+            next();
+        else {
+            var err = new Error("没有权限执行此操作");
+            err.status = 403;
+            next(err);
+        }
+    };
 };
 
 function isAuthenticated(req, res, next) {

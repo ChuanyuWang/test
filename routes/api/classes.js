@@ -43,7 +43,7 @@ router.get('/', function (req, res) {
     });
 });
 
-router.post('/', isAuthenticated, function (req, res) {
+router.post('/', isAuthenticated, requireRole("admin"), function (req, res) {
     var classes = require("../../models/classes")(req.db);
     classes.insert(req.body, function (err, docs) {
         if (err) {
@@ -57,7 +57,7 @@ router.post('/', isAuthenticated, function (req, res) {
     });
 });
 
-router.put('/:classID', isAuthenticated, function (req, res) {
+router.put('/:classID', isAuthenticated, requireRole("admin"), function (req, res) {
     var classes = req.db.collection("classes");
     classes.update({
         _id : mongojs.ObjectId(req.params.classID)
@@ -78,7 +78,7 @@ router.put('/:classID', isAuthenticated, function (req, res) {
     });
 });
 // remove a class or event which reservation is zero
-router.delete ('/:classID', isAuthenticated, function (req, res) {
+router.delete ('/:classID', isAuthenticated, requireRole("admin"), function (req, res) {
     var classes = req.db.collection("classes");
     classes.remove({
         _id : mongojs.ObjectId(req.params.classID),
@@ -105,6 +105,18 @@ router.delete ('/:classID', isAuthenticated, function (req, res) {
         }
     });
 });
+
+function requireRole(role) {
+    return function(req, res, next) {
+        if(req.user && req.user.role === role)
+            next();
+        else {
+            var err = new Error("没有权限执行此操作");
+            err.status = 403;
+            next(err);
+        }
+    };
+};
 
 function isAuthenticated(req, res, next) {
     if (req.user && req.user.tenant == req.tenant.name) {

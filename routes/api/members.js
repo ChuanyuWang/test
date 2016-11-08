@@ -33,7 +33,7 @@ router.get('/', function (req, res) {
     });
 });
 
-router.put('/:memberID', isAuthenticated, function (req, res) {
+router.put('/:memberID', isAuthenticated, requireRole("admin"), function (req, res) {
     var members = req.db.collection("members");
 
     convertDateObject(req.body);
@@ -58,7 +58,7 @@ router.put('/:memberID', isAuthenticated, function (req, res) {
     });
 });
 
-router.post('/', isAuthenticated, function (req, res, next) {
+router.post('/', isAuthenticated, requireRole("admin"), function (req, res, next) {
     if (!req.body.name || !req.body.contact) {
         res.status(400).send("Missing param 'name' or 'contact'");
         return;
@@ -99,7 +99,7 @@ router.post('/', isAuthenticated, function (req, res, next) {
     });
 });
 
-router.delete ('/:memberID', isAuthenticated, function (req, res) {
+router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res) {
     var members = req.db.collection("members");
     members.remove({
         _id : mongojs.ObjectId(req.params.memberID)
@@ -184,6 +184,18 @@ function getMemberBookQuantity(class_doc, member_id) {
         }
     }
     return NaN;
+};
+
+function requireRole(role) {
+    return function(req, res, next) {
+        if(req.user && req.user.role === role)
+            next();
+        else {
+            var err = new Error("没有权限执行此操作");
+            err.status = 403;
+            next(err);
+        }
+    };
 };
 
 function isAuthenticated(req, res, next) {

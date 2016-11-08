@@ -25,7 +25,7 @@ router.get('/', isAuthenticated, function (req, res) {
     });
 });
 
-router.put('/:opportunityID', isAuthenticated, function (req, res) {
+router.put('/:opportunityID', isAuthenticated, requireRole("admin"), function (req, res) {
     var opportunities = req.db.collection("opportunities");
 
     initDateField(req.body);
@@ -77,7 +77,7 @@ router.post('/', function (req, res) {
     });
 });
 
-router.delete ('/:memberID', isAuthenticated, function (req, res) {
+router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res) {
     //TODO
     return next(new Error("Not implementation"));
     
@@ -139,6 +139,18 @@ function initDateField(item) {
             item[fields[i]] = new Date(item[fields[i]]);
         }
     }
+};
+
+function requireRole(role) {
+    return function(req, res, next) {
+        if(req.user && req.user.role === role)
+            next();
+        else {
+            var err = new Error("没有权限执行此操作");
+            err.status = 403;
+            next(err);
+        }
+    };
 };
 
 function isAuthenticated(req, res, next) {

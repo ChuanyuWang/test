@@ -151,7 +151,7 @@
             },
             error : function (jqXHR, status, err) {
                 bootbox.dialog({
-                    message : jqXHR.responseJSON.message,
+                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title : "添加会员失败",
                     buttons : {
                         danger : {
@@ -181,7 +181,7 @@
             },
             error : function (jqXHR, status, err) {
                 bootbox.dialog({
-                    message : jqXHR.responseJSON.message,
+                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title : "修改会员失败",
                     buttons : {
                         danger : {
@@ -357,7 +357,16 @@
                         $('#member_table').bootstrapTable('removeByUniqueId', item._id);
                     },
                     error : function (jqXHR, status, err) {
-                        console.error(jqXHR.responseText);
+                        bootbox.dialog({
+                            message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                            title : "删除会员失败",
+                            buttons : {
+                                danger : {
+                                    label : "确定",
+                                    className : "btn-danger",
+                                }
+                            }
+                        });
                     },
                     complete : function(jqXHR, status) {
                         //TODO

@@ -227,26 +227,22 @@
                 classItem.age.max = classItem.age.min;
                 classItem.age.min = temp;
             }
-            modal.modal('hide');
-            addNewClass(classItem);
+            $.ajax("api/classes", {
+                type : "POST",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify(classItem),
+                success : function (data) {
+                    // update the cache
+                    cls_cache[data._id] = data;
+                    displayClass(data);
+                    modal.modal('hide');
+                },
+                error : function (jqXHR, status, err) {
+                    showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+                },
+                dataType : "json"
+            });
         }
-    };
-
-    function addNewClass(classItem) {
-        $.ajax("api/classes", {
-            type : "POST",
-            contentType : "application/json; charset=utf-8",
-            data : JSON.stringify(classItem),
-            success : function (data) {
-                // update the cache
-                cls_cache[data._id] = data;
-                displayClass(data);
-            },
-            error : function (jqXHR, status, err) {
-                console.error(jqXHR.responseText);
-            },
-            dataType : "json"
-        });
     };
 
     function displayClass(item) {
@@ -420,7 +416,7 @@
                     displayClass(class_item);
                 },
                 error : function (jqXHR, status, err) {
-                    console.error(jqXHR.responseJSON);
+                    showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
                 },
                 complete : function(jqXHR, status) {
                     //TODO
@@ -485,16 +481,7 @@
                     showSuccessMsg("删除成功");
                 },
                 error : function (jqXHR, status, err) {
-                    bootbox.dialog({
-                        message : jqXHR.responseJSON.message,
-                        title : "删除失败",
-                        buttons : {
-                            danger : {
-                                label : "确定",
-                                className : "btn-danger",
-                            }
-                        }
-                    });
+                    showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
                 },
                 complete : function(jqXHR, status) {
                     //TODO
