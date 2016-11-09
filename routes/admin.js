@@ -23,7 +23,7 @@ router.get('/home', checkTenantUser, function (req, res) {
 router.post('/createUser', isAuthenticated, function (req, res) {
     //TODO, check the tenant name existed
     Account.register(new Account({
-            username : req.body.user, tenant : req.body.tenant, displayName : req.body.display
+            username : req.body.user, tenant : req.body.tenant, displayName : req.body.display, role : req.body.role
         }), req.body.password, function (err, account) {
         if (err) {
             return res.status(500).send(err);

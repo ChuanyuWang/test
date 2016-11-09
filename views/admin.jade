@@ -21,21 +21,25 @@ block page
       div.tab-pane.active(role="tabpanel",id="users")
           form.form-horizontal(style={'padding':'11px'},role='form',action="createUser",method="post")
             div.form-group
-              label.control-label.col-sm-2(for='cls_name') User Name:
+              label.control-label.col-sm-2 User Name:
               div.col-sm-10
                 input.form-control(type='text',placeholder='',name='user')
             div.form-group
-              label.control-label.col-sm-2(for='cls_name') Password:
+              label.control-label.col-sm-2 Password:
               div.col-sm-10
                 input.form-control(type='password',placeholder='',name='password')
             div.form-group
-              label.control-label.col-sm-2(for='cls_name') Tenant:
+              label.control-label.col-sm-2 Tenant:
               div.col-sm-10
                 input.form-control(type='text',placeholder='',name='tenant')
             div.form-group
-              label.control-label.col-sm-2(for='cls_name') Display Name:
+              label.control-label.col-sm-2 Display Name:
               div.col-sm-10
                 input.form-control(type='text',placeholder='',name='display')
+            div.form-group
+              label.control-label.col-sm-2 Role:
+              div.col-sm-10
+                input.form-control(type='text',placeholder='admin',name='role')
             div.form-group
               div.col-sm-offset-2.col-sm-10
                 button.btn.btn-default(type='submit') Create User
