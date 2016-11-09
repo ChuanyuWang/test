@@ -6,7 +6,7 @@ var util = require('../../util');
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function (req, res, next) {
-    config_db = config_db || util.connect(req.app.locals.getURI('config'));
+    config_db = config_db || util.connect('config');
     next();
 });
 

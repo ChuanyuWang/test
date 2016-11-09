@@ -32,14 +32,14 @@ router.use(function (req, res, next) {
     // add the tenant database to request object for later usage
     if (!tenant_db) {
         var tenant_name = req.baseUrl.split("/")[1];
-        tenant_db = util.connect(req.app.locals.getURI(tenant_name));
+        tenant_db = util.connect(tenant_name);
     }
     req.db = tenant_db;
     
     if (!tenant) {
         //load tenant info from database and initialize db and api object
         var tenant_name = req.baseUrl.split("/")[1];
-        var config_db = util.connect(req.app.locals.getURI('config'));
+        var config_db = util.connect('config');
         config_db.collection('tenants').findOne({name:tenant_name}, function(err, doc){
             if (err || !doc) {
                 var error = new Error("tenant is not created");

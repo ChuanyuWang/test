@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var util = require('util');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 //var cookieParser = require('cookie-parser');
@@ -7,18 +8,20 @@ var bodyParser = require('body-parser');
 var flash = require('connect-flash');
 var passport = require('passport');
 var config = require('./config');
-var log4js = require('log4js');
+var db_config = require('./config.db');
 
+// load routes
 var routes = require('./routes/index');
 //var users = require('./routes/user');
 
-// route different public account
+// route different tenant
 var mygirl = require('./routes/mygirl');
 var bqsq = require('./routes/bqsq');
 var martin = require('./routes/martin');
 var test = require('./routes/test');
 var admin = require('./routes/admin');
 
+// main application
 var app = express();
 
 var env = process.env.NODE_ENV || 'development';
@@ -26,6 +29,7 @@ app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
 // set the logging
+var log4js = require('log4js');
 log4js.configure(config.log4js);
 log4js.getLogger().setLevel("TRACE");
 
@@ -123,20 +127,5 @@ app.use(function(err, req, res, next) {
         title: 'error'
     });
 });
-
-// load database connection string
-if (app.get('env') === 'development') {
-    app.locals.getURI = function(database) {
-        return "mongodb://admin:39fe4847-6ecb-431c-9647-23160a80db54@localhost/" + database + "?authSource=admin";
-    };
-}
-
-if (app.get('env') === 'production') {
-    // TODO, load the connection string from local config.js file
-    var connectionURL = "mongodb://admin:39fe4847-6ecb-431c-9647-23160a80db54@localhost/";
-    app.locals.getURI = function(database) {
-        return connectionURL + database + "?authSource=admin";
-    };
-}
 
 module.exports = app;

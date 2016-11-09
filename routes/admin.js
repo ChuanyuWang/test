@@ -7,7 +7,7 @@ var VERSION = 2;
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function (req, res, next) {
-    config_db = config_db || util.connect(req.app.locals.getURI('config'));
+    config_db = config_db || util.connect('config');
     next();
 });
 
@@ -126,7 +126,7 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
 
 function upgradeFromZero(req, res, next, tenant_name) {
     //TODO, close the connection when all data update done
-    tenant_db = util.connect(req.app.locals.getURI(tenant_name));
+    tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
     members.find({}).forEach(function(err, doc){
@@ -186,7 +186,7 @@ function upgradeFromZero(req, res, next, tenant_name) {
 
 function upgradeFromOne(req, res, next, tenant_name) {
     //TODO, close the connection when all data update done
-    tenant_db = util.connect(req.app.locals.getURI(tenant_name));
+    tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
     members.find({}).forEach(function(err, doc){
