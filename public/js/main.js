@@ -445,7 +445,7 @@
                     showSuccessMsg("成功取消预约");
                 },
                 error : function (jqXHR, status, err) {
-                    console.error(jqXHR.responseJSON);
+                    showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
                 },
                 complete : function(jqXHR, status) {
                     //TODO

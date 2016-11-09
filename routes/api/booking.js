@@ -251,7 +251,7 @@ router.post('/', function (req, res, next) {
 });
 
 // remove specfic user's booking info
-router.delete ('/:classID', function (req, res) {
+router.delete ('/:classID', function (req, res, next) {
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");
         return;
@@ -274,6 +274,20 @@ router.delete ('/:classID', function (req, res) {
                 'err' : err
             });
             return;
+        }
+        
+        // be free to cancel the booking if it's less than 24 hours before begin
+        // 24 hours = 86400000 ms (24*60*60*1000)
+        if (Date.now() + 86400000 > doc.date.getTime()) {
+            //only admin could delete the booking in the past, 
+            if(req.user && req.user.role === "admin") {
+                console.log("Admin %s cancel the booking of %s", req.user.name, req.body.memberid);
+            } else {
+                var error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
+                error.status = 400;
+                next(error);
+                return;
+            }
         }
         
         // find the booking quantity of member
