@@ -14,13 +14,6 @@ var db_config = require('./config.db');
 var routes = require('./routes/index');
 //var users = require('./routes/user');
 
-// route different tenant
-var mygirl = require('./routes/mygirl');
-var bqsq = require('./routes/bqsq');
-var martin = require('./routes/martin');
-var test = require('./routes/test');
-var admin = require('./routes/admin');
-
 // main application
 var app = express();
 
@@ -63,13 +56,6 @@ app.use(flash());
 
 // add router
 app.use('/', routes);
-app.use('/admin', admin);
-
-// add each tenant
-app.use('/mygirl',mygirl);
-app.use('/test', test);
-app.use('/bqsq', bqsq);
-app.use('/martin', martin);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

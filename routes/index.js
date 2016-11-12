@@ -3,9 +3,9 @@ var passport = require('passport');
 var router = express.Router();
 var Account = require('../account');
 var logger = require('log4js').getLogger();
+var util = require('../util');
 
 /* GET home page. */
-
 router.get('/', function (req, res) {
     if (!req.user) {
         res.render('index', {
@@ -17,6 +17,8 @@ router.get('/', function (req, res) {
         navigateToUserHome(req, res);
     }
 });
+
+/* login/logout API */
 
 router.post('/login', passport.authenticate('local', {
         failureRedirect : '/',
@@ -36,6 +38,38 @@ router.get('/logout', function (req, res) {
 
 function navigateToUserHome(req, res) {
     res.redirect('/' + req.user.tenant + '/home');
+}
+
+// administrator page
+router.use('/admin', require("./admin"));
+
+// route different tenant
+router.use('/:tenantName', getTenantInfo, require("./main"));
+router.use('/mygirl', require('./mygirl')); // load customize tenant before others
+
+function getTenantInfo(req, res, next) {
+    req.db = util.connect(req.params.tenantName);
+    // cache the tenant object in request, e.g.
+    /* tenant object
+    {
+        appid : 'wxe5e454c5dff8c7b2',
+        appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
+        token : 'Hibanana',
+        encodingAESKey : '',
+        name : 'test',
+        displayName : '大Q小q',
+        version : 1,
+        classroom : []
+    };
+    */
+    util.connect('config').collection('tenants').findOne({name:req.params.tenantName}, function(err, tenant){
+        if (err) {
+            console.error(err);
+        }
+        
+        req.tenant = tenant;
+        next();
+    });
 }
 
 module.exports = router;
