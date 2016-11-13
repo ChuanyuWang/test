@@ -187,7 +187,7 @@ block page
                 //th(data-field='_id',data-visible='false') ID
                 th(data-field='name',data-sortable='true') 宝宝姓名
                 th(data-field='contact') 联系方式
-                th(data-field='membership.0.credit',data-sortable='true') 剩余课时
+                th(data-field='membership',data-formatter='creditFormatter') 剩余课时
                 th(data-title='预约',data-align='center',data-formatter='addBookFormatter',data-events='handleAddBook')
         script(type='text/javascript').
             function addBookFormatter(value) {
@@ -196,6 +196,13 @@ block page
                     '<i class="glyphicon glyphicon-plus-sign"></i>',
                     '</a>'
                 ].join('');
+            };
+            function creditFormatter(membership) {
+                if (membership && membership[0]) {
+                    return membership[0].credit;
+                } else {
+                    return undefined;
+                }
             };
   div#alert_bar.bb-alert.alert-danger.alert(style='display:none')
     span >some message<
