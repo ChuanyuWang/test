@@ -65,9 +65,10 @@ router.put('/:classID', isAuthenticated, requireRole("admin"), function (req, re
         $set : req.body
     }, function (err, result) {
         if (err) {
-            res.status(500).json({
-                'err' : err
-            })
+            var error = new Error("Update class fails");
+            error.innerError = err;
+            next(error);
+            return;
         } 
         if (result.n == 1) {
             console.log("class %s is updated by %j", req.params.classID, req.body);
