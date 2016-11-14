@@ -43,7 +43,8 @@
         // listen to the action button on modal dialogs
         $('#create_cls').click(handleAddNewClass);
         $('#modify_cls').click(handleModifyClass);
-        $('#add_book').click(handleAddBooking);
+        $('#add_reservation').click(handleAddReservation);
+        $('#add_books').click(handleAddBooks);
 
         // listen to the previous week and next week button
         $('#previous_week').click(function (event) {
@@ -324,7 +325,7 @@
         $('#view_dlg').modal('show');
     };
     
-    function handleAddBooking(event) {
+    function handleAddReservation(event) {
         var view_dlg = $(this).closest('.modal');
         var class_id = view_dlg.find('#member_table').data('classid');
         view_dlg.modal('hide');
@@ -344,6 +345,91 @@
         book_dlg.find('table').bootstrapTable('refresh', {url:'api/members'});
 
         book_dlg.modal('show');
+    };
+    
+    function handleAddBooks(event) {
+        var view_dlg = $(this).closest('.modal');
+        var class_id = view_dlg.find('#member_table').data('classid');
+        view_dlg.modal('hide');
+        
+        var class_item = cls_cache[class_id];
+        if (!class_item) {
+            console.error("Can't find the class info with id: " + class_id);
+            return;
+        }
+        
+        // set the class id
+        var dlg_books = $('#dlg_books');
+        //dlg_books.find('table').data('classid', class_id);
+        
+        // clear the previous contents
+        dlg_books.find("div input").each(function(){
+            $(this).val(null);
+        });
+        
+        // update the new contents from cache
+        var books = class_item.books || [];
+        var index = 0;
+        dlg_books.find("div.book-item").each(function(){
+            if (books[index]) {
+                var item = books[index++];
+                $(this).find("input[name=book_name]").val(item.title);
+                $(this).find("input[name=book_teacher]").val(item.teacher);
+                $(this).find("input[name=book_info]").val(item.info);
+            }
+        });
+        
+        // hook up the OK button click event
+        $('#btn_modify_books').off("click");
+        $('#btn_modify_books').click(function(event) {
+            //get the update content of books
+            var books = [];
+            var hasError = false;
+            dlg_books.find("div.book-item").each(function(){
+                var item = {
+                    title : $(this).find("input[name=book_name]").val().trim(),
+                    teacher : $(this).find("input[name=book_teacher]").val().trim(),
+                    info : $(this).find("input[name=book_info]").val().trim()
+                };
+                // handle error input
+                $(this).find("div").removeClass("has-error");
+                // both teach and title are mandatory for one book item
+                if (item.teacher && !item.title) {
+                    $(this).find("input[name=book_name]").closest("div").addClass("has-error");
+                    hasError = true;
+                } else if (item.title && !item.teacher) {
+                    $(this).find("input[name=book_teacher]").closest("div").addClass("has-error");
+                    hasError = true;
+                } else if (item.title && item.teacher) {
+                    books.push(item);
+                }
+            });
+            
+            if (hasError) {
+                return; // Don't dismiss the dialog when there is input error
+            }
+            
+            $.ajax("api/classes/" + class_id, {
+                type : "PUT",
+                contentType : "application/json; charset=utf-8",
+                data : JSON.stringify({"books" : books}),
+                success : function (data) {
+                    //close the dialog
+                    dlg_books.modal('hide');
+                    //update books cache of the class
+                    class_item.books = books;
+                },
+                error : function (jqXHR, status, err) {
+                    showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+                },
+                complete : function(jqXHR, status) {
+                    //TODO
+                },
+                dataType : "json"
+            });
+        });
+        
+        dlg_books.modal('show');
     };
     
     function handleModifyClass(event) {

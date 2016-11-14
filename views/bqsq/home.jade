@@ -161,7 +161,8 @@ block page
                 ].join('');
             };
         div.modal-footer
-          button#add_book.btn.btn-primary.pull-left(type="button") 预约
+          button#add_reservation.btn.btn-primary.pull-left(type="button") 预约
+          button#add_books.btn.btn-primary.pull-left(type="button") 添加绘本
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#modify_cls.btn.btn-success(type="button") 修改
   div#search_member.modal.fade(tabindex='-1',data-backdrop='static')
@@ -204,5 +205,31 @@ block page
                     return undefined;
                 }
             };
+  div#dlg_books.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 添加绘本
+        div.modal-body
+          div.row
+            label.control-label.col-sm-2
+            label.control-label.col-sm-3 绘本名称
+            label.control-label.col-sm-3 上课老师
+            label.control-label.col-sm-3 课程内容
+          // at most there could be 3 books in one class
+          - each book in [1,2,3]
+            div.book-item.row
+              label.control-label.col-sm-1(style="line-height:34px") #{book}
+              div.col-sm-4(style="padding-left:0px")
+                input.form-control(type='text',name='book_name',placeholder='请输入',autofocus)
+              div.col-sm-3(style="padding-left:0px")
+                input.form-control(type='text',name='book_teacher',placeholder='请输入')
+              div.col-sm-4(style="padding-left:0px")
+                input.form-control(type='text',name='book_info',placeholder='请输入')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#btn_modify_books.btn.btn-success(type="button") 确定
   div#alert_bar.bb-alert.alert-danger.alert(style='display:none')
     span >some message<
