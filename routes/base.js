@@ -90,6 +90,12 @@ router.get('/mybooking', function (req, res) {
     });
 });
 
+router.get('/myReadBooks', function (req, res) {
+    res.render('bqsq/myReadBooks', {
+        title : '我的英文绘本'
+    });
+});
+
 router.get('/trial', function (req, res) {
     res.render('bqsq/trial', {
         title : '报名试听'

@@ -1,0 +1,78 @@
+extends ../layout
+
+block prepend css
+  link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css")
+
+block content
+  script(type='text/javascript').
+    function getCurrentUser() {
+        return '#{openid}';
+    };
+    function getTimeKey() {
+        return #{timeKey};
+    };
+    function getClassroomList() {
+        return !{classroom};
+    };
+  div#main.container(style='padding-left:7px;padding-right:7px')
+    div.row(style='margin-left:-7px;margin-right:-7px')
+      img.center-block(src='/img/logo-2x.png',style="padding:0px;width:200px")
+    form#login.form-horizontal(style='margin-top:15px;display:none;padding-left:8px;padding-right:8px',role='form')
+        div.form-group.form-group-sm
+          div.col-xs-12
+            p.form-control-static(style='color:#808080;text-align:center') 请输入宝宝姓名和联系方式查看阅读过的绘本
+        div.form-group.form-group-sm
+          label.control-label-sm.col-xs-3(for='cls_name') 宝宝姓名:
+          div.col-xs-9
+            input.form-control(type='text',placeholder='宝宝注册时用的姓名',name='name')
+        div.form-group.form-group-sm
+          label.control-label-sm.col-xs-3(for='cls_name') 联系方式:
+          div.col-xs-9
+            input.form-control(type='tel',placeholder='135xxx',name='contact')
+        div.form-group
+          div.col-xs-offset-3.col-xs-9
+            button.btn.btn-primary 登录
+    div#user_info.row(style='display:none;margin:7px -7px 3px -7px')
+      p.pull-left.col-xs-10
+        你好，小朋友
+      div.col-xs-2(style='padding-right:9px')
+        button.btn.btn-danger.btn-xs.pull-right 注销
+
+    div#content(style='display:none')
+      table.table.table-condensed.table-striped(style='margin-bottom:7px')
+        thead
+          tr
+            th(style='min-width:85px') 日期
+            th 书名
+            th(style='min-width:40px') 老师
+        tbody
+          - var testn = 0;
+          while testn < 100
+            tr
+              td 2016-2-6
+              td Three Little Pigs
+              td= testn++
+      p.small 阅读绘本共: <strong>{0}</strong>册
+  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 登录失败
+        div.modal-body
+          p#message
+          p
+            small 客服电话: 
+              a(href='tel:13661622231') 136 6162 2231
+            br
+            small 门店地址: 
+              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+        div.modal-footer
+          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
+
+  script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
+  //script(src='/components/requirejs/require.js',data-main="/js/booking")
+  script(src='/js/myReadBooks.js')
+  script(src="//cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js")
+  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
