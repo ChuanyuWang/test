@@ -62,11 +62,18 @@ function getTenantInfo(req, res, next) {
         classroom : []
     };
     */
-    util.connect('config').collection('tenants').findOne({name:req.params.tenantName}, function(err, tenant){
+    var config_db = util.connect('config');
+    if (!config_db) {
+        console.error("database config is not existed");
+        next();
+    }
+    config_db.collection('tenants').findOne({
+        name: req.params.tenantName
+    }, function (err, tenant) {
         if (err) {
             console.error(err);
         }
-        
+
         req.tenant = tenant;
         next();
     });

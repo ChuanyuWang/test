@@ -21,6 +21,9 @@
                 success : function (data) {
                     _openid = data.openid; // could be null
                 },
+                error : function (jqXHR, textStatus, error) {
+                    console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+                },
                 dataType : "json"
             });
         }
