@@ -208,13 +208,13 @@
             // initialize the default value from local storage
             $('#main form input[name=name]').val(localStorage._name);
             $('#main form input[name=contact]').val(localStorage._contact);
-            $('#main form').show();
+            $('#main form').fadeIn(400);
             $('#main form input[name=name]').focus();
         } else {
             $('#main form').hide();
             $('#user_info').show();
-            $('#main .nav-tabs').show();
-            $('#main .tab-content').show();
+            $('#main .nav-tabs').fadeIn(600);
+            $('#main .tab-content').fadeIn(600);
         }
     };
     
