@@ -7,18 +7,6 @@
     // DOM Ready =============================================================
     $(document).ready(function () {
         init();
-        
-        // click logout
-        $('#user_info .btn-danger').click(function (e) {
-            // TODO
-            //clearSchedule();
-            try {
-                localStorage._memberid = memberid = undefined;
-            }catch (oException) {
-                // the private browsing is on, access to localStorage cause exception on iOS
-            }
-            toggleLoginForm(true);
-        });
 
         // click login
         $('#login .btn').click(handleLoginOK);
@@ -101,12 +89,7 @@
     };
 
     function updateUserInfo(user) {
-        var credit = 0;
-        //TODO, support multi membership card
-        if (user.membership && user.membership.length > 0) {
-            credit = user.membership[0].credit;
-        }
-        $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友 <small style="color:#808080">剩余课时: ' + credit + '</small>');
+        $('#user_info p').html('<b>' + user.name +'</b>小朋友');
     };
     
     function toggleLoginForm(isShow) {
