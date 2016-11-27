@@ -1,0 +1,21 @@
+{
+  apps : [{
+    name        : "eshop",
+    script      : "bin/www",
+    watch       : false,
+    exec_mode   : "fork",
+    wait_ready  : false,
+    listen_timeout : 3000,
+    min_uptime  : "3s",
+    max_restarts : 3,
+    error_file  : "logs/err.log",
+    out_file    : "logs/out.log",
+    env: {
+      "NODE_ENV": "development",
+    },
+    env_production : {
+       "NODE_ENV": "production"
+    }
+  }]
+}
+
