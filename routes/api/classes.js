@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 
+var NORMAL_FIELDS = {
+    booking : 0
+};
 
 router.get('/', function (req, res) {
     if (!req.query.from || !req.query.to) {
@@ -29,7 +32,7 @@ router.get('/', function (req, res) {
     if (req.query.memberid) {
         query['booking.member'] = req.query.memberid;
     }
-    classes.find(query).sort({
+    classes.find(query, NORMAL_FIELDS).sort({
         date : sort
     }, function (err, docs) {
         if (err) {
