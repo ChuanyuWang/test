@@ -312,6 +312,7 @@ router.delete ('/:classID', function (req, res, next) {
         }, function (err, result) {
             if (result.n == 1) {
                 //TODO, support multi membership card
+                //TODO, handle the callback when member is not existed.
                 req.db.collection("members").update({
                     _id : mongojs.ObjectId(req.body.memberid),
                     membership : { $size : 1 }

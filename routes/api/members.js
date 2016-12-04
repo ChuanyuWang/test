@@ -2,6 +2,16 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 
+var NORMAL_FIELDS = {
+    since : 1,
+    name : 1,
+    contact : 1,
+    birthday : 1,
+    expire : 1,
+    note : 1,
+    membership : 1
+};
+
 router.get('/', function (req, res) {
     //console.log("get members with query %j", req.query);
     var members = req.db.collection("members");
@@ -19,7 +29,7 @@ router.get('/', function (req, res) {
         query["membership.type"] = "LIMITED";
         query["membership.room"] = [req.query.filter];
     }
-    members.find(query).sort({
+    members.find(query, NORMAL_FIELDS).sort({
         since : -1
     }, function (err, docs) {
         if (err) {
@@ -114,6 +124,7 @@ router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (re
             console.log("member %s is deteled", req.params.memberID);
 
             var classes = req.db.collection("classes");
+            //TODO, remove member's all booking information or only in the future???
             classes.find({
                 "booking.member" : req.params.memberID
             }, function (err, docs) {

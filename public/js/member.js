@@ -343,37 +343,45 @@
             return;
         }
 
-        bootbox.confirm("删除选中会员吗？", function(result) {
-            if (!result) { // user cancel
-                return ;
-            }
-            // delete all selected members one by one, and update the table
-            $.each(items, function(index, item){
-                $.ajax("api/members/" + item._id, {
-                    type : "DELETE",
-                    contentType : "application/json; charset=utf-8",
-                    data : JSON.stringify({dummy:1}),
-                    success : function (data) {
-                        $('#member_table').bootstrapTable('removeByUniqueId', item._id);
-                    },
-                    error : function (jqXHR, status, err) {
-                        bootbox.dialog({
-                            message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                            title : "删除会员失败",
-                            buttons : {
-                                danger : {
-                                    label : "确定",
-                                    className : "btn-danger",
+        bootbox.confirm({
+            message : "确定永久删除选中会员吗？<br><small>删除后，此会员的所有预约将会强制取消，包括过去、现在和将来的课程预约，并且无法恢复。</small>",
+            callback : function(result) {
+                if (!result) { // user cancel
+                    return ;
+                }
+                // delete all selected members one by one, and update the table
+                $.each(items, function(index, item){
+                    $.ajax("api/members/" + item._id, {
+                        type : "DELETE",
+                        contentType : "application/json; charset=utf-8",
+                        data : JSON.stringify({dummy:1}),
+                        success : function (data) {
+                            $('#member_table').bootstrapTable('removeByUniqueId', item._id);
+                        },
+                        error : function (jqXHR, status, err) {
+                            bootbox.dialog({
+                                message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                                title : "删除会员失败",
+                                buttons : {
+                                    danger : {
+                                        label : "确定",
+                                        className : "btn-danger",
+                                    }
                                 }
-                            }
-                        });
-                    },
-                    complete : function(jqXHR, status) {
-                        //TODO
-                    },
-                    dataType : "json"
+                            });
+                        },
+                        complete : function(jqXHR, status) {
+                            //TODO
+                        },
+                        dataType : "json"
+                    });
                 });
-            });
+            },
+            buttons : {
+                confirm : {
+                    className : "btn-danger"
+                }
+            }
         });
     };
 })(jQuery);
