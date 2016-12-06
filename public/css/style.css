@@ -43,6 +43,9 @@ html {
   padding-bottom: 16px;
   margin-bottom: -6px;
 }
+#cls_table tbody tr td {
+  overflow: hidden;
+}
 .class-row {
   margin-left: -7px;
   margin-right: -7px;

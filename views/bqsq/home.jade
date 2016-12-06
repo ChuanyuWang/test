@@ -171,15 +171,13 @@ block page
             span(aria-hidden="true") &times
           h4#myModalLabel.modal-title 添加预约
         div.modal-body
-          form.form-horizontal
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 课程名称:
-              div.col-sm-10
-                p#cls_name.form-control-static
-            div#toolset.form-group(style='margin-bottom:0px')
-              label.control-label.col-sm-2(for='quantity') 人数:
-              div.col-sm-2
-                input#quantity.form-control(type='number',name='quantity',min='1',step='1')
+          form.form-inline
+            div.form-group(style='margin-right:7px')
+              label.control-label 课程名称:
+              p#cls_name.form-control-static(style='vertical-align:middle')
+            div#toolset.form-group
+              label.control-label(for='quantity') 人数:
+              input#quantity.form-control(type='number',name='quantity',min='1',step='1')
           table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='left')
             thead
               tr
