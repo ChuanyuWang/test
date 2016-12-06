@@ -38,7 +38,7 @@ router.get('/', function (req, res) {
             });
             return;
         }
-        console.log("find members with result %j", docs);
+        console.log("find members: ", docs?docs.length:0);
         res.json(docs);
     });
 });

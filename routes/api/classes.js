@@ -41,7 +41,7 @@ router.get('/', function (req, res) {
             });
             return;
         }
-        console.log("find classes with result %j", docs);
+        console.log("find classes: ", docs?docs.length:0);
         res.json(docs);
     });
 });
