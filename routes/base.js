@@ -61,7 +61,7 @@ router.get('/member', checkTenantUser, function (req, res) {
             classroom : req.tenant.classroom ? req.tenant.classroom : [],
             statistics : {
                 count : doc.count,
-                total : doc.total
+                total : Math.round(doc.total*10)/10
             }
         });
     });

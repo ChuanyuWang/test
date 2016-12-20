@@ -142,7 +142,7 @@ block page
             div.form-group
               label.control-label.col-sm-2 课时:
               div.col-sm-4(style="display:inline-flex")
-                input.form-control(type='number',name='credit',min='0',step='0.1',style={'width':'70px'})
+                input.form-control(type='number',name='credit',min='0',step='0.1',style={'width':'85px'})
                 p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 次(剩余)
             div.form-group
               label.control-label.col-sm-2 有效期至:
@@ -199,7 +199,12 @@ block page
     };
     function creditFormatter(membership) {
         if (membership && membership[0]) {
-            return membership[0].credit;
+            // A better way of 'toFixed(1)'
+            if (typeof(membership[0].credit) == 'number') {
+                return Math.round(membership[0].credit * 10)/10;
+            } else {
+                return membership[0].credit;
+            }
         } else {
             return undefined;
         }

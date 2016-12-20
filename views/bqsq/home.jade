@@ -196,7 +196,12 @@ block page
             };
             function creditFormatter(membership) {
                 if (membership && membership[0]) {
-                    return membership[0].credit;
+                    // A better way of 'toFixed(1)'
+                    if (typeof(membership[0].credit) == 'number') {
+                        return Math.round(membership[0].credit * 10)/10;
+                    } else {
+                        return membership[0].credit;
+                    }
                 } else {
                     return undefined;
                 }

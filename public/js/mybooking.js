@@ -196,6 +196,10 @@
         if (user.membership && user.membership.length > 0) {
             credit = user.membership[0].credit;
         }
+        // A better way of 'toFixed(1)'
+        if (typeof(credit) == 'number') {
+            credit = Math.round(credit * 10)/10;
+        }
         $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友 <small style="color:#808080">剩余课时: ' + credit + '</small>');
     };
     
