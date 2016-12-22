@@ -85,7 +85,9 @@
                 $('#membership_dlg #roomlist input').prop('disabled', false);
             }
         });
-        $('#membership_dlg button#ok').click(editMemberShip);
+        // listen to the action button on modal dialogs
+        $('#membership_dlg button#charge_btn').click(openChargeDlg);
+        $('#membership_dlg button#ok').click(updateMemberShip);
     };
     
     // return true if an error occurs after validation, otherwise return false
@@ -168,16 +170,11 @@
     
     function editMember(id, member) {
         $.ajax("api/members/" + id, {
-            type : "PUT",
+            type : "PATCH",
             contentType : "application/json; charset=utf-8",
             data : JSON.stringify(member),
-            success : function (res) {
-                if (res.ok == 1 && res.nModified == 1) {
-                    $('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: member});
-                } else {
-                    console.error(res);
-                    console.error("Update %s member's info fails", id);
-                }
+            success : function (doc) {
+                $('#member_table').bootstrapTable('updateByUniqueId', {id: id, row: doc});
             },
             error : function (jqXHR, status, err) {
                 bootbox.dialog({
@@ -219,21 +216,15 @@
 
         history_dlg.modal('show');
     };
-    
-    function editMemberShip(event) {
+
+    function updateMemberShip(event) {
         var modal = $(this).closest('.modal');
         var member_id = modal.data('id');
+        var member = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
         var memberCard = {room : []};
         
         var hasError = false;
-        // get credit value
-        memberCard.credit = parseFloat(modal.find('input[name=credit]').val());
-        if (isNaN(memberCard.credit)) {
-            modal.find('input[name=credit]').closest(".form-group").addClass("has-error");
-            hasError = true;
-        } else {
-            modal.find('input[name=credit]').closest(".form-group").removeClass("has-error");
-        }
+
         // get expire date
         memberCard.expire = modal.find('#expire_date').data("DateTimePicker").date();
         memberCard.type = modal.find('select[name=card_type] option:selected').val();
@@ -252,18 +243,26 @@
         if (hasError) {
             return;
         }
+
+        //check the member has membership card
+        if (member && member.membership && member.membership.length > 0) {
+            //TODO, support multi membership card in the future
+            var updateOps = {
+                "membership.0.expire" : memberCard.expire,
+                "membership.0.type" : memberCard.type,
+                "membership.0.room" : memberCard.room
+            };
+        } else {
+            memberCard.credit = 0;
+            var updateOps = {"membership" : [memberCard]};
+        }
+
         $.ajax("api/members/" + member_id, {
-            type : "PUT",
+            type : "PATCH",
             contentType : "application/json; charset=utf-8",
-            data : JSON.stringify({"membership" : [memberCard]}),
-            success : function (res) {
-                if (res.ok == 1 && res.nModified == 1) {
-                    var row = {"membership" : [memberCard]};
-                    $('#member_table').bootstrapTable('updateByUniqueId', {id: member_id, row: row});
-                } else {
-                    console.error(res);
-                    console.error("Update %s member's card fails", member_id);
-                }
+            data : JSON.stringify(updateOps),
+            success : function (doc) {
+                $('#member_table').bootstrapTable('updateByUniqueId', {id: member_id, row: doc});
                 modal.modal('hide');
             },
             error : function (jqXHR, status, err) {
@@ -293,16 +292,15 @@
             } else {
                 // ghost card
                 var membership = {
-                    credit : 10,
+                    credit : 0,
                     // the default expire date is 3 months later
                     expire : moment().add(3, 'months'),
                     room : [],
                     type : null
                 };
             }
-            //modal.find('h4').text("添加会员");
             modal.find('#name').text(row.name);
-            modal.find('input[name=credit]').val(membership.credit).closest(".form-group").removeClass("has-error");
+            modal.find('#credit').text(Math.round(membership.credit*10)/10 || 0);
             modal.find('#expire_date').data('DateTimePicker').date(moment(membership.expire));
             modal.find('#roomlist input').prop('disabled', false);
             modal.find('#roomlist input').prop('checked', false);
@@ -327,6 +325,66 @@
             
             $('#membership_dlg').modal('show');
         }
+    };
+
+    function openChargeDlg(event) {
+        var memberCard_dlg = $(this).closest('.modal');
+        var member_id = memberCard_dlg.data('id');
+        memberCard_dlg.modal('hide');
+        var member = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
+        var credit = 0;
+        if (member.membership && member.membership[0]) {
+            credit = member.membership[0].credit || 0;
+        }
+
+        // set the member id
+        var charge_dlg = $('#charge_dlg');
+        charge_dlg.find('p#name').text(member.name);
+        charge_dlg.find('p#credit').text(Math.round(credit * 10)/10);
+        charge_dlg.find('input[name=charge]').val(0).closest(".form-group").removeClass("has-error");;
+        charge_dlg.find('input[name=remark]').val(null).closest(".form-group").removeClass("has-error");;
+		// refresh the change history
+        charge_dlg.find('table').bootstrapTable('refresh', {url:'api/members/' + member_id + '/history'});
+        // show the dialog in the end
+        charge_dlg.modal('show');
+
+        charge_dlg.find("button#ok").off("click");
+        charge_dlg.find("button#ok").click(function(event) {
+            var newVal = parseFloat(charge_dlg.find('input[name=charge]').val());
+            if (isNaN(newVal)) {
+                return charge_dlg.find('input[name=charge]').closest(".form-group").addClass("has-error");
+            } else if (newVal != 0) {
+                //TODO, remark is required???
+            }
+            $.ajax("api/members/" + member_id + "/charge", {
+                type : "POST",
+                contentType : "application/json; charset=utf-8",
+                //TODO, support multi membership card in the future
+                data : JSON.stringify({
+                    "old" : credit,
+                    "new" : credit + newVal,
+                    "remark" : charge_dlg.find('input[name=remark]').val().trim()
+                }),
+                success : function (doc) {
+                    $('#member_table').bootstrapTable('updateByUniqueId', {id: member_id, row: doc});
+                    charge_dlg.modal('hide');
+                },
+                error : function (jqXHR, status, err) {
+                    bootbox.dialog({
+                        message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                        title : "会员卡充值失败",
+                        buttons : {
+                            danger : {
+                                label : "确定",
+                                className : "btn-danger",
+                            }
+                        }
+                    });
+                    //console.error(jqXHR);
+                },
+                dataType : "json"
+            });
+        });
     };
 
     window.customQuery = function(params) {
