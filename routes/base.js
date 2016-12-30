@@ -1,13 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var mongojs = require('mongojs');
-
-//API routers
-var classes = require('./api/classes');
-var members = require('./api/members');
-var booking = require('./api/booking');
-var setting = require('./api/setting');
-var opportunities = require('./api/opportunities');
 
 router.get('/home', checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
@@ -101,14 +93,6 @@ router.get('/trial', function (req, res) {
         title : '报名试听'
     });
 });
-
-// API =============================================================
-
-router.use('/api/classes', classes);
-router.use('/api/members', members);
-router.use('/api/booking', booking);
-router.use('/api/setting', setting);
-router.use('/api/opportunities', opportunities);
 
 function checkTenantUser(req, res, next) {
     if (!req.user) {

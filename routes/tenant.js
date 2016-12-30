@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var base = require('./base');
-var wechat = require('wechat');
-var API = require('wechat-api');
 var util = require('../util');
+// var wechat = require('wechat');
+// var API = require('wechat-api');
 
 //[{time:1462976508, openid:"o0uUrv4RGMMiGasPF5bvlggasfGk"}]
 var visited_user_list = new Array();
@@ -44,8 +43,16 @@ router.get('/booking', function (req, res) {
 
 // Functions =============================================================
 
-// Route other request to base router ====================================
+// API routers ===========================================================
 
-router.use(base);
+router.use('/api/classes', require('./api/classes'));
+router.use('/api/members', require('./api/members'));
+router.use('/api/booking', require('./api/booking'));
+router.use('/api/setting', require('./api/setting'));
+router.use('/api/opportunities', require('./api/opportunities'));
+
+// Route other request to base pages =====================================
+
+router.use(require('./base'));
 
 module.exports = router;

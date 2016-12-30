@@ -1,7 +1,6 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-var Account = require('../account');
 var logger = require('log4js').getLogger();
 var util = require('../util');
 
@@ -44,7 +43,7 @@ function navigateToUserHome(req, res) {
 router.use('/admin', require("./admin"));
 
 // route different tenant
-router.use('/:tenantName', getTenantInfo, require("./main"));
+router.use('/:tenantName', getTenantInfo, require("./tenant"));
 router.use('/mygirl', require('./mygirl')); // load customize tenant before others
 
 function getTenantInfo(req, res, next) {
