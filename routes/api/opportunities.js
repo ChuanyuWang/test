@@ -77,58 +77,9 @@ router.post('/', function (req, res) {
     });
 });
 
-router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res) {
+router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res, next) {
     //TODO
     return next(new Error("Not implementation"));
-    
-    var members = req.db.collection("members");
-    members.remove({
-        _id : mongojs.ObjectId(req.params.memberID)
-    }, true, function (err, result) {
-        if (err) {
-            res.status(500).json({
-                'err' : err
-            });
-            return;
-        } 
-        if (result.n == 1) {
-            console.log("member %s is deteled", req.params.memberID);
-
-            var classes = req.db.collection("classes");
-            classes.find({
-                "booking.member" : req.params.memberID
-            }, function (err, docs) {
-                if (err) {
-                    console.error(err);
-                } else {
-                    var bulk = classes.initializeOrderedBulkOp();
-                    for (var i = 0; i < docs.length; i++) {
-                        var cls_item = docs[i];
-                        // find the booking quantity of member
-                        var quantity = getMemberBookQuantity(cls_item, req.params.memberID);
-                        bulk.find({
-                            _id : cls_item._id
-                        }).update({
-                            $inc : {
-                                reservation : -quantity
-                            },
-                            $pull : {
-                                "booking" : {
-                                    member : req.params.memberID
-                                }
-                            }
-                        });
-                    }
-                    bulk.execute(function (err, result) {
-                        console.log("remove member's all booking %j", result);
-                    });
-                }
-            });
-        } else {
-            console.error("member %s fails to be deteled", req.params.memberID);
-        }
-        res.json(result);
-    });
 });
 
 // make sure the datetime object is stored as ISODate
