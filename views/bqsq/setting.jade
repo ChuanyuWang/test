@@ -22,6 +22,7 @@ append pagjs
   //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.0/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.0/locale/bootstrap-table-zh-CN.min.js")
+  script(src="//cdn.bootcss.com/echarts/3.3.2/echarts.common.min.js")
   //script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
   script(src='/js/setting.js')
 
@@ -32,6 +33,8 @@ block page
         a(href="#general",role='tab',data-toggle='tab') 综合
       li.active(role='presentation')
         a(href="#classroom",role='tab',data-toggle='tab') 教室
+      li(role='presentation')
+        a(href="#analytics",role='tab',data-toggle='tab') 统计
     div.tab-content
       div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
         div#toolbar.btn-group(role='group')
@@ -44,6 +47,22 @@ block page
                 th(data-title='删除',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteClassroom')
       div.tab-pane(role="tabpanel",id="general",style="padding:7px")
         p 暂未开放
+      div.tab-pane(role="tabpanel",id="analytics",style="padding:7px")
+        div.row
+          div.col-md-1.pull-right(style="display:inline-flex")
+            button.btn.btn-default#refresh(type="button") 刷新
+          div.col-md-3.pull-right(style="display:inline-flex")
+            p.form-control-static(style="display:inline-table") 单位：
+            select#unit.form-control
+              option(value='month') 月
+              option(value='week') 周
+          div.col-md-3.pull-right(style="display:inline-flex")
+            p.form-control-static(style="display:inline-table") 年份： 
+            select#year.form-control
+              option(value=2016) 2016
+              option(value=2017) 2017
+        div.row(style="margin-top:15px")
+          div#consume_chart(style="height:400px")
     script(type='text/javascript').
         function deleteFormatter(value) {
             return [

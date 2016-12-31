@@ -1,5 +1,7 @@
 (function ($) {
 
+    var consumeChart = null;
+
     // DOM Ready =============================================================
     $(document).ready(function () {
         init();
@@ -10,6 +12,18 @@
     function init() {
         //moment.locale('zh-CN');
         bootbox.setLocale('zh_CN');
+
+        // register vintage Theme for echarts
+        var colorPalette = ['#d87c7c','#919e8b', '#d7ab82', '#6e7074','#61a0a8','#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b'];
+        echarts.registerTheme('vintage', {
+            color: colorPalette,
+            backgroundColor: '#00000',
+            graph: {
+                color: colorPalette
+            }
+        });
+        // initialize chart instance
+        consumeChart = echarts.init(document.getElementById('consume_chart'), 'vintage');
         
         $('#clsroom_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
@@ -27,8 +41,20 @@
         });
         
         $('#add_room').click(handleAddNewClassRoom);
+        // handle user refresh the chart
+        $('#refresh').click(refreshChart);
+        // handle user change the chart filters
+        $('div.tab-pane#analytics select').change(function (event) {
+            refreshChart();
+        });
+        // refresh the chart when user switch to analytics tab first time
+        $('a[href="#analytics"]').on('shown.bs.tab', function (e) {
+            refreshChart();
+            //e.target // newly activated tab
+            //e.relatedTarget // previous active tab
+        })
     };
-    
+
     function handleAddNewClassRoom(event) {
         var modal = $(this).closest('.modal');
         var newRoom = {};
@@ -57,7 +83,7 @@
             addNewClassroom(newRoom);
         }
     };
-    
+
     function addNewClassroom(room) {
         $.ajax("api/setting/classrooms", {
             type : "POST",
@@ -80,6 +106,97 @@
             },
             dataType : "json"
         });
+    };
+
+    function refreshChart() {
+        var unit = $("div#analytics select#unit").val();
+        var year = parseInt($("div#analytics select#year").val());
+        $.ajax("api/analytics/consumption", {
+            type : "GET",
+            //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+            data : {
+                "year" : year,
+                "unit" : unit
+            },
+            success : function (data) {
+                if (unit == "month") {
+                    drawChart(preChartData(data), year, '月');
+                } else if (unit == "week") {
+                    drawChart(preChartData(data), year, '周');
+                }
+            },
+            error : function (jqXHR, status, err) {
+                bootbox.dialog({
+                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                    title : "刷新图表失败",
+                    buttons : {
+                        danger : {
+                            label : "确定",
+                            className : "btn-danger",
+                        }
+                    }
+                });
+            },
+            dataType : "json"
+        });
+    };
+
+    function preChartData(data) {
+        var chartData = {
+            xAxis: [],
+            series0: []
+        };
+
+        if (!data || data.length == 0) {
+            return chartData;
+        }
+
+        for (var i=0; i<data.length; i++) {
+            chartData.xAxis.push(data[i]._id);
+            chartData.series0.push(Math.round(data[i].total*10)/10);
+        }
+
+        return chartData;
+    };
+
+    function drawChart(data, year, unitName) {
+        // resize the chart according to its parent dom size
+        consumeChart.resize();
+        // define the options of charts
+        var option = {
+            title: {
+                text: year + '年课时消费明细',
+                top: 'top',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            toolbox: {
+                feature: {
+                    dataView: {readOnly: true}
+                }
+            },
+            legend: {
+                data:['消费课时'],
+                top: 'bottom'
+            },
+            xAxis: {
+                name: unitName,
+                data: data.xAxis
+            },
+            yAxis: {
+                name: "课时"
+            },
+            series: [{
+                name: '消费课时',
+                type: 'bar',
+                data: data.series0
+            }]
+        };
+
+        // Apply the chart options to create/update chart instance
+        consumeChart.setOption(option);
     };
 
     // event handler defined in setting.jade file for removing classroom

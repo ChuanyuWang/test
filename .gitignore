@@ -3,3 +3,4 @@ public/components
 .sass-cache
 logs/
 config.db.js
+.vscode

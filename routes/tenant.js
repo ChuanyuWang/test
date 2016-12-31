@@ -50,6 +50,7 @@ router.use('/api/members', require('./api/members'));
 router.use('/api/booking', require('./api/booking'));
 router.use('/api/setting', require('./api/setting'));
 router.use('/api/opportunities', require('./api/opportunities'));
+router.use('/api/analytics', require('./api/analytics'));
 
 // Route other request to base pages =====================================
 
