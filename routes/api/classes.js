@@ -98,7 +98,7 @@ router.delete ('/:classID', isAuthenticated, requireRole("admin"), function (req
             return;
         }
         if (result.n == 1) {
-            console.log("class %s is deteled", req.params.classID);
+            console.log("class %s is deleted", req.params.classID);
             res.json(result);
         } else {
             res.status(400).json({
