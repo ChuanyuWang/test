@@ -251,7 +251,7 @@ router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (re
         } 
         if (result.n == 1) {
             console.log("member %s is deteled", req.params.memberID);
-
+            /*
             var classes = req.db.collection("classes");
             //TODO, remove member's all booking information or only in the future???
             classes.find({
@@ -283,6 +283,7 @@ router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (re
                     });
                 }
             });
+            */
         } else {
             console.error("member %s fails to be deteled", req.params.memberID);
         }
