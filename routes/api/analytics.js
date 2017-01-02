@@ -27,10 +27,6 @@ router.get('/consumption', isAuthenticated, function (req, res, next) {
             }
         }
     }, {
-        $sort: {
-            "date" : -1 // have to sort the class by its date, from old to new
-        }
-    }, {
         $unwind: "$booking"
     }, {
         $project: {
@@ -50,6 +46,10 @@ router.get('/consumption', isAuthenticated, function (req, res, next) {
             total: {
                 $sum: "$totalCost"
             }
+        }
+    }, {
+        $sort: {
+            "_id" : 1 // have to sort the class by its date, from old to new
         }
     }], function (err, docs) {
         if (err) {
