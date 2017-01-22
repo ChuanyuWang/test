@@ -63,6 +63,63 @@ router.get('/consumption', isAuthenticated, function (req, res, next) {
     });
 });
 
+router.get('/deposit', isAuthenticated, function (req, res, next) {
+    //[Default] get the current year consumption by month
+    var year = (new Date()).getFullYear();
+    var unit = 'month';
+    if (req.query.hasOwnProperty("year")) {
+        year = parseInt(req.query.year);
+    }
+    if (req.query.hasOwnProperty("unit")) {
+        unit = req.query.unit;
+    }
+
+    var members = req.db.collection("members");
+    members.aggregate([{
+        $match: {
+            "history.date": {
+                $gte: new Date(year, 0),
+                $lt: new Date(year+1, 0)
+            },
+            "history.target" : "membership.0.credit"
+        }
+    }, {
+        $unwind: "$history"
+    }, {
+        $project: {
+            week: {
+                $week: "$history.date"
+            },
+            month: {
+                $month: "$history.date"
+            },
+            delta : {
+                '$subtract' : [ '$history.new', '$history.old' ]
+            }
+        }
+    }, {
+        $group: {
+            _id: "$" + unit, // group the data according to unit (month or week)
+            total: {
+                $sum: "$delta"
+            }
+        }
+    }, {
+        $sort: {
+            "_id" : 1 // have to sort the class by its date, from old to new
+        }
+    }], function (err, docs) {
+        if (err) {
+            var error = new Error("analyze deposit fails");
+            error.innerError = err;
+            next(error);
+            return;
+        }
+        console.log("analyze deposit: ", docs?docs.length:0);
+        res.json(docs);
+    });
+});
+
 function requireRole(role) {
     return function (req, res, next) {
         if (req.user && req.user.role === role)
