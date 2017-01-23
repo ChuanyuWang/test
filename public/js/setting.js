@@ -14,7 +14,7 @@
         bootbox.setLocale('zh_CN');
 
         // register vintage Theme for echarts
-        var colorPalette = ['#d87c7c','#919e8b', '#d7ab82', '#6e7074','#61a0a8','#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b'];
+        var colorPalette = ['#d87c7c', '#919e8b', '#d7ab82', '#6e7074', '#61a0a8', '#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b'];
         echarts.registerTheme('vintage', {
             color: colorPalette,
             backgroundColor: '#00000',
@@ -24,7 +24,7 @@
         });
         // initialize chart instance
         consumeChart = echarts.init(document.getElementById('consume_chart'), 'vintage');
-        
+
         $('#clsroom_dlg').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             if (button.data('action') == "add") {
@@ -33,13 +33,13 @@
                 modal.find('.modal-title').text("添加教室");
                 modal.find('input[name=id]').val("").closest(".form-group").removeClass("has-error");
                 modal.find('input[name=name]').val("").closest(".form-group").removeClass("has-error");
-                
+
                 modal.find('#add_room').show();
             } else if (button.data('action') == "edit") {
                 //TODO
             }
         });
-        
+
         $('#add_room').click(handleAddNewClassRoom);
         // handle user refresh the chart
         $('#refresh').click(refreshChart);
@@ -58,7 +58,7 @@
     function handleAddNewClassRoom(event) {
         var modal = $(this).closest('.modal');
         var newRoom = {};
-        
+
         // validate the input
         var hasError = false;
         // get the classroom id
@@ -86,74 +86,107 @@
 
     function addNewClassroom(room) {
         $.ajax("api/setting/classrooms", {
-            type : "POST",
-            contentType : "application/json; charset=utf-8",
-            data : JSON.stringify(room),
-            success : function (data) {
-                $('#classroom_table').bootstrapTable('insertRow', {index: 0, row: room});
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(room),
+            success: function (data) {
+                $('#classroom_table').bootstrapTable('insertRow', { index: 0, row: room });
             },
-            error : function (jqXHR, status, err) {
+            error: function (jqXHR, status, err) {
                 bootbox.dialog({
-                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                    title : "添加教室失败",
-                    buttons : {
-                        danger : {
-                            label : "确定",
-                            className : "btn-danger",
+                    message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                    title: "添加教室失败",
+                    buttons: {
+                        danger: {
+                            label: "确定",
+                            className: "btn-danger",
                         }
                     }
                 });
             },
-            dataType : "json"
+            dataType: "json"
         });
     };
 
     function refreshChart() {
-        var unit = $("div#analytics select#unit").val();
-        var year = parseInt($("div#analytics select#year").val());
-        $.ajax("api/analytics/consumption", {
-            type : "GET",
-            //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-            data : {
-                "year" : year,
-                "unit" : unit
-            },
-            success : function (data) {
-                if (unit == "month") {
-                    drawChart(preChartData(data), year, '月');
-                } else if (unit == "week") {
-                    drawChart(preChartData(data), year, '周');
-                }
-            },
-            error : function (jqXHR, status, err) {
-                bootbox.dialog({
-                    message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                    title : "刷新图表失败",
-                    buttons : {
-                        danger : {
-                            label : "确定",
-                            className : "btn-danger",
-                        }
-                    }
-                });
-            },
-            dataType : "json"
-        });
-    };
-
-    function preChartData(data) {
-        var chartData = {
-            xAxis: [],
-            series0: []
+        var filter = {
+            "unit": $("div#analytics select#unit").val(),
+            "year": parseInt($("div#analytics select#year").val())
         };
 
-        if (!data || data.length == 0) {
+        var drawChartFunc = function (consumptionQueryResult, depositQueryResult) {
+            if (filter.unit == "month") {
+                drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0]), filter.year, '月');
+            } else if (filter.unit == "week") {
+                drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0]), filter.year, '周');
+            }
+        };
+
+        var errorFunc = function (jqXHR, textStatus, errorThrown) {
+            bootbox.dialog({
+                message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                title: "刷新图表失败",
+                buttons: {
+                    danger: {
+                        label: "确定",
+                        className: "btn-danger",
+                    }
+                }
+            });
+        };
+
+        //Execute the function drawChartFunc when both ajax requests are successful, or errorFunc if either one has an error.
+        // errorFunc is called only once even if both ajax requests have error
+        var consumptionQuery = $.get("api/analytics/consumption", filter, "json");
+        var depositQuery = $.get("api/analytics/deposit", filter, "json");
+        $.when(consumptionQuery, depositQuery).then(drawChartFunc, errorFunc);
+    };
+
+    function preChartData(consumptionData, depositData) {
+        var chartData = {
+            xAxis: [],
+            series0: [], // consumption value list
+            series1: []  // deposit value list
+        };
+
+        if (!consumptionData && !depositData) {
             return chartData;
         }
 
-        for (var i=0; i<data.length; i++) {
-            chartData.xAxis.push(data[i]._id);
-            chartData.series0.push(Math.round(data[i].total*10)/10);
+        var i=0,j=0;
+        while ( i < consumptionData.length || j < depositData.length ) {
+            var c = i < consumptionData.length ? consumptionData[i] : null;
+            var d = j < depositData.length ? depositData[j] : null;
+
+            if (c && d) {
+                if (c._id == d._id) {
+                    chartData.xAxis.push(c._id);
+                    chartData.series0.push(Math.round(c.total * 10) / 10);
+                    chartData.series1.push(Math.round(d.total * 10) / 10);
+                    i++;
+                    j++;
+                } else if (c._id < d._id) {
+                    chartData.xAxis.push(c._id);
+                    chartData.series0.push(Math.round(c.total * 10) / 10);
+                    chartData.series1.push(0);
+                    i++;
+                } else if (c._id > d._id) {
+                    chartData.xAxis.push(d._id);
+                    chartData.series0.push(0);
+                    chartData.series1.push(Math.round(d.total * 10) / 10);
+                    j++;
+                }
+            } else if (c) {
+                chartData.xAxis.push(c._id);
+                chartData.series0.push(Math.round(c.total * 10) / 10);
+                chartData.series1.push(0);
+                i++;
+            } else if (d) {
+                chartData.xAxis.push(d._id);
+                chartData.series0.push(0);
+                chartData.series1.push(Math.round(d.total * 10) / 10);
+                j++;
+            }
         }
 
         return chartData;
@@ -174,11 +207,11 @@
             },
             toolbox: {
                 feature: {
-                    dataView: {readOnly: true}
+                    dataView: { readOnly: true }
                 }
             },
             legend: {
-                data:['消费课时'],
+                data: ['消费课时', "充值课时"],
                 top: 'bottom'
             },
             xAxis: {
@@ -192,6 +225,10 @@
                 name: '消费课时',
                 type: 'bar',
                 data: data.series0
+            }, {
+                name: '充值课时',
+                type: 'bar',
+                data: data.series1
             }]
         };
 
@@ -201,43 +238,43 @@
 
     // event handler defined in setting.jade file for removing classroom
     window.handleDeleteClassroom = {
-        'click .remove' : function (e, value, row, index) {
-            bootbox.confirm({ 
-                message : "确定永久删除此教室吗？<br><small>删除后，教室中的课程将无法显示或预约，并且已经预约的课时也不会返还到会员卡中</small>", 
-                callback : function(result) {
+        'click .remove': function (e, value, row, index) {
+            bootbox.confirm({
+                message: "确定永久删除此教室吗？<br><small>删除后，教室中的课程将无法显示或预约，并且已经预约的课时也不会返还到会员卡中</small>",
+                callback: function (result) {
                     if (!result) { // user cancel
-                        return ;
+                        return;
                     }
 
                     $.ajax("api/setting/classrooms/" + row.id, {
-                        type : "DELETE",
-                        contentType : "application/json; charset=utf-8",
-                        data : {},
-                        success : function (data) {
+                        type: "DELETE",
+                        contentType: "application/json; charset=utf-8",
+                        data: {},
+                        success: function (data) {
                             if (data && data.n == 1 && data.ok == 1) {
                                 $('#classroom_table').bootstrapTable('removeByUniqueId', row.id);
                             } else {
                                 console.error("remove class room " + row.id + " fails");
                             }
                         },
-                        error : function (jqXHR, status, err) {
+                        error: function (jqXHR, status, err) {
                             bootbox.dialog({
-                                message : jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                                title : "删除教室失败",
-                                buttons : {
-                                    danger : {
-                                        label : "确定",
-                                        className : "btn-danger",
+                                message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                                title: "删除教室失败",
+                                buttons: {
+                                    danger: {
+                                        label: "确定",
+                                        className: "btn-danger",
                                     }
                                 }
                             });
                         },
-                        dataType : "json"
+                        dataType: "json"
                     });
                 },
-                buttons : {
-                    confirm : {
-                        className : "btn-danger"
+                buttons: {
+                    confirm: {
+                        className: "btn-danger"
                     }
                 }
             });
