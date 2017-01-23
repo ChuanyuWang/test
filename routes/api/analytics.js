@@ -76,6 +76,8 @@ router.get('/deposit', isAuthenticated, function (req, res, next) {
 
     var members = req.db.collection("members");
     members.aggregate([{
+        $unwind: "$history"
+    }, {
         $match: {
             "history.date": {
                 $gte: new Date(year, 0),
@@ -83,8 +85,6 @@ router.get('/deposit', isAuthenticated, function (req, res, next) {
             },
             "history.target" : "membership.0.credit"
         }
-    }, {
-        $unwind: "$history"
     }, {
         $project: {
             week: {
