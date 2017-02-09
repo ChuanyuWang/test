@@ -224,6 +224,7 @@
             series: [{
                 name: '消费课时',
                 type: 'bar',
+                barGap: 0,
                 data: data.series0
             }, {
                 name: '充值课时',
