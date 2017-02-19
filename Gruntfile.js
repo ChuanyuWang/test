@@ -26,7 +26,7 @@ module.exports = function (grunt) {
     },
     watch: {
       options: {
-        spawn: false,
+        spawn: true,
         livereload: reloadPort
       },
       server: {
@@ -37,28 +37,25 @@ module.exports = function (grunt) {
           'routes/api/*.js',
           'models/*.js'
         ],
-        tasks: ['develop', 'delayed-livereload']
-      },
-      js: {
-        files: ['public/js/*.js'],
+        tasks: ['develop'], //, 'delayed-livereload']
         options: {
-          livereload: reloadPort
+          spawn: false
         }
       },
-      css: {
+      public: {
+        files: ['public/js/*.js', 'public/css/*.css']
+      },
+      less: {
         files: [
           'public/css/*.less'
         ],
         tasks: ['less'],
         options: {
-          livereload: reloadPort
+          livereload: false
         }
       },
       views: {
-        files: ['views/*.jade'],
-        options: {
-          livereload: reloadPort
-        }
+        files: ['views/*.jade']
       }
     }
   });
