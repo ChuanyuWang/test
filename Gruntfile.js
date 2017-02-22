@@ -1,83 +1,15 @@
 'use strict';
 
-var request = require('request');
-
 module.exports = function (grunt) {
   // show elapsed time at the end
   require('time-grunt')(grunt);
-  // load all grunt tasks
-  require('load-grunt-tasks')(grunt);
+  // load all grunt tasks and their config
+  require('load-grunt-config')(grunt);
 
-  var reloadPort = 35729, files;
-
-  grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
-    develop: {
-      server: {
-        file: 'bin/www'
-      }
-    },
-    less: {
-      dist: {
-        files: {
-          'public/css/style.css': 'public/css/style.less'
-        }
-      }
-    },
-    watch: {
-      options: {
-        spawn: true,
-        livereload: reloadPort
-      },
-      server: {
-        files: [
-          'bin/www',
-          'app.js',
-          'routes/*.js',
-          'routes/api/*.js',
-          'models/*.js'
-        ],
-        tasks: ['develop'], //, 'delayed-livereload']
-        options: {
-          spawn: false
-        }
-      },
-      public: {
-        files: ['public/js/*.js', 'public/css/*.css']
-      },
-      less: {
-        files: [
-          'public/css/*.less'
-        ],
-        tasks: ['less'],
-        options: {
-          livereload: false
-        }
-      },
-      views: {
-        files: ['views/*.jade']
-      }
-    }
-  });
-
-  grunt.config.requires('watch.server.files');
-  files = grunt.config('watch.server.files');
-  files = grunt.file.expand(files);
-
-  grunt.registerTask('delayed-livereload', 'Live reload after the node server has restarted.', function () {
-    var done = this.async();
-    setTimeout(function () {
-      request.get('http://localhost:' + reloadPort + '/changed?files=' + files.join(','),  function (err, res) {
-          var reloaded = !err && res.statusCode === 200;
-          if (reloaded) {
-            grunt.log.ok('Delayed live reload successful.');
-          } else {
-            grunt.log.error('Unable to make a delayed live reload.');
-          }
-          done(reloaded);
-        });
-    }, 500);
-  });
+  grunt.registerTask('build', [
+    'less',
+    'browserify'
+  ]);
 
   grunt.registerTask('default', [
     'less',
