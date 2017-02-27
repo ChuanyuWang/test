@@ -17,20 +17,11 @@ module.exports = {
         }
         
         //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
-        var uriString = util.format("mongodb://%s:%s@%s/%s?authSource=admin", config.user, config.pass, config.host, database);
+        var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
         var options = {
-            db : {
-                native_parser : true,
-                authSource : 'admin'
-            },
-            server : {
-                poolSize : 5
-                /*,
-                socketOptions : {
-                    keepAlive : 120
-                }
-                */
-            }
+            authSource : 'admin',
+            poolSize : 5
+            /* keepAlive : 120 */
         };
         var db = mongojs(uriString, [], options);
         
