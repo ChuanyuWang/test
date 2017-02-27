@@ -18,6 +18,9 @@ router.get('/', function (req, res) {
 });
 
 /* login/logout API */
+router.get('/login', function (req, res) {
+    res.redirect('/');
+});
 
 router.post('/login', passport.authenticate('local', {
         failureRedirect : '/',
@@ -43,7 +46,7 @@ function navigateToUserHome(req, res) {
 router.use('/admin', require("./admin"));
 
 // route different tenant
-router.use('/:tenantName', getTenantInfo, require("./tenant"));
+router.use('/:tenantName/*', getTenantInfo, require("./tenant"));
 router.use('/mygirl', require('./mygirl')); // load customize tenant before others
 
 function getTenantInfo(req, res, next) {
