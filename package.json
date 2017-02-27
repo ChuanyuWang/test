@@ -1,11 +1,12 @@
 {
   "name": "eshop",
-  "version": "0.1.0",
+  "version": "0.5.1",
   "description": "A mini on-line store",
   "private": true,
   "main": "app.js",
   "scripts": {
     "grunt": "grunt",
+    "bower": "bower",
     "start": "node ./bin/www"
   },
   "dependencies": {
