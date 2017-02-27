@@ -46,7 +46,7 @@ function navigateToUserHome(req, res) {
 router.use('/admin', require("./admin"));
 
 // route different tenant
-router.use('/:tenantName/*', getTenantInfo, require("./tenant"));
+router.use('/:tenantName/', getTenantInfo, require("./tenant"));
 router.use('/mygirl', require('./mygirl')); // load customize tenant before others
 
 function getTenantInfo(req, res, next) {
