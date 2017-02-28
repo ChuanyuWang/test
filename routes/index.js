@@ -76,7 +76,7 @@ function getTenantInfo(req, res, next) {
             console.error(err);
         }
 
-        req.tenant = tenant;
+        req.tenant = tenant || {};
         next();
     });
 }
