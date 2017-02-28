@@ -54,6 +54,7 @@ router.use('/api/analytics', require('./api/analytics'));
 
 // Route other request to base pages =====================================
 
+router.use('/course', require('./course'));
 router.use(require('./base'));
 
 module.exports = router;
