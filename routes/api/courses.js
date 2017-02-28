@@ -15,6 +15,8 @@ router.get('/', function(req, res, next) {
             "_id": "1",
             "name": "123",
             "date": "2017-02-27T02:00:00Z",
+            "status": "inprogress",
+            "remark": "summar only",
             "classroom": "room1",
             "members": [
                 { "id": "123", "name": "Hellen" },
@@ -27,14 +29,34 @@ router.get('/', function(req, res, next) {
                 "start": "2017-02-27T02:00:00Z",
                 "end": 12 | "2017-02-27T02:00:00Z"
             }
+        },
+        {
+            "_id": "2",
+            "name": "456",
+            "date": "2017-03-27T02:00:00Z",
+            "status": "closed",
+            "remark": "winter only",
+            "classroom": "room2",
+            "members": [
+                { "id": "123", "name": "Hellen" },
+                { "id": "456", "name": "Peter" },
+                { "id": "789", "name": "Joey" }
+            ],
+            "recurrence": {
+                "pattern": "weekly" | "daily",
+                "iterator": 1,
+                "matcher": ["monday", "sunday"],
+                "start": "2017-02-27T02:00:00Z",
+                "end": 12 | "2017-02-27T02:00:00Z"
+            }
         }
     ]);
 });
 
-// Below APIs are visible to authenticated users by current tenant
+/// Below APIs are visible to authenticated users by current tenant
 router.all(helper.isAuthenticated);
 
-// Below APIs are only visible to authenticated users with 'admin' role
+/// Below APIs are only visible to authenticated users with 'admin' role
 router.all(helper.requireRole("admin"));
 
 router.post('/', function(req, res, next) {
