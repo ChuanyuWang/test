@@ -14,6 +14,7 @@ router.get('/', function(req, res, next) {
         {
             "_id": "1",
             "name": "123",
+            "createDate": "2017-02-26T02:00:00Z",
             "date": "2017-02-27T02:00:00Z",
             "status": "inprogress",
             "remark": "summar only",
@@ -21,18 +22,12 @@ router.get('/', function(req, res, next) {
             "members": [
                 { "id": "123", "name": "Hellen" },
                 { "id": "456", "name": "Peter" }
-            ],
-            "recurrence": {
-                "pattern": "weekly" | "daily",
-                "iterator": 1,
-                "matcher": ["monday", "sunday"],
-                "start": "2017-02-27T02:00:00Z",
-                "end": 12 | "2017-02-27T02:00:00Z"
-            }
+            ]
         },
         {
             "_id": "2",
             "name": "456",
+            "createDate": "2017-02-25T02:00:00Z",
             "date": "2017-03-27T02:00:00Z",
             "status": "closed",
             "remark": "winter only",
@@ -41,14 +36,7 @@ router.get('/', function(req, res, next) {
                 { "id": "123", "name": "Hellen" },
                 { "id": "456", "name": "Peter" },
                 { "id": "789", "name": "Joey" }
-            ],
-            "recurrence": {
-                "pattern": "weekly" | "daily",
-                "iterator": 1,
-                "matcher": ["monday", "sunday"],
-                "start": "2017-02-27T02:00:00Z",
-                "end": 12 | "2017-02-27T02:00:00Z"
-            }
+            ]
         }
     ]);
 });

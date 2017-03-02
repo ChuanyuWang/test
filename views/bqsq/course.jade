@@ -35,10 +35,14 @@ block page
         tr
           //th(data-field='_id',data-visible='false') ID
           th(data-field='name',data-sortable='true') 班级名称
+          th(data-field='createDate',data-formatter='dateFormatter',data-sortable='true') 创建时间
           th(data-field='status',data-formatter='statusFormatter',data-sortable='true') 状态
           th(data-field='members',data-formatter='membersFormatter',data-sortable='true') 人数
           th(data-width='180px',data-align='center',data-formatter='actionFormatter',data-events='handleActionClick') 操作
   script(type='text/javascript').
+    function dateFormatter(value) {
+        return value ? moment(value).format('ll') : undefined;
+    };
     function membersFormatter(value) {
         return value && value.length ? value.length : 0;
     };
