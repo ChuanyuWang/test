@@ -13,6 +13,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'less',
+    'browserify',
     'develop',
     'watch'
   ]);
