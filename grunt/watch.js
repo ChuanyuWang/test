@@ -8,7 +8,7 @@ module.exports = {
             'bin/www',
             'app.js',
             'routes/*.js',
-            'routes/api/*.js',
+            'routes/**/*.js',
             'models/*.js'
         ],
         tasks: ['develop'], //, 'delayed-livereload']
@@ -29,6 +29,6 @@ module.exports = {
         }
     },
     views: {
-        files: ['views/*.jade', 'views/bqsq/*.jade']
+        files: ['views/*.jade', 'views/**/*.jade']
     }
 };
