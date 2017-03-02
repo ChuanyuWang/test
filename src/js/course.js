@@ -54,7 +54,7 @@ function handleEditCourse(e, value, row, index) {
  * @public
  */
 function handleViewCourse(e, value, row, index) {
-    //TODO
+    window.location.href = window.location.pathname + '/' + row._id + '/view';
 };
 
 // global event handler for table inline action
