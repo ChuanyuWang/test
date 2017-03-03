@@ -1,7 +1,9 @@
-extends ../layout
+extends ../mlayout
 
-block prepend css
-  link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
+block append js
+  //script(src='/components/requirejs/require.js',data-main="/js/booking")
+  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  script(src='/js/mybooking.js')
 
 block content
   script(type='text/javascript').
@@ -76,9 +78,3 @@ block content
         div.modal-footer
           button#cancel_ok.btn.btn-danger(type="button") 确定
           button.btn.btn-default(type="button",data-dismiss="modal") 关闭
-
-  script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
-  //script(src='/components/requirejs/require.js',data-main="/js/booking")
-  script(src='/js/mybooking.js')
-  script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
-  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
