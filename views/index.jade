@@ -3,6 +3,10 @@ extends layout
 block append css
   link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
 
+block append js
+    script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
+    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
+
 block content
   nav.navbar.navbar-inverse.navbar-fixed-top
     div.container
@@ -44,6 +48,3 @@ block content
     div.container
       p.text-muted
         small 沪ICP备16016548号
-  block pagjs
-    script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
-    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
