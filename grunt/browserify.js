@@ -6,5 +6,9 @@ module.exports = {
     course: {
         src: 'src/js/course.js',
         dest: 'public/js/course.js'
+    },
+    course_view: {
+        src: 'src/js/course_view.js',
+        dest: 'public/js/course_view.js'
     }
 };

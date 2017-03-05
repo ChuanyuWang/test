@@ -5,7 +5,7 @@
  */
 
 // DOM Ready =============================================================
-$(document).ready(function() {
+$(document).ready(function () {
     init();
 });
 
