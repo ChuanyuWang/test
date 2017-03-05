@@ -3,6 +3,7 @@ var router = express.Router();
 var mongojs = require('mongojs');
 
 var NORMAL_FIELDS = {
+    status : 1,
     since : 1,
     name : 1,
     contact : 1,
@@ -11,7 +12,7 @@ var NORMAL_FIELDS = {
     note : 1,
     membership : 1
 };
-
+// TODO, user authenticated user can access this API
 router.get('/', function (req, res) {
     //console.log("get members with query %j", req.query);
     var members = req.db.collection("members");
@@ -28,6 +29,10 @@ router.get('/', function (req, res) {
         query["membership"] = { $size : 1 };
         query["membership.type"] = "LIMITED";
         query["membership.room"] = [req.query.filter];
+    }
+    // query members by status
+    if (req.query.hasOwnProperty('status')) {
+        query["status"] = req.query.status;
     }
     members.find(query, NORMAL_FIELDS).sort({
         since : -1

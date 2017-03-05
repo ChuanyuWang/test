@@ -110,6 +110,12 @@ router.post('/', function (req, res, next) {
         }
         console.log("member is found %j", doc);
 
+        if (doc.status == 'inactive') {
+            var error = new Error("此会员已被停用，无法在线预约；如果您还在有效期内，请来电或到店咨询");
+            error.status = 400;
+            return next(error);
+        }
+
         //TODO, support multi membership card
         var membership = null;
         if (doc.membership && doc.membership.length > 0) {
@@ -313,6 +319,7 @@ router.delete ('/:classID', function (req, res, next) {
             if (result.n == 1) {
                 //TODO, support multi membership card
                 //TODO, handle the callback when member is not existed.
+                //TODO, handle the callback when member is inactive.
                 req.db.collection("members").update({
                     _id : mongojs.ObjectId(req.body.memberid),
                     membership : { $size : 1 }
