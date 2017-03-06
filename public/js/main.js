@@ -341,8 +341,8 @@
         book_dlg.find('table').data('classid', class_id);
         book_dlg.find('#cls_name').text(class_item.name);
         book_dlg.find('#quantity').val(1).closest(".form-group").removeClass("has-error");;
-		// refresh the member list
-        book_dlg.find('table').bootstrapTable('refresh', {url:'api/members'});
+		// refresh the member list (active only)
+        book_dlg.find('table').bootstrapTable('refresh', {url:'api/members', query:{status:'active'}});
 
         book_dlg.modal('show');
     };

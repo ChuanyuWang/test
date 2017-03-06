@@ -3,7 +3,7 @@ var router = express.Router();
 var Account = require('../account');
 var util = require('../util');
 
-var VERSION = 2;
+var VERSION = 3;
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function (req, res, next) {
@@ -108,7 +108,6 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
                 res.send("Tenant update to 1.0");
             });
         } if (doc.version == 1) {
-            // TODO, upgrade
             upgradeFromOne(req, res, next, doc.name);
             doc.version = 2;
             config_db.collection("tenants").save(doc, function(err, doc){
@@ -117,6 +116,16 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
                 }
                 //TODO, send the complete message when all data update
                 res.send("Tenant update to 2.0");
+            });
+        } else if (doc.version == 2) {
+            upgradeFromTwo(req, res, next, doc.name);
+            doc.version = 3;
+            config_db.collection("tenants").save(doc, function(err, doc){
+                if (err) {
+                    return next(new Error("save tenant version fails"));
+                }
+                //TODO, send the complete message when all data update
+                res.send("Tenant update to 3.0");
             });
         } else {
             res.send("Tenant is already update to date");
@@ -205,6 +214,29 @@ function upgradeFromOne(req, res, next, tenant_name) {
                 doc.membership.push(defaultCard);
                 members.save(doc);
             }
+        }
+    });
+};
+/**
+ * Update the tenant from version 2 to 3, which append `status` field to all members documents
+ * @param {Object} req
+ * @param {Object} res 
+ * @param {Function} next 
+ * @param {String} tenant_name 
+ */
+function upgradeFromTwo(req, res, next, tenant_name) {
+    tenant_db = util.connect(tenant_name);
+
+    var members = tenant_db.collection('members');
+    // query matches documents that either contain the status field whose value is null or that do not contain the status field.
+    // assign default status as 'active'
+    members.update({status:null}, {$set : {status : 'active'}}, {multi : true}, function(err, result){
+        if (err) {
+            console.error(err);
+        } else {
+            console.info('Upgrade from version 2 successfully');
+            // e.g. { ok: 1, nModified: 3, n: 3 }
+            console.debug(result);
         }
     });
 };

@@ -29,20 +29,17 @@ append js
 
 block page
   div.container(style={'padding-top': '58px'})
-    div.filter.row
-      div.col-sm-1 状态:
-      div.col-sm-1
-        label.radio-inline
-          input(type="radio", name="inlineRadioOptions", id="inlineRadio1", value="active")
-          |正常
-      div.col-sm-1
-        label.radio-inline
-          input(type="radio", name="inlineRadioOptions", id="inlineRadio2", value="inactive")
-          |停用
+    div.statusFilter.row
+      div.col-sm-12
+        label(style='font-size:90%;margin-right:7px') 状态:
+        button.btn.btn-info.btn-sm(type='button',data-filter='active') 正常
+        button.btn.btn-default.btn-sm(type='button',data-filter='inactive') 停用
+    div.row(style='border-bottom:1px solid #eee;margin:7px 0 0 0')
     div#toolbar.btn-group(role='group')
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
       button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 修改
       button#dea_member.btn.btn-danger(type='button') 停用
+      button#act_member.btn.btn-success(type='button',style='display:none') 激活
       button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
         span.glyphicon.glyphicon-filter
     table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true",data-query-params="customQuery")

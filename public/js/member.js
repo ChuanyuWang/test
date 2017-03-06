@@ -50,7 +50,9 @@
         $('#add_member').click(handleAddNewMember);
         $('#edit_member').click(handleEditMember);
         $('#dea_member').click(handleDeactivateMember);
+        $('#act_member').click(handleActivateMember);
         $('#view_history').click(handleMemberHistory);
+        $('div.statusFilter button').click(handleFilterStatus);
     });
 
     // Functions =============================================================
@@ -391,7 +393,27 @@
         // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
         var filter = $("#filter_dlg input:checked").val();
         params.filter = filter;
+        var status = $('div.statusFilter button.btn-info').data('filter');
+        params.status = status;
         return params;
+    };
+
+    function handleFilterStatus(event) {
+        var btn = $(this);
+        btn.removeClass('btn-default').addClass('btn-info');
+        btn.siblings('button').removeClass('btn-info').addClass('btn-default');
+        // refresh the table when user changes the status filter
+        $('#member_table').bootstrapTable('refresh');
+        // show/hide activate buttons
+        if (btn.data('filter') == 'active') {
+            $('#toolbar button[data-action=add]').show();
+            $('#dea_member').show();
+            $('#act_member').hide();
+        } else {
+            $('#toolbar button[data-action=add]').hide();
+            $('#dea_member').hide();
+            $('#act_member').show();
+        }
     };
 
     function updateMemberStatus(memberID, status) {
@@ -403,6 +425,48 @@
                 //TODO
             },
             dataType: "json"
+        });
+    };
+
+    function handleActivateMember(event) {
+        var items = $('#member_table').bootstrapTable('getSelections');
+
+        if (items.length != 1) {
+            bootbox.alert('请选择一个会员');
+            return;
+        }
+
+        bootbox.confirm({
+            message: "确定激活选中会员吗？",
+            callback: function (result) {
+                if (!result) { // user cancel
+                    return;
+                }
+                // activate all selected members one by one, and update the table
+                $.each(items, function (index, item) {
+                    var request = updateMemberStatus(item._id, 'active');
+                    request.done(function (data, textStatus, jqXHR) {
+                        $('#member_table').bootstrapTable('removeByUniqueId', data._id);
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        // alert dialog with danger button
+                        bootbox.dialog({
+                            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                            title: "激活会员失败",
+                            buttons: {
+                                danger: {
+                                    label: "确定",
+                                    className: "btn-danger"
+                                }
+                            }
+                        });
+                    });
+                });
+            },
+            buttons: {
+                confirm: {
+                    className: "btn-primary"
+                }
+            }
         });
     };
 
