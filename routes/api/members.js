@@ -244,6 +244,7 @@ router.post('/', isAuthenticated, requireRole("admin"), function (req, res, next
 });
 
 router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res, next) {
+    return next(new Error("Not implementation"));
     var members = req.db.collection("members");
     members.remove({
         _id : mongojs.ObjectId(req.params.memberID)
