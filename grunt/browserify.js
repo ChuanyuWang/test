@@ -19,6 +19,10 @@ module.exports = {
         src: 'src/js/mybooks.js',
         dest: 'public/js/myreadbooks.js'
     },
+    trial: {
+        src: 'src/js/trial.js',
+        dest: 'public/js/trial.js'
+    },
     course: {
         src: 'src/js/course.js',
         dest: 'public/js/course.js'

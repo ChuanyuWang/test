@@ -1,8 +1,53 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
+var util = require('../../util');
+var helper = require('../../helper');
 
-router.get('/', isAuthenticated, function (req, res) {
+router.post('/', function (req, res, next) {
+    var tenantDB = null;
+    if (req.body.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.body.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
+    if (!req.body.name || !req.body.contact) {
+        res.status(400).send("Missing param 'name' or 'contact'");
+        return;
+    }
+    var query = {
+        name : req.body.name,
+        contact : req.body.contact
+    };
+    
+    initDateField(req.body);
+
+    var opportunities = tenantDB.collection("opportunities");
+    //if the same opportunity is posted twice, the last one will override the previous
+    opportunities.update(query, req.body, {upsert:true}, function (err, result) {
+        if (err) {
+            var error = new Error('Add opportunity fails with error');
+            error.innerError = err;
+            return next(error);
+        } else {
+            // result is object, e.g.
+            // {"ok":1,"nModified":0,"n":1,"upserted":[{"index":0,"_id":"577a77651b298d2b68bfb1c6"}]}
+            console.log("opportunity is added with result %j", result);
+            res.json(result);
+        }
+    });
+});
+
+/// Below APIs are visible to authenticated users only
+router.all(helper.isAuthenticated);
+
+router.get('/', function (req, res) {
     var opportunities = req.db.collection("opportunities");
     var query = {};
     if (req.query.name) {
@@ -20,12 +65,12 @@ router.get('/', isAuthenticated, function (req, res) {
             });
             return;
         }
-        console.log("find opportunities with result %j", docs);
+        console.log("find opportunities: ", docs?docs.length:0);
         res.json(docs);
     });
 });
 
-router.put('/:opportunityID', isAuthenticated, requireRole("admin"), function (req, res) {
+router.patch('/:opportunityID', helper.requireRole("admin"), function (req, res) {
     var opportunities = req.db.collection("opportunities");
 
     initDateField(req.body);
@@ -50,34 +95,7 @@ router.put('/:opportunityID', isAuthenticated, requireRole("admin"), function (r
     });
 });
 
-router.post('/', function (req, res) {
-    if (!req.body.name || !req.body.contact) {
-        res.status(400).send("Missing param 'name' or 'contact'");
-        return;
-    }
-    var query = {
-        name : req.body.name,
-        contact : req.body.contact
-    };
-    
-    initDateField(req.body);
-
-    var opportunities = req.db.collection("opportunities");
-    opportunities.update(query, req.body, {upsert:true}, function (err, result) {
-        if (err) {
-            var error = new Error('Add opportunity fails with error');
-            error.innerError = err;
-            return next(error);
-        } else {
-            // result is object, e.g.
-            // {"ok":1,"nModified":0,"n":1,"upserted":[{"index":0,"_id":"577a77651b298d2b68bfb1c6"}]}
-            console.log("opportunity is added with result %j", result);
-            res.json(result);
-        }
-    });
-});
-
-router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res, next) {
+router.delete ('/:memberID', helper.requireRole("admin"), function (req, res, next) {
     //TODO
     return next(new Error("Not implementation"));
 });
@@ -89,26 +107,6 @@ function initDateField(item) {
         if (item && item.hasOwnProperty(fields[i])) {
             item[fields[i]] = new Date(item[fields[i]]);
         }
-    }
-};
-
-function requireRole(role) {
-    return function(req, res, next) {
-        if(req.user && req.user.role === role)
-            next();
-        else {
-            var err = new Error("没有权限执行此操作");
-            err.status = 403;
-            next(err);
-        }
-    };
-};
-
-function isAuthenticated(req, res, next) {
-    if (req.user && req.user.tenant == req.tenant.name) {
-        next()
-    } else {
-        res.status(401).send('Unauthorized Request');
     }
 };
 
