@@ -176,7 +176,8 @@ function handleBookOK(event) {
 };
 
 function addNewBook(bookInfo) {
-    $.ajax("api/booking", {
+    bookInfo.tenant = common.getTenantName();
+    $.ajax("/api/booking", {
         type : "POST",
         contentType : "application/json; charset=utf-8",
         data : JSON.stringify(bookInfo),
@@ -185,7 +186,7 @@ function addNewBook(bookInfo) {
             // update cache
             var classInfo = data['class'];
             cls_cache[classInfo._id] = classInfo;
-            // TODO, update the button status
+            // TODO, update the button status according to latest return data
             var remaining = classInfo.capacity - classInfo.reservation;
             var book_col = $(".book-col[data-id=" + bookInfo.classid + "]");
             book_col.find("span").text(remaining < 0 ? 0 : remaining);

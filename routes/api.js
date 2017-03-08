@@ -7,6 +7,7 @@ router.use(getTenantInfo);
 router.use('/classes', require('./api/classes'));
 router.use('/courses', require('./api/courses'));
 router.use('/members', require('./api/members'));
+router.use('/booking', require('./api/booking'));
 
 function getTenantInfo(req, res, next) {
     if (req.isUnauthenticated() || req.tenant) {

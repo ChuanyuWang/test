@@ -309,10 +309,10 @@ function cancelBooking(class_id, member_id, button_div) {
     // remove previous attached 'click' event listener!
     $('#cancel_ok').off("click");
     $('#cancel_ok').click(function(event) {
-        $.ajax("api/booking/" + class_id, {
+        $.ajax("/api/booking/" + class_id, {
             type : "DELETE",
             contentType : "application/json; charset=utf-8",
-            data : JSON.stringify({memberid:member_id}),
+            data : JSON.stringify({memberid:member_id, tenant: common.getTenantName()}),
             success : function (data) {
                 // check if it's the only class in this day
                 var count = $(button_div).closest('div.class-row').find('div.content-col > div').length;
@@ -331,6 +331,9 @@ function cancelBooking(class_id, member_id, button_div) {
             },
             error : function (jqXHR, status, err) {
                 console.error(jqXHR.responseJSON);
+                $('#error_dlg').find("h4").text('取消失败');
+                $('#error_dlg').find("p#message").text(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+                $('#error_dlg').modal('show');
             },
             complete : function(jqXHR, status) {
                 $('#confirm_dlg').modal('hide');

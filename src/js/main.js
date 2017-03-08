@@ -326,7 +326,7 @@ function handleViewClass(event) {
     // cache the class ID on member table
     modal.find('#member_table').data('classid', class_id);
     modal.find('#member_table').bootstrapTable('removeAll');
-    modal.find('#member_table').bootstrapTable('refresh', { url: 'api/booking', query: { classid: class_id } });
+    modal.find('#member_table').bootstrapTable('refresh', { url: '/api/booking', query: { classid: class_id } });
     $('#view_dlg').modal('show');
 };
 
@@ -522,7 +522,7 @@ window.handleDeleteBook = {
     'click .remove': function(e, value, row, index) {
         var class_id = $(e.target).closest('table').data('classid');
 
-        $.ajax("api/booking/" + class_id, {
+        $.ajax("/api/booking/" + class_id, {
             type: "DELETE",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ memberid: row.member }),
@@ -602,7 +602,7 @@ window.handleAddBook = {
             modal.find('#quantity').closest(".form-group").removeClass("has-error");
         }
 
-        $.ajax("api/booking/", {
+        $.ajax("/api/booking/", {
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(bookInfo),

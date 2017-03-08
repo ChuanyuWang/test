@@ -1,15 +1,27 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-
+var util = require('../../util');
 
 router.get('/', function (req, res) {
+    var tenantDB = null;
+    if (req.query.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.query.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
     if (!req.query.classid) {
         res.status(400).send("Missing param 'classid'");
         return;
     }
 
-    var classes = req.db.collection("classes");
+    var classes = tenantDB.collection("classes");
     classes.findOne({
         _id : mongojs.ObjectId(req.query.classid)
     }, function(err, doc){
@@ -45,7 +57,7 @@ router.get('/', function (req, res) {
         }
 
         // query all the members who books this class
-        var members = req.db.collection("members");
+        var members = tenantDB.collection("members");
         members.find({
             _id : {
                 "$in" : query_member
@@ -85,11 +97,23 @@ classID : "5716630aa012576d0371e888"
 }
  */
 router.post('/', function (req, res, next) {
+    var tenantDB = null;
+    if (req.body.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.body.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
     if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
         res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
         return;
     }
-    var members = req.db.collection("members");
+    var members = tenantDB.collection("members");
     var user_query = {
         name : req.body.name,
         contact : req.body.contact
@@ -123,7 +147,7 @@ router.post('/', function (req, res, next) {
         }
 
         // find the class want to book
-        var classes = req.db.collection("classes");
+        var classes = tenantDB.collection("classes");
         classes.findOne({
             _id : mongojs.ObjectId(req.body.classid)
         }, function (err, cls) {
@@ -251,18 +275,30 @@ router.post('/', function (req, res, next) {
                 }
             }
 
-            createNewBook(req, res, doc, cls, req.body.quantity);
+            createNewBook(tenantDB, res, doc, cls, req.body.quantity);
         });
     });
 });
 
 // remove specfic user's booking info
 router.delete ('/:classID', function (req, res, next) {
+    var tenantDB = null;
+    if (req.body.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.body.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");
         return;
     }
-    var classes = req.db.collection("classes");
+    var classes = tenantDB.collection("classes");
     classes.findOne({
         _id : mongojs.ObjectId(req.params.classID),
         "booking.member" : req.body.memberid
@@ -320,7 +356,7 @@ router.delete ('/:classID', function (req, res, next) {
                 //TODO, support multi membership card
                 //TODO, handle the callback when member is not existed.
                 //TODO, handle the callback when member is inactive.
-                req.db.collection("members").update({
+                tenantDB.collection("members").update({
                     _id : mongojs.ObjectId(req.body.memberid),
                     membership : { $size : 1 }
                 }, {
@@ -333,13 +369,21 @@ router.delete ('/:classID', function (req, res, next) {
     });
 });
 
-function createNewBook(req, res, user, cls, quantity) {
+/**
+ * 
+ * @param {Object} tenantDB 
+ * @param {Object} res 
+ * @param {Object} user 
+ * @param {Object} cls 
+ * @param {Number} quantity 
+ */
+function createNewBook(tenantDB, res, user, cls, quantity) {
     var newbooking = {
         member : user._id.toString(),
         quantity : quantity,
         bookDate : new Date()
     };
-    var classes = req.db.collection("classes");
+    var classes = tenantDB.collection("classes");
     classes.findAndModify({
         query : {
             _id : cls._id
@@ -369,7 +413,7 @@ function createNewBook(req, res, user, cls, quantity) {
             membership = user.membership[0];
         
             // update the credit value in membership
-            var members = req.db.collection("members");
+            var members = tenantDB.collection("members");
             members.update({
                 _id : user._id
             }, {
