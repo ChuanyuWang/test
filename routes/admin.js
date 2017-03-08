@@ -246,7 +246,7 @@ function checkTenantUser(req, res, next) {
         req.flash('error', '用户未登陆或连接超时');
         res.redirect('/');
     } else if (req.user.tenant != 'admin') {
-        res.redirect('/' + req.user.tenant + '/home');
+        res.redirect('/t/' + req.user.tenant + '/home');
     } else {
         next();
     }

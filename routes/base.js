@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var helper = require('../helper');
 
-router.get('/home', checkTenantUser, function (req, res) {
+router.get('/home', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title: '课程表',
         user: req.user,
@@ -10,7 +11,7 @@ router.get('/home', checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/member', checkTenantUser, function (req, res) {
+router.get('/member', helper.checkTenantUser, function (req, res) {
     var members = req.db.collection("members");
     //TODO, support multi membership card
     members.aggregate([{
@@ -58,7 +59,7 @@ router.get('/member', checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/opportunity', checkTenantUser, function (req, res) {
+router.get('/opportunity', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/opportunity', {
         title: '试听',
         user: req.user,
@@ -66,7 +67,7 @@ router.get('/opportunity', checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/setting', checkTenantUser, function (req, res) {
+router.get('/setting', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/setting', {
         title: '设置',
         user: req.user,
@@ -92,16 +93,5 @@ router.get('/trial', function (req, res) {
         title: '报名试听'
     });
 });
-
-function checkTenantUser(req, res, next) {
-    if (!req.user) {
-        req.flash('error', '用户未登陆或连接超时');
-        res.redirect('/');
-    } else if (req.user.tenant != req.tenant.name) {
-        res.redirect('/' + req.user.tenant + '/home');
-    } else {
-        next();
-    }
-};
 
 module.exports = router;
