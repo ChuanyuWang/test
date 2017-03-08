@@ -4,7 +4,6 @@
  * Entry module of view course page
  * --------------------------------------------------------------------------
  */
-var common = require('./common');
 
 // DOM Ready =============================================================
 $(document).ready(function () {
@@ -28,7 +27,7 @@ function init() {
  */
 function loadCourse(coureID) {
     if (!ignoreEdit()) return;
-    $.get('/' + common.getTenantName() + "/api/courses/" + coureID, null, 'json').done(function (data, textStatus, jqXHR) {
+    $.get('/api/courses/' + coureID, null, 'json').done(function (data, textStatus, jqXHR) {
         updatePage(data);
     }).fail(function (jqXHR, textStatus, errorThrown) {
         //alert("error");

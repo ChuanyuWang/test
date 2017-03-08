@@ -2,30 +2,10 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
- * common.js
- * --------------------------------------------------------------------------
- */
-
-module.exports = {
-    /**
-     * get the tenat name of current page, e.g.
-     * return 'bqsq' from http://localhost:3000/bqsq/course/1/view
-     */
-    getTenantName : function() {
-        var pathname = window.location.pathname;
-        if (pathname.length == 0) return "";
-        if (pathname.charAt(0) == '/') pathname = pathname.substring(1);
-        return pathname.split( '/' )[0];
-    }
-};
-},{}],2:[function(require,module,exports){
-/**
- * --------------------------------------------------------------------------
  * course_view.js 
  * Entry module of view course page
  * --------------------------------------------------------------------------
  */
-var common = require('./common');
 
 // DOM Ready =============================================================
 $(document).ready(function () {
@@ -49,7 +29,7 @@ function init() {
  */
 function loadCourse(coureID) {
     if (!ignoreEdit()) return;
-    $.get('/' + common.getTenantName() + "/api/courses/" + coureID, null, 'json').done(function (data, textStatus, jqXHR) {
+    $.get('/api/courses/' + coureID, null, 'json').done(function (data, textStatus, jqXHR) {
         updatePage(data);
     }).fail(function (jqXHR, textStatus, errorThrown) {
         //alert("error");
@@ -106,4 +86,4 @@ function ignoreEdit() {
     // TODO
     return true;
 };
-},{"./common":1}]},{},[2]);
+},{}]},{},[1]);

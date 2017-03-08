@@ -45,7 +45,6 @@ router.get('/booking', function (req, res) {
 
 // API routers ===========================================================
 
-router.use('/api/courses', require('./api/courses'));
 router.use('/api/members', require('./api/members'));
 router.use('/api/booking', require('./api/booking'));
 router.use('/api/setting', require('./api/setting'));
