@@ -43,9 +43,6 @@ router.get('/booking', function (req, res) {
 
 // Functions =============================================================
 
-// API routers ===========================================================
-
-router.use('/api/analytics', require('./api/analytics'));
 
 // Route other request to base pages =====================================
 

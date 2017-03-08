@@ -1,7 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var helper = require('../../helper');
 
-router.get('/consumption', isAuthenticated, function (req, res, next) {
+/// Below APIs are visible to authenticated users only
+router.all(helper.isAuthenticated);
+
+router.get('/consumption', function (req, res, next) {
     //[Default] get the current year consumption by month
     var year = (new Date()).getFullYear();
     var unit = 'month';
@@ -63,7 +67,7 @@ router.get('/consumption', isAuthenticated, function (req, res, next) {
     });
 });
 
-router.get('/deposit', isAuthenticated, function (req, res, next) {
+router.get('/deposit', function (req, res, next) {
     //[Default] get the current year consumption by month
     var year = (new Date()).getFullYear();
     var unit = 'month';
@@ -120,7 +124,7 @@ router.get('/deposit', isAuthenticated, function (req, res, next) {
     });
 });
 
-router.get('/deposit', isAuthenticated, function (req, res, next) {
+router.get('/deposit', function (req, res, next) {
     //[Default] get the current year consumption by month
     var year = (new Date()).getFullYear();
     var unit = 'month';
@@ -176,25 +180,5 @@ router.get('/deposit', isAuthenticated, function (req, res, next) {
         res.json(docs);
     });
 });
-
-function requireRole(role) {
-    return function (req, res, next) {
-        if (req.user && req.user.role === role)
-            next();
-        else {
-            var err = new Error("没有权限执行此操作");
-            err.status = 403;
-            next(err);
-        }
-    };
-};
-
-function isAuthenticated(req, res, next) {
-    if (req.user && req.user.tenant == req.tenant.name) {
-        next()
-    } else {
-        res.status(401).send('Unauthorized Request');
-    }
-};
 
 module.exports = router;

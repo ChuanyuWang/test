@@ -137,8 +137,8 @@
 
         //Execute the function drawChartFunc when both ajax requests are successful, or errorFunc if either one has an error.
         // errorFunc is called only once even if both ajax requests have error
-        var consumptionQuery = $.get("api/analytics/consumption", filter, "json");
-        var depositQuery = $.get("api/analytics/deposit", filter, "json");
+        var consumptionQuery = $.get("/api/analytics/consumption", filter, "json");
+        var depositQuery = $.get("/api/analytics/deposit", filter, "json");
         $.when(consumptionQuery, depositQuery).then(drawChartFunc, errorFunc);
     };
 

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var util = require('../util');
+
 // API routers ===========================================================
 
 router.use(getTenantInfo);
@@ -10,6 +11,7 @@ router.use('/members', require('./api/members'));
 router.use('/booking', require('./api/booking'));
 router.use('/setting', require('./api/setting'));
 router.use('/opportunities', require('./api/opportunities'));
+router.use('/analytics', require('./api/analytics'));
 
 function getTenantInfo(req, res, next) {
     if (req.isUnauthenticated() || req.tenant) {
