@@ -92,17 +92,17 @@ function handleLoginOK(event) {
     }
 
     if (!hasError) {
-        $.ajax("/api/members", {
-            type : "GET",
-            //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-            data : userInfo,
+        $.ajax("/api/members/validate", {
+            type : "POST",
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify(userInfo),
             success : function (data) {
-                if (data && data.length > 0) {
+                if (data) {
                     try {
                         // cache the member id in global variable before access localStorage
-                        localStorage._memberid = memberid = data[0]._id;
-                        localStorage._name = data[0].name;
-                        localStorage._contact = data[0].contact;
+                        localStorage._memberid = memberid = data._id;
+                        localStorage._name = data.name;
+                        localStorage._contact = data.contact;
                     }catch (oException) {
                         if(oException.name == 'QuotaExceededError'){
                             console.error('超出本地存储限额！');
@@ -111,7 +111,7 @@ function handleLoginOK(event) {
                         }
                     }
                     toggleLoginForm(false);
-                    updateUserInfo(data[0]);
+                    updateUserInfo(data);
                     showMyBooking();
                 } else {
                     // handle login fail

@@ -44,7 +44,7 @@ router.get('/classrooms', function(req, res, next) {
 });
 
 /// Below APIs are visible to authenticated users only
-router.all(helper.isAuthenticated);
+router.use(helper.isAuthenticated);
 
 router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
     //var newRoom = {id:'abc', name:''};

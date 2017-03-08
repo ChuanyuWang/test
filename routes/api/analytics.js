@@ -3,7 +3,7 @@ var router = express.Router();
 var helper = require('../../helper');
 
 /// Below APIs are visible to authenticated users only
-router.all(helper.isAuthenticated);
+router.use(helper.isAuthenticated);
 
 router.get('/consumption', function (req, res, next) {
     //[Default] get the current year consumption by month

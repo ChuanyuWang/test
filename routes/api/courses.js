@@ -82,10 +82,10 @@ router.get('/:courseID', function(req, res, next) {
 });
 
 /// Below APIs are visible to authenticated users only
-router.all(helper.isAuthenticated);
+router.use(helper.isAuthenticated);
 
 /// Below APIs are only visible to authenticated users with 'admin' role
-router.all(helper.requireRole("admin"));
+router.use(helper.requireRole("admin"));
 
 router.post('/', function(req, res, next) {
     return next(new Error("Not implementation"));

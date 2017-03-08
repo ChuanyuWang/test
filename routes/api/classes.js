@@ -61,7 +61,7 @@ router.get('/', function (req, res, next) {
 });
 
 /// Below APIs are visible to authenticated users only
-router.all(helper.isAuthenticated);
+router.use(helper.isAuthenticated);
 
 router.post('/', helper.requireRole("admin"), function (req, res) {
     var classes = require("../../models/classes")(req.db);

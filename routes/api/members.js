@@ -14,11 +14,11 @@ var NORMAL_FIELDS = {
     note : 1,
     membership : 1
 };
-// TODO, user authenticated user can access this API
-router.get('/', function (req, res, next) {
+
+router.post('/validate', function (req, res, next) {
     var tenantDB = null;
-    if (req.query.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.query.tenant);
+    if (req.body.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.body.tenant);
     } else if (req.db) {
         // initialize the tenant db if it's authenticated user
         tenantDB = req.db;
@@ -28,7 +28,34 @@ router.get('/', function (req, res, next) {
         return next(err);
     }
 
+    var query = {};
+    if (req.body.hasOwnProperty('name') && req.body.hasOwnProperty('contact')) {
+        query['name'] = req.body.name;
+        query['contact'] = req.body.contact;
+    } else {
+        var err = new Error("Missing param 'name' or 'contact'");
+        err.status = 400;
+        return next(err);
+    }
+
     var members = tenantDB.collection("members");
+    members.findOne(query, NORMAL_FIELDS, function (err, doc) {
+        if (err) {
+            res.status(500).json({
+                'err' : err
+            });
+            return;
+        }
+        console.log("validate member: %j", doc);
+        res.json(doc);
+    });
+});
+
+/// Below APIs are visible to authenticated users only
+router.use(helper.isAuthenticated);
+
+router.get('/', function (req, res, next) {
+    var members = req.db.collection("members");
     var query = {};
     if (req.query.name) {
         query['name'] = req.query.name;
@@ -60,9 +87,6 @@ router.get('/', function (req, res, next) {
         res.json(docs);
     });
 });
-
-/// Below APIs are visible to authenticated users only
-router.all(helper.isAuthenticated);
 
 router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next) {
     var members = req.db.collection("members");

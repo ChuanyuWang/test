@@ -45,7 +45,7 @@ router.post('/', function (req, res, next) {
 });
 
 /// Below APIs are visible to authenticated users only
-router.all(helper.isAuthenticated);
+router.use(helper.isAuthenticated);
 
 router.get('/', function (req, res) {
     var opportunities = req.db.collection("opportunities");

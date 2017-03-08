@@ -58,7 +58,9 @@ module.exports.requireRole = function(role) {
  * Continue to next middleware if user is authenticated;
  * Otherwise respond with error message and status 401.
  * 
- * @param {String} role
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
  * @public
  */
 module.exports.isAuthenticated = function(req, res, next) {
