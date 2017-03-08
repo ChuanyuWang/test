@@ -146,7 +146,7 @@
     };
 
     function addNewMember(member) {
-        $.ajax("api/members", {
+        $.ajax("/api/members", {
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(member),
@@ -171,7 +171,7 @@
     };
 
     function editMember(id, member) {
-        $.ajax("api/members/" + id, {
+        $.ajax("/api/members/" + id, {
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(member),
@@ -259,7 +259,7 @@
             var updateOps = { "membership": [memberCard] };
         }
 
-        $.ajax("api/members/" + member_id, {
+        $.ajax("/api/members/" + member_id, {
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(updateOps),
@@ -346,7 +346,7 @@
         charge_dlg.find('input[name=charge]').val(0).closest(".form-group").removeClass("has-error");;
         charge_dlg.find('input[name=remark]').val(null).closest(".form-group").removeClass("has-error");;
         // refresh the change history
-        charge_dlg.find('table').bootstrapTable('refresh', { url: 'api/members/' + member_id + '/history' });
+        charge_dlg.find('table').bootstrapTable('refresh', { url: '/api/members/' + member_id + '/history' });
         // show the dialog in the end
         charge_dlg.modal('show');
 
@@ -358,7 +358,7 @@
             } else if (newVal != 0) {
                 //TODO, remark is required???
             }
-            $.ajax("api/members/" + member_id + "/charge", {
+            $.ajax("/api/members/" + member_id + "/charge", {
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 //TODO, support multi membership card in the future
@@ -417,7 +417,7 @@
     };
 
     function updateMemberStatus(memberID, status) {
-        return $.ajax("api/members/" + memberID, {
+        return $.ajax("/api/members/" + memberID, {
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ 'status': status }),

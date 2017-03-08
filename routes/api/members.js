@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
+var helper = require('../../helper');
+var util = require('../../util');
 
 var NORMAL_FIELDS = {
     status : 1,
@@ -13,9 +15,20 @@ var NORMAL_FIELDS = {
     membership : 1
 };
 // TODO, user authenticated user can access this API
-router.get('/', function (req, res) {
-    //console.log("get members with query %j", req.query);
-    var members = req.db.collection("members");
+router.get('/', function (req, res, next) {
+    var tenantDB = null;
+    if (req.query.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.query.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
+    var members = tenantDB.collection("members");
     var query = {};
     if (req.query.name) {
         query['name'] = req.query.name;
@@ -48,7 +61,10 @@ router.get('/', function (req, res) {
     });
 });
 
-router.patch('/:memberID', isAuthenticated, requireRole("admin"), function (req, res, next) {
+/// Below APIs are visible to authenticated users only
+router.all(helper.isAuthenticated);
+
+router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next) {
     var members = req.db.collection("members");
 
     convertDateObject(req.body);
@@ -84,7 +100,7 @@ router.patch('/:memberID', isAuthenticated, requireRole("admin"), function (req,
     "remark" : "****"
 }
 */
-router.post('/:memberID/charge', isAuthenticated, requireRole("admin"), function (req, res, next) {
+router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res, next) {
     if (!req.body.hasOwnProperty("old") && !req.body.hasOwnProperty("new")) {
         var error = new Error("Missing param 'old' or 'new'");
         error.status = 400;
@@ -177,7 +193,7 @@ router.post('/:memberID/charge', isAuthenticated, requireRole("admin"), function
     }]
 }
 */
-router.get('/:memberID/history', isAuthenticated, function (req, res, next) {
+router.get('/:memberID/history', function (req, res, next) {
     var members = req.db.collection("members");
 
     members.find({
@@ -200,12 +216,16 @@ router.get('/:memberID/history', isAuthenticated, function (req, res, next) {
     });
 });
 
-router.post('/', isAuthenticated, requireRole("admin"), function (req, res, next) {
+router.post('/', helper.requireRole("admin"), function (req, res, next) {
     if (!req.body.name || !req.body.contact) {
         var error = new Error("Missing param 'name' or 'contact'");
         error.status = 400;
         next(error);
         return;
+    }
+    // new member default status is 'active'
+    if (!req.body.hasOwnProperty('status')) {
+        req.body.status = 'active';
     }
 
     var members = req.db.collection("members");
@@ -243,7 +263,7 @@ router.post('/', isAuthenticated, requireRole("admin"), function (req, res, next
     });
 });
 
-router.delete ('/:memberID', isAuthenticated, requireRole("admin"), function (req, res, next) {
+router.delete ('/:memberID', helper.requireRole("admin"), function (req, res, next) {
     return next(new Error("Not implementation"));
     var members = req.db.collection("members");
     members.remove({
@@ -334,26 +354,6 @@ function getMemberBookQuantity(class_doc, member_id) {
         }
     }
     return NaN;
-};
-
-function requireRole(role) {
-    return function(req, res, next) {
-        if(req.user && req.user.role === role)
-            next();
-        else {
-            var err = new Error("没有权限执行此操作");
-            err.status = 403;
-            next(err);
-        }
-    };
-};
-
-function isAuthenticated(req, res, next) {
-    if (req.user && req.user.tenant == req.tenant.name) {
-        next()
-    } else {
-        res.status(401).send('Unauthorized Request');
-    }
 };
 
 module.exports = router;

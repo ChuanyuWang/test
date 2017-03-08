@@ -34,7 +34,9 @@ function handleLoginOK(event) {
     var loginForm = $(this).closest('form');
     var hasError = false;
     // validate the input
-    var userInfo = {};
+    var userInfo = {
+        tenant : common.getTenantName()
+    };
     userInfo.name = loginForm.find('input[name=name]').val().trim();
     if (!userInfo.name || userInfo.name.length == 0) {
         loginForm.find('input[name=name]').closest(".form-group").addClass("has-error");
@@ -52,7 +54,7 @@ function handleLoginOK(event) {
     }
 
     if (!hasError) {
-        $.ajax("api/members", {
+        $.ajax("/api/members", {
             type : "GET",
             //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
             data : userInfo,
