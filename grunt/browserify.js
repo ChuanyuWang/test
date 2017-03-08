@@ -3,6 +3,22 @@ module.exports = {
         'watch': true,
         'banner': '/* Copyright 2016-2017 Chuanyu Wang */'
     },
+    home: {
+        src: 'src/js/main.js',
+        dest: 'public/js/main.js'
+    },
+    booking: {
+        src: 'src/js/booking.js',
+        dest: 'public/js/booking.js'
+    },
+    mybooking: {
+        src: 'src/js/mybooking.js',
+        dest: 'public/js/mybooking.js'
+    },
+    mybooks: {
+        src: 'src/js/mybooks.js',
+        dest: 'public/js/myreadbooks.js'
+    },
     course: {
         src: 'src/js/course.js',
         dest: 'public/js/course.js'

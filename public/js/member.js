@@ -207,7 +207,7 @@
         var begin = moment(0);
         var end = moment().add(10, 'years');
         history_dlg.find('table').bootstrapTable('refresh', {
-            url: 'api/classes',
+            url: '/api/classes',
             query: {
                 memberid: member_id,
                 from: begin.toISOString(),

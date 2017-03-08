@@ -38,7 +38,12 @@ module.exports.checkTenantUser = function(req, res, next) {
  */
 module.exports.requireRole = function(role) {
     return function(req, res, next) {
-        if(req.isAuthenticated() && req.user.role === role)
+        if (req.isUnauthenticated()) {
+            var err = new Error("Unauthorized Request");
+            err.status = 401;
+            next(err);
+        } else if(req.user.role === role)
+            // success
             next();
         else {
             var err = new Error("没有权限执行此操作");
@@ -49,15 +54,15 @@ module.exports.requireRole = function(role) {
 };
 
 /**
- * An Express middleware to check user is authenticated by current tenant. 
- * Continue to next middleware if user is authenticated by current tenant;
+ * An Express middleware to check user is authenticated. 
+ * Continue to next middleware if user is authenticated;
  * Otherwise respond with error message and status 401.
  * 
  * @param {String} role
  * @public
  */
 module.exports.isAuthenticated = function(req, res, next) {
-    if (req.isAuthenticated() && req.user.tenant == req.tenant.name) {
+    if (req.isAuthenticated()) {
         next()
     } else {
         res.status(401).send('Unauthorized Request');

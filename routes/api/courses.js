@@ -81,7 +81,7 @@ router.get('/:courseID', function(req, res, next) {
     }
 });
 
-/// Below APIs are visible to authenticated users by current tenant
+/// Below APIs are visible to authenticated users only
 router.all(helper.isAuthenticated);
 
 /// Below APIs are only visible to authenticated users with 'admin' role

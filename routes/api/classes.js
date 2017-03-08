@@ -1,18 +1,32 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
+var util = require('../../util');
+var helper = require('../../helper');
 
 var NORMAL_FIELDS = {
     booking : 0
 };
 
-router.get('/', function (req, res) {
+router.get('/', function (req, res, next) {
+    var tenantDB = null;
+    if (req.query.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.query.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
     if (!req.query.from || !req.query.to) {
         res.status(400).send("Missing param 'from' or 'to'");
         return;
     }
 
-    var classes = req.db.collection("classes");
+    var classes = tenantDB.collection("classes");
     var query = {
         date : {
             $gte : new Date(req.query.from),
@@ -46,7 +60,10 @@ router.get('/', function (req, res) {
     });
 });
 
-router.post('/', isAuthenticated, requireRole("admin"), function (req, res) {
+/// Below APIs are visible to authenticated users by current tenant
+router.all(helper.isAuthenticated);
+
+router.post('/', helper.requireRole("admin"), function (req, res) {
     var classes = require("../../models/classes")(req.db);
     classes.insert(req.body, function (err, docs) {
         if (err) {
@@ -60,7 +77,7 @@ router.post('/', isAuthenticated, requireRole("admin"), function (req, res) {
     });
 });
 
-router.put('/:classID', isAuthenticated, requireRole("admin"), function (req, res) {
+router.put('/:classID', helper.requireRole("admin"), function (req, res) {
     var classes = req.db.collection("classes");
     classes.update({
         _id : mongojs.ObjectId(req.params.classID)
@@ -82,7 +99,7 @@ router.put('/:classID', isAuthenticated, requireRole("admin"), function (req, re
     });
 });
 // remove a class or event which reservation is zero
-router.delete ('/:classID', isAuthenticated, requireRole("admin"), function (req, res) {
+router.delete ('/:classID', helper.requireRole("admin"), function (req, res) {
     var classes = req.db.collection("classes");
     classes.remove({
         _id : mongojs.ObjectId(req.params.classID),
@@ -109,25 +126,5 @@ router.delete ('/:classID', isAuthenticated, requireRole("admin"), function (req
         }
     });
 });
-
-function requireRole(role) {
-    return function(req, res, next) {
-        if(req.user && req.user.role === role)
-            next();
-        else {
-            var err = new Error("没有权限执行此操作");
-            err.status = 403;
-            next(err);
-        }
-    };
-};
-
-function isAuthenticated(req, res, next) {
-    if (req.user && req.user.tenant == req.tenant.name) {
-        next()
-    } else {
-        res.status(401).send('Unauthorized Request');
-    }
-};
 
 module.exports = router;

@@ -42,6 +42,9 @@ function navigateToUserHome(req, res) {
     res.redirect('/' + req.user.tenant + '/home');
 }
 
+// API routers ===========================================================
+router.use('/api', require('./api'));
+
 // administrator page
 router.use('/admin', require("./admin"));
 
