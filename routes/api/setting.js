@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 var util = require('../../util');
+var helper = require('../../helper');
 
 var config_db = null;
 // initialize the 'config' database for setting router
@@ -11,19 +12,29 @@ router.use(function (req, res, next) {
 });
 
 router.get('/classrooms', function(req, res, next) {
-    // get the tenant name from url, as this api is used public
-    var tenant = req.baseUrl.split("/")[1];
+    var tenantName = null;
+    if (req.query.hasOwnProperty('tenant')) {
+        tenantName = req.query.tenant;
+    } else if (req.isAuthenticated()) {
+        // initialize the tenant db if it's authenticated user
+        tenantName = req.user.tenant;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
     config_db.collection('tenants').findOne({
-        name : tenant
+        name : tenantName
     }, function(err, doc) {
         if (err) {
-            var error = new Error("Get classroom list fails with tenant: " + tenant);
+            var error = new Error("Get classroom list fails with tenant: " + tenantName);
             error.status = 400;
             return next(error);
         }
         
         if (!doc) {
-            var error = new Error("Not found classroom with tenant: " + tenant);
+            var error = new Error("Not found classroom with tenant: " + tenantName);
             error.status = 400;
             return next(error);
         }
@@ -32,7 +43,10 @@ router.get('/classrooms', function(req, res, next) {
     });
 });
 
-router.post('/classrooms', isAuthenticated, requireRole("admin"), function(req, res, next) {
+/// Below APIs are visible to authenticated users only
+router.all(helper.isAuthenticated);
+
+router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
     //var newRoom = {id:'abc', name:''};
     if (!req.body.id) {
         var error = new Error("classroom ID is not defined");
@@ -88,7 +102,7 @@ router.post('/classrooms', isAuthenticated, requireRole("admin"), function(req, 
 });
 
 router.route('/classrooms/:roomID')
-.all(isAuthenticated, requireRole("admin"))
+.all(helper.requireRole("admin"))
 .get(function(req, res){
     //TODO, get a classroom
     next(new Error('not implemented'));
@@ -150,27 +164,6 @@ function migrateFreeClass(room, database) {
         }
         console.log("%d class is/are linked to classroom %s", result.n, room.id);
     });
-};
-
-function requireRole(role) {
-    return function(req, res, next) {
-        if(req.user && req.user.role === role)
-            next();
-        else {
-            var err = new Error("没有权限执行此操作");
-            err.status = 403;
-            next(err);
-        }
-    };
-};
-
-function isAuthenticated(req, res, next) {
-    //TODO, only the tenant's admin can modify own tenant's setting
-    if (req.user && req.user.tenant == req.tenant.name) {
-        next()
-    } else {
-        res.status(401).send('Unauthorized Request');
-    }
 };
 
 module.exports = router;

@@ -85,7 +85,7 @@
     };
 
     function addNewClassroom(room) {
-        $.ajax("api/setting/classrooms", {
+        $.ajax("/api/setting/classrooms", {
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(room),
@@ -247,7 +247,7 @@
                         return;
                     }
 
-                    $.ajax("api/setting/classrooms/" + row.id, {
+                    $.ajax("/api/setting/classrooms/" + row.id, {
                         type: "DELETE",
                         contentType: "application/json; charset=utf-8",
                         data: {},
