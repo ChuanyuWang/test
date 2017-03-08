@@ -90,7 +90,14 @@ router.get('/', function (req, res, next) {
 
 router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next) {
     var members = req.db.collection("members");
-
+    // no one can change history, even the admin
+    for (var key in req.body) {
+        if (key.indexOf('history') > -1) {
+            var error = new Error('field "history" is not able to be modified');
+            error.status = 400;
+            return next(error);
+        }
+    }
     convertDateObject(req.body);
     
     members.findAndModify({
@@ -106,8 +113,7 @@ router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next
         if (err) {
             var error = new Error("Update member fails");
             error.innerError = err;
-            next(error);
-            return;
+            return next(error);
         }
         console.log("member %s is updated by %j", req.params.memberID, req.body);
         res.json(doc);
@@ -128,8 +134,7 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
     if (!req.body.hasOwnProperty("old") && !req.body.hasOwnProperty("new")) {
         var error = new Error("Missing param 'old' or 'new'");
         error.status = 400;
-        next(error);
-        return;
+        return next(error);
     }
 
     var members = req.db.collection("members");
@@ -139,7 +144,7 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
         user : req.user.username,
         target: "membership.0.credit",
         old : parseFloat(req.body.old),
-        "new" : parseFloat(req.body.new),
+        new : parseFloat(req.body.new),
         remark : req.body.remark
     };
 
@@ -149,34 +154,29 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
         if (err) {
             var error = new Error("find member fails");
             error.innerError = err;
-            next(error);
-            return;
+            return next(error);
         }
         if (docs.length == 0) {
             var error = new Error("用户不存在");
             error.status = 400;
-            next(error);
-            return;
+            return next(error);
         }
         var member = docs[0];
         if (!member.membership || !member.membership[0]) {
             var error = new Error("用户没有建立会员卡");
             error.status = 400;
-            next(error);
-            return;
+            return next(error);
         }
         
         var membershipCard = member.membership[0];
         if (membershipCard.credit != chargeItem.old) {
             var error = new Error("充值失败，剩余课时不匹配");
             error.status = 400;
-            next(error);
-            return;
+            return next(error);
         }
         //nothing changed, just return the original member object
         if (chargeItem.old == chargeItem["new"]) {
-            res.json(member);
-            return;
+            return res.json(member);
         }
 
         members.findAndModify({
@@ -193,8 +193,7 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
             if (err) {
                 var error = new Error("charge membership card fails");
                 error.innerError = err;
-                next(error);
-                return;
+                return next(error);
             }
             console.log("charge member %s from %d to %d by %s", req.params.memberID, chargeItem.old, chargeItem["new"], chargeItem.user);
             res.json(doc);
@@ -226,15 +225,13 @@ router.get('/:memberID/history', function (req, res, next) {
         if (err) {
             var error = new Error("fail to get member charge history");
             error.innerError = err;
-            next(error);
-            return;
+            return next(error);
         }
         console.log("get member charge history");
         if (docs.length == 0) {
             var error = new Error("会员不存在");
             error.status = 400;
-            next(error);
-            return;
+            return next(error);
         }
         res.json(docs[0].history || []);
     });
@@ -244,8 +241,7 @@ router.post('/', helper.requireRole("admin"), function (req, res, next) {
     if (!req.body.name || !req.body.contact) {
         var error = new Error("Missing param 'name' or 'contact'");
         error.status = 400;
-        next(error);
-        return;
+        return next(error);
     }
     // new member default status is 'active'
     if (!req.body.hasOwnProperty('status')) {
@@ -262,15 +258,13 @@ router.post('/', helper.requireRole("admin"), function (req, res, next) {
         if (err) {
             var error = new Error("fail to find member");
             error.innerError = err;
-            next(error);
-            return;
+            return next(error);
         }
 
         if (doc) {
             var error = new Error("会员已经存在");
             error.code = 2007;
-            next(error);
-            return;
+            return next(error);
         }
 
         convertDateObject(req.body);
@@ -296,8 +290,7 @@ router.delete ('/:memberID', helper.requireRole("admin"), function (req, res, ne
         if (err) {
             var error = new Error("fail to remove member");
             error.innerError = err;
-            next(error);
-            return;
+            return next(error);
         } 
         if (result.n == 1) {
             console.log("member %s is deleted", req.params.memberID);
