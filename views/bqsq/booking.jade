@@ -13,7 +13,7 @@ block content
     function getTimeKey() {
         return #{timeKey};
     };
-  div#main.container(style='padding-left:7px;padding-right:7px')
+  div#topbar.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
       img.col-xs-9.center-block(src='/img/logo-2x.png',style="padding:0px;width:200px")
       div.col-xs-3.pull-right(style="padding:0px;margin:14px 9px")
@@ -30,6 +30,7 @@ block content
         button#next_week.btn.btn-default.btn-xs 下一周
       div(style='float:right;padding-right:9px')
         a#showMyBooking.btn.btn-success.btn-xs(href='mybooking') 我的课程
+  div#main.container(style='padding-left:7px;padding-right:7px;overflow-y:auto')
       
   div#book_dlg.modal(tabindex='-1',data-backdrop='static')
     div.modal-dialog.modal-sm

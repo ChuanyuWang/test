@@ -80,6 +80,15 @@ function init() {
     //bootbox.setLocale('zh_CN');
     //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
     currentMonday = getMonday(moment());
+
+    // set the height of #main div to enable div scroll bar instead of body scroll bar
+    $('#main').height(window.innerHeight - $('#topbar').height() - 2);
+
+    /*去掉iphone手机滑动默认行为
+    $('body').on('touchmove', function (event) {
+        event.preventDefault();
+    });*/
+
     // select the specific classroom in the dropdown list
     var room = getParam('classroom');
     if (room) {
@@ -334,6 +343,7 @@ function updateSchedule(control) {
             if (!data.length) {
                 displayNoClassWarning(begin);
             }
+            scrollToToday();
         },
         error : function (jqXHR, status, err) {
             console.error(jqXHR.responseText);
@@ -347,6 +357,17 @@ function updateSchedule(control) {
     });
 };
 
+function scrollToToday() {
+    var coordinate = $('div.class-row button[disabled!=disabled]').offset();
+    if (coordinate) {
+        var container = $('#main');
+        var position = coordinate.top - container.offset().top + container.scrollTop();
+        container.animate({
+            scrollTop: position
+        }, 1000);
+    }
+};
+
 function displayNoClassWarning(Monday) {
     var list = $('#main');
     // add separator bar
@@ -357,8 +378,9 @@ function displayNoClassWarning(Monday) {
 
 function clearSchedule() {
     // remove all classes and separators
-    $('.class-row,.class-separator').remove();
-    $('.alert-warning').remove();
+    $('#main .class-separator').remove();
+    $('#main .class-row').remove();
+    $('#main .alert-warning').remove();
 };
 
 function getAgeLimit(cls) {
