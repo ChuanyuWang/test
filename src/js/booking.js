@@ -82,7 +82,18 @@ function init() {
     // set the height of #main div to enable div scroll bar instead of body scroll bar
     $('#main').height(window.innerHeight - $('#topbar').height() - 2);
 
-    /*去掉iphone手机滑动默认行为
+    /* fix topbar at the top of screen when scroll down
+    $(window).scroll(this, function (event) {
+        //console.log(event);
+        var position = $(event.currentTarget).scrollTop();
+        if (position > 68) {
+            $('#weekbtns').addClass('float-banner');
+        } else {
+            $('#weekbtns').removeClass('float-banner');
+        }
+    })
+    */
+    /* 去掉iphone手机滑动默认行为
     $('body').on('touchmove', function (event) {
         event.preventDefault();
     });*/
