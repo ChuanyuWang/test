@@ -8,7 +8,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'less',
-    'browserify'
+    'browserify',
+    'uglify'
   ]);
 
   grunt.registerTask('default', [

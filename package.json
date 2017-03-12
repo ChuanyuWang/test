@@ -1,7 +1,7 @@
 {
-  "name": "eshop",
-  "version": "0.5.1",
-  "description": "A mini on-line store",
+  "name": "e-education",
+  "version": "0.5.3",
+  "description": "On-line course management",
   "private": true,
   "main": "app.js",
   "scripts": {
@@ -33,6 +33,7 @@
     "grunt": "~1.0.1",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-less": "~1.4.0",
+    "grunt-contrib-uglify": "^2.2.0",
     "grunt-contrib-watch": "~1.0.0",
     "grunt-develop": "^0.4.0",
     "load-grunt-config": "^0.19.2",
