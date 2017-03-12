@@ -48,7 +48,7 @@
     "express"
   ],
   "author": "Chuanyu Wang",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/ChuanyuWang/test/issues"
   },
