@@ -94,9 +94,11 @@ function init() {
     })
     */
     /* 去掉iphone手机滑动默认行为
-    $('body').on('touchmove', function (event) {
-        event.preventDefault();
-    });*/
+    var handleMove = function (e) {
+        if($(e.target).closest('.scrollable').length == 0) { e.preventDefault(); }
+    }
+    document.addEventListener('touchmove', handleMove, true);
+    */
 
     // select the specific classroom in the dropdown list
     var room = getParam('classroom');
@@ -367,10 +369,16 @@ function updateSchedule(control) {
 };
 
 function scrollToToday() {
-    var coordinate = $('div.class-row button[disabled!=disabled]').offset();
-    if (coordinate) {
+    var btns = $('div.class-row button[disabled!=disabled]');
+    if (btns.length > 0) {
         var container = $('#main');
-        var position = coordinate.top - container.offset().top + container.scrollTop();
+        var h = btns.height();
+        var coordinate = btns.offset();
+        if (coordinate.top - container.offset().top < h) {
+            // it's the first element in the list, no need scroll
+            return;
+        }
+        var position = coordinate.top - 7 - container.offset().top + container.scrollTop();
         container.animate({
             scrollTop: position
         }, 1000);
