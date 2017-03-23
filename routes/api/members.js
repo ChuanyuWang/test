@@ -5,17 +5,17 @@ var helper = require('../../helper');
 var util = require('../../util');
 
 var NORMAL_FIELDS = {
-    status : 1,
-    since : 1,
-    name : 1,
-    contact : 1,
-    birthday : 1,
-    expire : 1,
-    note : 1,
-    membership : 1
+    status: 1,
+    since: 1,
+    name: 1,
+    contact: 1,
+    birthday: 1,
+    expire: 1,
+    note: 1,
+    membership: 1
 };
 
-router.post('/validate', function (req, res, next) {
+router.post('/validate', function(req, res, next) {
     var tenantDB = null;
     if (req.body.hasOwnProperty('tenant')) {
         tenantDB = util.connect(req.body.tenant);
@@ -39,10 +39,10 @@ router.post('/validate', function (req, res, next) {
     }
 
     var members = tenantDB.collection("members");
-    members.findOne(query, NORMAL_FIELDS, function (err, doc) {
+    members.findOne(query, NORMAL_FIELDS, function(err, doc) {
         if (err) {
             res.status(500).json({
-                'err' : err
+                'err': err
             });
             return;
         }
@@ -54,7 +54,7 @@ router.post('/validate', function (req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', function (req, res, next) {
+router.get('/', function(req, res, next) {
     var members = req.db.collection("members");
     var query = {};
     if (req.query.name) {
@@ -66,7 +66,7 @@ router.get('/', function (req, res, next) {
     // "null" is the keyword indicate display all members
     if (req.query.filter && req.query.filter != "null") {
         //TODO, support multi membership card
-        query["membership"] = { $size : 1 };
+        query["membership"] = { $size: 1 };
         query["membership.type"] = "LIMITED";
         query["membership.room"] = [req.query.filter];
     }
@@ -75,20 +75,20 @@ router.get('/', function (req, res, next) {
         query["status"] = req.query.status;
     }
     members.find(query, NORMAL_FIELDS).sort({
-        since : -1
-    }, function (err, docs) {
+        since: -1
+    }, function(err, docs) {
         if (err) {
             res.status(500).json({
-                'err' : err
+                'err': err
             });
             return;
         }
-        console.log("find members: ", docs?docs.length:0);
+        console.log("find members: ", docs ? docs.length : 0);
         res.json(docs);
     });
 });
 
-router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next) {
+router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next) {
     var members = req.db.collection("members");
     // no one can change history, even the admin
     for (var key in req.body) {
@@ -96,20 +96,24 @@ router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next
             var error = new Error('field "history" is not able to be modified');
             error.status = 400;
             return next(error);
-        }
+        }/* else if (key.indexOf('membership') > -1) {
+            var error = new Error('field "membership" has to be updated by "/memberships" API');
+            error.status = 400;
+            return next(error);
+        }*/
     }
     convertDateObject(req.body);
-    
+
     members.findAndModify({
         query: {
-            _id : mongojs.ObjectId(req.params.memberID)
+            _id: mongojs.ObjectId(req.params.memberID)
         },
-        update: { 
+        update: {
             $set: req.body
         },
         fields: NORMAL_FIELDS,
         new: true
-    }, function (err, doc, lastErrorObject) {
+    }, function(err, doc, lastErrorObject) {
         if (err) {
             var error = new Error("Update member fails");
             error.innerError = err;
@@ -130,7 +134,7 @@ router.patch('/:memberID', helper.requireRole("admin"), function (req, res, next
     "remark" : "****"
 }
 */
-router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res, next) {
+router.post('/:memberID/charge', helper.requireRole("admin"), function(req, res, next) {
     if (!req.body.hasOwnProperty("old") && !req.body.hasOwnProperty("new")) {
         var error = new Error("Missing param 'old' or 'new'");
         error.status = 400;
@@ -140,17 +144,17 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
     var members = req.db.collection("members");
 
     var chargeItem = {
-        date : new Date(),
-        user : req.user.username,
+        date: new Date(),
+        user: req.user.username,
         target: "membership.0.credit",
-        old : parseFloat(req.body.old),
-        new : parseFloat(req.body.new),
-        remark : req.body.remark
+        old: parseFloat(req.body.old),
+        new: parseFloat(req.body.new),
+        remark: req.body.remark
     };
 
     members.find({
-        _id : mongojs.ObjectId(req.params.memberID)
-    }, NORMAL_FIELDS, function (err, docs) {
+        _id: mongojs.ObjectId(req.params.memberID)
+    }, NORMAL_FIELDS, function(err, docs) {
         if (err) {
             var error = new Error("find member fails");
             error.innerError = err;
@@ -167,7 +171,7 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
             error.status = 400;
             return next(error);
         }
-        
+
         var membershipCard = member.membership[0];
         if (membershipCard.credit != chargeItem.old) {
             var error = new Error("充值失败，剩余课时不匹配");
@@ -181,15 +185,15 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
 
         members.findAndModify({
             query: {
-                _id : mongojs.ObjectId(req.params.memberID)
+                _id: mongojs.ObjectId(req.params.memberID)
             },
-            update: { 
-                $set: {"membership.0.credit" : chargeItem["new"]},
-                $push : {history : chargeItem}
+            update: {
+                $set: { "membership.0.credit": chargeItem["new"] },
+                $push: { history: chargeItem }
             },
             fields: NORMAL_FIELDS,
             new: true
-        }, function (err, doc, lastErrorObject) {
+        }, function(err, doc, lastErrorObject) {
             if (err) {
                 var error = new Error("charge membership card fails");
                 error.innerError = err;
@@ -216,12 +220,12 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function (req, res
     }]
 }
 */
-router.get('/:memberID/history', function (req, res, next) {
+router.get('/:memberID/history', function(req, res, next) {
     var members = req.db.collection("members");
 
     members.find({
-        _id : mongojs.ObjectId(req.params.memberID)
-    }, {"history" : 1}, function (err, docs) {
+        _id: mongojs.ObjectId(req.params.memberID)
+    }, { "history": 1 }, function(err, docs) {
         if (err) {
             var error = new Error("fail to get member charge history");
             error.innerError = err;
@@ -237,7 +241,7 @@ router.get('/:memberID/history', function (req, res, next) {
     });
 });
 
-router.post('/', helper.requireRole("admin"), function (req, res, next) {
+router.post('/', helper.requireRole("admin"), function(req, res, next) {
     if (!req.body.name || !req.body.contact) {
         var error = new Error("Missing param 'name' or 'contact'");
         error.status = 400;
@@ -250,11 +254,11 @@ router.post('/', helper.requireRole("admin"), function (req, res, next) {
 
     var members = req.db.collection("members");
     var query = {
-        name : req.body.name,
-        contact : req.body.contact
+        name: req.body.name,
+        contact: req.body.contact
     };
-    
-    members.findOne(query, function(err, doc){
+
+    members.findOne(query, function(err, doc) {
         if (err) {
             var error = new Error("fail to find member");
             error.innerError = err;
@@ -268,7 +272,7 @@ router.post('/', helper.requireRole("admin"), function (req, res, next) {
         }
 
         convertDateObject(req.body);
-        members.insert(req.body, function(err, docs){
+        members.insert(req.body, function(err, docs) {
             if (err) {
                 var error = new Error("fail to add member");
                 error.innerError = err;
@@ -281,17 +285,95 @@ router.post('/', helper.requireRole("admin"), function (req, res, next) {
     });
 });
 
-router.delete ('/:memberID', helper.requireRole("admin"), function (req, res, next) {
+router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
+    var members = req.db.collection("members");
+    convertDateObject(req.body);
+    members.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.memberID)
+        },
+        update: {
+            $push: { membership: req.body }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Create membership fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("membership %s is created by %j", req.params.memberID, req.body);
+        res.json(doc);
+    });
+});
+
+router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), function(req, res, next) {
+    var members = req.db.collection("members");
+    convertDateObject(req.body);
+    convertNumberValue(req.body);
+
+    members.findOne({
+        _id: mongojs.ObjectId(req.params.memberID)
+    }, { membership: 1 }, function(err, doc) {
+        if (err) {
+            var error = new Error("find member fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var error = new Error("用户不存在");
+            error.status = 400;
+            return next(error);
+        }
+        if (!doc.membership || !doc.membership[req.params.cardIndex]) {
+            var error = new Error("没有找到指定会员卡，请先建立会员卡");
+            error.status = 400;
+            return next(error);
+        }
+        var membershipCard = doc.membership[req.params.cardIndex];
+
+        var setQuery = {}, historyItems = [];
+        genMembershipSetQueries(req.user.username, req.param.cardIndex, membershipCard, req.body, setQuery, historyItems);
+
+        //nothing changed, just return the original member object
+        if (Object.keys(setQuery).length === 0) {
+            return res.json(member);
+        }
+
+        members.findAndModify({
+            query: {
+                _id: mongojs.ObjectId(req.params.memberID)
+            },
+            update: {
+                $set: setQuery,
+                $push: { history: {$each: historyItems }}
+            },
+            fields: NORMAL_FIELDS,
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if (err) {
+                var error = new Error("update membership card fails");
+                error.innerError = err;
+                return next(error);
+            }
+            console.log("update member %s by %s successfully", req.params.memberID, chargeItem.user);
+            res.json(doc);
+        });
+    });
+});
+
+router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
     return next(new Error("Not implementation"));
     var members = req.db.collection("members");
     members.remove({
-        _id : mongojs.ObjectId(req.params.memberID)
-    }, true, function (err, result) {
+        _id: mongojs.ObjectId(req.params.memberID)
+    }, true, function(err, result) {
         if (err) {
             var error = new Error("fail to remove member");
             error.innerError = err;
             return next(error);
-        } 
+        }
         if (result.n == 1) {
             console.log("member %s is deleted", req.params.memberID);
             /*
@@ -334,13 +416,32 @@ router.delete ('/:memberID', helper.requireRole("admin"), function (req, res, ne
     });
 });
 
+/**
+ * make sure the Number field is stored as Number
+ * @param {Object} doc 
+ */
+function convertNumberValue(doc) {
+    if (!doc) {
+        return doc;
+    }
+    if (doc.hasOwnProperty('credit')) {
+        doc['credit'] = parseFloat(doc['credit']);
+    }
+};
+
+/**
+ * make sure the datetime object is stored as ISODate
+ * @param {Object} doc 
+ */
 function convertDateObject(doc) {
     if (!doc) {
         return doc;
     }
-    // make sure the datetime object is stored as ISODate
     if (doc.hasOwnProperty("membership.0.expire")) {
         doc["membership.0.expire"] = new Date(doc["membership.0.expire"]);
+    }
+    if (doc.hasOwnProperty("expire")) {
+        doc["expire"] = new Date(doc["expire"]);
     }
     if (doc.birthday) {
         doc.birthday = new Date(doc.birthday);
@@ -360,12 +461,30 @@ function convertDateObject(doc) {
     return doc;
 };
 
+function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems) {
+    for (var key in newItem) {
+        if (current.hasOwnProperty(key) && current[key] == newItem[key]) {
+            // skip update of this field
+            continue;
+        }
+        var targetField = 'membership' + cardIndex + key;
+        setQuery[targetField] = newItem[key];
+        historyItems.push({
+            date: new Date(),
+            user: username,
+            target: targetField,
+            old: current[key],
+            new: newItem[key]
+        });
+    }
+};
+
 function getMemberBookQuantity(class_doc, member_id) {
     if (!class_doc || !class_doc.booking) {
         return NaN;
     }
     // find the booking quantity of member
-    for (var i=0;i<class_doc.booking.length;i++) {
+    for (var i = 0; i < class_doc.booking.length; i++) {
         if (class_doc.booking[i].member == member_id) {
             return class_doc.booking[i].quantity;
         }
