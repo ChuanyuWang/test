@@ -1,10 +1,10 @@
-(function ($) {
+(function($) {
 
     // DOM Ready =============================================================
-    $(document).ready(function () {
+    $(document).ready(function() {
         init();
 
-        $('#member_dlg').on('show.bs.modal', function (event) {
+        $('#member_dlg').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             if (button.data('action') == "add") {
                 // create a new member
@@ -43,7 +43,7 @@
             }
         });
 
-        $('#member_dlg').on('shown.bs.modal', function (event) {
+        $('#member_dlg').on('shown.bs.modal', function(event) {
             $(this).find('input[name=name]').focus(); // focus on the member name input control
         });
 
@@ -71,7 +71,7 @@
             defaultDate: moment().add(6, 'months')
         });
 
-        $('#member_table').on("page-change.bs.table", function (number, size) {
+        $('#member_table').on("page-change.bs.table", function(number, size) {
             //uncheck all the selected rows to fix the radio column only take effects in one page
             var items = $('#member_table').bootstrapTable('getSelections');
             for (var i = 0; i < items.length; i++) {
@@ -79,7 +79,7 @@
             }
         });
 
-        $('#membership_dlg select[name=card_type]').change(function (event) {
+        $('#membership_dlg select[name=card_type]').change(function(event) {
             if ($(this).find('option:selected').val() == 'ALL') {
                 $('#membership_dlg #roomlist input').prop('checked', true);
                 $('#membership_dlg #roomlist input').prop('disabled', true);
@@ -150,10 +150,10 @@
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(member),
-            success: function (data) {
+            success: function(data) {
                 $('#member_table').bootstrapTable('insertRow', { index: 0, row: data });
             },
-            error: function (jqXHR, status, err) {
+            error: function(jqXHR, status, err) {
                 bootbox.dialog({
                     message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title: "添加会员失败",
@@ -175,10 +175,10 @@
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(member),
-            success: function (doc) {
+            success: function(doc) {
                 $('#member_table').bootstrapTable('updateByUniqueId', { id: id, row: doc });
             },
-            error: function (jqXHR, status, err) {
+            error: function(jqXHR, status, err) {
                 bootbox.dialog({
                     message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title: "修改会员失败",
@@ -238,7 +238,7 @@
 
         }
         // get limited classrooms
-        modal.find('#roomlist input:checked').each(function (index, element) {
+        modal.find('#roomlist input:checked').each(function(index, element) {
             memberCard.room.push($(this).val());
         });
 
@@ -246,28 +246,16 @@
             return;
         }
 
-        //check the member has membership card
-        if (member && member.membership && member.membership.length > 0) {
-            //TODO, support multi membership card in the future
-            var updateOps = {
-                "membership.0.expire": memberCard.expire,
-                "membership.0.type": memberCard.type,
-                "membership.0.room": memberCard.room
-            };
-        } else {
-            memberCard.credit = 0;
-            var updateOps = { "membership": [memberCard] };
-        }
-
-        $.ajax("/api/members/" + member_id, {
+        //TODO, support multi membership card in the future
+        $.ajax("/api/members/" + member_id + '/memberships/0', {
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(updateOps),
-            success: function (doc) {
+            data: JSON.stringify(memberCard),
+            success: function(doc) {
                 $('#member_table').bootstrapTable('updateByUniqueId', { id: member_id, row: doc });
                 modal.modal('hide');
             },
-            error: function (jqXHR, status, err) {
+            error: function(jqXHR, status, err) {
                 bootbox.dialog({
                     message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title: "修改会员卡失败",
@@ -286,47 +274,79 @@
 
     // event handler defined in home.jade file for removing booking item
     window.editMembership = {
-        'click .membership': function (e, value, row, index) {
-            var modal = $('#membership_dlg').data('id', row._id);
-
+        'click .membership': function(e, value, row, index) {
             if (row.membership && row.membership.length > 0) {
-                var membership = row.membership[0];
+                openEditMembershipCardDlg(row);
             } else {
-                // ghost card
-                var membership = {
-                    credit: 0,
-                    // the default expire date is 3 months later
-                    expire: moment().add(3, 'months'),
-                    room: [],
-                    type: null
-                };
+                // confirm to create membership card
+                bootbox.confirm('为此会员创建会员卡吗？', function(ok) {
+                    if (!ok) return;
+                    var request = $.ajax("/api/members/" + row._id + "/memberships", {
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({
+                            credit: 0,
+                            // the default expire date is 3 months later
+                            expire: moment().add(3, 'months'),
+                            room: [],
+                            type: 'ALL'
+                        }),
+                        dataType: "json"
+                    });
+                    request.done(function(data, textStatus, jqXHR) {
+                        $('#member_table').bootstrapTable('updateByUniqueId', { id: row._id, row: data });
+                        // show membership card dialog
+                        openEditMembershipCardDlg(data);
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        // alert dialog with danger button
+                        bootbox.dialog({
+                            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                            title: "创建会员卡失败",
+                            buttons: {
+                                ok: {
+                                    label: "确定",
+                                    className: "btn-danger"
+                                }
+                            }
+                        });
+                    });
+                })
             }
-            modal.find('#name').text(row.name);
-            modal.find('#credit').text(Math.round(membership.credit * 10) / 10 || 0);
-            modal.find('#expire_date').data('DateTimePicker').date(moment(membership.expire));
-            modal.find('#roomlist input').prop('disabled', false);
-            modal.find('#roomlist input').prop('checked', false);
-            modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
-            if (membership.type) {
-                modal.find('select[name=card_type] option[value=' + membership.type + ']').prop('selected', true);
-                // update classroom check box
-                switch (membership.type) {
-                    case "ALL":
-                        modal.find('#roomlist input').prop('checked', true);
-                        modal.find('#roomlist input').prop('disabled', true);
-                        break;
-                    case "LIMITED":
-                        for (var index in membership.room) {
-                            modal.find('#roomlist input[value=' + membership.room[index] + ']').prop('checked', true);
-                        }
-                        break;
-                }
-            } else {
-                modal.find('select[name=card_type]').prop('selectedIndex', -1);
-            }
-
-            $('#membership_dlg').modal('show');
         }
+    };
+
+    function openEditMembershipCardDlg(member) {
+        if (member.membership && member.membership.length > 0) {
+            var membership = member.membership[0];
+        }
+        if (!membership) return;
+
+        var modal = $('#membership_dlg').data('id', member._id);
+        modal.find('#name').text(member.name);
+        modal.find('#credit').text(Math.round(membership.credit * 10) / 10 || 0);
+        modal.find('#expire_date').data('DateTimePicker').date(moment(membership.expire));
+        modal.find('#roomlist input').prop('disabled', false);
+        modal.find('#roomlist input').prop('checked', false);
+        modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
+        if (membership.type) {
+            modal.find('select[name=card_type] option[value=' + membership.type + ']').prop('selected', true);
+            // update classroom check box
+            switch (membership.type) {
+                case "ALL":
+                    modal.find('#roomlist input').prop('checked', true);
+                    modal.find('#roomlist input').prop('disabled', true);
+                    break;
+                case "LIMITED":
+                    for (var index in membership.room) {
+                        modal.find('#roomlist input[value=' + membership.room[index] + ']').prop('checked', true);
+                    }
+                    break;
+            }
+        } else {
+            modal.find('select[name=card_type]').prop('selectedIndex', -1);
+        }
+
+        $('#membership_dlg').modal('show');
     };
 
     function openChargeDlg(event) {
@@ -351,7 +371,7 @@
         charge_dlg.modal('show');
 
         charge_dlg.find("button#ok").off("click");
-        charge_dlg.find("button#ok").click(function (event) {
+        charge_dlg.find("button#ok").click(function(event) {
             var newVal = parseFloat(charge_dlg.find('input[name=charge]').val());
             if (isNaN(newVal)) {
                 return charge_dlg.find('input[name=charge]').closest(".form-group").addClass("has-error");
@@ -367,11 +387,11 @@
                     "new": credit + newVal,
                     "remark": charge_dlg.find('input[name=remark]').val().trim()
                 }),
-                success: function (doc) {
+                success: function(doc) {
                     $('#member_table').bootstrapTable('updateByUniqueId', { id: member_id, row: doc });
                     charge_dlg.modal('hide');
                 },
-                error: function (jqXHR, status, err) {
+                error: function(jqXHR, status, err) {
                     bootbox.dialog({
                         message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                         title: "会员卡充值失败",
@@ -389,7 +409,7 @@
         });
     };
 
-    window.customQuery = function (params) {
+    window.customQuery = function(params) {
         // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
         var filter = $("#filter_dlg input:checked").val();
         params.filter = filter;
@@ -421,7 +441,7 @@
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({ 'status': status }),
-            complete: function (jqXHR, status) {
+            complete: function(jqXHR, status) {
                 //TODO
             },
             dataType: "json"
@@ -438,16 +458,16 @@
 
         bootbox.confirm({
             message: "确定激活选中会员吗？",
-            callback: function (result) {
+            callback: function(result) {
                 if (!result) { // user cancel
                     return;
                 }
                 // activate all selected members one by one, and update the table
-                $.each(items, function (index, item) {
+                $.each(items, function(index, item) {
                     var request = updateMemberStatus(item._id, 'active');
-                    request.done(function (data, textStatus, jqXHR) {
+                    request.done(function(data, textStatus, jqXHR) {
                         $('#member_table').bootstrapTable('removeByUniqueId', data._id);
-                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
                         // alert dialog with danger button
                         bootbox.dialog({
                             message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
@@ -480,16 +500,16 @@
 
         bootbox.confirm({
             message: "确定停用选中会员吗？<br><small>停用后，此会员将无法进行自助预约</small>",
-            callback: function (result) {
+            callback: function(result) {
                 if (!result) { // user cancel
                     return;
                 }
                 // deactivate all selected members one by one, and update the table
-                $.each(items, function (index, item) {
+                $.each(items, function(index, item) {
                     var request = updateMemberStatus(item._id, 'inactive');
-                    request.done(function (data, textStatus, jqXHR) {
+                    request.done(function(data, textStatus, jqXHR) {
                         $('#member_table').bootstrapTable('removeByUniqueId', data._id);
-                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
                         // alert dialog with danger button
                         bootbox.dialog({
                             message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,

@@ -96,11 +96,11 @@ router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next)
             var error = new Error('field "history" is not able to be modified');
             error.status = 400;
             return next(error);
-        }/* else if (key.indexOf('membership') > -1) {
+        } else if (key.indexOf('membership') > -1) {
             var error = new Error('field "membership" has to be updated by "/memberships" API');
             error.status = 400;
             return next(error);
-        }*/
+        }
     }
     convertDateObject(req.body);
 
@@ -288,6 +288,7 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
     var members = req.db.collection("members");
     convertDateObject(req.body);
+    convertNumberValue(req.body);
     members.findAndModify({
         query: {
             _id: mongojs.ObjectId(req.params.memberID)
@@ -304,6 +305,21 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
             return next(error);
         }
         console.log("membership %s is created by %j", req.params.memberID, req.body);
+        // update the history when a new membership card is added
+        var setQuery = {}, historyItems = [];
+        genMembershipSetQueries(req.user.username, doc.membership.length - 1, {}, req.body, setQuery, historyItems);
+        members.update({
+            _id: mongojs.ObjectId(req.params.memberID)
+        }, {
+            $push: {
+                history: {
+                    $each: historyItems
+                }
+            }
+        }, function(err, result) {
+            if (err) console.error(err);
+            console.log('update history by creating new card %j', result);
+        });
         res.json(doc);
     });
 });
@@ -334,12 +350,15 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
         var membershipCard = doc.membership[req.params.cardIndex];
 
         var setQuery = {}, historyItems = [];
-        genMembershipSetQueries(req.user.username, req.param.cardIndex, membershipCard, req.body, setQuery, historyItems);
+        genMembershipSetQueries(req.user.username, req.params.cardIndex, membershipCard, req.body, setQuery, historyItems);
 
         //nothing changed, just return the original member object
         if (Object.keys(setQuery).length === 0) {
             return res.json(member);
         }
+
+        console.log(setQuery);
+        console.log(historyItems);
 
         members.findAndModify({
             query: {
@@ -347,7 +366,7 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
             },
             update: {
                 $set: setQuery,
-                $push: { history: {$each: historyItems }}
+                $push: { history: { $each: historyItems } }
             },
             fields: NORMAL_FIELDS,
             new: true
@@ -357,7 +376,7 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
                 error.innerError = err;
                 return next(error);
             }
-            console.log("update member %s by %s successfully", req.params.memberID, chargeItem.user);
+            console.log("update member %s by %s successfully", req.params.memberID, req.user.username);
             res.json(doc);
         });
     });
@@ -463,17 +482,18 @@ function convertDateObject(doc) {
 
 function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems) {
     for (var key in newItem) {
+        //TODO, compare two objects 
         if (current.hasOwnProperty(key) && current[key] == newItem[key]) {
             // skip update of this field
             continue;
         }
-        var targetField = 'membership' + cardIndex + key;
+        var targetField = 'membership.' + cardIndex + '.' + key;
         setQuery[targetField] = newItem[key];
         historyItems.push({
             date: new Date(),
             user: username,
             target: targetField,
-            old: current[key],
+            old: current.hasOwnProperty(key) ? current[key] : null,
             new: newItem[key]
         });
     }
