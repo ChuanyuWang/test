@@ -215,29 +215,28 @@ router.post('/:memberID/charge', helper.requireRole("admin"), function(req, res,
             "date": "2016-1-1",
             "target": "membership.0.credit",
             "old": 4,
-            "new": 14,
-            "remark" : "****"
+            "new": 14
     }]
 }
 */
 router.get('/:memberID/history', function(req, res, next) {
     var members = req.db.collection("members");
 
-    members.find({
+    members.findOne({
         _id: mongojs.ObjectId(req.params.memberID)
-    }, { "history": 1 }, function(err, docs) {
+    }, { "history": 1 }, function(err, doc) {
         if (err) {
-            var error = new Error("fail to get member charge history");
+            var error = new Error("fail to get member history");
             error.innerError = err;
             return next(error);
         }
-        console.log("get member charge history");
-        if (docs.length == 0) {
+        console.log("get member history");
+        if (!doc) {
             var error = new Error("会员不存在");
             error.status = 400;
             return next(error);
         }
-        res.json(docs[0].history || []);
+        res.json(doc.history || []);
     });
 });
 
@@ -354,7 +353,7 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
 
         //nothing changed, just return the original member object
         if (Object.keys(setQuery).length === 0) {
-            return res.json(member);
+            return res.json(doc);
         }
 
         console.log(setQuery);
@@ -482,9 +481,8 @@ function convertDateObject(doc) {
 
 function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems) {
     for (var key in newItem) {
-        //TODO, compare two objects 
-        if (current.hasOwnProperty(key) && current[key] == newItem[key]) {
-            // skip update of this field
+        if (current.hasOwnProperty(key) && isEqual(current[key], newItem[key])) {
+            // skip update of this field when it's the same
             continue;
         }
         var targetField = 'membership.' + cardIndex + '.' + key;
@@ -497,6 +495,18 @@ function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery
             new: newItem[key]
         });
     }
+};
+
+function isEqual(a, b) {
+    if (a === b) return true;
+    if (a.constructor === Date && b.constructor === Date) return a.getTime() === b.getTime();
+    if (a.constructor === Array && b.constructor === Array) {
+        if (a.length != b.length) return false;
+        else return a.every(function(u, i) {
+            return u == b[i];
+        });
+    }
+    return a == b;
 };
 
 function getMemberBookQuantity(class_doc, member_id) {

@@ -242,9 +242,7 @@
             memberCard.room.push($(this).val());
         });
 
-        if (hasError) {
-            return;
-        }
+        if (hasError) return;
 
         //TODO, support multi membership card in the future
         $.ajax("/api/members/" + member_id + '/memberships/0', {
