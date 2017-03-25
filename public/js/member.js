@@ -88,7 +88,7 @@
             }
         });
         // listen to the action button on modal dialogs
-        $('#membership_dlg button#charge_btn').click(openChargeDlg);
+        $('#membership_dlg button#log_btn').click(openChangeLogDlg);
         $('#membership_dlg button#ok').click(updateMemberShip);
     };
 
@@ -242,6 +242,19 @@
             memberCard.room.push($(this).val());
         });
 
+        // get charge value
+        var newVal = parseFloat(modal.find('input[name=charge]').val());
+        if (isNaN(newVal)) {
+            modal.find('input[name=charge]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('input[name=charge]').closest(".form-group").removeClass("has-error");
+            if (newVal != 0) {
+                memberCard.credit = member.membership[0].credit;
+                memberCard.credit += newVal;
+            }
+        }
+
         if (hasError) return;
 
         //TODO, support multi membership card in the future
@@ -285,7 +298,7 @@
                         data: JSON.stringify({
                             credit: 0,
                             // the default expire date is 3 months later
-                            expire: moment().add(3, 'months'),
+                            expire: moment().add(3, 'months').hours(0).minutes(0).seconds(0).millisecond(0),
                             room: [],
                             type: 'ALL'
                         }),
@@ -322,6 +335,7 @@
         var modal = $('#membership_dlg').data('id', member._id);
         modal.find('#name').text(member.name);
         modal.find('#credit').text(Math.round(membership.credit * 10) / 10 || 0);
+        modal.find('input[name=charge]').val(0).closest(".form-group").removeClass("has-error");
         modal.find('#expire_date').data('DateTimePicker').date(moment(membership.expire));
         modal.find('#roomlist input').prop('disabled', false);
         modal.find('#roomlist input').prop('checked', false);
@@ -347,64 +361,19 @@
         $('#membership_dlg').modal('show');
     };
 
-    function openChargeDlg(event) {
+    function openChangeLogDlg(event) {
         var memberCard_dlg = $(this).closest('.modal');
         var member_id = memberCard_dlg.data('id');
         memberCard_dlg.modal('hide');
         var member = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
-        var credit = 0;
-        if (member.membership && member.membership[0]) {
-            credit = member.membership[0].credit || 0;
-        }
 
         // set the member id
-        var charge_dlg = $('#charge_dlg');
-        charge_dlg.find('p#name').text(member.name);
-        charge_dlg.find('p#credit').text(Math.round(credit * 10) / 10);
-        charge_dlg.find('input[name=charge]').val(0).closest(".form-group").removeClass("has-error");;
-        charge_dlg.find('input[name=remark]').val(null).closest(".form-group").removeClass("has-error");;
-        // refresh the change history
-        charge_dlg.find('table').bootstrapTable('refresh', { url: '/api/members/' + member_id + '/history' });
+        var changeLogDlg = $('#changeLog_dlg');
+        changeLogDlg.find('#name').text(member.name);
+        // refresh the change log
+        changeLogDlg.find('table').bootstrapTable('refresh', { url: '/api/members/' + member_id + '/history' });
         // show the dialog in the end
-        charge_dlg.modal('show');
-
-        charge_dlg.find("button#ok").off("click");
-        charge_dlg.find("button#ok").click(function(event) {
-            var newVal = parseFloat(charge_dlg.find('input[name=charge]').val());
-            if (isNaN(newVal)) {
-                return charge_dlg.find('input[name=charge]').closest(".form-group").addClass("has-error");
-            } else if (newVal != 0) {
-                //TODO, remark is required???
-            }
-            $.ajax("/api/members/" + member_id + "/charge", {
-                type: "POST",
-                contentType: "application/json; charset=utf-8",
-                //TODO, support multi membership card in the future
-                data: JSON.stringify({
-                    "old": credit,
-                    "new": credit + newVal,
-                    "remark": charge_dlg.find('input[name=remark]').val().trim()
-                }),
-                success: function(doc) {
-                    $('#member_table').bootstrapTable('updateByUniqueId', { id: member_id, row: doc });
-                    charge_dlg.modal('hide');
-                },
-                error: function(jqXHR, status, err) {
-                    bootbox.dialog({
-                        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                        title: "会员卡充值失败",
-                        buttons: {
-                            danger: {
-                                label: "确定",
-                                className: "btn-danger",
-                            }
-                        }
-                    });
-                    //console.error(jqXHR);
-                },
-                dataType: "json"
-            });
-        });
+        changeLogDlg.modal('show');
     };
 
     window.customQuery = function(params) {

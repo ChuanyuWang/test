@@ -124,104 +124,18 @@ router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next)
     });
 });
 
-/*
-{
-    "user": "yezhi",
-    "date": "2016-1-1",
-    "target": "membership.0.credit",
-    "old": 4,
-    "new": 14,
-    "remark" : "****"
-}
-*/
-router.post('/:memberID/charge', helper.requireRole("admin"), function(req, res, next) {
-    if (!req.body.hasOwnProperty("old") && !req.body.hasOwnProperty("new")) {
-        var error = new Error("Missing param 'old' or 'new'");
-        error.status = 400;
-        return next(error);
-    }
-
-    var members = req.db.collection("members");
-
-    var chargeItem = {
-        date: new Date(),
-        user: req.user.username,
-        target: "membership.0.credit",
-        old: parseFloat(req.body.old),
-        new: parseFloat(req.body.new),
-        remark: req.body.remark
-    };
-
-    members.find({
-        _id: mongojs.ObjectId(req.params.memberID)
-    }, NORMAL_FIELDS, function(err, docs) {
-        if (err) {
-            var error = new Error("find member fails");
-            error.innerError = err;
-            return next(error);
-        }
-        if (docs.length == 0) {
-            var error = new Error("用户不存在");
-            error.status = 400;
-            return next(error);
-        }
-        var member = docs[0];
-        if (!member.membership || !member.membership[0]) {
-            var error = new Error("用户没有建立会员卡");
-            error.status = 400;
-            return next(error);
-        }
-
-        var membershipCard = member.membership[0];
-        if (membershipCard.credit != chargeItem.old) {
-            var error = new Error("充值失败，剩余课时不匹配");
-            error.status = 400;
-            return next(error);
-        }
-        //nothing changed, just return the original member object
-        if (chargeItem.old == chargeItem["new"]) {
-            return res.json(member);
-        }
-
-        members.findAndModify({
-            query: {
-                _id: mongojs.ObjectId(req.params.memberID)
-            },
-            update: {
-                $set: { "membership.0.credit": chargeItem["new"] },
-                $push: { history: chargeItem }
-            },
-            fields: NORMAL_FIELDS,
-            new: true
-        }, function(err, doc, lastErrorObject) {
-            if (err) {
-                var error = new Error("charge membership card fails");
-                error.innerError = err;
-                return next(error);
-            }
-            console.log("charge member %s from %d to %d by %s", req.params.memberID, chargeItem.old, chargeItem["new"], chargeItem.user);
-            res.json(doc);
-        });
-    });
-});
-
-/* 
-{
-    "_id": ObjectID("5787bab6e0de69928c6ad14b"),
-    "name": "22",
-    "membership": [],
-    "history" : [{
-            "user": "yezhi",
-            "date": "2016-1-1",
-            "target": "membership.0.credit",
-            "old": 4,
-            "new": 14
-    }]
-}
-*/
+/**
+ * Get the change log of current member, return 
+ * [{
+ *     "user": "yezhi",
+ *     "date": "2016-1-1",
+ *     "target": "membership.0.credit",
+ *     "old": 4,
+ *     "new": 14
+ * }]
+ */
 router.get('/:memberID/history', function(req, res, next) {
     var members = req.db.collection("members");
-
     members.findOne({
         _id: mongojs.ObjectId(req.params.memberID)
     }, { "history": 1 }, function(err, doc) {
@@ -236,7 +150,11 @@ router.get('/:memberID/history', function(req, res, next) {
             error.status = 400;
             return next(error);
         }
-        res.json(doc.history || []);
+        var history = doc.history || []
+        res.json(history.filter(function(val) {
+            if (!val.hasOwnProperty('target')) return false;
+            else return val.target.indexOf('credit') > -1 || val.target.indexOf('expire') > -1;
+        }));
     });
 });
 
@@ -356,9 +274,6 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
             return res.json(doc);
         }
 
-        console.log(setQuery);
-        console.log(historyItems);
-
         members.findAndModify({
             query: {
                 _id: mongojs.ObjectId(req.params.memberID)
@@ -382,56 +297,7 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
 });
 
 router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
-    return next(new Error("Not implementation"));
-    var members = req.db.collection("members");
-    members.remove({
-        _id: mongojs.ObjectId(req.params.memberID)
-    }, true, function(err, result) {
-        if (err) {
-            var error = new Error("fail to remove member");
-            error.innerError = err;
-            return next(error);
-        }
-        if (result.n == 1) {
-            console.log("member %s is deleted", req.params.memberID);
-            /*
-            var classes = req.db.collection("classes");
-            //TODO, remove member's all booking information or only in the future???
-            classes.find({
-                "booking.member" : req.params.memberID
-            }, function (err, docs) {
-                if (err) {
-                    console.error(err);
-                } else {
-                    var bulk = classes.initializeOrderedBulkOp();
-                    for (var i = 0; i < docs.length; i++) {
-                        var cls_item = docs[i];
-                        // find the booking quantity of member
-                        var quantity = getMemberBookQuantity(cls_item, req.params.memberID);
-                        bulk.find({
-                            _id : cls_item._id
-                        }).update({
-                            $inc : {
-                                reservation : -quantity
-                            },
-                            $pull : {
-                                "booking" : {
-                                    member : req.params.memberID
-                                }
-                            }
-                        });
-                    }
-                    bulk.execute(function (err, result) {
-                        console.log("remove member's all booking %j", result);
-                    });
-                }
-            });
-            */
-        } else {
-            console.error("member %s fails to be deleted", req.params.memberID);
-        }
-        res.json(result);
-    });
+    return next(new Error("Not Supported"));
 });
 
 /**
@@ -487,6 +353,8 @@ function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery
         }
         var targetField = 'membership.' + cardIndex + '.' + key;
         setQuery[targetField] = newItem[key];
+        // skip null value update
+        if (!current.hasOwnProperty(key) && newItem[key] === null) continue;
         historyItems.push({
             date: new Date(),
             user: username,

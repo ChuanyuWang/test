@@ -153,7 +153,23 @@ block page
               div.col-sm-10(style="display:inline-flex")
                 p#credit.form-control-static {0}
                 p.form-control-static 次(剩余)
-                button#charge_btn.btn.btn-sm.btn-primary(type="button",style="margin:2px") 充值...
+                //button#charge_btn.btn.btn-sm.btn-primary(type="button",style="margin:2px") 充值...
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 增加/减少:
+              div.col-sm-10(style="display:inline-flex")
+                button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",onClick="alterCharge(-10)")
+                  span.glyphicon.glyphicon-minus
+                  | 10
+                button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",onClick="alterCharge(-1)")
+                  span.glyphicon.glyphicon-minus
+                  | 1
+                input.form-control(type='number',name='charge',min='-100',max='100',step='0.1',style="width:85px;margin:0 2px")
+                button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",onClick="alterCharge(1)")
+                  span.glyphicon.glyphicon-plus
+                  | 1
+                button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",onClick="alterCharge(10)")
+                  span.glyphicon.glyphicon-plus
+                  | 10
             div.form-group(style='margin-bottom:7px')
               label.control-label.col-sm-2 有效期至:
               div.col-sm-4
@@ -176,58 +192,31 @@ block page
                       input(type="checkbox", value=room.id)
                       = room.name
         div.modal-footer
+          button#log_btn.btn.btn-primary.pull-left(type="button") 修改记录
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#ok.btn.btn-success(type="button") 确定
-  div#charge_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+  div#changeLog_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
         div.modal-header
           button.close(type="button",data-dismiss="modal")
             span &times
-          h4.modal-title 充值
+          h4.modal-title 修改日志
         div.modal-body
-          form.form-horizontal
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 宝宝姓名:
-              div.col-sm-10
-                p#name.form-control-static
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 剩余课时:
-              div.col-sm-10(style="display:inline-flex")
-                p#credit.form-control-static {0}
-                p.form-control-static 次
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 增加/减少:
-              div.col-sm-10(style="display:inline-flex")
-                button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",onClick="alterCharge(-10)")
-                  span.glyphicon.glyphicon-minus
-                  | 10
-                button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",onClick="alterCharge(-1)")
-                  span.glyphicon.glyphicon-minus
-                  | 1
-                input.form-control(type='number',name='charge',min='-100',max='100',step='0.1',style="width:85px;margin:0 2px")
-                button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",onClick="alterCharge(1)")
-                  span.glyphicon.glyphicon-plus
-                  | 1
-                button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",onClick="alterCharge(10)")
-                  span.glyphicon.glyphicon-plus
-                  | 10
-            div.form-group
-              label.control-label.col-sm-2 备注:
-              div.col-sm-8
-                input.form-control(type='text',placeholder='例：充值1200元', name='remark')
-            div.form-group(style='margin-bottom:7px;border-top:1px solid #e5e5e5')
-              label.control-label.col-sm-2 充值记录:
-              div.col-sm-10(style='margin-top:7px')
-                table(data-toggle="table",data-sort-name="date",data-striped='true',data-pagination='true',data-page-size='6')
-                  thead
-                    tr
-                      th(data-field='date',data-formatter='dateFormatter') 日期
-                      th(data-field='new',data-formatter='deltaFormatter') 课时变化
-                      th(data-field='remark') 备注
+          div.row(style='margin:auto')
+            label.col-sm-2 宝宝姓名:
+            div#name.col-sm-10
+          div.row
+            div.col-sm-12(style='margin-top:7px')
+              table(data-toggle="table",data-sort-name="date",data-striped='true',data-pagination='true',data-page-size='10')
+                thead
+                  tr
+                    th(data-field='date',data-formatter='dateFormatter') 日期
+                    th(data-field='target',data-formatter='fieldFormatter') 属性
+                    th(data-field='new',data-formatter='deltaFormatter') 变更
+                    //th(data-field='remark') 备注
         div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#ok.btn.btn-success(type="button") 确定
+          button.btn.btn-default(type="button",data-dismiss="modal") 确定
   script(type='text/javascript').
     function alterCharge(value) {
         var inputCharge = $(event.target).closest("div").find("input[name=charge]");
@@ -235,11 +224,34 @@ block page
         inputCharge.val(Math.round((currentVal + value)*10)/10);
     };
     function deltaFormatter(value, row, index) {
-        return [
-            Math.round(row.old * 10)/10,
-            ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-            Math.round(row.new * 10)/10
-        ].join('');
+        if (row.target.indexOf('credit') > -1) {
+            return [
+                row.old === null ? null : Math.round(row.old * 10)/10,
+                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
+                Math.round(row.new * 10)/10
+            ].join('');
+        } else if (row.target.indexOf('expire') > -1) {
+            return [
+                moment(row.old).isValid() ? moment(row.old).format('ll') : null,
+                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
+                moment(row.new).isValid() ? moment(row.new).format('ll') : null
+            ].join('');
+        } else {
+            return [
+                row.old,
+                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
+                row.new
+            ].join('');
+        }
+    };
+    function fieldFormatter(value) {
+        if (value.indexOf('credit') > -1) {
+            return '课时';
+        } else if (value.indexOf('expire') > -1) {
+            return '有效期';
+        } else {
+          return value;
+        }
     };
     function dateFormatter(value) {
         if (value) {
