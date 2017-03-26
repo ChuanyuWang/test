@@ -52,5 +52,8 @@
   "bugs": {
     "url": "https://github.com/ChuanyuWang/test/issues"
   },
-  "homepage": "https://github.com/ChuanyuWang/test#readme"
+  "homepage": "https://github.com/ChuanyuWang/test#readme",
+  "browserify-shim": {
+    "Vue": "global:Vue"
+  }
 }

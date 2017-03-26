@@ -1,7 +1,10 @@
 module.exports = {
     options: {
         'watch': true,
-        'banner': '/* Copyright 2016-2017 Chuanyu Wang */'
+        'banner': '/* Copyright 2016-2017 Chuanyu Wang */',
+        'transform': [
+            //'browserify-shim'
+        ]
     },
     home: {
         src: 'src/js/main.js',
