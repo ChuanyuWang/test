@@ -4,40 +4,64 @@
  * --------------------------------------------------------------------------
  */
 var common = require('./common');
+var initClassCell = require('./components/class-cell');
 // local cache for class or event
 var cls_cache = {};
+var classTableData = {
+    monday: null,
+    columns: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
+    sections: [{ name: "上午", startTime: 0, duration: 12 }, { name: "下午", startTime: 12, duration: 6 }, { name: "晚上", startTime: 18, duration: 6 }],
+    classes: []
+};
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
 
-    // reset dialog status when add a new class or event
-    $('#cls_dlg').on('show.bs.modal', function(event) {
-        var button = $(event.relatedTarget); // Button that triggered the modal
-        if (button.text() == "+") {
-            // create a new class
-            var rowIndex = $("#cls_table tr").index(button.closest('tr'));
-            var colIndex = $("#cls_table td").index(button.closest('td')) % 8;
-        }
-        var modal = $(this);
-        modal.find('#cls_name').val("").closest(".form-group").removeClass("has-error");
-        modal.find('input[name=cost]').val(1).closest(".form-group").removeClass("has-error");
-        modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
-        modal.find('input[name=age_min]').val(24).closest(".form-group").removeClass("has-error");
-        modal.find('input[name=age_max]').val(48).closest(".form-group").removeClass("has-error");
-        var defaultDate = generateDate(rowIndex, colIndex, currentMonday)
-        modal.find('#cls_date').text(defaultDate.format('ll'));
-        var timePicker = modal.find('#cls_time').data('DateTimePicker').minDate(false).maxDate(false).date(defaultDate);
-        // add the limitation of each slot
-        if (rowIndex == 1 || rowIndex == 2) {// morning
-            timePicker.minDate(defaultDate.hour(6).minute(0));
-            timePicker.maxDate(defaultDate.hour(11).minute(59));
-        } else if (rowIndex == 3 || rowIndex == 4) { // afternoon
-            timePicker.minDate(defaultDate.hour(12).minute(0));
-            timePicker.maxDate(defaultDate.hour(17).minute(59));
-        } else if (rowIndex == 5 || rowIndex == 6) { // evening
-            timePicker.minDate(defaultDate.hour(18).minute(0));
-            timePicker.maxDate(defaultDate.hour(23).minute(59));
+    initClassCell();
+    // bootstrap the class table
+    var clsTable = new Vue({
+        el: '#cls_table',
+        data: classTableData,
+        computed: {
+            sortedClasses: function() {
+                return this.classes.sort(function(a, b) {
+                    if (moment(a.date).isBefore(b.date)) return -1;
+                    else return 1;
+                })
+            }
+        },
+        filters: {
+            displayWeekDay: function(dayOffset, monday) {
+                return moment(monday).add(dayOffset, 'days').format('MMMDo');
+            }
+        },
+        methods: {
+            getClassess: function(dayOffset, startTime, duration) {
+                var result = [];
+                var theDay = moment(this.monday).add(dayOffset, 'days').hours(startTime);
+                for (var i = 0; i < this.sortedClasses.length; i++) {
+                    var classItem = this.classes[i];
+                    if (moment(classItem.date).isSameOrAfter(theDay)) {
+                        if (moment(classItem.date).diff(theDay, 'hours') >= duration) break;
+                        else result.push(classItem);
+                    }
+                }
+                return result;
+            },
+            getDateTime: function(section, dayOffset) {
+                return moment(this.monday).add(dayOffset, 'days').toDate();
+            },
+            viewClass: function(classItem) {
+                handleViewClass(classItem);
+            },
+            deleteClass: function(classItem) {
+                handleRemoveClass(classItem);
+            },
+            addClass: function(dayOffset, startTime) {
+                // the first class should start from 8:00 in the morning
+                showAddNewClassDlg(moment(this.monday).add(dayOffset, 'days').hours(startTime == 0 ? 8 : startTime));
+            }
         }
     });
 
@@ -54,22 +78,19 @@ $(document).ready(function() {
     // listen to the previous week and next week button
     $('#previous_week').click(function(event) {
         $("this").prop("disabled", true);
-        currentMonday.subtract(7, 'days');
-        updateWeekInfo(currentMonday);
+        classTableData.monday.subtract(7, 'days');
         updateSchedule($("this"));
     });
 
     $('#next_week').click(function(event) {
         $("this").prop("disabled", true);
-        currentMonday.add(7, 'days');
-        updateWeekInfo(currentMonday);
+        classTableData.monday.add(7, 'days');
         updateSchedule($("this"));
     });
 
     $('#current_week').click(function(event) {
         $("this").prop("disabled", true);
-        currentMonday = getMonday(moment());
-        updateWeekInfo(currentMonday);
+        classTableData.monday = getMonday(moment());
         updateSchedule($("this"));
     });
 
@@ -89,8 +110,7 @@ function init() {
         locale: 'zh-CN',
         format: 'LT'
     });
-    currentMonday = getMonday(moment());
-    updateWeekInfo(currentMonday);
+    classTableData.monday = getMonday(moment());
     initClassRoomList();
     updateSchedule();
 };
@@ -128,41 +148,19 @@ function getMonday(date) {
     return _date;
 };
 
-function updateWeekInfo(Monday) {
-    // add the date info in header
-    var items = $('#cls_table thead tr th+th');
-    $.each(items, function(index, item) {
-        var temp = moment(Monday).add(index, 'days');
-        $(item).html(temp.format('dddd') + '<br>' + temp.format('MMMDo'));
-    });
-};
+function showAddNewClassDlg(startDateTime) {
+    // reset dialog status when add a new class
+    var modal = $('#cls_dlg');
 
-function generateDate(rowIndex, colIndex, currentMonday) {
-    var temp = moment(currentMonday);
-    temp.add(colIndex - 1, 'days');
-    temp.seconds(0);
-    temp.milliseconds(0);
-    switch (rowIndex) {
-        case 1: // morning
-        case 2: // morning
-            temp.hours(10);
-            temp.minutes(00);
-            break;
-        case 3: // afternoon
-        case 4: // afternoon
-            temp.hours(16);
-            temp.minutes(40);
-            break;
-        case 5: // evening
-        case 6: // evening
-            temp.hours(19);
-            temp.minutes(00);
-            break;
-        default:
-            throw "Invalid time slot"
-    }
-    return temp;
-};
+    modal.find('#cls_name').val("").closest(".form-group").removeClass("has-error");
+    modal.find('input[name=cost]').val(1).closest(".form-group").removeClass("has-error");
+    modal.find('#cls_capacity').val(8).closest(".form-group").removeClass("has-error");
+    modal.find('input[name=age_min]').val(24).closest(".form-group").removeClass("has-error");
+    modal.find('input[name=age_max]').val(48).closest(".form-group").removeClass("has-error");
+    modal.find('#cls_date').text(startDateTime.format('ll'));
+    modal.find('#cls_time').data('DateTimePicker').date(startDateTime);
+    modal.modal('show');
+}
 
 function handleAddNewClass(event) {
     var modal = $(this).closest('.modal');
@@ -240,7 +238,7 @@ function handleAddNewClass(event) {
             success: function(data) {
                 // update the cache
                 cls_cache[data._id] = data;
-                displayClass(data);
+                updateClasses(data);
                 modal.modal('hide');
             },
             error: function(jqXHR, status, err) {
@@ -251,67 +249,13 @@ function handleAddNewClass(event) {
     }
 };
 
-function displayClass(item) {
-    var date = moment(item.date);
-    // day is 0 if it's Sunday
-    var colIndex = (date.day() == 0) ? 7 : date.day();
-    if (date.hour() < 12) {
-        var min = 1;
-        var max = 2;
-    } else if (date.hour() < 18) {
-        var min = 3;
-        var max = 4;
-    } else {
-        var min = 5;
-        var max = 6;
-    }
-    colIndex = colIndex + 1; // append the first column
-    var firstEmptyRow = null;
-    for (var i = min; i <= max; i++) {
-        var cell = $('#cls_table tbody tr:nth-child(' + i + ') td:nth-child(' + colIndex + ')');
-        // locate the cell by class's id
-        if (cell.data('id') == item._id) {
-            var rowIndex = i;
-            break;
-        }
-        if (!firstEmptyRow && !cell.data('id')) {
-            firstEmptyRow = i;
-        }
-    }
-    var rowIndex = rowIndex || firstEmptyRow;
-    if (!rowIndex) {
-        console.error("can't find the empty cell to display the class item ", item);
-        showErrorMsg("课表已满，无法显示该课程");
-        return;
-    }
-
-    var cell = $('#cls_table tbody tr:nth-child(' + rowIndex + ') td:nth-child(' + colIndex + ')');
-    cell.data('id', item._id);
-    cell.find('p').text(item.name);
-    cell.find('.btn-group').empty();
-    cell.find('.btn-group').append('<button class="btn btn-primary">查看 </button>');
-    cell.find('.btn-primary').click(handleViewClass);
-    cell.find('.btn-primary').append('<span class="badge">' + item.reservation + '</span>');
-    cell.find('.btn-group').append('<button class="btn btn-danger">删除</button>');
-    cell.find('.btn-danger').click(handleRemoveClass);
-    if (item.reservation > 0) {
-        cell.removeClass("info");
-        cell.addClass('success');
-    } else {
-        cell.removeClass("success");
-        cell.addClass('info');
-    }
-};
-
-function handleViewClass(event) {
-    var cell = $(this).closest('td');
-    var class_id = cell.data('id');
-    var class_item = cls_cache[class_id];
-
+function handleViewClass(class_item) {
     if (!class_item) {
-        console.error("Can't find the class info with id: " + class_id);
+        console.error("class_item is null");
         return;
     }
+
+    var class_id = class_item._id;
 
     var modal = $('#view_dlg');
     modal.find('#cls_name').val(class_item.name).closest(".form-group").removeClass("has-error");
@@ -365,7 +309,6 @@ function handleAddBooks(event) {
 
     // set the class id
     var dlg_books = $('#dlg_books');
-    //dlg_books.find('table').data('classid', class_id);
 
     // clear the previous contents
     dlg_books.find("div input").each(function() {
@@ -503,8 +446,6 @@ function handleModifyClass(event) {
                 class_item.name = classItem.name;
                 class_item.capacity = classItem.capacity;
                 class_item.age = classItem.age;
-                // update the class schedule
-                displayClass(class_item);
             },
             error: function(jqXHR, status, err) {
                 showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
@@ -529,9 +470,8 @@ window.handleDeleteBook = {
             success: function(data) {
                 // update the cache
                 var class_item = cls_cache[class_id];
+                // TODO, check the return 'data' as new class item
                 class_item.reservation -= row.quantity;
-                // update the class schedule
-                displayClass(class_item);
                 $('#member_table').bootstrapTable('removeByUniqueId', row.member);
                 showSuccessMsg("成功取消预约");
             },
@@ -546,9 +486,8 @@ window.handleDeleteBook = {
     }
 };
 
-function handleRemoveClass(event) {
-    var cell = $(this).closest('td');
-    var item_id = cell.data('id');
+function handleRemoveClass(class_item) {
+    var item_id = class_item._id;
 
     //TODO, make this confirm as danger style
     bootbox.confirm("删除此课程吗？", function(result) {
@@ -563,12 +502,8 @@ function handleRemoveClass(event) {
             success: function(data) {
                 // update the cache
                 cls_cache[item_id] = undefined;
-                cell.data('id', null);
-                cell.find('p').empty();
-                cell.find('.btn-group').empty();
-                cell.find('.btn-group').append('<button class="btn btn-default" data-toggle="modal" data-target="#cls_dlg">+</button>');
-                cell.removeClass('success');
-                cell.removeClass('info');
+                // TODO, check the 'data' and remove class
+                removeClasses(class_item);
                 showSuccessMsg("删除成功");
             },
             error: function(jqXHR, status, err) {
@@ -610,8 +545,7 @@ window.handleAddBook = {
                 // update the cache
                 var classInfo = data['class'];
                 cls_cache[classInfo._id] = classInfo;
-                // update the class schedule
-                displayClass(classInfo);
+                updateClasses(classInfo);
                 showSuccessMsg("预约成功");
                 $(e.target).closest('tr').hide(600, function() {
                     $('#search_member table').bootstrapTable('removeByUniqueId', row._id);
@@ -628,6 +562,33 @@ window.handleAddBook = {
     }
 };
 
+function updateClasses(newClass) {
+    for (var i = 0; i < classTableData.classes.length; i++) {
+        if (classTableData.classes[i]._id == newClass._id) {
+            // remove existed and replace by update one
+            classTableData.classes.splice(i, 1, newClass);
+            break;
+        }
+    }
+    if (i == classTableData.classes.length && i > 0) {
+        // a new class item
+        classTableData.classes.push(newClass);
+    }
+}
+
+function removeClasses(oldClass) {
+    for (var i = 0; i < classTableData.classes.length; i++) {
+        if (classTableData.classes[i]._id == oldClass._id) {
+            // remove existed and replace by update one
+            classTableData.classes.splice(i, 1);
+            break;
+        }
+    }
+    if (i == classTableData.classes.length && i > 0) {
+        console.error("can't find the oldClass");
+    }
+}
+
 // sort the array of class from Monday to Sunday
 function sortClass(a, b) {
     if (!a || !b) {
@@ -642,9 +603,8 @@ function sortClass(a, b) {
 };
 
 function updateSchedule(control) {
-    clearSchedule();
-    var begin = moment(currentMonday);
-    var end = moment(currentMonday).add(7, 'days');
+    var begin = moment(classTableData.monday);
+    var end = moment(classTableData.monday).add(7, 'days');
     $.ajax('/api/classes', {
         type: "GET",
         //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
@@ -655,13 +615,13 @@ function updateSchedule(control) {
             tenant: common.getTenantName()
         },
         success: function(data) {
+            classTableData.classes = data || [];
             if (data && $.isArray(data)) {
                 // the data is already sorted in server side as "asc"
                 //data.sort(sortClass);
                 for (var i = 0; i < data.length; i++) {
                     // update the cache
                     cls_cache[data[i]._id] = data[i];
-                    displayClass(data[i]);
                 }
             }
         },
@@ -687,20 +647,4 @@ function showErrorMsg(msg) {
     var alert_bar = $('#alert_bar').removeClass('alert-success').addClass("alert-danger");
     alert_bar.find('span').text(msg);
     alert_bar.finish().show().fadeOut(2000);
-};
-
-function clearSchedule() {
-    // replace all the table cell in tbody except the first column
-    $('<td>\
-        <p></p>\
-        <div class="btn-group btn-group-xs pull-right">\
-          <button class="btn btn-default" data-toggle="modal" data-target="#cls_dlg">+</button>\
-        </div>\
-       </td>').replaceAll("#cls_table tbody td+td");
-};
-
-function getParam(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-    var param = window.location.search.substr(1).match(reg);
-    return param ? decodeURI(param[2]) : undefined;
 };

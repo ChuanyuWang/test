@@ -20,6 +20,10 @@ append css
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+  else
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
   script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.0/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.0/locale/bootstrap-table-zh-CN.min.js")
@@ -44,26 +48,30 @@ block page
       div.col-sm-12(style='height:200px;background-color:#eee')
         a.btn.btn-success(style='margin:83px auto;display:table',href='setting') 创建教室
     table#cls_table.table.table-bordered.table-hover(style='margin-top:15px;display:none')
-        thead#schedule_header
-          tr
-            th(style='width:60px;text-align:center') 时间
-            th 星期一
-            th 星期二
-            th 星期三
-            th 星期四
-            th 星期五
-            th 星期六
-            th 星期日
-        tbody
-          - each item in ["上午一","上午二","下午一","下午二","晚上一","晚上二"]
-            tr
-              td(style='text-align:center')= item
-              each val in [1, 2, 3, 4, 5, 6, 7]
-                td
-                  p
-                  div.btn-group.btn-group-xs.pull-right
-                    button#add_cls.btn.btn-default(data-toggle='modal',data-target='#cls_dlg') +
+      thead
+        tr
+          th(style='width:60px;text-align:center') 时间
+          th(v-for='(col, index) in columns') {{col}}
+            div {{index | displayWeekDay(monday)}}
+      tbody
+        tr(v-for='(section, i) in sections')
+          td {{section.name}}
+          td(v-for='(col, j) in columns')
+            class-list(:data='getClassess(j, section.startTime, section.duration)',v-on:view="viewClass",v-on:delete="deleteClass",v-on:add="addClass(j,section.startTime)")
 
+  script#classlist-template(type='text/x-template')
+    div
+      template(v-for='classItem in data')
+        div
+          p {{classItem.name}}
+          div.btn-group.btn-group-xs.pull.right
+            button.btn.btn-primary(v-on:click='$emit("view", classItem)')
+              |View
+              span.badge {{classItem.reservation}}
+            button.btn.btn-danger(v-on:click='$emit("delete", classItem)') Delete
+      div.btn-group.btn-group-xs.pull-right
+        button.btn.btn-default(v-on:click='$emit("add")') +
+    
   div#cls_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content
