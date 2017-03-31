@@ -73,7 +73,7 @@ $(document).ready(function() {
         computed: {
             sortedClasses: function() {
                 return this.classes.sort(function(a, b) {
-                    if (moment(a.date).isBefore(b.date)) return -1;
+                    if (moment(a.date).isSameOrBefore(b.date)) return -1;
                     else return 1;
                 })
             }
