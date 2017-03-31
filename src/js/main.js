@@ -563,28 +563,32 @@ window.handleAddBook = {
 };
 
 function updateClasses(newClass) {
+    var found = false;
     for (var i = 0; i < classTableData.classes.length; i++) {
         if (classTableData.classes[i]._id == newClass._id) {
             // remove existed and replace by update one
             classTableData.classes.splice(i, 1, newClass);
+            var found = true;
             break;
         }
     }
-    if (i == classTableData.classes.length && i > 0) {
-        // a new class item
+    if (!found) {
+        // add as a new class item
         classTableData.classes.push(newClass);
     }
 }
 
 function removeClasses(oldClass) {
+    var found = false;
     for (var i = 0; i < classTableData.classes.length; i++) {
         if (classTableData.classes[i]._id == oldClass._id) {
-            // remove existed and replace by update one
+            // remove the old one
             classTableData.classes.splice(i, 1);
+            found = true;
             break;
         }
     }
-    if (i == classTableData.classes.length && i > 0) {
+    if (!found) {
         console.error("can't find the oldClass");
     }
 }

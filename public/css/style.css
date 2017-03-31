@@ -45,16 +45,16 @@ html {
   padding-top: 5px !important;
   padding-bottom: 5px !important;
 }
-#cls_table {
+.class-table {
   table-layout: fixed;
 }
-#cls_table tbody td p {
+.class-table tbody td p {
   display: inline-block;
   height: 100%;
   padding-bottom: 16px;
   margin-bottom: -6px;
 }
-#cls_table tbody tr td {
+.class-table tbody tr td {
   overflow: hidden;
 }
 .class-row {
