@@ -16,7 +16,11 @@ module.exports = function() {
             };
         },
         computed: {},
-        filters: {},
+        filters: {
+            displayTime: function(date) {
+                return moment(date).format('HH:mm');
+            }
+        },
         methods: {}
     });
 };
