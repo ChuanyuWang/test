@@ -71,6 +71,7 @@
             defaultDate: moment().add(6, 'months')
         });
 
+        // Fix for table control, current version 1.11.1
         $('#member_table').on("page-change.bs.table", function(number, size) {
             //uncheck all the selected rows to fix the radio column only take effects in one page
             var items = $('#member_table').bootstrapTable('getSelections');
