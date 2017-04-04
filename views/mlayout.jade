@@ -1,8 +1,14 @@
 extends layout
 
 block prepend css
-  link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
+  if ENV_DEVELOPMENT
+    link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css")
+  else
+    link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
 block append js
-  //script(src='https://code.jquery.com/jquery-1.12.3.min.js', integrity='sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=', crossorigin='anonymous')
-  script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
-  script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/jquery/3.2.1/jquery.js")
+    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js")
+  else
+    script(src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js")
+    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
