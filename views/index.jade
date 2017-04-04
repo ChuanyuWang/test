@@ -1,9 +1,16 @@
 extends layout
 
 block append css
-  link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
+  if ENV_DEVELOPMENT
+    link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css")
+  else
+    link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
 
 block append js
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.js")
+    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js")
+  else
     script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js")
     script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
 

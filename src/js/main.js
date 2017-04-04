@@ -8,7 +8,7 @@ var initClassCell = require('./components/class-cell');
 // local cache for class or event
 var cls_cache = {};
 var classTableData = {
-    monday: null,
+    monday: null, // moment date object
     columns: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
     sections: [{ name: "上午", startTime: 0, duration: 12 }, { name: "下午", startTime: 12, duration: 6 }, { name: "晚上", startTime: 18, duration: 6 }],
     classes: []
