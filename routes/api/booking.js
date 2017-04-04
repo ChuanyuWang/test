@@ -317,21 +317,30 @@ router.delete ('/:classID', function (req, res, next) {
             });
             return;
         }
-        
-        // be free to cancel the booking if it's less than 24 hours before begin
-        // 24 hours = 86400000 ms (24*60*60*1000)
-        if (Date.now() + 86400000 > doc.date.getTime()) {
-            //only admin could delete the booking in the past, 
-            if(req.user && req.user.role === "admin") {
+
+        if (req.isAuthenticated()) {
+            if (req.user.role === "admin") {
+                //only admin could delete the booking in any time
                 console.log("Admin %s cancel the booking of %s", req.user.name, req.body.memberid);
+            } else if (Date.now() + 7200000 < doc.date.getTime()) {
+                // the other authenticated users could delete the booking before 2 hours, 
+                // 2 hours = 7200000 (2*60*60*1000)
+                console.log("User %s cancel the booking of %s", req.user.name, req.body.memberid);
             } else {
-                var error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
+                var error = new Error("不能在开始前2小时内取消课程或取消已经结束的课程");
                 error.status = 400;
                 next(error);
                 return;
             }
+        } else if (Date.now() + 86400000 > doc.date.getTime()) {
+            // be free to cancel the booking if it's less than 24 hours before begin
+            // 24 hours = 86400000 ms (24*60*60*1000)
+            var error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
+            error.status = 400;
+            next(error);
+            return;
         }
-        
+
         // find the booking quantity of member
         for (var i=0;i<doc.booking.length;i++) {
             if (doc.booking[i].member == req.body.memberid) {
