@@ -1,0 +1,21 @@
+extends ../index
+
+append css
+  link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css")
+  link(rel="stylesheet",href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")
+
+append js
+  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  //script(src='/components/bootbox.js/bootbox.js')
+  script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
+  //script(src='/components/requirejs/require.js',data-main="/js/main")
+  script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
+  script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
+  script(src='/js/member_view.js')
+
+block page
+  div.container(style='padding-top:69px')
+    div.btn-group(role='group')
+      button.btn.btn-primary(type='button',onclick='window.history.back()') 后退
+    label 班级信息

@@ -59,6 +59,16 @@ router.get('/member', helper.checkTenantUser, function (req, res) {
     });
 });
 
+router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next) {
+    res.locals.memberID = req.params.memberID;
+    res.render('bqsq/member_view', {
+        title: '查看会员',
+        user: req.user,
+        navTitle: req.tenant.displayName,
+        classroom: req.tenant.classroom ? req.tenant.classroom : []
+    });
+});
+
 router.get('/opportunity', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/opportunity', {
         title: '试听',
