@@ -10,6 +10,10 @@ module.exports = {
         src: 'src/js/main.js',
         dest: 'public/js/main.js'
     },
+    members: {
+        src: 'src/js/member.js',
+        dest: 'public/js/member.js'
+    },
     booking: {
         src: 'src/js/booking.js',
         dest: 'public/js/booking.js'
