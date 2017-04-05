@@ -12,10 +12,58 @@ append js
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
   script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+  else
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
   script(src='/js/member_view.js')
 
 block page
-  div.container(style='padding-top:69px')
-    div.btn-group(role='group')
-      button.btn.btn-primary(type='button',onclick='window.history.back()') 后退
-    label 班级信息
+  div#member_app.container(style='padding-top:69px')
+    ol.breadcrumb
+      li
+        a(href="../home") 主页
+      li
+        a(href="./") 会员列表
+      li.active 查看会员
+    div.page-header
+      h3 基本信息
+    form.form-horizontal
+      div.form-group
+        label.col-sm-2.control-label 状态:
+        select.col-sm-5.form-control(v-model='status',style='margin-left:15px;width:auto')
+          option.text-success(value='active') 激活
+          option.text-danger(value='inactive') 未激活
+      div.form-group
+        label.col-sm-2.control-label 姓名:
+        div.col-sm-5
+          input.form-control(v-model.trim='name', placeholder='小朋友姓名')
+      div.form-group
+        label.col-sm-2.control-label 联系方式:
+        div.col-sm-5
+          input.form-control(v-model.trim='contact', placeholder='135xxx')
+      div.form-group
+        label.control-label.col-sm-2 宝宝生日:
+        div.col-sm-4
+          div#birth_date.input-group.date
+            input.form-control(text='text',name='brith')
+            span.input-group-addon
+              span.glyphicon.glyphicon-calendar
+      div.form-group
+        label.control-label.col-sm-2 备注:
+        div.col-sm-10
+          textarea.form-control(rows='3', name='note',v-model.trim='note')
+      div.form-group
+        div.col-sm-offset-2.col-sm-10
+          button.btn.btn-success(type='button',v-on:click='saveBasicInfo') 保存
+          div.alert.alert-danger(style='position:absolute;top:-10px;left:100px;right:15px',v-if='errors')
+            strong 错误! 
+            |{{errors.basic}} 
+    div.page-header
+      h3 会员卡
+    div.page-header
+      h3 备忘
+    div.page-header
+      h3 充值记录
+    div.page-header
+      h3 上课记录
