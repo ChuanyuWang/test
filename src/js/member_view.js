@@ -24,6 +24,11 @@ var memberData = {
     "errors": null
 };
 
+var viewData = {
+    memberData : {},
+    errors : null
+}
+
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
@@ -31,7 +36,7 @@ $(document).ready(function() {
     // bootstrap the class table
     var memberViewer = new Vue({
         el: '#member_app',
-        data: memberData,
+        data: viewData,
         computed: {
         },
         filters: {
@@ -42,16 +47,16 @@ $(document).ready(function() {
         methods: {
             saveBasicInfo: function() {
                 this.errors = null;
-                if (this.name.length == 0) this.errors = { basic: '姓名不能为空' };
-                if (this.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
+                if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
+                if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
                 var birth = $(this.$el).find('#birth_date').data('DateTimePicker').date();
-                if (birth.isValid() == false) this.errors = { basic: '生日格式不正确' };
+                if (birth && birth.isValid() == false) this.errors = { basic: '生日格式不正确' };
                 if (!this.errors) {
                     var request = update({
-                        status: this.status,
-                        name: this.name,
-                        contact: this.contact,
-                        note: this.note,
+                        status: this.memberData.status,
+                        name: this.memberData.name,
+                        contact: this.memberData.contact,
+                        note: this.memberData.note,
                         birthday: birth
                     });
                     request.done(function(data, textStatus, jqXHR) {
@@ -78,9 +83,14 @@ $(document).ready(function() {
             $(this.$el).find('#birth_date').datetimepicker({
                 format: 'll',
                 locale: 'zh-CN',
-                defaultDate: this.birthday
+                defaultDate: this.memberData.birthday
             });
         }
+    });
+
+    var request = getMemberInfo($('#member_app').data('member-id'));
+    request.done(function(data, textStatus, jqXHR) {
+        viewData.memberData = data;
     });
 });
 
@@ -101,6 +111,25 @@ function update(fields) {
         },
         dataType: "json"
     });
+
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        // alert dialog with danger button
+        bootbox.dialog({
+            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+            title: "更新会员失败",
+            buttons: {
+                danger: {
+                    label: "确定",
+                    className: "btn-danger"
+                }
+            }
+        });
+    })
+    return request;
+};
+
+function getMemberInfo(id) {
+    var request = $.getJSON("/api/members/" + id, '');
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
         // alert dialog with danger button
