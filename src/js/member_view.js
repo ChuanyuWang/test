@@ -102,7 +102,7 @@ function init() {
 };
 
 function update(fields) {
-    var request = $.ajax("/api/members/" + memberData._id, {
+    var request = $.ajax("/api/members/" + viewData.memberData._id, {
         type: "PATCH",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
