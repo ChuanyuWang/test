@@ -88,6 +88,21 @@ router.get('/', function(req, res, next) {
     });
 });
 
+router.get('/:memberID', function(req, res, next) {
+    var members = req.db.collection("members");
+    members.findOne({
+            _id: mongojs.ObjectId(req.params.memberID)
+        }, NORMAL_FIELDS, function(err, doc) {
+        if (err) {
+            var error = new Error("Get member fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("find member %j", doc);
+        res.json(doc);
+    });
+});
+
 router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next) {
     var members = req.db.collection("members");
     // no one can change history, even the admin
