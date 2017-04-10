@@ -27,8 +27,8 @@ var memberData = {
 };
 
 var viewData = {
-    memberData : {},
-    errors : null
+    memberData: {},
+    errors: null
 }
 
 // DOM Ready =============================================================
@@ -44,6 +44,12 @@ $(document).ready(function() {
         filters: {
             test: function(dateString) {
                 return moment(dateString);
+            }
+        },
+        watch: {
+            'memberData.birthday': function(val, oldVal) {
+                // 'this' is refer to vm instance
+                $(this.$el).find('#birth_date').data("DateTimePicker").date(moment(val));
             }
         },
         methods: {
@@ -84,8 +90,7 @@ $(document).ready(function() {
             // 'this' is refer to vm instance
             $(this.$el).find('#birth_date').datetimepicker({
                 format: 'll',
-                locale: 'zh-CN',
-                defaultDate: this.memberData.birthday
+                locale: 'zh-CN'
             });
         }
     });
