@@ -49,7 +49,7 @@ block page
         label.control-label.col-sm-2 宝宝生日:
         div.col-sm-4
           div#birth_date.input-group.date
-            input.form-control(text='text',name='brith')
+            input.form-control(text='text')
             span.input-group-addon
               span.glyphicon.glyphicon-calendar
       div.form-group
@@ -64,6 +64,48 @@ block page
             |{{errors.basic}} 
     div.page-header
       h3 会员卡
+    form.form-horizontal
+      div.form-group
+        label.control-label.col-sm-2 课时:
+        div.col-sm-10
+          p.form-control-static {{credit}}次(剩余)
+      div.form-group
+        label.control-label.col-sm-2 增加/减少:
+        div.col-sm-10(style="display:inline-flex")
+          button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",@click="alterCharge(-10)")
+            span.glyphicon.glyphicon-minus
+            | 10
+          button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",@click="alterCharge(-1)")
+            span.glyphicon.glyphicon-minus
+            | 1
+          input.form-control(type='number',v-model.number='delta',min='-100',max='100',step='0.1',style="width:85px;margin:0 2px")
+          button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",@click="alterCharge(1)")
+            span.glyphicon.glyphicon-plus
+            | 1
+          button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",@click="alterCharge(10)")
+            span.glyphicon.glyphicon-plus
+            | 10
+      div.form-group
+        label.control-label.col-sm-2 有效期至:
+        div.col-sm-4
+          div#expire_date.input-group.date
+            input.form-control(text='text')
+            span.input-group-addon
+              span.glyphicon.glyphicon-calendar
+      div.form-group
+        label.control-label.col-sm-2 类型:
+        div.col-sm-4
+          select.form-control(name="card_type")
+            option(value='ALL') 通用卡
+            option(value='LIMITED') 限定卡
+      div.form-group
+        label.control-label.col-sm-2 可用教室:
+        div#roomlist.col-sm-10
+          - each room in classroom
+            div.checkbox
+              label
+                input(type="checkbox", value=room.id)
+                = room.name
     div.page-header
       h3 备忘
     div.page-header

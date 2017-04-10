@@ -28,6 +28,7 @@ var memberData = {
 
 var viewData = {
     memberData: {},
+    delta: 0,
     errors: null
 }
 
@@ -40,6 +41,9 @@ $(document).ready(function() {
         el: '#member_app',
         data: viewData,
         computed: {
+            credit: function() {
+                return this.memberData && this.memberData.membership && this.memberData.membership[0] && this.memberData.membership[0].credit || 0;
+            }
         },
         filters: {
             formatDate: function(value) {
@@ -51,6 +55,10 @@ $(document).ready(function() {
             'memberData.birthday': function(val, oldVal) {
                 // 'this' is refer to vm instance
                 $(this.$el).find('#birth_date').data("DateTimePicker").date(moment(val));
+            },
+            'memberData.membership.0.expire': function(val, oldVal) {
+                // 'this' is refer to vm instance
+                $(this.$el).find('#expire_date').data("DateTimePicker").date(moment(val));
             }
         },
         methods: {
@@ -73,6 +81,9 @@ $(document).ready(function() {
                     });
                 }
             },
+            alterCharge: function(value) {
+                this.delta += value;
+            },
             getDateTime: function(section, dayOffset) {
                 return moment(this.monday).add(dayOffset, 'days').toDate();
             },
@@ -90,6 +101,10 @@ $(document).ready(function() {
         mounted: function() {
             // 'this' is refer to vm instance
             $(this.$el).find('#birth_date').datetimepicker({
+                format: 'll',
+                locale: 'zh-CN'
+            });
+            $(this.$el).find('#expire_date').datetimepicker({
                 format: 'll',
                 locale: 'zh-CN'
             });
