@@ -42,8 +42,9 @@ $(document).ready(function() {
         computed: {
         },
         filters: {
-            test: function(dateString) {
-                return moment(dateString);
+            formatDate: function(value) {
+                if (!value) return '?';
+                return moment(value).format('ll');
             }
         },
         watch: {

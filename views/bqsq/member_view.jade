@@ -38,6 +38,9 @@ block page
         label.col-sm-2.control-label 姓名:
         div.col-sm-5
           input.form-control(v-model.trim='memberData.name', placeholder='小朋友姓名')
+        div.col-sm-5
+          p.form-control-static(style='color:#808080')
+            small {{memberData.since | formatDate}}注册会员
       div.form-group
         label.col-sm-2.control-label 联系方式:
         div.col-sm-5
