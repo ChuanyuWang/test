@@ -79,6 +79,9 @@ $(document).ready(function() {
                     });
                 }
             },
+            saveCardInfo: function() {
+                console.log(this.memberData.membership[0].type)
+            },
             alterCharge: function(value) {
                 this.delta += value;
             },
