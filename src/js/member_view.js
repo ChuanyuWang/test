@@ -117,8 +117,8 @@ $(document).ready(function() {
         el: '#member_app',
         data: viewData,
         computed: {
-            credit: function() {
-                return this.memberData && this.memberData.membership && this.memberData.membership[0] && this.memberData.membership[0].credit || 0;
+            birthDate: function() {
+                return this.memberData.birthday && moment(this.memberData.birthday).format('ll');
             }
         },
         filters: {
@@ -127,12 +127,7 @@ $(document).ready(function() {
                 return moment(value).format('ll');
             }
         },
-        watch: {
-            'memberData.birthday': function(val, oldVal) {
-                // 'this' is refer to vm instance
-                $(this.$el).find('#birth_date').data("DateTimePicker").date(moment(val));
-            }
-        },
+        watch: {},
         methods: {
             saveBasicInfo: function() {
                 this.errors = null;

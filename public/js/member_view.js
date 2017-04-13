@@ -119,8 +119,8 @@ $(document).ready(function() {
         el: '#member_app',
         data: viewData,
         computed: {
-            credit: function() {
-                return this.memberData && this.memberData.membership && this.memberData.membership[0] && this.memberData.membership[0].credit || 0;
+            birthDate: function() {
+                return this.memberData.birthday && moment(this.memberData.birthday).format('ll');
             }
         },
         filters: {
@@ -129,26 +129,20 @@ $(document).ready(function() {
                 return moment(value).format('ll');
             }
         },
-        watch: {
-            'memberData.birthday': function(val, oldVal) {
-                // 'this' is refer to vm instance
-                $(this.$el).find('#birth_date').data("DateTimePicker").date(moment(val));
-            }
-        },
+        watch: {},
         methods: {
             saveBasicInfo: function() {
                 this.errors = null;
                 if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
                 if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
-                var birth = $(this.$el).find('#birth_date').data('DateTimePicker').date();
-                if (birth && birth.isValid() == false) this.errors = { basic: '生日格式不正确' };
+                if (moment(this.memberData.birthday).isValid == false) this.errors = { basic: '生日格式不正确' };
                 if (!this.errors) {
                     var request = update({
                         status: this.memberData.status,
                         name: this.memberData.name,
                         contact: this.memberData.contact,
                         note: this.memberData.note,
-                        birthday: birth
+                        birthday: this.memberData.birthday
                     });
                     request.done(function(data, textStatus, jqXHR) {
                         bootbox.alert('会员基本资料更新成功');
@@ -172,9 +166,15 @@ $(document).ready(function() {
         },
         mounted: function() {
             // 'this' is refer to vm instance
+            var vm = this;
             $(this.$el).find('#birth_date').datetimepicker({
                 format: 'll',
                 locale: 'zh-CN'
+            });
+            $(this.$el).find('#birth_date').on('dp.change', function(e) {
+                // update the expire value from datetimepicker control event
+                vm.memberData.birthday = e.date;
+                console.log(vm.memberData.birthday);
             });
         }
     });
