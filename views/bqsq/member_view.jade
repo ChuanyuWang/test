@@ -64,7 +64,10 @@ block page
             |{{errors.basic}} 
     div.page-header
       h3 会员卡
-      card(v-for="card in memberData.membership",@save="saveCardInfo",:item='card')
+      template(v-if='memberData.membership&&memberData.membership.length')
+        card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
+      template(v-else)
+        card(@save="saveCardInfo",:item='{credit:0}',:index=-1)
     div.page-header
       h3 备忘
     div.page-header
@@ -97,7 +100,7 @@ block page
         label.control-label.col-sm-2 有效期至:
         div.col-sm-4
           div#expire_date.input-group.date
-            input.form-control(text='text',:value='displayExpireDay(item.expire)',@change='setExpireDay')
+            input.form-control(text='text',v-model='expireDate')
             span.input-group-addon
               span.glyphicon.glyphicon-calendar
       div.form-group
@@ -116,7 +119,7 @@ block page
                 = room.name
       div.form-group
         div.col-sm-offset-2.col-sm-10
-          button.btn.btn-success(type='button',v-on:click='$emit("save", item)') 保存
-          div.alert.alert-danger(style='position:absolute;top:-10px;left:100px;right:15px',v-if='errors')
+          button.btn.btn-success(type='button',v-on:click='validteBeforeSave') 保存
+          div.alert.alert-danger(style='position:absolute;top:-10px;left:100px;right:15px',v-if='error')
             strong 错误! 
-            |{{errors.card}}
+            |{{error}}

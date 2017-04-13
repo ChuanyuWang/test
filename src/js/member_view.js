@@ -38,48 +38,62 @@ $(document).ready(function() {
     Vue.component('card', {
         template: '#card-template',
         props: {
+            index: Number, // index of membership card
             item: Object // object of membership card object
         },
         data: function() {
             return {
                 delta: 0,
-                expire: this.item.expire,
-                errors: null
+                expire: this.item.expire ? moment(this.item.expire) : null,
+                error: null
             };
         },
-        watch: {
-            'item.expire': function(val, oldVal) {
-                console.log('item.expire changed');
-                // 'this' is refer to vm instance
-                $(this.$el).find('#expire_date').data("DateTimePicker").date(moment(val));
+        watch: {},
+        computed: {
+            expireDate: function() {
+                return this.expire ? this.expire.format('ll') : null;
             }
         },
-        computed: {},
         filters: {},
         methods: {
             alterCharge: function(value) {
+                if (typeof(this.delta) !== 'number') {
+                    this.delta = parseFloat(this.delta) || 0;
+                }
                 this.delta += value;
             },
-            displayExpireDay: function(val) {
-                console.log(val);
-                if (val) {
-                    //$(this.$el).find('#expire_date').data("DateTimePicker").date(moment(val));
-                    return moment(val).format('ll');
+            validteBeforeSave: function() {
+                this.error = null;
+                if (typeof(this.delta) !== 'number') {
+                    this.error = '增加/减少的课时数不正确';
+                    return;
                 }
-                return null;
-            },
-            setExpireDay: function() {
-                console.log(arguments);
-                console.log('abc');
-                
-                this.expire = $(this.$el).find('#expire_date').data("DateTimePicker").date();
+                if (!this.expire || !this.expire.isValid()) {
+                    this.error = '请指定会员有效期';
+                    return;
+                }
+                if (!this.item.type) {
+                    this.error = '请选择会员卡类型';
+                    return;
+                }
+                var toBeSaved = {
+                    "type": this.item.type,
+                    "room": this.item.room,
+                    "expire": this.expire && this.expire.toISOString(),
+                    "credit": this.item.credit + this.delta
+                };
+                this.$emit("save", toBeSaved, this.index);
             }
         },
         mounted: function() {
-            console.log('mounted');
+            var vm = this;
             $(this.$el).find('#expire_date').datetimepicker({
                 format: 'll',
                 locale: 'zh-CN'
+            });
+            $(this.$el).find('#expire_date').on('dp.change', function(e) {
+                // update the expire value from datetimepicker control event
+                vm.expire = e.date;
             });
         }
     });
@@ -125,9 +139,9 @@ $(document).ready(function() {
                     });
                 }
             },
-            saveCardInfo: function(card) {
-                console.log(card.expire);
-                console.log(memberData.membership[0].expire);
+            saveCardInfo: function(card, index) {
+                // TODO, update card
+                console.log(card);
             },
             viewClass: function(classItem) {
                 handleViewClass(classItem);
