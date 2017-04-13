@@ -70,6 +70,7 @@ block page
       card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
     div.page-header
       h3 备忘
+    button.btn.btn-success(type='button',data-toggle='modal',data-target='#comment_dlg') 新备忘
     div.page-header
       h3 充值记录
     div.page-header
@@ -123,3 +124,19 @@ block page
           div.alert.alert-danger(style='position:absolute;top:-10px;left:100px;right:15px',v-if='error')
             strong 错误! 
             |{{error}}
+  div#comment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 添加备忘
+        div.modal-body
+          form
+            div.form-group
+              label.control-label 新备忘:
+              textarea.form-control(rows='3', name='comment')
+              small(style='color:#777') 不超过256个字
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_comment.btn.btn-success(type="button") 添加
