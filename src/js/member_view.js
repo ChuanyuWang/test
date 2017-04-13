@@ -26,7 +26,7 @@ var memberData = {
 
 var viewData = {
     memberData: {},
-    delta: 0,
+    birth: null,
     errors: null
 }
 
@@ -118,7 +118,7 @@ $(document).ready(function() {
         data: viewData,
         computed: {
             birthDate: function() {
-                return this.memberData.birthday && moment(this.memberData.birthday).format('ll');
+                return this.birth && this.birth.format('ll');
             }
         },
         filters: {
@@ -127,21 +127,24 @@ $(document).ready(function() {
                 return moment(value).format('ll');
             }
         },
-        watch: {},
+        watch: {
+            'memberData.birthday': function() {
+                this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
+            }
+        },
         methods: {
             saveBasicInfo: function() {
                 this.errors = null;
                 if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
                 if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
-                var birth = $(this.$el).find('#birth_date').data('DateTimePicker').date();
-                if (birth && birth.isValid() == false) this.errors = { basic: '生日格式不正确' };
+                if (!this.birth || !this.birth.isValid()) this.errors = { basic: '生日格式不正确' };
                 if (!this.errors) {
                     var request = update({
                         status: this.memberData.status,
                         name: this.memberData.name,
                         contact: this.memberData.contact,
                         note: this.memberData.note,
-                        birthday: birth
+                        birthday: this.birth.toISOString()
                     });
                     request.done(function(data, textStatus, jqXHR) {
                         bootbox.alert('会员基本资料更新成功');
@@ -165,9 +168,15 @@ $(document).ready(function() {
         },
         mounted: function() {
             // 'this' is refer to vm instance
-            $(this.$el).find('#birth_date').datetimepicker({
+            var vm = this;
+            $(vm.$el).find('#birth_date').datetimepicker({
                 format: 'll',
                 locale: 'zh-CN'
+            });
+
+            $(vm.$el).find('#birth_date').on('dp.change', function(e) {
+                // TODO, the change event is not fired when the first time empty input
+                vm.birth = e.date;
             });
         }
     });
