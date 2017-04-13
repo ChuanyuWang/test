@@ -2,41 +2,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
- * member_view.js single member view page main entry module
+ * card.js component for membership card
  * --------------------------------------------------------------------------
  */
 
-var memberData = {
-    "_id": "5787bac1e0de69928c6ad14c",
-    "since": "2016-07-14T16:16:01.604Z",
-    "name": "33",
-    "contact": "33",
-    "birthday": "2015-07-08T16:00:00.000Z",
-    "expire": "2019-07-14T16:15:51.750Z",
-    "note": "abc notes",
-    "membership": [
-        {
-            "type": "ALL",
-            "room": [],
-            "expire": "2019-07-14T16:15:51.750Z",
-            "credit": 10
-        }
-    ],
-    "status": "active",
-    "errors": null
-};
-
-var viewData = {
-    memberData: {},
-    birth: null,
-    errors: null
-}
-
-// DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-
-    // register the class list in table
+module.exports = function() {
+    // register the membership card component
     Vue.component('card', {
         template: '#card-template',
         props: {
@@ -52,7 +23,11 @@ $(document).ready(function() {
                 allRooms: []
             };
         },
-        watch: {},
+        watch: {
+            'item' : function() {
+                this.delta = 0;
+            }
+        },
         computed: {
             expireDate: function() {
                 return this.expire ? this.expire.format('ll') : null;
@@ -113,8 +88,49 @@ $(document).ready(function() {
             });
         }
     });
+};
 
-    // bootstrap the class table
+},{}],2:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * member_view.js single member view page main entry module
+ * --------------------------------------------------------------------------
+ */
+
+var initCard = require('./components/card');
+
+var memberData = {
+    "_id": "5787bac1e0de69928c6ad14c",
+    "since": "2016-07-14T16:16:01.604Z",
+    "name": "33",
+    "contact": "33",
+    "birthday": "2015-07-08T16:00:00.000Z",
+    "expire": "2019-07-14T16:15:51.750Z",
+    "note": "abc notes",
+    "membership": [
+        {
+            "type": "ALL",
+            "room": [],
+            "expire": "2019-07-14T16:15:51.750Z",
+            "credit": 10
+        }
+    ],
+    "status": "active",
+    "errors": null
+};
+
+var viewData = {
+    memberData: {},
+    birth: null,
+    errors: null
+}
+
+// DOM Ready =============================================================
+$(document).ready(function() {
+    init();
+    initCard();
+
+    // bootstrap the member view page
     var memberViewer = new Vue({
         el: '#member_app',
         data: viewData,
@@ -300,4 +316,4 @@ function getMemberInfo(id) {
     })
     return request;
 };
-},{}]},{},[1]);
+},{"./components/card":1}]},{},[2]);
