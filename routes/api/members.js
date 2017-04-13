@@ -91,8 +91,8 @@ router.get('/', function(req, res, next) {
 router.get('/:memberID', function(req, res, next) {
     var members = req.db.collection("members");
     members.findOne({
-            _id: mongojs.ObjectId(req.params.memberID)
-        }, NORMAL_FIELDS, function(err, doc) {
+        _id: mongojs.ObjectId(req.params.memberID)
+    }, NORMAL_FIELDS, function(err, doc) {
         if (err) {
             var error = new Error("Get member fails");
             error.innerError = err;
@@ -216,6 +216,58 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
         });
     });
 });
+/**
+ * comments: [
+        { posted: ISODateTime(...),
+          author: 'Rick' ,
+          text: 'This is so bogus ... ' },
+       ... ]
+ */
+router.post('/:memberID/comments', function(req, res, next) {
+    var members = req.db.collection("members");
+    if (!req.body.text || req.body.text.length <= 0) {
+        var error = new Error("Missing param 'text'");
+        error.status = 400;
+        return next(error);
+    }
+    // add comment author
+    req.body.author = req.user.username;
+    // add posted date
+    req.body.posted = new Date();
+    members.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.memberID)
+        },
+        update: {
+            $push: { comments: req.body }
+        },
+        fields: { comments: 1 },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Add comment fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("member %s has 1 new comment: %s", req.params.memberID, req.body);
+        res.json(doc);
+    });
+});
+
+router.get('/:memberID/comments', function(req, res, next) {
+    var members = req.db.collection("members");
+    members.findOne({
+        _id: mongojs.ObjectId(req.params.memberID)
+    }, { comments: 1 }, function(err, doc) {
+        if (err) {
+            var error = new Error("Get comments fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("Get comments from member %s", req.params.memberID);
+        res.json(doc);
+    });
+});
 
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
     var members = req.db.collection("members");
@@ -236,22 +288,22 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
             error.innerError = err;
             return next(error);
         }
-        console.log("membership %s is created by %j", req.params.memberID, req.body);
+        console.log("membership %s is created by %j", req.body, req.user.username);
         // update the history when a new membership card is added
         var setQuery = {}, historyItems = [];
         genMembershipSetQueries(req.user.username, doc.membership.length - 1, {}, req.body, setQuery, historyItems);
         members.update({
             _id: mongojs.ObjectId(req.params.memberID)
         }, {
-            $push: {
-                history: {
-                    $each: historyItems
+                $push: {
+                    history: {
+                        $each: historyItems
+                    }
                 }
-            }
-        }, function(err, result) {
-            if (err) console.error(err);
-            console.log('update history by creating new card %j', result);
-        });
+            }, function(err, result) {
+                if (err) console.error(err);
+                console.log('update history by creating new card %j', result);
+            });
         res.json(doc);
     });
 });
@@ -341,6 +393,9 @@ function convertDateObject(doc) {
     }
     if (doc.hasOwnProperty("expire")) {
         doc["expire"] = new Date(doc["expire"]);
+    }
+    if (doc.hasOwnProperty("posted")) {
+        doc["posted"] = new Date(doc["posted"]);
     }
     if (doc.birthday) {
         doc.birthday = new Date(doc.birthday);
