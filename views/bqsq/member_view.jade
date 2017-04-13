@@ -64,10 +64,10 @@ block page
             |{{errors.basic}} 
     div.page-header
       h3 会员卡
-      template(v-if='memberData.membership&&memberData.membership.length')
-        card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
-      template(v-else)
-        card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
+    template(v-if='memberData.membership&&memberData.membership.length')
+      card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
+    template(v-else)
+      card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
     div.page-header
       h3 备忘
     div.page-header
@@ -105,7 +105,7 @@ block page
               span.glyphicon.glyphicon-calendar
       div.form-group
         label.control-label.col-sm-2 类型:
-        div.col-sm-4
+        div.col-sm-5
           select.form-control(name="card_type",v-model='type',@change='autoSelectRooms')
             option(value='ALL') 通用卡
             option(value='LIMITED') 限定卡

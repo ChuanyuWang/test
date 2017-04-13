@@ -64,7 +64,7 @@ $(document).ready(function() {
         filters: {},
         methods: {
             alterCharge: function(value) {
-                if (typeof(this.delta) !== 'number') {
+                if (typeof (this.delta) !== 'number') {
                     this.delta = parseFloat(this.delta) || 0;
                 }
                 this.delta += value;
@@ -77,7 +77,7 @@ $(document).ready(function() {
             },
             validteBeforeSave: function() {
                 this.error = null;
-                if (typeof(this.delta) !== 'number') {
+                if (typeof (this.delta) !== 'number') {
                     this.error = '增加/减少的课时数不正确';
                     return;
                 }
@@ -154,8 +154,20 @@ $(document).ready(function() {
                 }
             },
             saveCardInfo: function(card, index) {
-                // TODO, update card
-                console.log(card);
+                var vm = this;
+                if (index > -1) {
+                    var request = updateCard(this.memberData._id, index, card);
+                    request.done(function(data, textStatus, jqXHR) {
+                        bootbox.alert('会员卡更新成功');
+                        Vue.set(vm.memberData.membership, index, data.membership[index]);
+                    });
+                } else {
+                    var request = createCard(this.memberData._id, card);
+                    request.done(function(data, textStatus, jqXHR) {
+                        bootbox.alert('会员卡创建成功');
+                        vm.memberData.membership = data.membership;
+                    });
+                }
             },
             viewClass: function(classItem) {
                 handleViewClass(classItem);
@@ -222,6 +234,53 @@ function update(fields) {
     })
     return request;
 };
+
+function createCard(memberID, fields) {
+    var request = $.ajax("/api/members/" + memberID + '/memberships', {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        bootbox.dialog({
+            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+            title: "创建会员卡失败",
+            buttons: {
+                danger: {
+                    label: "确定",
+                    className: "btn-danger",
+                }
+            }
+        });
+        //console.error(jqXHR);
+    });
+    return request;
+}
+
+function updateCard(memberID, index, fields) {
+    var request = $.ajax("/api/members/" + memberID + '/memberships/' + index, {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        bootbox.dialog({
+            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+            title: "修改会员卡失败",
+            buttons: {
+                danger: {
+                    label: "确定",
+                    className: "btn-danger",
+                }
+            }
+        });
+        //console.error(jqXHR);
+    });
+    return request;
+}
 
 function getMemberInfo(id) {
     var request = $.getJSON("/api/members/" + id, '');
