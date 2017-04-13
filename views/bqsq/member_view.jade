@@ -67,7 +67,7 @@ block page
       template(v-if='memberData.membership&&memberData.membership.length')
         card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
       template(v-else)
-        card(@save="saveCardInfo",:item='{credit:0}',:index=-1)
+        card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
     div.page-header
       h3 备忘
     div.page-header
