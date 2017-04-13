@@ -46,14 +46,19 @@ $(document).ready(function() {
         data: function() {
             return {
                 delta: 0,
+                type: this.item.type,
                 expire: this.item.expire ? moment(this.item.expire) : null,
-                error: null
+                error: null,
+                allRooms: []
             };
         },
         watch: {},
         computed: {
             expireDate: function() {
                 return this.expire ? this.expire.format('ll') : null;
+            },
+            checkAllRooms: function() {
+                return this.type === 'ALL';
             }
         },
         filters: {},
@@ -63,6 +68,12 @@ $(document).ready(function() {
                     this.delta = parseFloat(this.delta) || 0;
                 }
                 this.delta += value;
+            },
+            autoSelectRooms: function() {
+                if (this.type == 'ALL') {
+                    // auto select all rooms
+                    this.item.room = this.allRooms;
+                }
             },
             validteBeforeSave: function() {
                 this.error = null;
@@ -74,12 +85,12 @@ $(document).ready(function() {
                     this.error = '请指定会员有效期';
                     return;
                 }
-                if (!this.item.type) {
+                if (!this.type) {
                     this.error = '请选择会员卡类型';
                     return;
                 }
                 var toBeSaved = {
-                    "type": this.item.type,
+                    "type": this.type,
                     "room": this.item.room,
                     "expire": this.expire && this.expire.toISOString(),
                     "credit": this.item.credit + this.delta
@@ -96,6 +107,9 @@ $(document).ready(function() {
             $(this.$el).find('#expire_date').on('dp.change', function(e) {
                 // update the expire value from datetimepicker control event
                 vm.expire = e.date;
+            });
+            $(this.$el).find('#roomlist input').each(function(index, el) {
+                vm.allRooms.push(el.value);
             });
         }
     });

@@ -106,7 +106,7 @@ block page
       div.form-group
         label.control-label.col-sm-2 类型:
         div.col-sm-4
-          select.form-control(name="card_type",v-model='item.type')
+          select.form-control(name="card_type",v-model='type',@change='autoSelectRooms')
             option(value='ALL') 通用卡
             option(value='LIMITED') 限定卡
       div.form-group
@@ -115,7 +115,7 @@ block page
           - each room in classroom
             div.checkbox
               label
-                input(type="checkbox", value=room.id,v-model='item.room')
+                input(type="checkbox", value=room.id,v-model='item.room',:disabled='checkAllRooms')
                 = room.name
       div.form-group
         div.col-sm-offset-2.col-sm-10
