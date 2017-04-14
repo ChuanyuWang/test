@@ -27,7 +27,11 @@ var memberData = {
 };
 
 var viewData = {
-    memberData: {},
+    memberData: {
+        membership: [],
+        comments: [],
+        history: []
+    },
     birth: null,
     errors: null
 }
@@ -45,12 +49,19 @@ $(document).ready(function() {
         computed: {
             birthDate: function() {
                 return this.birth && this.birth.format('ll');
+            },
+            commentCount: function() {
+                return this.memberData.comments ? this.memberData.comments.length : 0;
             }
         },
         filters: {
             formatDate: function(value) {
                 if (!value) return '?';
                 return moment(value).format('ll');
+            },
+            formatDateTime: function(value) {
+                if (!value) return '?';
+                return moment(value).format('lll');
             }
         },
         watch: {
@@ -120,6 +131,11 @@ $(document).ready(function() {
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
     });
+
+    var request = getMemberComments($('#member_app').data('member-id'));
+    request.done(function(data, textStatus, jqXHR) {
+        Vue.set(viewData.memberData, 'comments', data.comments)
+    });
 });
 
 // Functions =============================================================
@@ -130,21 +146,21 @@ function init() {
 };
 
 function handleClickAddComment() {
-
     var modal = $(this).closest('.modal');
     var content = modal.find('textarea[name=comment]').val().trim();
     if (content.length === 0 || content.length > 255) {
         modal.find('textarea[name=comment]').closest(".form-group").addClass("has-error");
-        return ;
+        return;
     } else {
         modal.find('textarea[name=comment]').closest(".form-group").removeClass("has-error");
     }
     var comment = {
-        text : content
+        text: content
     };
-
     var request = addComment(viewData.memberData._id, comment);
-    //TODO, update comment
+    request.done(function(data, textStatus, jqXHR) {
+        Vue.set(viewData.memberData, 'comments', data.comments)
+    });
     modal.modal('hide');
 };
 
@@ -253,7 +269,26 @@ function getMemberInfo(id) {
         // alert dialog with danger button
         bootbox.dialog({
             message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "更新会员失败",
+            title: "获取会员信息失败",
+            buttons: {
+                danger: {
+                    label: "确定",
+                    className: "btn-danger"
+                }
+            }
+        });
+    })
+    return request;
+};
+
+function getMemberComments(id) {
+    var request = $.getJSON("/api/members/" + id + '/comments', '');
+
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        // alert dialog with danger button
+        bootbox.dialog({
+            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+            title: "获取会员备忘失败",
             buttons: {
                 danger: {
                     label: "确定",

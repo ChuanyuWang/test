@@ -70,7 +70,18 @@ block page
       card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
     div.page-header
       h3 备忘
-    button.btn.btn-success(type='button',:disabled='!memberData._id',data-toggle='modal',data-target='#comment_dlg') 新备忘
+    template(v-for="comment in memberData.comments")
+      div.media
+        div.media-left
+          span.glyphicon.glyphicon-comment(style='font-size:large')
+        div.media-body
+          h4.media-heading(style='font-size:small') {{comment.text}}
+          p.small(style='color:#777') by {{comment.author}} at {{comment.posted | formatDateTime}}
+    small(style='color:#777;float:right') 共{{commentCount}}条备忘
+    form.form-horizontal
+      div.form-group
+        div.col-sm-offset-2.col-sm-10
+          button.btn.btn-success(type='button',:disabled='!memberData._id',data-toggle='modal',data-target='#comment_dlg') 新备忘    
     div.page-header
       h3 充值记录
     div.page-header
