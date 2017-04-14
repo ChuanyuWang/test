@@ -6,26 +6,6 @@
 
 var initCard = require('./components/card');
 
-var memberData = {
-    "_id": "5787bac1e0de69928c6ad14c",
-    "since": "2016-07-14T16:16:01.604Z",
-    "name": "33",
-    "contact": "33",
-    "birthday": "2015-07-08T16:00:00.000Z",
-    "expire": "2019-07-14T16:15:51.750Z",
-    "note": "abc notes",
-    "membership": [
-        {
-            "type": "ALL",
-            "room": [],
-            "expire": "2019-07-14T16:15:51.750Z",
-            "credit": 10
-        }
-    ],
-    "status": "active",
-    "errors": null
-};
-
 var viewData = {
     memberData: {
         membership: [],
@@ -176,17 +156,7 @@ function update(fields) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        // alert dialog with danger button
-        bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "更新会员失败",
-            buttons: {
-                danger: {
-                    label: "确定",
-                    className: "btn-danger"
-                }
-            }
-        });
+        showAlert("更新会员失败", jqXHR);
     })
     return request;
 };
@@ -198,19 +168,8 @@ function addComment(memberID, fields) {
         data: JSON.stringify(fields),
         dataType: "json"
     });
-
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "添加会员备忘失败",
-            buttons: {
-                danger: {
-                    label: "确定",
-                    className: "btn-danger",
-                }
-            }
-        });
-        //console.error(jqXHR);
+        showAlert("添加会员备忘失败", jqXHR);
     });
     return request;
 }
@@ -224,17 +183,7 @@ function createCard(memberID, fields) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "创建会员卡失败",
-            buttons: {
-                danger: {
-                    label: "确定",
-                    className: "btn-danger",
-                }
-            }
-        });
-        //console.error(jqXHR);
+        showAlert("创建会员卡失败", jqXHR);
     });
     return request;
 }
@@ -247,55 +196,44 @@ function updateCard(memberID, index, fields) {
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "修改会员卡失败",
-            buttons: {
-                danger: {
-                    label: "确定",
-                    className: "btn-danger",
-                }
-            }
-        });
-        //console.error(jqXHR);
+        showAlert("修改会员卡失败", jqXHR);
     });
     return request;
 }
 
 function getMemberInfo(id) {
     var request = $.getJSON("/api/members/" + id, '');
-
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        // alert dialog with danger button
-        bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "获取会员信息失败",
-            buttons: {
-                danger: {
-                    label: "确定",
-                    className: "btn-danger"
-                }
-            }
-        });
+        showAlert("获取会员信息失败", jqXHR);
     })
     return request;
 };
 
 function getMemberComments(id) {
     var request = $.getJSON("/api/members/" + id + '/comments', '');
-
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        // alert dialog with danger button
-        bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "获取会员备忘失败",
-            buttons: {
-                danger: {
-                    label: "确定",
-                    className: "btn-danger"
-                }
-            }
-        });
+        showAlert("获取会员备忘失败", jqXHR);
     })
     return request;
+};
+
+/**
+ * 
+ * @param {String} title 
+ * @param {Object} jqXHR 
+ * @param {String} className default is 'btn-danger'
+ */
+function showAlert(title, jqXHR, className) {
+    //console.error(jqXHR);
+    bootbox.dialog({
+        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+        title: title || '错误',
+        buttons: {
+            danger: {
+                label: "确定",
+                // alert dialog with danger button by default
+                className: className || "btn-danger"
+            }
+        }
+    });
 };
