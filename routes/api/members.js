@@ -249,7 +249,7 @@ router.post('/:memberID/comments', function(req, res, next) {
             error.innerError = err;
             return next(error);
         }
-        console.log("member %s has 1 new comment: %s", req.params.memberID, req.body);
+        console.log("member %s has 1 new comment: %j", req.params.memberID, req.body);
         res.json(doc);
     });
 });

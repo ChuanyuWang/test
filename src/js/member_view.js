@@ -36,6 +36,7 @@ var viewData = {
 $(document).ready(function() {
     init();
     initCard();
+    $('#comment_dlg #add_comment').click(handleClickAddComment);
 
     // bootstrap the member view page
     var memberViewer = new Vue({
@@ -92,9 +93,6 @@ $(document).ready(function() {
                     });
                 }
             },
-            viewClass: function(classItem) {
-                handleViewClass(classItem);
-            },
             deleteClass: function(classItem) {
                 handleRemoveClass(classItem);
             },
@@ -131,6 +129,25 @@ function init() {
     moment.locale('zh-CN');
 };
 
+function handleClickAddComment() {
+
+    var modal = $(this).closest('.modal');
+    var content = modal.find('textarea[name=comment]').val().trim();
+    if (content.length === 0 || content.length > 255) {
+        modal.find('textarea[name=comment]').closest(".form-group").addClass("has-error");
+        return ;
+    } else {
+        modal.find('textarea[name=comment]').closest(".form-group").removeClass("has-error");
+    }
+    var comment = {
+        text : content
+    };
+
+    var request = addComment(viewData.memberData._id, comment);
+    //TODO, update comment
+    modal.modal('hide');
+};
+
 function update(fields) {
     var request = $.ajax("/api/members/" + viewData.memberData._id, {
         type: "PATCH",
@@ -157,6 +174,30 @@ function update(fields) {
     })
     return request;
 };
+
+function addComment(memberID, fields) {
+    var request = $.ajax("/api/members/" + memberID + '/comments', {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        bootbox.dialog({
+            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+            title: "添加会员备忘失败",
+            buttons: {
+                danger: {
+                    label: "确定",
+                    className: "btn-danger",
+                }
+            }
+        });
+        //console.error(jqXHR);
+    });
+    return request;
+}
 
 function createCard(memberID, fields) {
     var request = $.ajax("/api/members/" + memberID + '/memberships', {
