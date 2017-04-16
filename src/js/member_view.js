@@ -9,8 +9,7 @@ var initCard = require('./components/card');
 var viewData = {
     memberData: {
         membership: [],
-        comments: [],
-        history: []
+        comments: []
     },
     birth: null,
     errors: null
@@ -83,13 +82,6 @@ $(document).ready(function() {
                         vm.memberData.membership = data.membership;
                     });
                 }
-            },
-            deleteClass: function(classItem) {
-                handleRemoveClass(classItem);
-            },
-            addClass: function(dayOffset, startTime) {
-                // the first class should start from 8:00 in the morning
-                showAddNewClassDlg(moment(this.monday).add(dayOffset, 'days').hours(startTime == 0 ? 8 : startTime));
             }
         },
         mounted: function() {
@@ -123,6 +115,8 @@ $(document).ready(function() {
 function init() {
     console.log("init view member ~~~");
     moment.locale('zh-CN');
+    $('#loadHistoryBtn').click(loadHistory);
+    $('#loadClassesBtn').click(loadClasses);
 };
 
 function handleClickAddComment() {
@@ -142,6 +136,26 @@ function handleClickAddComment() {
         Vue.set(viewData.memberData, 'comments', data.comments)
     });
     modal.modal('hide');
+};
+
+function loadHistory(e) {
+    e.preventDefault();
+    $('#history_table').bootstrapTable('refresh', { url: '/api/members/' + viewData.memberData._id + '/history' });
+};
+
+function loadClasses(e) {
+    e.preventDefault();
+    var begin = moment(0);
+    var end = moment().add(10, 'years');
+    $('#classes_table').bootstrapTable('refresh', {
+        url: '/api/classes',
+        query: {
+            memberid: viewData.memberData._id,
+            from: begin.toISOString(),
+            to: end.toISOString(),
+            order: 'desc'
+        }
+    });
 };
 
 function update(fields) {
