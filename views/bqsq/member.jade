@@ -40,7 +40,7 @@ block page
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
       button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
         span.glyphicon.glyphicon-filter
-    table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true",data-query-params="customQuery")
+    table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
       thead
         tr
           th(data-radio='true')
@@ -48,9 +48,10 @@ block page
           th(data-field='name',data-sortable='true') 宝宝姓名
           th(data-field='contact') 联系方式
           th(data-field='birthday',data-sortable='true') 宝宝生日
-          th(data-field='membership',data-sortable='true',data-sort-name='membership.0.credit') 剩余课时
-          th(data-field='membership.0',data-sortable='true',data-sort-name='membership.0.expire',data-formatter='membershipFormatter',data-events='editMembership') 会员卡
-          th(data-field='since',data-sortable='true') 登记时间
+          th(data-sortable='true',data-sort-name='membership.0.credit') 剩余课时
+          th(data-sortable='true',data-sort-name='membership.0.expire') 有效期
+          //th(data-field='since',data-sortable='true') 登记时间
+          th 操作
           th(data-field='note',data-visible='false') 简介
     p.small 有效会员: <strong>#{statistics.count}</strong>人<br>剩余课时: <b>#{statistics.total}</b>
   div#member_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
@@ -110,166 +111,3 @@ block page
                       | 显示只能在<u>#{room.name}</u>消费的会员
         div.modal-footer
           button.btn.btn-primary(type="button",data-dismiss="modal") 确定
-  div#membership_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 会员卡
-        div.modal-body
-          form.form-horizontal
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 宝宝姓名:
-              div.col-sm-10
-                p#name.form-control-static
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 课时:
-              div.col-sm-10(style="display:inline-flex")
-                p#credit.form-control-static {0}
-                p.form-control-static 次(剩余)
-                //button#charge_btn.btn.btn-sm.btn-primary(type="button",style="margin:2px") 充值...
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 增加/减少:
-              div.col-sm-10(style="display:inline-flex")
-                button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",onClick="alterCharge(-10)")
-                  span.glyphicon.glyphicon-minus
-                  | 10
-                button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",onClick="alterCharge(-1)")
-                  span.glyphicon.glyphicon-minus
-                  | 1
-                input.form-control(type='number',name='charge',min='-100',max='100',step='0.1',style="width:85px;margin:0 2px")
-                button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",onClick="alterCharge(1)")
-                  span.glyphicon.glyphicon-plus
-                  | 1
-                button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",onClick="alterCharge(10)")
-                  span.glyphicon.glyphicon-plus
-                  | 10
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 有效期至:
-              div.col-sm-4
-                div#expire_date.input-group.date
-                  input.form-control(text='text')
-                  span.input-group-addon
-                    span.glyphicon.glyphicon-calendar
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 类型:
-              div.col-sm-4
-                select.form-control(name="card_type")
-                  option(value='ALL') 通用卡
-                  option(value='LIMITED') 限定卡
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 可用教室:
-              div#roomlist.col-sm-10
-                - each room in classroom
-                  div.checkbox
-                    label
-                      input(type="checkbox", value=room.id)
-                      = room.name
-        div.modal-footer
-          button#log_btn.btn.btn-primary.pull-left(type="button") 修改记录
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#ok.btn.btn-success(type="button") 确定
-  div#changeLog_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal")
-            span &times
-          h4.modal-title 修改日志
-        div.modal-body
-          div.row(style='margin:auto')
-            label.col-sm-2 宝宝姓名:
-            div#name.col-sm-10
-          div.row
-            div.col-sm-12(style='margin-top:7px')
-              table(data-toggle="table",data-sort-name="date",data-striped='true',data-pagination='true',data-page-size='10')
-                thead
-                  tr
-                    th(data-field='date',data-formatter='dateFormatter') 日期
-                    th(data-field='target',data-formatter='fieldFormatter') 属性
-                    th(data-field='new',data-formatter='deltaFormatter') 变更
-                    //th(data-field='remark') 备注
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 确定
-  script(type='text/javascript').
-    function alterCharge(value) {
-        var inputCharge = $(event.target).closest("div").find("input[name=charge]");
-        var currentVal = isNaN(parseFloat(inputCharge.val()))? 0 : parseFloat(inputCharge.val());
-        inputCharge.val(Math.round((currentVal + value)*10)/10);
-    };
-    function deltaFormatter(value, row, index) {
-        if (row.target.indexOf('credit') > -1) {
-            return [
-                row.old === null ? null : Math.round(row.old * 10)/10,
-                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-                Math.round(row.new * 10)/10
-            ].join('');
-        } else if (row.target.indexOf('expire') > -1) {
-            return [
-                moment(row.old).isValid() ? moment(row.old).format('ll') : null,
-                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-                moment(row.new).isValid() ? moment(row.new).format('ll') : null
-            ].join('');
-        } else {
-            return [
-                row.old,
-                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-                row.new
-            ].join('');
-        }
-    };
-    function fieldFormatter(value) {
-        if (value.indexOf('credit') > -1) {
-            return '课时';
-        } else if (value.indexOf('expire') > -1) {
-            return '有效期';
-        } else {
-          return value;
-        }
-    };
-    function dateFormatter(value) {
-        if (value) {
-            return moment(value).format('ll');
-        } else {
-            return undefined;
-        }
-    };
-    function highlightExpire(row, index) {
-        //TODO, 
-        return {};
-        if (row.expire) {
-            var expire = new Date(row.expire);
-            // highlight the row if member is expired
-            if (expire < new Date()) {
-                return {
-                    classes: 'danger'
-                };
-            }
-            // highlight the row if member has no credit
-            if (row.hasOwnProperty('credit') && row.credit <= 0) {
-                return {
-                    classes: 'danger'
-                };
-            }
-        }
-        return {};
-    };
-    function membershipFormatter(value) {
-        var color = "text-success";
-        if (value) {
-            // highlight the card if member is expired or has no credit
-            if (new Date(value.expire) < new Date() || value.credit <=0) {
-                color = 'text-danger';
-            }
-        } else {
-            // highlight the card if member has no card
-            color = 'text-muted';
-        }
-        return [
-            //TODO, update title according to different color
-            '<a class="membership ' + color + '" href="javascript:void(0)" title="会员卡">',
-            '<i class="glyphicon glyphicon-credit-card"></i> 会员卡',
-            '</a>'
-        ].join('');
-    };

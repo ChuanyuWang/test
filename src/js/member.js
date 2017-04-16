@@ -43,20 +43,19 @@ function init() {
         locale: 'zh-CN',
         defaultDate: moment()
     });
-    $('#expire_date').datetimepicker({
-        format: 'll',
-        locale: 'zh-CN',
-        defaultDate: moment().add(6, 'months')
-    });
 
     $('#member_table').bootstrapTable({
         locale: 'zh-CN',
+        rowStyle: highlightExpire,
+        queryParams: customQuery,
         columns: [{}, {}, {}, {
             formatter: common.dateFormatter
         }, {
             formatter: creditFormatter
-        }, {}, {
-            formatter: common.dateFormatter
+        }, {
+            formatter: expireFormatter
+        }, {
+            formatter: viewFormatter
         }, {}
         ]
     });
@@ -69,18 +68,6 @@ function init() {
             $('#member_table').bootstrapTable('uncheckBy', { field: '_id', values: [items[i]._id] });
         }
     });
-
-    $('#membership_dlg select[name=card_type]').change(function(event) {
-        if ($(this).find('option:selected').val() == 'ALL') {
-            $('#membership_dlg #roomlist input').prop('checked', true);
-            $('#membership_dlg #roomlist input').prop('disabled', true);
-        } else {
-            $('#membership_dlg #roomlist input').prop('disabled', false);
-        }
-    });
-    // listen to the action button on modal dialogs
-    $('#membership_dlg button#log_btn').click(openChangeLogDlg);
-    $('#membership_dlg button#ok').click(updateMemberShip);
 };
 
 // return true if an error occurs after validation, otherwise return false
@@ -149,164 +136,7 @@ function addNewMember(member) {
     });
 };
 
-function updateMemberShip(event) {
-    var modal = $(this).closest('.modal');
-    var member_id = modal.data('id');
-    var member = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
-    var memberCard = { room: [] };
-
-    var hasError = false;
-
-    // get expire date
-    memberCard.expire = modal.find('#expire_date').data("DateTimePicker").date();
-    memberCard.type = modal.find('select[name=card_type] option:selected').val();
-    if (memberCard.type == null) {
-        modal.find('select[name=card_type]').closest(".form-group").addClass("has-error");
-        hasError = true;
-    } else {
-        modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
-
-    }
-    // get limited classrooms
-    modal.find('#roomlist input:checked').each(function(index, element) {
-        memberCard.room.push($(this).val());
-    });
-
-    // get charge value
-    var newVal = parseFloat(modal.find('input[name=charge]').val());
-    if (isNaN(newVal)) {
-        modal.find('input[name=charge]').closest(".form-group").addClass("has-error");
-        hasError = true;
-    } else {
-        modal.find('input[name=charge]').closest(".form-group").removeClass("has-error");
-        if (newVal != 0) {
-            memberCard.credit = member.membership[0].credit;
-            memberCard.credit += newVal;
-        }
-    }
-
-    if (hasError) return;
-
-    //TODO, support multi membership card in the future
-    $.ajax("/api/members/" + member_id + '/memberships/0', {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(memberCard),
-        success: function(doc) {
-            $('#member_table').bootstrapTable('updateByUniqueId', { id: member_id, row: doc });
-            modal.modal('hide');
-        },
-        error: function(jqXHR, status, err) {
-            bootbox.dialog({
-                message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                title: "修改会员卡失败",
-                buttons: {
-                    danger: {
-                        label: "确定",
-                        className: "btn-danger",
-                    }
-                }
-            });
-            //console.error(jqXHR);
-        },
-        dataType: "json"
-    });
-};
-
-// event handler defined in home.jade file for removing booking item
-window.editMembership = {
-    'click .membership': function(e, value, row, index) {
-        if (row.membership && row.membership.length > 0) {
-            openEditMembershipCardDlg(row);
-        } else {
-            // confirm to create membership card
-            bootbox.confirm('为此会员创建会员卡吗？', function(ok) {
-                if (!ok) return;
-                var request = $.ajax("/api/members/" + row._id + "/memberships", {
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({
-                        credit: 0,
-                        // the default expire date is 3 months later
-                        expire: moment().add(3, 'months').hours(0).minutes(0).seconds(0).millisecond(0),
-                        room: [],
-                        type: 'ALL'
-                    }),
-                    dataType: "json"
-                });
-                request.done(function(data, textStatus, jqXHR) {
-                    $('#member_table').bootstrapTable('updateByUniqueId', { id: row._id, row: data });
-                    // show membership card dialog
-                    openEditMembershipCardDlg(data);
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    // alert dialog with danger button
-                    bootbox.dialog({
-                        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                        title: "创建会员卡失败",
-                        buttons: {
-                            ok: {
-                                label: "确定",
-                                className: "btn-danger"
-                            }
-                        }
-                    });
-                });
-            })
-        }
-    }
-};
-
-function openEditMembershipCardDlg(member) {
-    if (member.membership && member.membership.length > 0) {
-        var membership = member.membership[0];
-    }
-    if (!membership) return;
-
-    var modal = $('#membership_dlg').data('id', member._id);
-    modal.find('#name').text(member.name);
-    modal.find('#credit').text(Math.round(membership.credit * 10) / 10 || 0);
-    modal.find('input[name=charge]').val(0).closest(".form-group").removeClass("has-error");
-    modal.find('#expire_date').data('DateTimePicker').date(moment(membership.expire));
-    modal.find('#roomlist input').prop('disabled', false);
-    modal.find('#roomlist input').prop('checked', false);
-    modal.find('select[name=card_type]').closest(".form-group").removeClass("has-error");
-    if (membership.type) {
-        modal.find('select[name=card_type] option[value=' + membership.type + ']').prop('selected', true);
-        // update classroom check box
-        switch (membership.type) {
-            case "ALL":
-                modal.find('#roomlist input').prop('checked', true);
-                modal.find('#roomlist input').prop('disabled', true);
-                break;
-            case "LIMITED":
-                for (var index in membership.room) {
-                    modal.find('#roomlist input[value=' + membership.room[index] + ']').prop('checked', true);
-                }
-                break;
-        }
-    } else {
-        modal.find('select[name=card_type]').prop('selectedIndex', -1);
-    }
-
-    $('#membership_dlg').modal('show');
-};
-
-function openChangeLogDlg(event) {
-    var memberCard_dlg = $(this).closest('.modal');
-    var member_id = memberCard_dlg.data('id');
-    memberCard_dlg.modal('hide');
-    var member = $('#member_table').bootstrapTable('getRowByUniqueId', member_id);
-
-    // set the member id
-    var changeLogDlg = $('#changeLog_dlg');
-    changeLogDlg.find('#name').text(member.name);
-    // refresh the change log
-    changeLogDlg.find('table').bootstrapTable('refresh', { url: '/api/members/' + member_id + '/history' });
-    // show the dialog in the end
-    changeLogDlg.modal('show');
-};
-
-window.customQuery = function(params) {
+function customQuery(params) {
     // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
     var filter = $("#filter_dlg input:checked").val();
     params.filter = filter;
@@ -329,7 +159,8 @@ function handleFilterStatus(event) {
     }
 };
 
-function creditFormatter(membership) {
+function creditFormatter(value, row, index) {
+    var membership = row.membership;
     if (membership && membership[0]) {
         // A better way of 'toFixed(1)'
         if (typeof (membership[0].credit) == 'number') {
@@ -337,6 +168,17 @@ function creditFormatter(membership) {
         } else {
             return membership[0].credit;
         }
+    } else {
+        return undefined;
+    }
+};
+
+function expireFormatter(value, row, index) {
+    var membership = row.membership;
+    if (membership && membership[0]) {
+        // A better way of 'toFixed(1)'
+        var expire = membership[0].expire;
+        return expire ? moment(expire).format('ll') : null;
     } else {
         return undefined;
     }
@@ -350,4 +192,36 @@ function viewMember(membership) {
         return;
     }
     window.location.href = window.location.pathname + '/' + items[0]._id;
+};
+
+function highlightExpire(row, index) {
+    var card = row.membership && row.membership[0];
+    if (card) {
+        var expire = moment(card.expire);
+        // skip is expire is not set
+        if (!expire.isValid()) return {};
+        // highlight the row if member is expired
+        if (expire.isBefore(moment())) {
+            return {
+                classes: 'danger'
+            };
+        }
+        // highlight the row if member has no credit
+        if (card.hasOwnProperty('credit') && card.credit < 0) {
+            return {
+                classes: 'danger'
+            };
+        }
+    }
+    return {};
+};
+
+function viewFormatter(value, row, index) {
+    var url = window.location.pathname + '/' + row._id;
+    return [
+        //TODO, update title according to different color
+        '<a href="' + url + '" title="查看会员详情">',
+        '<i class="glyphicon glyphicon-user"></i> 查看详情',
+        '</a>'
+    ].join('');
 };
