@@ -119,23 +119,30 @@ router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next)
     }
     convertDateObject(req.body);
 
-    members.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.memberID)
-        },
-        update: {
-            $set: req.body
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update member fails");
-            error.innerError = err;
+    checkDuplicate(members, req.params.memberID, req.body, function(err, isExisted) {
+        if (isExisted) {
+            var error = new Error("会员姓名和联系方式已经存在，请勿重复");
+            error.status = 400;
             return next(error);
         }
-        console.log("member %s is updated by %j", req.params.memberID, req.body);
-        res.json(doc);
+        members.findAndModify({
+            query: {
+                _id: mongojs.ObjectId(req.params.memberID)
+            },
+            update: {
+                $set: req.body
+            },
+            fields: NORMAL_FIELDS,
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if (err) {
+                var error = new Error("Update member fails");
+                error.innerError = err;
+                return next(error);
+            }
+            console.log("member %s is updated by %j", req.params.memberID, req.body);
+            res.json(doc);
+        });
     });
 });
 
@@ -414,6 +421,52 @@ function convertDateObject(doc) {
 
     return doc;
 };
+
+function checkDuplicate(collection, id, query, callback) {
+    var FIELDS = { name: 1, contact: 1 };
+    if (query.hasOwnProperty('name') && query.hasOwnProperty('contact')) {
+        collection.find({
+            name: query.name, contact: query.contact
+        }, FIELDS, function(err, docs) {
+            if (err) return callback(err);
+            if (docs.length > 1) return callback(null, true);
+            else if (docs.length == 1) {
+                if (docs[0]._id.toString() != id) {
+                    return callback(null, true);
+                }
+            }
+            return callback(null, false);
+        });
+    } else if (query.hasOwnProperty('name') || query.hasOwnProperty('contact')) {
+        collection.findOne({
+            _id: mongojs.ObjectId(req.params.memberID)
+        }, FIELDS, function(err, doc) {
+            if (err) return callback(err);
+            if (!doc) return callback(null, false);
+
+            var search = {
+                name: doc.name,
+                contact: doc.contact
+            };
+            if (query.hasOwnProperty('name')) search.name = query.name;
+            if (query.hasOwnProperty('contact')) search.contact = query.contact;
+
+            collection.find(search, FIELDS, function(err, docs) {
+                if (err) return callback(err);
+                if (docs.length > 1) return callback(null, true);
+                else if (docs.length == 1) {
+                    if (docs[0]._id.toString() != id) {
+                        return callback(null, true);
+                    }
+                }
+                return callback(null, false);
+            });
+        });
+
+    } else {
+        return callback(null, false);
+    }
+}
 
 function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems) {
     for (var key in newItem) {
