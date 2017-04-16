@@ -30,37 +30,12 @@ block page
   div.container(style='padding-top:58px')
     div#toolbar.btn-group(role='group')
       button.btn.btn-success(type='button') 创建
-    table#course_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/courses',data-toolbar='#toolbar',data-unique-id="_id")
+    table#course_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/courses',data-toolbar='#toolbar',data-unique-id="_id")
       thead
         tr
           //th(data-field='_id',data-visible='false') ID
           th(data-field='name',data-sortable='true') 班级名称
-          th(data-field='createDate',data-formatter='dateFormatter',data-sortable='true') 创建时间
-          th(data-field='status',data-formatter='statusFormatter',data-sortable='true') 状态
-          th(data-field='members',data-formatter='membersFormatter',data-sortable='true') 人数
-          th(data-width='180px',data-align='center',data-formatter='actionFormatter',data-events='handleActionClick') 操作
-  script(type='text/javascript').
-    function dateFormatter(value) {
-        return value ? moment(value).format('ll') : undefined;
-    };
-    function membersFormatter(value) {
-        return value && value.length ? value.length : 0;
-    };
-    function statusFormatter(value) {
-      if (value == "inprogress") return '进行中';
-      if (value == "closed") return '结束';
-      return value;
-    };
-    function actionFormatter(value) {
-        return [
-          '<button type="button" class="end btn btn-danger btn-xs">',
-          '  <span class="glyphicon glyphicon-ban-circle"></span> 结束',
-          '</button>',
-          '<button type="button" style="margin:0px 3px" class="edit btn btn-warning btn-xs">',
-          '  <span class="glyphicon glyphicon-edit"></span> 修改',
-          '</button>',
-          '<button type="button" class="view btn btn-primary btn-xs">',
-          '  <span class="glyphicon glyphicon-expand"></span> 查看',
-          '</button>'
-        ].join('');
-    };
+          th(data-field='createDate',data-sortable='true') 创建时间
+          th(data-field='status',data-sortable='true') 状态
+          th(data-field='members',data-sortable='true') 人数
+          th(data-width='180px',data-align='center') 操作
