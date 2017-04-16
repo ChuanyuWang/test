@@ -17,6 +17,14 @@ append js
   else
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
   script(src='/js/member_view.js')
+  style.
+    .container .page-header {
+      margin: 15px 0;
+      padding-bottom: 3px;
+    }
+    .container .form-group {
+      margin-bottom: 7px;
+    }
 
 block page
   div#member_app.container(style='padding-top:69px',data-member-id='#{memberID}')
