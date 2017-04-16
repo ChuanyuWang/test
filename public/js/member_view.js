@@ -300,11 +300,13 @@ function handleClickAddComment() {
 
 function loadHistory(e) {
     e.preventDefault();
+    $('#loadHistory_mask').show(600);
     $('#history_table').bootstrapTable('refresh', { url: '/api/members/' + viewData.memberData._id + '/history' });
 };
 
 function loadClasses(e) {
     e.preventDefault();
+    $('#loadClasses_mask').show(600);
     var begin = moment(0);
     var end = moment().add(10, 'years');
     $('#classes_table').bootstrapTable('refresh', {

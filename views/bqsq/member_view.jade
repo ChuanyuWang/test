@@ -25,6 +25,12 @@ append js
     .container .form-group {
       margin-bottom: 7px;
     }
+    .container .page-header span{
+      transition: all 0.8s ease-in-out;
+    }
+    .container .page-header span:hover{
+      transform: rotate(360deg);
+    }
 
 block page
   div#member_app.container(style='padding-top:69px',data-member-id='#{memberID}')
@@ -93,26 +99,28 @@ block page
   div.container(data-member-id='#{memberID}')
     div.page-header
       h3(style='margin-top:0;display:inline-block') 充值记录
-      a#loadHistoryBtn(href='#')
+      a#loadHistoryBtn(href='#',title='点击加载')
         span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
-    table#history_table(data-striped='true',data-pagination='true',data-page-size='10')
-      thead
-        tr
-          th(data-field='date') 日期
-          th(data-field='target') 属性
-          th(data-field='new') 变更
-          th(data-field='remark') 备注
+    div#loadHistory_mask(style='display:none')
+      table#history_table(data-striped='true',data-pagination='true',data-page-size='10')
+        thead
+          tr
+            th(data-field='date') 日期
+            th(data-field='target') 属性
+            th(data-field='new') 变更
+            th(data-field='remark') 备注
     div.page-header
       h3(style='margin-top:0;display:inline-block') 上课记录
-      a#loadClassesBtn(href='#')
+      a#loadClassesBtn(href='#',title='点击加载')
         span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
-    table#classes_table(data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
-      thead
-        tr
-          //th(data-field='_id',data-visible='false') ID
-          th(data-field='name') 课程名称
-          th(data-field='cost') 课时
-          th(data-field='date',data-sortable='true') 课程日期
+    div#loadClasses_mask(style='display:none')
+      table#classes_table(data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
+        thead
+          tr
+            //th(data-field='_id',data-visible='false') ID
+            th(data-field='name') 课程名称
+            th(data-field='cost') 课时
+            th(data-field='date',data-sortable='true') 课程日期
     div(style='height:20px')
   script#card-template(type='text/x-template')
     form.form-horizontal
