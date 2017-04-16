@@ -117,7 +117,10 @@ function addNewMember(member) {
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(member),
         success: function(data) {
-            $('#member_table').bootstrapTable('insertRow', { index: 0, row: data });
+            // update the table
+            //$('#member_table').bootstrapTable('insertRow', { index: 0, row: data });
+            // jump to new member page
+            window.location.href = window.location.pathname + '/' + data._id;
         },
         error: function(jqXHR, status, err) {
             bootbox.dialog({
