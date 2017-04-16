@@ -31,7 +31,7 @@ block page
     form.form-horizontal
       div.form-group
         label.col-sm-2.control-label 状态:
-        select.col-sm-5.form-control(v-model='memberData.status',style='margin-left:15px;width:auto')
+        select.col-sm-5.form-control(v-model='memberData.status',@change='deactivateAlert',style='margin-left:15px;width:auto')
           option.text-success(value='active') 激活
           option.text-danger(value='inactive') 未激活
       div.form-group
