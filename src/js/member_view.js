@@ -5,6 +5,7 @@
  */
 
 var initCard = require('./components/card');
+var common = require('./common');
 
 var viewData = {
     memberData: {
@@ -131,7 +132,7 @@ function init() {
     $('#history_table').bootstrapTable({
         locale: 'zh-CN',
         columns: [{
-            formatter: dateFormatter
+            formatter: common.dateFormatter
         }, {
             formatter: fieldFormatter
         }, {
@@ -142,7 +143,7 @@ function init() {
     $('#classes_table').bootstrapTable({
         locale: 'zh-CN',
         columns: [{}, {}, {
-            formatter: dateFormatter
+            formatter: common.dateFormatter
         }]
     });
 
@@ -281,19 +282,6 @@ function showAlert(title, jqXHR, className) {
             }
         }
     });
-};
-/**
- * 
- * @param {Object} value the field value
- * @param {Object} row the row record data
- * @param {Number} index the row index
- */
-function dateFormatter(value, row, index) {
-    if (value) {
-        return moment(value).format('ll');
-    } else {
-        return undefined;
-    }
 };
 
 function fieldFormatter(value, row, index) {

@@ -2,6 +2,41 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
+ * common.js
+ * --------------------------------------------------------------------------
+ */
+
+module.exports = {
+    /**
+     * get the tenat name of current page, e.g.
+     * return 'bqsq' from http://localhost:3000/t/bqsq/course/1/view
+     */
+    getTenantName: function() {
+        var pathname = window.location.pathname;
+        if (pathname.length == 0) return "";
+        if (pathname.charAt(0) == '/') pathname = pathname.substring(1);
+        if (pathname.charAt(0) == 't') pathname = pathname.substring(1);
+        if (pathname.charAt(0) == '/') pathname = pathname.substring(1);
+        return pathname.split('/')[0];
+    },
+    /**
+     * Data fomatter function of bootstrap-table to format date localized string by 'll'
+     * 
+     * @param {Object} value the field value
+     * @param {Object} row the row record data
+     * @param {Number} index the row index
+     */
+    dateFormatter: function(value, row, index) {
+        if (value) {
+            return moment(value).format('ll');
+        } else {
+            return undefined;
+        }
+    }
+};
+},{}],2:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
  * card.js component for membership card
  * --------------------------------------------------------------------------
  */
@@ -90,7 +125,7 @@ module.exports = function() {
     });
 };
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * member_view.js single member view page main entry module
@@ -98,6 +133,7 @@ module.exports = function() {
  */
 
 var initCard = require('./components/card');
+var common = require('./common');
 
 var viewData = {
     memberData: {
@@ -224,7 +260,7 @@ function init() {
     $('#history_table').bootstrapTable({
         locale: 'zh-CN',
         columns: [{
-            formatter: dateFormatter
+            formatter: common.dateFormatter
         }, {
             formatter: fieldFormatter
         }, {
@@ -235,7 +271,7 @@ function init() {
     $('#classes_table').bootstrapTable({
         locale: 'zh-CN',
         columns: [{}, {}, {
-            formatter: dateFormatter
+            formatter: common.dateFormatter
         }]
     });
 
@@ -375,19 +411,6 @@ function showAlert(title, jqXHR, className) {
         }
     });
 };
-/**
- * 
- * @param {Object} value the field value
- * @param {Object} row the row record data
- * @param {Number} index the row index
- */
-function dateFormatter(value, row, index) {
-    if (value) {
-        return moment(value).format('ll');
-    } else {
-        return undefined;
-    }
-};
 
 function fieldFormatter(value, row, index) {
     if (value.indexOf('credit') > -1) {
@@ -420,4 +443,4 @@ function deltaFormatter(value, row, index) {
         ].join('');
     }
 };
-},{"./components/card":1}]},{},[2]);
+},{"./common":1,"./components/card":2}]},{},[3]);
