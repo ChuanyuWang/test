@@ -2,9 +2,46 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
+ * common.js
+ * --------------------------------------------------------------------------
+ */
+
+module.exports = {
+    /**
+     * get the tenat name of current page, e.g.
+     * return 'bqsq' from http://localhost:3000/t/bqsq/course/1/view
+     */
+    getTenantName: function() {
+        var pathname = window.location.pathname;
+        if (pathname.length == 0) return "";
+        if (pathname.charAt(0) == '/') pathname = pathname.substring(1);
+        if (pathname.charAt(0) == 't') pathname = pathname.substring(1);
+        if (pathname.charAt(0) == '/') pathname = pathname.substring(1);
+        return pathname.split('/')[0];
+    },
+    /**
+     * Data fomatter function of bootstrap-table to format date localized string by 'll'
+     * 
+     * @param {Object} value the field value
+     * @param {Object} row the row record data
+     * @param {Number} index the row index
+     */
+    dateFormatter: function(value, row, index) {
+        if (value) {
+            return moment(value).format('ll');
+        } else {
+            return undefined;
+        }
+    }
+};
+},{}],2:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
  * member.js members page main entry module
  * --------------------------------------------------------------------------
  */
+
+var common = require('./common');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -20,32 +57,7 @@ $(document).ready(function() {
             modal.find('input[name=contact]').val("").closest(".form-group").removeClass("has-error");
             modal.find('#birth_date').data('DateTimePicker').date(null);
             modal.find('textarea[name=note]').val("");
-            modal.find('#edit_member').hide();
-            modal.find('#view_history').hide();
             modal.find('#add_member').show();
-        } else if (button.data('action') == "edit") {
-            //Don't show the dialog if user select nothing
-            var items = $('#member_table').bootstrapTable('getSelections');
-            if (items.length != 1) {
-                bootbox.alert('请选择一个会员');
-                event.preventDefault();
-                return;
-            }
-            // edit existed member
-            var modal = $(this);
-            modal.find('h4').text("查看会员");
-
-            //get member data
-            var user = items[0];
-            modal.find('input[name=name]').val(user.name).closest(".form-group").removeClass("has-error");
-            modal.find('input[name=contact]').val(user.contact).closest(".form-group").removeClass("has-error");
-            modal.find('#birth_date').data('DateTimePicker').date(user.birthday ? moment(user.birthday) : null);
-            modal.find('textarea[name=note]').val(user.note);
-
-            modal.find('#add_member').hide();
-            modal.find('#view_history').show();
-            modal.find('#edit_member').show();
-            modal.find('#edit_member').data('id', user._id);
         }
     });
 
@@ -53,11 +65,10 @@ $(document).ready(function() {
         $(this).find('input[name=name]').focus(); // focus on the member name input control
     });
 
+    $('#viewMember').click(viewMember);
     $('#add_member').click(handleAddNewMember);
-    $('#edit_member').click(handleEditMember);
     $('#dea_member').click(handleDeactivateMember);
     $('#act_member').click(handleActivateMember);
-    $('#view_history').click(handleMemberHistory);
     $('div.statusFilter button').click(handleFilterStatus);
 });
 
@@ -75,6 +86,18 @@ function init() {
         format: 'll',
         locale: 'zh-CN',
         defaultDate: moment().add(6, 'months')
+    });
+
+    $('#member_table').bootstrapTable({
+        locale: 'zh-CN',
+        columns: [{}, {}, {}, {
+            formatter: common.dateFormatter
+        }, {
+            formatter: creditFormatter
+        }, {}, {
+            formatter: common.dateFormatter
+        }, {}
+        ]
     });
 
     // Fix for table control, current version 1.11.1
@@ -140,18 +163,6 @@ function handleAddNewMember(event) {
     }
 };
 
-function handleEditMember(event) {
-    var modal = $(this).closest('.modal');
-    var id = modal.find('#edit_member').data('id');
-    var existMember = {};
-
-    // validate the input
-    if (!validateInput(modal, existMember)) {
-        modal.modal('hide');
-        editMember(id, existMember);
-    }
-};
-
 function addNewMember(member) {
     $.ajax("/api/members", {
         type: "POST",
@@ -175,55 +186,6 @@ function addNewMember(member) {
         },
         dataType: "json"
     });
-};
-
-function editMember(id, member) {
-    $.ajax("/api/members/" + id, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(member),
-        success: function(doc) {
-            $('#member_table').bootstrapTable('updateByUniqueId', { id: id, row: doc });
-        },
-        error: function(jqXHR, status, err) {
-            bootbox.dialog({
-                message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                title: "修改会员失败",
-                buttons: {
-                    danger: {
-                        label: "确定",
-                        className: "btn-danger",
-                    }
-                }
-            });
-            //console.error(jqXHR);
-        },
-        dataType: "json"
-    });
-};
-
-function handleMemberHistory(event) {
-    var view_dlg = $(this).closest('.modal');
-    var member_id = view_dlg.find('#edit_member').data('id');
-    var member_name = view_dlg.find('input[name=name]').val();
-    view_dlg.modal('hide');
-
-    var history_dlg = $('#history_member');
-    history_dlg.find('#name').text(member_name);
-    // refresh the class list of this member
-    var begin = moment(0);
-    var end = moment().add(10, 'years');
-    history_dlg.find('table').bootstrapTable('refresh', {
-        url: '/api/classes',
-        query: {
-            memberid: member_id,
-            from: begin.toISOString(),
-            to: end.toISOString(),
-            order: 'desc'
-        }
-    });
-
-    history_dlg.modal('show');
 };
 
 function updateMemberShip(event) {
@@ -505,4 +467,27 @@ function handleDeactivateMember(event) {
         }
     });
 };
-},{}]},{},[1]);
+
+function creditFormatter(membership) {
+    if (membership && membership[0]) {
+        // A better way of 'toFixed(1)'
+        if (typeof (membership[0].credit) == 'number') {
+            return Math.round(membership[0].credit * 10) / 10;
+        } else {
+            return membership[0].credit;
+        }
+    } else {
+        return undefined;
+    }
+};
+
+function viewMember(membership) {
+    console.log('abc');
+    var items = $('#member_table').bootstrapTable('getSelections');
+    if (items.length != 1) {
+        bootbox.alert('请选择一个会员');
+        return;
+    }
+    window.location.href = window.location.pathname + '/' + items[0]._id;
+};
+},{"./common":1}]},{},[2]);

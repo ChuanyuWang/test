@@ -36,24 +36,24 @@ block page
         button.btn.btn-default.btn-sm(type='button',data-filter='inactive') 停用
     div.row(style='border-bottom:1px solid #eee;margin:7px 0 0 0')
     div#toolbar.btn-group(role='group')
+      button#viewMember.btn.btn-primary(type='button') 查看
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
-      button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 修改
       button#dea_member.btn.btn-danger(type='button') 停用
       button#act_member.btn.btn-success(type='button',style='display:none') 激活
       button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
         span.glyphicon.glyphicon-filter
-    table#member_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true",data-query-params="customQuery")
+    table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true",data-query-params="customQuery")
       thead
         tr
           th(data-radio='true')
           //th(data-field='_id',data-visible='false') ID
           th(data-field='name',data-sortable='true') 宝宝姓名
           th(data-field='contact') 联系方式
-          th(data-field='birthday',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
-          th(data-field='membership',data-formatter='creditFormatter',data-sortable='true',data-sort-name='membership.0.credit') 剩余课时
+          th(data-field='birthday',data-sortable='true') 宝宝生日
+          th(data-field='membership',data-sortable='true',data-sort-name='membership.0.credit') 剩余课时
           th(data-field='membership.0',data-sortable='true',data-sort-name='membership.0.expire',data-formatter='membershipFormatter',data-events='editMembership') 会员卡
-          th(data-field='since',data-formatter='dateFormatter',data-sortable='true') 登记时间
-          th(data-field='note',data-visible='false') 备注
+          th(data-field='since',data-sortable='true') 登记时间
+          th(data-field='note',data-visible='false') 简介
     p.small 有效会员: <strong>#{statistics.count}</strong>人<br>剩余课时: <b>#{statistics.total}</b>
   div#member_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
     div.modal-dialog(role="document")
@@ -80,15 +80,12 @@ block page
                   span.input-group-addon
                     span.glyphicon.glyphicon-calendar
             div.form-group
-              label.control-label.col-sm-2(for='note') 备注:
+              label.control-label.col-sm-2(for='note') 简介:
               div.col-sm-10
                 textarea.form-control(rows='3', name='note')
         div.modal-footer
-          button#view_history.btn.btn-primary.pull-left(type="button") 历史课程
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_member.btn.btn-success(type="button") 添加
-          button#edit_member.btn.btn-success(type="button") 修改
-
   div#filter_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
@@ -115,26 +112,6 @@ block page
                       | 显示只能在<u>#{room.name}</u>消费的会员
         div.modal-footer
           button.btn.btn-primary(type="button",data-dismiss="modal") 确定
-  div#history_member.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 会员历史课程
-        div.modal-body
-          form.form-horizontal
-            div.form-group(style='margin-bottom:7px')
-              label.control-label.col-sm-2 宝宝姓名:
-              div.col-sm-10
-                p#name.form-control-static
-          table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
-            thead
-              tr
-                //th(data-field='_id',data-visible='false') ID
-                th(data-field='name') 课程名称
-                th(data-field='cost') 所须课时
-                th(data-field='date',data-formatter='dateFormatter',data-sortable='true') 课程日期
   div#membership_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
@@ -279,18 +256,6 @@ block page
             }
         }
         return {};
-    };
-    function creditFormatter(membership) {
-        if (membership && membership[0]) {
-            // A better way of 'toFixed(1)'
-            if (typeof(membership[0].credit) == 'number') {
-                return Math.round(membership[0].credit * 10)/10;
-            } else {
-                return membership[0].credit;
-            }
-        } else {
-            return undefined;
-        }
     };
     function membershipFormatter(value) {
         var color = "text-success";
