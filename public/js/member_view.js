@@ -214,9 +214,10 @@ $(document).ready(function() {
             deactivateAlert: function(e) {
                 if (this.memberData.status == 'inactive') {
                     bootbox.alert({
-                        message: "确定停用此会员吗？<br><small>停用后，此会员将无法进行自助预约</small>",
+                        message: "未激活会员将无法进行自助预约<br><small>确定后，请点击保存进行修改</small>",
                         buttons: {
                             ok: {
+                                label: "确定",
                                 className: "btn-danger"
                             }
                         }
