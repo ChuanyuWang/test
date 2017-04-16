@@ -87,24 +87,25 @@ block page
       h3(style='margin-top:0;display:inline-block') 充值记录
       a#loadHistoryBtn(href='#')
         span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
-    table#history_table(data-toggle="table",data-sort-name="date",data-striped='true',data-pagination='true',data-page-size='10')
+    table#history_table(data-striped='true',data-pagination='true',data-page-size='10')
       thead
         tr
-          th(data-field='date',data-formatter='dateFormatter') 日期
-          th(data-field='target',data-formatter='fieldFormatter') 属性
-          th(data-field='new',data-formatter='deltaFormatter') 变更
-          //th(data-field='remark') 备注
+          th(data-field='date') 日期
+          th(data-field='target') 属性
+          th(data-field='new') 变更
+          th(data-field='remark') 备注
     div.page-header
       h3(style='margin-top:0;display:inline-block') 上课记录
       a#loadClassesBtn(href='#')
         span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
-    table#classes_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
+    table#classes_table(data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
       thead
         tr
           //th(data-field='_id',data-visible='false') ID
           th(data-field='name') 课程名称
-          th(data-field='cost') 所须课时
-          th(data-field='date',data-formatter='dateFormatter',data-sortable='true') 课程日期
+          th(data-field='cost') 课时
+          th(data-field='date',data-sortable='true') 课程日期
+    div(style='height:20px')
   script#card-template(type='text/x-template')
     form.form-horizontal
       div.form-group
@@ -170,41 +171,3 @@ block page
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_comment.btn.btn-success(type="button") 添加
-  script(type='text/javascript').
-    function deltaFormatter(value, row, index) {
-        if (row.target.indexOf('credit') > -1) {
-            return [
-                row.old === null ? null : Math.round(row.old * 10)/10,
-                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-                Math.round(row.new * 10)/10
-            ].join('');
-        } else if (row.target.indexOf('expire') > -1) {
-            return [
-                moment(row.old).isValid() ? moment(row.old).format('ll') : null,
-                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-                moment(row.new).isValid() ? moment(row.new).format('ll') : null
-            ].join('');
-        } else {
-            return [
-                row.old,
-                ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
-                row.new
-            ].join('');
-        }
-    };
-    function fieldFormatter(value) {
-        if (value.indexOf('credit') > -1) {
-            return '课时';
-        } else if (value.indexOf('expire') > -1) {
-            return '有效期';
-        } else {
-          return value;
-        }
-    };
-    function dateFormatter(value) {
-        if (value) {
-            return moment(value).format('ll');
-        } else {
-            return undefined;
-        }
-    };

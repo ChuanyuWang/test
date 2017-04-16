@@ -208,6 +208,25 @@ $(document).ready(function() {
 function init() {
     console.log("init view member ~~~");
     moment.locale('zh-CN');
+
+    $('#history_table').bootstrapTable({
+        locale: 'zh-CN',
+        columns: [{
+            formatter: dateFormatter
+        }, {
+            formatter: fieldFormatter
+        }, {
+            formatter: deltaFormatter
+        }]
+    });
+
+    $('#classes_table').bootstrapTable({
+        locale: 'zh-CN',
+        columns: [{}, {}, {
+            formatter: dateFormatter
+        }]
+    });
+
     $('#loadHistoryBtn').click(loadHistory);
     $('#loadClassesBtn').click(loadClasses);
 };
@@ -343,5 +362,50 @@ function showAlert(title, jqXHR, className) {
             }
         }
     });
+};
+/**
+ * 
+ * @param {Object} value the field value
+ * @param {Object} row the row record data
+ * @param {Number} index the row index
+ */
+function dateFormatter(value, row, index) {
+    if (value) {
+        return moment(value).format('ll');
+    } else {
+        return undefined;
+    }
+};
+
+function fieldFormatter(value, row, index) {
+    if (value.indexOf('credit') > -1) {
+        return '课时';
+    } else if (value.indexOf('expire') > -1) {
+        return '有效期';
+    } else {
+        return value;
+    }
+};
+
+function deltaFormatter(value, row, index) {
+    if (row.target.indexOf('credit') > -1) {
+        return [
+            row.old === null ? null : Math.round(row.old * 10) / 10,
+            ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
+            Math.round(row.new * 10) / 10
+        ].join('');
+    } else if (row.target.indexOf('expire') > -1) {
+        return [
+            moment(row.old).isValid() ? moment(row.old).format('ll') : null,
+            ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
+            moment(row.new).isValid() ? moment(row.new).format('ll') : null
+        ].join('');
+    } else {
+        return [
+            row.old,
+            ' <i class="text-primary glyphicon glyphicon-arrow-right"></i> ',
+            row.new
+        ].join('');
+    }
 };
 },{"./components/card":1}]},{},[2]);
