@@ -38,8 +38,6 @@ block page
     div#toolbar.btn-group(role='group')
       button#viewMember.btn.btn-primary(type='button') 查看
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
-      button#dea_member.btn.btn-danger(type='button') 停用
-      button#act_member.btn.btn-success(type='button',style='display:none') 激活
       button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
         span.glyphicon.glyphicon-filter
     table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true",data-query-params="customQuery")

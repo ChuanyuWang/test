@@ -67,8 +67,6 @@ $(document).ready(function() {
 
     $('#viewMember').click(viewMember);
     $('#add_member').click(handleAddNewMember);
-    $('#dea_member').click(handleDeactivateMember);
-    $('#act_member').click(handleActivateMember);
     $('div.statusFilter button').click(handleFilterStatus);
 });
 
@@ -360,112 +358,12 @@ function handleFilterStatus(event) {
     btn.siblings('button').removeClass('btn-info').addClass('btn-default');
     // refresh the table when user changes the status filter
     $('#member_table').bootstrapTable('refresh');
-    // show/hide activate buttons
+    // show/hide add new member button
     if (btn.data('filter') == 'active') {
         $('#toolbar button[data-action=add]').show();
-        $('#dea_member').show();
-        $('#act_member').hide();
     } else {
         $('#toolbar button[data-action=add]').hide();
-        $('#dea_member').hide();
-        $('#act_member').show();
     }
-};
-
-function updateMemberStatus(memberID, status) {
-    return $.ajax("/api/members/" + memberID, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({ 'status': status }),
-        complete: function(jqXHR, status) {
-            //TODO
-        },
-        dataType: "json"
-    });
-};
-
-function handleActivateMember(event) {
-    var items = $('#member_table').bootstrapTable('getSelections');
-
-    if (items.length != 1) {
-        bootbox.alert('请选择一个会员');
-        return;
-    }
-
-    bootbox.confirm({
-        message: "确定激活选中会员吗？",
-        callback: function(result) {
-            if (!result) { // user cancel
-                return;
-            }
-            // activate all selected members one by one, and update the table
-            $.each(items, function(index, item) {
-                var request = updateMemberStatus(item._id, 'active');
-                request.done(function(data, textStatus, jqXHR) {
-                    $('#member_table').bootstrapTable('removeByUniqueId', data._id);
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    // alert dialog with danger button
-                    bootbox.dialog({
-                        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                        title: "激活会员失败",
-                        buttons: {
-                            danger: {
-                                label: "确定",
-                                className: "btn-danger"
-                            }
-                        }
-                    });
-                });
-            });
-        },
-        buttons: {
-            confirm: {
-                className: "btn-primary"
-            }
-        }
-    });
-};
-
-function handleDeactivateMember(event) {
-    var items = $('#member_table').bootstrapTable('getSelections');
-
-    if (items.length != 1) {
-        bootbox.alert('请选择一个会员');
-        return;
-    }
-
-    bootbox.confirm({
-        message: "确定停用选中会员吗？<br><small>停用后，此会员将无法进行自助预约</small>",
-        callback: function(result) {
-            if (!result) { // user cancel
-                return;
-            }
-            // deactivate all selected members one by one, and update the table
-            $.each(items, function(index, item) {
-                var request = updateMemberStatus(item._id, 'inactive');
-                request.done(function(data, textStatus, jqXHR) {
-                    $('#member_table').bootstrapTable('removeByUniqueId', data._id);
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    // alert dialog with danger button
-                    bootbox.dialog({
-                        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-                        title: "停用会员失败",
-                        buttons: {
-                            danger: {
-                                label: "确定",
-                                className: "btn-danger"
-                            }
-                        }
-                    });
-                });
-            });
-        },
-        buttons: {
-            confirm: {
-                className: "btn-danger"
-            }
-        }
-    });
 };
 
 function creditFormatter(membership) {

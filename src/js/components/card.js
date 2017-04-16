@@ -79,7 +79,8 @@ module.exports = function() {
             });
             $(this.$el).find('#expire_date').on('dp.change', function(e) {
                 // update the expire value from datetimepicker control event
-                vm.expire = e.date;
+                // when user clears the input box, the 'e.date' is false value
+                vm.expire = e.date === false ? null : e.date;
             });
             $(this.$el).find('#roomlist input').each(function(index, el) {
                 vm.allRooms.push(el.value);

@@ -49,11 +49,11 @@ block page
         label.control-label.col-sm-2 宝宝生日:
         div.col-sm-4
           div#birth_date.input-group.date
-            input.form-control(text='text',v-model='birthDate')
+            input.form-control(text='text')
             span.input-group-addon
               span.glyphicon.glyphicon-calendar
       div.form-group
-        label.control-label.col-sm-2 备注:
+        label.control-label.col-sm-2 简介:
         div.col-sm-10
           textarea.form-control(rows='3', name='note',v-model.trim='memberData.note')
       div.form-group

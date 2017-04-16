@@ -27,9 +27,6 @@ $(document).ready(function() {
         el: '#member_app',
         data: viewData,
         computed: {
-            birthDate: function() {
-                return this.birth && this.birth.format('ll');
-            },
             commentCount: function() {
                 return this.memberData.comments ? this.memberData.comments.length : 0;
             }
@@ -46,7 +43,9 @@ $(document).ready(function() {
         },
         watch: {
             'memberData.birthday': function() {
-                this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
+                $('#birth_date').data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
+                // only update the birth in dp.change event
+                //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
             }
         },
         methods: {
@@ -54,14 +53,14 @@ $(document).ready(function() {
                 this.errors = null;
                 if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
                 if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
-                if (!this.birth || !this.birth.isValid()) this.errors = { basic: '生日格式不正确' };
+                if (this.birth && !this.birth.isValid()) this.errors = { basic: '生日格式不正确' };
                 if (!this.errors) {
                     var request = update({
                         status: this.memberData.status,
                         name: this.memberData.name,
                         contact: this.memberData.contact,
                         note: this.memberData.note,
-                        birthday: this.birth.toISOString()
+                        birthday: this.birth && this.birth.toISOString()
                     });
                     request.done(function(data, textStatus, jqXHR) {
                         bootbox.alert('会员基本资料更新成功');
@@ -106,8 +105,8 @@ $(document).ready(function() {
             });
 
             $(vm.$el).find('#birth_date').on('dp.change', function(e) {
-                // TODO, the change event is not fired when the first time empty input
-                vm.birth = e.date;
+                // when user clears the input box, the 'e.date' is false value
+                vm.birth = e.date === false ? null : e.date;
             });
         }
     });
