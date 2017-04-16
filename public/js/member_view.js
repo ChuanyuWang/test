@@ -149,7 +149,6 @@ var viewData = {
 $(document).ready(function() {
     init();
     initCard();
-    $('#comment_dlg #add_comment').click(handleClickAddComment);
 
     // bootstrap the member view page
     var memberViewer = new Vue({
@@ -256,6 +255,12 @@ $(document).ready(function() {
 function init() {
     console.log("init view member ~~~");
     moment.locale('zh-CN');
+    // event listener of adding new comment
+    $('#comment_dlg #add_comment').click(handleClickAddComment);
+    $('#comment_dlg').on('shown.bs.modal', function(event) {
+        // focus on the commnet input control
+        $(this).find('textarea[name=comment]').focus(); 
+    });
 
     $('#history_table').bootstrapTable({
         locale: 'zh-CN',
