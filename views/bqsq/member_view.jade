@@ -84,18 +84,20 @@ block page
       card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
     div.page-header
       h3 备忘
-    template(v-for="comment in memberData.comments")
-      div.media
-        div.media-left
-          span.glyphicon.glyphicon-comment(style='font-size:large')
-        div.media-body
-          h4.media-heading(style='font-size:small') {{comment.text}}
-          p.small(style='color:#777') by {{comment.author}} at {{comment.posted | formatDateTime}}
-    small(style='color:#777;float:right') 共{{commentCount}}条备忘
     form.form-horizontal
-      div.form-group(style='margin-bottom:0')
-        div.col-sm-offset-2.col-sm-10
-          button.btn.btn-success(type='button',:disabled='!memberData._id',data-toggle='modal',data-target='#comment_dlg') 新备忘    
+      div.form-group
+        div.col-sm-2
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!memberData._id',data-toggle='modal',data-target='#comment_dlg')
+            span.glyphicon.glyphicon-plus 新备忘
+        div.col-sm-10
+          template(v-for="comment in memberData.comments")
+            div.media
+              div.media-left
+                span.glyphicon.glyphicon-comment.text-primary(style='font-size:large;opacity:0.8')
+              div.media-body
+                h4.media-heading(style='font-size:small') {{comment.text}}
+                p.small(style='color:#777') by {{comment.author}} at {{comment.posted | formatDateTime}}
+          small(style='color:#777;float:right') 共{{commentCount}}条备忘
   div.container(data-member-id='#{memberID}')
     div.page-header
       h3(style='margin-top:0;display:inline-block') 充值记录
@@ -183,7 +185,7 @@ block page
             div.form-group
               label.control-label 新备忘:
               textarea.form-control(rows='3', name='comment')
-              small(style='color:#777') 不超过256个字
+              small(style='color:#777;float:right;margin-top:2px') 不超过256个字
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_comment.btn.btn-success(type="button") 添加
