@@ -23,11 +23,11 @@ router.use(helper.isAuthenticated);
         "name": "123",
         "createDate": "2017-02-26T02:00:00Z",
         "date": "2017-02-27T02:00:00Z",
-        "status": "inprogress",
+        "status": "active|closed",
         "remark": "summar only",
         "classroom": "room1",
         "members": [
-            { "id": "123", "name": "Hellen" },
+            { "id": "123", "name": "Hellen", note:"only available in morning" },
             { "id": "456", "name": "Peter" }
         ]
     }
@@ -78,7 +78,7 @@ router.post('/', function(req, res, next) {
         return next(error);
     }
     convertDateObject(req.body);
-    req.body.status = '';
+    req.body.status = 'active';
 
     var courses = req.db.collection("courses");
     courses.insert(req.body, function(err, docs) {

@@ -5,6 +5,11 @@
  * --------------------------------------------------------------------------
  */
 
+var viewData = {
+    course: {},
+    error: null
+}
+
 // DOM Ready =============================================================
 $(document).ready(function () {
     init();
@@ -17,70 +22,134 @@ function init() {
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
-    loadCourse($('#course-root').data('course-id'));
-};
 
-/**
- * Retrieve course object according to ID and update the page
- * 
- * @param {String} coureID 
- */
-function loadCourse(coureID) {
-    if (!ignoreEdit()) return;
-    $.get('/api/courses/' + coureID, null, 'json').done(function (data, textStatus, jqXHR) {
-        updatePage(data);
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        //alert("error");
-    }).always(function () {
-        //alert("finished");
+    var request = getCourse($('#course_app').data('course-id'));
+    request.done(function(data, textStatus, jqXHR) {
+        initPage(data);
     });
 };
 
-/**
- * Update the page according to course object
- * @param {Object} course 
- */
-function updatePage(course) {
-    //TODO
-    console.log(course);
-    updateCourseHead(course);
-};
+function initPage(course) {
+    viewData.course = course;
+
+    // bootstrap the course view page
+    var courseViewer = new Vue({
+        el: '#course_app',
+        data: viewData,
+        computed: {
+            commentCount: function() {
+                return this.memberData.comments ? this.memberData.comments.length : 0;
+            }
+        },
+        filters: {
+            formatDate: function(value) {
+                if (!value) return '?';
+                return moment(value).format('ll');
+            },
+            formatDateTime: function(value) {
+                if (!value) return '?';
+                return moment(value).format('lll');
+            }
+        },
+        watch: {
+        },
+        methods: {
+            saveBasicInfo: function() {
+                this.error = null;
+                if (this.course.name.length == 0) this.error = '名称不能为空';
+                if (!this.error) {
+                    var request = updateCourse(this.course._id, {
+                        status: this.course.status,
+                        name: this.course.name,
+                        classroom: this.course.classroom,
+                        remark: this.course.remark
+                    });
+                    request.done(function(data, textStatus, jqXHR) {
+                        bootbox.alert('班级基本资料更新成功');
+                    });
+                }
+            },
+            closeAlert: function(e) {
+                if (this.course.status == 'closed') {
+                    bootbox.alert({
+                        message: "结束此班级后会删除所有未开始的课程<br><small>确定后，请点击保存进行修改</small>",
+                        buttons: {
+                            ok: {
+                                label: "确定",
+                                className: "btn-danger"
+                            }
+                        }
+                    });
+                }
+            }
+        },
+        mounted: function() {
+            // 'this' is refer to vm instance
+            var vm = this;
+            $(vm.$el).find('#birth_date').datetimepicker({
+                format: 'll',
+                locale: 'zh-CN'
+            });
+
+            $(vm.$el).find('#birth_date').on('dp.change', function(e) {
+                // when user clears the input box, the 'e.date' is false value
+                vm.birth = e.date === false ? null : e.date;
+            });
+        }
+    });
+}
 
 /**
- * Update the head part of page according to course object
- * @param {Object} coure 
+ * Retrieve course object according to ID
+ * 
+ * @param {String} coureID 
  */
-function updateCourseHead(course) {
-    //TODO
-    var head = $('#course-root div.head');
-    head.empty();
-    head.append(genLabel('名称', course.name ,'name'));
-    head.append(genLabel('创建时间', moment(course.createDate).format('ll') ,'createDate'));
-    head.append(genLabel('状态', getStatusName(course.status) ,'status'));
+function getCourse(coureID) {
+    var request = $.getJSON('/api/courses/' + coureID, null);
+    request.fail(function (jqXHR, textStatus, errorThrown) {
+        showAlert('获取班级失败', jqXHR);
+    })
+    return request;
 };
 
-function getStatusName(value) {
-    if (value == "inprogress") return '进行中';
-    if (value == "closed") return '结束';
-    return value;
+function updateCourse(coureID, fields) {
+    var request = $.ajax("/api/courses/" + coureID, {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("更新班级失败", jqXHR);
+    })
+    return request;
 };
 
-function genLabel(name, value, prop) {
-    return [
-        '<div class="row">',
-        '  <div class="col-sm-2">',
-        '    <label>' + name + ':</label>',
-        '  </div>',
-        '  <div class="col-sm-8">' + value + '</div>',
-        '</div>'
-    ].join('');
+function closeAlert(coureID) {
+    var request = $.getJSON('/api/courses/' + coureID, null);
+    request.fail(function (jqXHR, textStatus, errorThrown) {
+        showAlert('获取班级失败', jqXHR);
+    })
+    return request;
 };
 
 /**
- * Display the warning message if user has unsaved data or change
- * @return {Boolean} true ignore unsaved change;otherwise false
+ * 
+ * @param {String} title 
+ * @param {Object} jqXHR 
+ * @param {String} className default is 'btn-danger'
  */
-function ignoreEdit() {
-    // TODO
-    return true;
+function showAlert(title, jqXHR, className) {
+    //console.error(jqXHR);
+    bootbox.dialog({
+        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+        title: title || '错误',
+        buttons: {
+            danger: {
+                label: "确定",
+                // alert dialog with danger button by default
+                className: className || "btn-danger"
+            }
+        }
+    });
 };

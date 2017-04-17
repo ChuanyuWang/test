@@ -128,7 +128,7 @@ function membersFormatter(value, row, index) {
 };
 
 function statusFormatter(value, row, index) {
-    if (value == "inprogress") return '进行中';
+    if (value == "active") return '进行中';
     if (value == "closed") return '结束';
     return value;
 };

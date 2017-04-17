@@ -331,9 +331,6 @@ function update(fields) {
         type: "PATCH",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
-        complete: function(jqXHR, status) {
-            //TODO
-        },
         dataType: "json"
     });
 

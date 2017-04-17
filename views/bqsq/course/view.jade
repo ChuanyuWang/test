@@ -2,7 +2,7 @@ extends ../../index
 
 append css
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css")
-  //link(rel="stylesheet",href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")
+  link(rel="stylesheet",href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
@@ -11,15 +11,62 @@ append js
   //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
-  //script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
+  script(src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+  else
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
   script(src='/js/course_view.js')
+  style.
+    .container .page-header {
+      margin: 15px 0;
+      padding-bottom: 3px;
+    }
+    .container .form-group {
+      margin-bottom: 7px;
+    }
 
 block page
-  div.container(style='padding-top:69px')
-    div.btn-group(role='group')
-      button.btn.btn-primary(type='button',onclick='window.history.back()') 后退
-    label 班级信息
-  div#course-root(style='padding-top:7px',data-course-id='#{courseID}')
-    div.container.head
-    div.container.members
-    div.container.classes
+  div#course_app.container(style='padding-top:69px',data-course-id='#{courseID}')
+    ol.breadcrumb
+      li
+        a(href="../home") 主页
+      li
+        a(href="../course") 班级列表
+      li.active 查看班级
+    div.page-header
+      h3 基本信息
+    form.form-horizontal
+      div.form-group
+        label.col-sm-2.control-label 状态:
+        select.col-sm-5.form-control(v-model='course.status',@change='closeAlert',style='margin-left:15px;width:auto')
+          option.text-success(value='active') 进行中
+          option.text-danger(value='closed') 结束
+      div.form-group
+        label.col-sm-2.control-label 名称:
+        div.col-sm-5
+          input.form-control(v-model.trim='course.name', placeholder='班级名称')
+        div.col-sm-5
+          p.form-control-static(style='color:#808080')
+            small {{course.createDate | formatDate}}创建
+      div.form-group
+        label.control-label.col-sm-2 教室:
+        select.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='course.classroom')
+          - each room in classroom
+            option(value=room.id)= room.name
+      div.form-group
+        label.control-label.col-sm-2 简介:
+        div.col-sm-10
+          textarea.form-control(rows='3', v-model.trim='course.remark')
+      div.form-group
+        div.col-sm-offset-2.col-sm-10
+          button.btn.btn-success(type='button',v-on:click='saveBasicInfo') 保存
+          div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='error')
+            strong 错误! 
+            |{{error}}
+    div.page-header
+      h3(style='margin-top:0;display:inline-block') 成员
+      a(href='javascript:void(0)',title='人数') 
+        span.glyphicon.glyphicon-user(style='font-size:normal;margin-left:5px') 5
+    div.page-header
+      h3 课程
