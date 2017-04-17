@@ -260,7 +260,7 @@ function init() {
     $('#comment_dlg #add_comment').click(handleClickAddComment);
     $('#comment_dlg').on('shown.bs.modal', function(event) {
         // focus on the commnet input control
-        $(this).find('textarea[name=comment]').focus(); 
+        $(this).find('textarea[name=comment]').focus();
     });
 
     $('#history_table').bootstrapTable({

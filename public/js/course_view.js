@@ -13,7 +13,7 @@ var viewData = {
 }
 
 // DOM Ready =============================================================
-$(document).ready(function () {
+$(document).ready(function() {
     init();
 });
 
@@ -24,6 +24,27 @@ function init() {
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
+
+    $('#member_table').bootstrapTable({
+        url: '/api/members?status=active',
+        locale: 'zh-CN',
+        columns: [{}, {}, {}, {
+            formatter: creditFormatter
+        }]
+    });
+
+    // event listener of adding new comment
+    $('#member_dlg #add_member').click(handleClickAddMember);
+    $('#member_dlg').on('shown.bs.modal', function(event) {
+        //$(this).find('table').bootstrapTable('refresh', { url: '/api/members', query: { status: 'active' } });
+        // check selected members
+        if (viewData.course.members) {
+            var checkedItems = viewData.course.members.map(function(value, index, array) {
+                return value._id
+            });
+            $(this).find('table').bootstrapTable('checkBy', { field: '_id', values: checkedItems });
+        }
+    });
 
     var request = getCourse($('#course_app').data('course-id'));
     request.done(function(data, textStatus, jqXHR) {
@@ -71,6 +92,15 @@ function initPage(course) {
                     });
                 }
             },
+            removeMember: function(id) {
+                var members = viewData.course.members;
+                for(var i=0;i<members.length;i++) {
+                    if (members[i].id == id) {
+                        members.splice(i, 1);
+                        break;
+                    }
+                }
+            },
             closeAlert: function(e) {
                 if (this.course.status == 'closed') {
                     bootbox.alert({
@@ -99,7 +129,20 @@ function initPage(course) {
             });
         }
     });
-}
+};
+
+function handleClickAddMember() {
+    var modal = $(this).closest('.modal');
+    var selections = modal.find('table').bootstrapTable('getAllSelections');
+    var result = selections.map(function(value, index, array) {
+        return {
+            id: value._id,
+            name: value.name
+        };
+    });
+    Vue.set(viewData.course, 'members', result)
+    modal.modal('hide');
+};
 
 /**
  * Retrieve course object according to ID
@@ -108,7 +151,7 @@ function initPage(course) {
  */
 function getCourse(coureID) {
     var request = $.getJSON('/api/courses/' + coureID, null);
-    request.fail(function (jqXHR, textStatus, errorThrown) {
+    request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取班级失败', jqXHR);
     })
     return request;
@@ -129,7 +172,7 @@ function updateCourse(coureID, fields) {
 
 function closeAlert(coureID) {
     var request = $.getJSON('/api/courses/' + coureID, null);
-    request.fail(function (jqXHR, textStatus, errorThrown) {
+    request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取班级失败', jqXHR);
     })
     return request;
@@ -154,5 +197,19 @@ function showAlert(title, jqXHR, className) {
             }
         }
     });
+};
+
+function creditFormatter(value, row, index) {
+    var membership = row.membership;
+    if (membership && membership[0]) {
+        // A better way of 'toFixed(1)'
+        if (typeof (membership[0].credit) == 'number') {
+            return Math.round(membership[0].credit * 10) / 10;
+        } else {
+            return membership[0].credit;
+        }
+    } else {
+        return undefined;
+    }
 };
 },{}]},{},[1]);
