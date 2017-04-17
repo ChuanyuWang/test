@@ -29,7 +29,7 @@ append js
 block page
   div.container(style='padding-top:58px')
     div#toolbar.btn-group(role='group')
-      button.btn.btn-success(type='button') 创建
+      button.btn.btn-success(type='button',data-toggle='modal',data-target='#course_dlg') 创建
     table#course_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/courses',data-toolbar='#toolbar',data-unique-id="_id")
       thead
         tr
@@ -39,3 +39,28 @@ block page
           th(data-field='status',data-sortable='true') 状态
           th(data-field='members',data-sortable='true') 人数
           th(data-width='180px',data-align='center') 操作
+  div#course_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
+    div.modal-dialog(role="document")
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4#myModalLabel.modal-title 添加班级
+        div.modal-body
+          form.form-horizontal
+            div.form-group
+              label.control-label.col-sm-2(for='name') 班级名称:
+              div.col-sm-4
+                input.form-control(type='text',name='name',placeholder='班级名称')
+            div.form-group
+              label.control-label.col-sm-2 教室:
+              select.form-control.col-sm-4(style='margin-left:15px;width:auto',name='classroom')
+                - each room in classroom
+                  option(value=room.id)= room.name
+            div.form-group
+              label.control-label.col-sm-2(for='remark') 简介:
+              div.col-sm-10
+                textarea.form-control(rows='3', name='remark')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_course.btn.btn-success(type="button") 创建

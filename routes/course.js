@@ -11,7 +11,7 @@ router.get('/', helper.checkTenantUser, function (req, res, next) {
     });
 });
 
-router.get('/:courseID/view', helper.checkTenantUser, function (req, res, next) {
+router.get('/:courseID', helper.checkTenantUser, function (req, res, next) {
     res.locals.courseID = req.params.courseID;
     res.render('bqsq/course/view', {
         title: '查看班级',
