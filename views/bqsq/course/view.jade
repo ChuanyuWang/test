@@ -78,6 +78,7 @@ block page
                 i.glyphicon.glyphicon-user
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member.id)') 移除
               | {{member.name}}
+          small(style='color:#777') 共{{membersCount}}人
     div.page-header
       h3(style='margin-top:0;display:inline-block') 课程
       a(href='javascript:void(0)',title='人数') 

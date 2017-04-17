@@ -58,8 +58,8 @@ function initPage(course) {
         el: '#course_app',
         data: viewData,
         computed: {
-            commentCount: function() {
-                return this.memberData.comments ? this.memberData.comments.length : 0;
+            membersCount: function() {
+                return this.course.members ? this.course.members.length : 0;
             }
         },
         filters: {
