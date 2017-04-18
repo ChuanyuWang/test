@@ -38,7 +38,7 @@ function init() {
         // check selected members
         if (viewData.course.members) {
             var checkedItems = viewData.course.members.map(function(value, index, array) {
-                return value._id
+                return value.id
             });
             $(this).find('table').bootstrapTable('checkBy', { field: '_id', values: checkedItems });
         }
@@ -91,13 +91,18 @@ function initPage(course) {
                 }
             },
             removeMember: function(id) {
-                var members = viewData.course.members;
-                for(var i=0;i<members.length;i++) {
-                    if (members[i].id == id) {
-                        members.splice(i, 1);
-                        break;
+                var vm = this;
+                var request = removeCourseMember(vm.course._id, { 'id': id });
+                request.done(function(data, textStatus, jqXHR) {
+                    var members = vm.course.members;
+                    for (var i = 0; i < members.length; i++) {
+                        if (members[i].id == id) {
+                            members.splice(i, 1);
+                            break;
+                        }
                     }
-                }
+                    bootbox.alert('删除班级成员成功');
+                });
             },
             closeAlert: function(e) {
                 if (this.course.status == 'closed') {
@@ -132,13 +137,37 @@ function initPage(course) {
 function handleClickAddMember() {
     var modal = $(this).closest('.modal');
     var selections = modal.find('table').bootstrapTable('getAllSelections');
-    var result = selections.map(function(value, index, array) {
-        return {
-            id: value._id,
-            name: value.name
-        };
+
+    var members = viewData.course.members || [];
+    var addedOnes = selections.filter(function(element, index, array) {
+        // filter the new added member
+        return !members.some(function(value, index, array) {
+            // find one matched member and return true
+            return value.id == element._id;
+        });
     });
-    Vue.set(viewData.course, 'members', result)
+
+    if (addedOnes.length > 0) {
+        // initialize members property
+        if (!viewData.course.hasOwnProperty('members')) {
+            Vue.set(viewData.course, 'members', [])
+        }
+        var result = addedOnes.map(function(value, index, array) {
+            return {
+                id: value._id,
+                name: value.name
+            };
+        });
+
+        var request = addCourseMembers(viewData.course._id, result);
+        request.done(function(data, textStatus, jqXHR) {
+            result.forEach(function(value, index, array) {
+                viewData.course.members.push(value);
+            });
+            bootbox.alert('添加班级成员成功');
+        });
+    }
+
     modal.modal('hide');
 };
 
@@ -164,6 +193,32 @@ function updateCourse(coureID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("更新班级失败", jqXHR);
+    })
+    return request;
+};
+
+function addCourseMembers(coureID, fields) {
+    var request = $.ajax("/api/courses/" + coureID + '/members', {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("添加班级成员失败", jqXHR);
+    })
+    return request;
+};
+
+function removeCourseMember(coureID, fields) {
+    var request = $.ajax("/api/courses/" + coureID + '/members', {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("删除班级成员失败", jqXHR);
     })
     return request;
 };

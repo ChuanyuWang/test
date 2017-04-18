@@ -80,6 +80,13 @@ router.post('/', function(req, res, next) {
     convertDateObject(req.body);
     req.body.status = 'active';
 
+    // members can only added by post 'courses/:id/members' 
+    if (req.body.hasOwnProperty('members') > -1) {
+        var error = new Error('members can only added by API "courses/:id/members"');
+        error.status = 400;
+        return next(error);
+    }
+
     var courses = req.db.collection("courses");
     courses.insert(req.body, function(err, docs) {
         if (err) {
@@ -97,6 +104,13 @@ router.patch('/:courseID', function(req, res, next) {
     var courses = req.db.collection("courses");
     convertDateObject(req.body);
 
+    // members can only added by post 'courses/:id/members' 
+    if (req.body.hasOwnProperty('members') > -1) {
+        var error = new Error('members can only added by API "courses/:id/members"');
+        error.status = 400;
+        return next(error);
+    }
+
     courses.findAndModify({
         query: {
             _id: mongojs.ObjectId(req.params.courseID)
@@ -113,6 +127,59 @@ router.patch('/:courseID', function(req, res, next) {
             return next(error);
         }
         console.log("course %s is updated by %j", req.params.courseID, req.body);
+        res.json(doc);
+    });
+});
+
+router.post('/:courseID/members', function(req, res, next) {
+    var courses = req.db.collection("courses");
+    var members = Array.isArray(req.body) ? req.body : [req.body];
+    courses.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.courseID)
+        },
+        update: {
+            $push: { members: { $each: members } }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("add course's members fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("add %j members to course %s", req.body, req.params.courseID);
+        //TODO, update classes booking
+        res.json(doc);
+    });
+});
+
+router.delete('/:courseID/members', function(req, res, next) {
+    var courses = req.db.collection("courses");
+    var members = Array.isArray(req.body) ? req.body : [req.body];
+    var ids = members.map(function(value, index, array) {
+        return value.id;
+    });
+    courses.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.courseID)
+        },
+        update: {
+            $pull: {
+                members: { id: { $in: ids } }
+            }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("delete course's members fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("delete %j members from course %s", req.body, req.params.courseID);
+        //TODO, update classes booking
         res.json(doc);
     });
 });
