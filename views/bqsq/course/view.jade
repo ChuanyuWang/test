@@ -74,7 +74,7 @@ block page
         div.col-sm-5
           ul.list-group(style='margin-bottom:0px')
             li.list-group-item(v-for="member in course.members")
-              a(:href='"../member/" + member.id',style='margin-right:3px')
+              a(:href='"../member/" + member.id',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-user
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member.id)') 移除
               | {{member.name}}
