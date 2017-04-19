@@ -80,9 +80,14 @@ block page
               | {{member.name}}
           small(style='color:#777') 共{{membersCount}}人
     div.page-header
-      h3(style='margin-top:0;display:inline-block') 课程
-      a(href='javascript:void(0)',title='人数') 
-        span.glyphicon.glyphicon-book(style='font-size:normal;margin-left:5px') ?
+      h3 课程
+    form.form-horizontal
+      div.form-group
+        div.col-sm-2
+          button.btn.btn-primary.btn-sm(type="button",:disabled='true',data-toggle='modal',data-target='#')
+            span.glyphicon.glyphicon-plus 添加
+        div.col-sm-5
+          small(style='color:#777') 共0节
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content

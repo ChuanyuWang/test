@@ -105,7 +105,7 @@ router.patch('/:courseID', function(req, res, next) {
     convertDateObject(req.body);
 
     // members can only added by post 'courses/:id/members' 
-    if (req.body.hasOwnProperty('members') > -1) {
+    if (req.body.hasOwnProperty('members')) {
         var error = new Error('members can only added by API "courses/:id/members"');
         error.status = 400;
         return next(error);
