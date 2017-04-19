@@ -177,6 +177,62 @@ router.delete('/:courseID/members', function(req, res, next) {
     });
 });
 
+router.post('/:courseID/classes', function(req, res, next) {
+    var courses = req.db.collection("courses");
+    var items = Array.isArray(req.body) ? req.body : [req.body];
+
+    courses.findOne({
+        _id: mongojs.ObjectId(req.params.courseID)
+    }, NORMAL_FIELDS, function(err, doc) {
+        if (err) {
+            var error = new Error("Get course fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var error = new Error("Course doesn't exist");
+            error.status = 400;
+            return next(error);
+        }
+        if (doc.status == 'closed') {
+            var error = new Error("班级已经结束，不能添加课程");
+            error.status = 400;
+            return next(error);
+        }
+
+        var members = doc.members || [];
+        var classes = items.map(function(value, index, array) {
+            value.courseID = req.params.courseID;
+            if (value.hasOwnProperty("date")) {
+                value["date"] = new Date(value["date"]);
+            }
+            value.cost = value.cost || 0;
+            value.capacity = value.capacity || 8;
+            value.reservation = value.reservation || 0;
+            value.reservation = + members.length;
+            value.booking = value.booking || [];
+            members.forEach(function(m, index, array) {
+                value.booking.push({
+                    member: m.id,
+                    quantity: 1,
+                    bookDate: new Date()
+                })
+            });
+            return value;
+        })
+
+        req.db.collection("classes").insert(classes, function(err, docs) {
+            if (err) {
+                var error = new Error("add course's classes fails");
+                error.innerError = err;
+                return next(error);
+            }
+            console.log("add %j classes to course %s", classes, req.params.courseID);
+            res.json(docs);
+        });
+    });
+});
+
 router.delete('/:courseID', function(req, res, next) {
     return next(new Error("Not implementation"));
 });

@@ -15,6 +15,11 @@ var viewData = {
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
+
+    var request = getCourse($('#course_app').data('course-id'));
+    request.done(function(data, textStatus, jqXHR) {
+        initPage(data);
+    });
 });
 
 // Functions =============================================================
@@ -32,6 +37,18 @@ function init() {
             formatter: creditFormatter
         }]
     });
+    $('#class_date').datetimepicker({
+        locale: 'zh-CN',
+        format: 'lll'
+    });
+    $('#class_begin').datetimepicker({
+        locale: 'zh-CN',
+        format: 'll'
+    });
+    $('#class_end').datetimepicker({
+        locale: 'zh-CN',
+        format: 'll'
+    });
 
     // event listener of adding new comment
     $('#member_dlg #add_member').click(handleClickAddMember);
@@ -46,9 +63,16 @@ function init() {
         }
     });
 
-    var request = getCourse($('#course_app').data('course-id'));
-    request.done(function(data, textStatus, jqXHR) {
-        initPage(data);
+    // event listener of adding new class
+    $('#class_dlg #add_class').click(handleClickAddClass);
+    $('#class_dlg').on('shown.bs.modal', resetAddClassDlg);
+    $('#class_dlg input[name=recurrence]').on('change', function(e) {
+        $('#class_dlg div.recurrence-panel').toggle(250);
+        if ($(this).is(':checked')) {
+            $('#class_date').data("DateTimePicker").format('LT');
+        } else {
+            $('#class_date').data("DateTimePicker").format('lll');
+        }
     });
 };
 
@@ -173,6 +197,25 @@ function handleClickAddMember() {
     modal.modal('hide');
 };
 
+function handleClickAddClass() {
+    var modal = $(this).closest('.modal');
+    var isRepeated = modal.find('input[name=recurrence]').is(':checked');
+    var datetime = modal.find('#class_date').data("DateTimePicker").date();
+    if (isRepeated) {
+        //TODO
+    } else {
+        var item = createClass(datetime);
+        var request = addCourseClasses(viewData.course._id, item);
+        request.done(function(data, textStatus, jqXHR) {
+            data.forEach(function(value, index, array) {
+                viewData.course.classes.push(value);
+            });
+            bootbox.alert('班级课程添加成功');
+        });
+    }
+    modal.modal('hide');
+};
+
 /**
  * Retrieve course object according to ID
  * 
@@ -225,6 +268,19 @@ function removeCourseMember(coureID, fields) {
     return request;
 };
 
+function addCourseClasses(coureID, fields) {
+    var request = $.ajax("/api/courses/" + coureID + '/classes', {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("添加课程失败", jqXHR);
+    })
+    return request;
+};
+
 function closeAlert(coureID) {
     var request = $.getJSON('/api/courses/' + coureID, null);
     request.fail(function(jqXHR, textStatus, errorThrown) {
@@ -266,5 +322,33 @@ function creditFormatter(value, row, index) {
     } else {
         return undefined;
     }
+};
+
+function resetAddClassDlg(event) {
+    var modal = $(this);
+    if (!viewData.course.hasOwnProperty('classes')) {
+        Vue.set(viewData.course, 'classes', [])
+    }
+};
+
+function genClassName() {
+    var existed = viewData.course.classes || [];
+    var suffix = existed.length + 1;
+    var name = viewData.course.name + '-' + suffix;
+    while (existed.some(function(val, index, array) {
+        return val.name == name;
+    })) {
+        suffix++;
+        name = viewData.course.name + '-' + suffix;
+    }
+    return name;
+};
+
+function createClass(datetime) {
+    return {
+        name: genClassName(),
+        date: datetime.toISOString(),
+        classroom: viewData.course.classroom
+    };
 };
 },{}]},{},[1]);

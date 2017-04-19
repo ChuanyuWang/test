@@ -84,7 +84,7 @@ block page
     form.form-horizontal
       div.form-group
         div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='true',data-toggle='modal',data-target='#')
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',data-toggle='modal',data-target='#class_dlg')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           small(style='color:#777') 共0节
@@ -107,3 +107,51 @@ block page
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_member.btn.btn-success(type="button") 确定
+  div#class_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 添加课程
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2 时间/日期:
+              div.col-sm-6
+                div#class_date.input-group.date
+                  input.form-control(text='text',name='brith')
+                  span.input-group-addon
+                    span.glyphicon.glyphicon-calendar
+            div.form-group(style='margin-bottom:7px')
+              div.col-sm-offset-2.col-sm-10
+                div.checkbox
+                  label
+                    input(type='checkbox',name='recurrence')
+                    |每周重复
+            div.recurrence-panel(style='display:none')
+              div.form-group(style='margin-bottom:7px')
+                label.control-label.col-sm-2 每周:
+                div.col-sm-10(style='display:flex;flex-wrap:wrap')
+                  - each day,index in ['星期一','星期二','星期三','星期四','星期五','星期六','星期日']
+                    div.checkbox(style='margin:0 30px 0 0')
+                      label
+                        input(type="checkbox", name="weekday", value="#{index}")
+                        | #{day}
+              div.form-group(style='margin-bottom:7px')
+                label.control-label.col-sm-2 开始日期:
+                div.col-sm-5
+                  div#class_begin.input-group.date
+                    input.form-control(text='text',name='begin')
+                    span.input-group-addon
+                      span.glyphicon.glyphicon-calendar
+              div.form-group(style='margin-bottom:7px')
+                label.control-label.col-sm-2 结束:
+                div.col-sm-5
+                  div#class_end.input-group.date
+                    input.form-control(text='text',name='end')
+                    span.input-group-addon
+                      span.glyphicon.glyphicon-calendar
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_class.btn.btn-success(type="button") 确定
