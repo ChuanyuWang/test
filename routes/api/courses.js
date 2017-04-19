@@ -80,13 +80,6 @@ router.post('/', function(req, res, next) {
     convertDateObject(req.body);
     req.body.status = 'active';
 
-    // members can only added by post 'courses/:id/members' 
-    if (req.body.hasOwnProperty('members') > -1) {
-        var error = new Error('members can only added by API "courses/:id/members"');
-        error.status = 400;
-        return next(error);
-    }
-
     var courses = req.db.collection("courses");
     courses.insert(req.body, function(err, docs) {
         if (err) {
