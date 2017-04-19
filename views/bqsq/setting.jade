@@ -39,12 +39,13 @@ block page
       div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
         div#toolbar.btn-group(role='group')
           button.btn.btn-success(type='button',data-toggle='modal',data-target='#clsroom_dlg', data-action='add') 添加
-        table#classroom_table(data-toggle="table",data-checkbox-header='false',data-striped='true',data-unique-id="id",data-show-refresh='true',data-toolbar='#toolbar',data-url='/api/setting/classrooms')
-            thead
-              tr
-                th(data-field='id',data-sortable='true') 教室ID
-                th(data-field='name') 教室名字
-                th(data-title='删除',data-align='center',data-formatter='deleteFormatter',data-events='handleDeleteClassroom')
+        table#classroom_table(data-checkbox-header='false',data-striped='true',data-unique-id="id",data-show-refresh='true',data-toolbar='#toolbar')
+          thead
+            tr
+              th(data-field='id',data-sortable='true') 教室ID
+              th(data-field='name') 教室名字
+              th(data-field='visibility') 内部预约
+              th(data-title='删除',data-align='center')
       div.tab-pane(role="tabpanel",id="general",style="padding:7px")
         p 暂未开放
       div.tab-pane(role="tabpanel",id="analytics",style="padding:7px")
@@ -63,14 +64,6 @@ block page
               option(value=2016) 2016
         div.row(style="margin-top:15px")
           div#consume_chart(style="height:400px")
-    script(type='text/javascript').
-        function deleteFormatter(value) {
-            return [
-                '<a class="remove text-danger" href="javascript:void(0)" title="删除">',
-                '<i class="glyphicon glyphicon-remove"></i>',
-                '</a>'
-            ].join('');
-        };
   div#clsroom_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content
@@ -88,6 +81,12 @@ block page
               label.control-label.col-sm-2(for='classroom_name') 教室名字:
               div.col-sm-10
                 input#classroom_name.form-control(type='text',name='name',placeholder='教室名字')
+            div.form-group
+              div.col-sm-offset-2.col-sm-10
+                div.checkbox
+                  label
+                    input(type='checkbox',name='visibility',value='internal')
+                    |内部预约
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_room.btn.btn-success(type="button") 添加

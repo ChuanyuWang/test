@@ -1,9 +1,9 @@
-(function ($) {
+(function($) {
 
     var consumeChart = null;
 
     // DOM Ready =============================================================
-    $(document).ready(function () {
+    $(document).ready(function() {
         init();
     });
 
@@ -25,7 +25,19 @@
         // initialize chart instance
         consumeChart = echarts.init(document.getElementById('consume_chart'), 'vintage');
 
-        $('#clsroom_dlg').on('show.bs.modal', function (event) {
+        // initialize the classroom table
+        $('#classroom_table').bootstrapTable({
+            locale: 'zh-CN',
+            url: '/api/setting/classrooms',
+            columns: [{}, {}, {
+                formatter: visibilityFormatter
+            }, {
+                formatter: deleteFormatter,
+                events: handleDeleteClassroom
+            }]
+        });
+
+        $('#clsroom_dlg').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
             if (button.data('action') == "add") {
                 // create a new classroom
@@ -44,11 +56,11 @@
         // handle user refresh the chart
         $('#refresh').click(refreshChart);
         // handle user change the chart filters
-        $('div.tab-pane#analytics select').change(function (event) {
+        $('div.tab-pane#analytics select').change(function(event) {
             refreshChart();
         });
         // refresh the chart when user switch to analytics tab first time
-        $('a[href="#analytics"]').on('shown.bs.tab', function (e) {
+        $('a[href="#analytics"]').on('shown.bs.tab', function(e) {
             refreshChart();
             //e.target // newly activated tab
             //e.relatedTarget // previous active tab
@@ -78,6 +90,9 @@
             modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
         }
 
+        // get the classroom visibility
+        newRoom.visibility = modal.find('input[name=visibility]:checked').val();
+
         if (!hasError) {
             modal.modal('hide');
             addNewClassroom(newRoom);
@@ -89,10 +104,10 @@
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(room),
-            success: function (data) {
+            success: function(data) {
                 $('#classroom_table').bootstrapTable('insertRow', { index: 0, row: room });
             },
-            error: function (jqXHR, status, err) {
+            error: function(jqXHR, status, err) {
                 bootbox.dialog({
                     message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title: "添加教室失败",
@@ -114,7 +129,7 @@
             "year": parseInt($("div#analytics select#year").val())
         };
 
-        var drawChartFunc = function (consumptionQueryResult, depositQueryResult) {
+        var drawChartFunc = function(consumptionQueryResult, depositQueryResult) {
             if (filter.unit == "month") {
                 drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0]), filter.year, '月');
             } else if (filter.unit == "week") {
@@ -122,7 +137,7 @@
             }
         };
 
-        var errorFunc = function (jqXHR, textStatus, errorThrown) {
+        var errorFunc = function(jqXHR, textStatus, errorThrown) {
             bootbox.dialog({
                 message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                 title: "刷新图表失败",
@@ -153,8 +168,8 @@
             return chartData;
         }
 
-        var i=0,j=0;
-        while ( i < consumptionData.length || j < depositData.length ) {
+        var i = 0, j = 0;
+        while (i < consumptionData.length || j < depositData.length) {
             var c = i < consumptionData.length ? consumptionData[i] : null;
             var d = j < depositData.length ? depositData[j] : null;
 
@@ -237,12 +252,25 @@
         consumeChart.setOption(option);
     };
 
+    function visibilityFormatter(value, row, index) {
+        if (value == 'internal') return '是';
+        else return '否';
+    };
+
+    function deleteFormatter(value, row, index) {
+        return [
+            '<a class="remove text-danger" href="javascript:void(0)" title="删除">',
+            '<i class="glyphicon glyphicon-remove"></i>',
+            '</a>'
+        ].join('');
+    };
+
     // event handler defined in setting.jade file for removing classroom
-    window.handleDeleteClassroom = {
-        'click .remove': function (e, value, row, index) {
+    var handleDeleteClassroom = {
+        'click .remove': function(e, value, row, index) {
             bootbox.confirm({
                 message: "确定永久删除此教室吗？<br><small>删除后，教室中的课程将无法显示或预约，并且已经预约的课时也不会返还到会员卡中</small>",
-                callback: function (result) {
+                callback: function(result) {
                     if (!result) { // user cancel
                         return;
                     }
@@ -251,14 +279,14 @@
                         type: "DELETE",
                         contentType: "application/json; charset=utf-8",
                         data: {},
-                        success: function (data) {
+                        success: function(data) {
                             if (data && data.n == 1 && data.ok == 1) {
                                 $('#classroom_table').bootstrapTable('removeByUniqueId', row.id);
                             } else {
                                 console.error("remove class room " + row.id + " fails");
                             }
                         },
-                        error: function (jqXHR, status, err) {
+                        error: function(jqXHR, status, err) {
                             bootbox.dialog({
                                 message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                                 title: "删除教室失败",

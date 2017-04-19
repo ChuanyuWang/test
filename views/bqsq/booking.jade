@@ -19,7 +19,8 @@ block content
       div.col-xs-3.pull-right(style="padding:0px;margin:18px 9px")
         select#chooseRoom.form-control.text-primary.input-sm(style='float:right;width:90px;padding:0 0 0 5px;border-color:#2e6da4')
           - each room in classroom
-            option(value=room.id)= room.name
+            if room.visibility != 'internal'
+              option(value=room.id)= room.name
         //span(style='float:right;line-height:30px') 教室: 
     div#weekbtns.row(style='margin:7px -7px 3px -7px')
       div(style='float:left;padding-left:9px')
