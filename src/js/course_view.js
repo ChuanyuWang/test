@@ -241,7 +241,7 @@ function markError(container, selector, hasError) {
     } else {
         container.find(selector).closest(".form-group").removeClass("has-error");
     }
-}
+};
 
 function handleClickAddClass() {
     var modal = $(this).closest('.modal');
@@ -279,10 +279,11 @@ function handleClickAddClass() {
         } else {
             markError(modal, '.weekdays', false);
         }
+        if (enddate.diff(startdate, 'days') > 180) return bootbox.alert('开始和结束日期不能超过180天');
         result = genRepeatClass(datetime, startdate, enddate, days);
     } else {
         result.push({
-            name: genClassName(),
+            name: genClassNames(1)[0],
             date: datetime.toISOString()
         });
     }
@@ -436,20 +437,47 @@ function resetAddClassDlg(event) {
     // TODO, select the classroom as the same as course
 };
 
-function genClassName() {
+function genClassNames(count) {
+    var count = count || 0;
+    var result = [];
     var existed = viewData.course.classes || [];
     var suffix = existed.length + 1;
-    var name = viewData.course.name + '-' + suffix;
-    while (existed.some(function(val, index, array) {
-        return val.name == name;
-    })) {
+    for (var i = 0; i < count; i++) {
+        var name = viewData.course.name + '-' + suffix;
+        while (existed.some(function(val, index, array) {
+            return val.name == name;
+        })) {
+            suffix++;
+            name = viewData.course.name + '-' + suffix;
+        }
+        result.push(name);
         suffix++;
-        name = viewData.course.name + '-' + suffix;
     }
-    return name;
+    return result;
 };
 
 function genRepeatClass(datetime, startdate, enddate, days) {
-    // TODO
-    return [];
+    var dates = [];
+    var current = moment(startdate);
+    while (current.isSameOrBefore(enddate)) {
+        if (days.some(function(value, index, array) {
+            return value == current.day();
+        })) {
+            var date = moment(current).set({
+                'hours': datetime.hours(),
+                'minutes': datetime.minutes(),
+                'seconds': datetime.seconds(),
+                'milliseconds': datetime.milliseconds()
+            });
+            dates.push(date);
+        }
+        current.add(1, 'day');
+    }
+    var names = genClassNames(dates.length);
+    return names.map(function(value, index, array) {
+        return {
+            name: value,
+            date: dates[index].toISOString()
+        }
+    });
 };
