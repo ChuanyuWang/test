@@ -18,6 +18,9 @@ $(document).ready(function() {
     request.done(function(data, textStatus, jqXHR) {
         initPage(data);
     });
+    request.done(function(data, textStatus, jqXHR) {
+        loadCourseClasses(data);
+    });
 });
 
 // Functions =============================================================
@@ -114,6 +117,10 @@ function initPage(course) {
                     });
                 }
             },
+            removeClass: function(id) {
+                var vm = this;
+                //TODO
+            },
             removeMember: function(id) {
                 var vm = this;
                 var request = removeCourseMember(vm.course._id, { 'id': id });
@@ -155,6 +162,19 @@ function initPage(course) {
                 vm.birth = e.date === false ? null : e.date;
             });
         }
+    });
+};
+
+function loadCourseClasses(course) {
+    var request = getCourseClasses(course._id);
+    request.done(function(data, textStatus, jqXHR) {
+        // initialize classes property
+        if (!course.hasOwnProperty('classes')) {
+            Vue.set(course, 'classes', [])
+        }
+        data.forEach(function(value, index, array) {
+            course.classes.push(value);
+        });
     });
 };
 
@@ -279,10 +299,10 @@ function addCourseClasses(coureID, fields) {
     return request;
 };
 
-function closeAlert(coureID) {
-    var request = $.getJSON('/api/courses/' + coureID, null);
+function getCourseClasses(coureID) {
+    var request = $.getJSON('/api/classes', {'courseID': coureID});
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert('获取班级失败', jqXHR);
+        showAlert('获取班级课程失败', jqXHR);
     })
     return request;
 };

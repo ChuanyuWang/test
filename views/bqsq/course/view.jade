@@ -87,7 +87,14 @@ block page
           button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',data-toggle='modal',data-target='#class_dlg')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
+          ul.list-group(style='margin-bottom:0px')
+            li.list-group-item(v-for="item in course.classes")
+              a(href='javascript:void(0)',style='margin-right:3px',target='_blank')
+                i.glyphicon.glyphicon-calendar
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item._id)') 移除
+              | {{item.name}}
           small(style='color:#777') 共0节
+    div(style='height:20px')
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
