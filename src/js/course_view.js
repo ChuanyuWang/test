@@ -281,7 +281,10 @@ function handleClickAddClass() {
         }
         result = genRepeatClass(datetime, startdate, enddate, days);
     } else {
-        result.push(createClass(datetime));
+        result.push({
+            name: genClassName(),
+            date: datetime.toISOString()
+        });
     }
     if (result.length === 0) return bootbox.alert('没有符合所选条件的课程');
     // assign classroom
@@ -444,14 +447,6 @@ function genClassName() {
         name = viewData.course.name + '-' + suffix;
     }
     return name;
-};
-
-function createClass(datetime) {
-    return {
-        name: genClassName(),
-        date: datetime.toISOString(),
-        classroom: viewData.course.classroom
-    };
 };
 
 function genRepeatClass(datetime, startdate, enddate, days) {
