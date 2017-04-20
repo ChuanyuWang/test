@@ -19,7 +19,7 @@ $(document).ready(function() {
     init();
 
     //get list of classroom
-    $('#class_room option').each(function(index, element){
+    $('#class_room option').each(function(index, element) {
         viewData.classrooms[element.value] = element.text;
     });
 
@@ -75,7 +75,7 @@ function init() {
 
     // event listener of adding new class
     $('#class_dlg #add_class').click(handleClickAddClass);
-    $('#class_dlg').on('shown.bs.modal', resetAddClassDlg);
+    $('#class_dlg').on('show.bs.modal', resetAddClassDlg);
     $('#class_dlg input[name=recurrence]').on('change', function(e) {
         $('#class_dlg div.recurrence-panel').toggle(250);
         if ($(this).is(':checked')) {
@@ -237,24 +237,68 @@ function handleClickAddMember() {
     modal.modal('hide');
 };
 
+function markError(container, selector, hasError) {
+    if (hasError) {
+        container.find(selector).closest(".form-group").addClass("has-error");
+    } else {
+        container.find(selector).closest(".form-group").removeClass("has-error");
+    }
+}
+
 function handleClickAddClass() {
     var modal = $(this).closest('.modal');
-    var isRepeated = modal.find('input[name=recurrence]').is(':checked');
     var datetime = modal.find('#class_date').data("DateTimePicker").date();
-    var classroom = modal.find('#class_room').val();
-    if (isRepeated) {
-        //TODO
+    if (!datetime || !datetime.isValid()) {
+        markError(modal, '#class_date', true);
+        return;
     } else {
-        var item = createClass(datetime);
-        item.classroom = classroom;
-        var request = addCourseClasses(viewData.course._id, item);
-        request.done(function(data, textStatus, jqXHR) {
-            data.forEach(function(value, index, array) {
-                viewData.course.classes.push(value);
-            });
-            bootbox.alert('班级课程添加成功');
-        });
+        markError(modal, '#class_date', false);
     }
+    var result = [];
+    var isRepeated = modal.find('input[name=recurrence]').is(':checked');
+    if (isRepeated) {
+        var startdate = modal.find('#class_begin').data("DateTimePicker").date();
+        if (!startdate || !startdate.isValid()) {
+            markError(modal, '#class_begin', true);
+            return;
+        } else {
+            markError(modal, '#class_begin', false);
+        }
+        var enddate = modal.find('#class_end').data("DateTimePicker").date();
+        if (!enddate || !enddate.isValid()) {
+            markError(modal, '#class_end', true);
+            return;
+        } else {
+            markError(modal, '#class_end', false);
+        }
+        var days = [];
+        modal.find('.weekdays input:checked').each(function(index, element) {
+            days.push(element.value);
+        });
+        if (days.length == 0) {
+            markError(modal, '.weekdays', true);
+            return;
+        } else {
+            markError(modal, '.weekdays', false);
+        }
+        result = genRepeatClass(datetime, startdate, enddate, days);
+    } else {
+        result.push(createClass(datetime));
+    }
+    if (result.length === 0) return bootbox.alert('没有符合所选条件的课程');
+    // assign classroom
+    var classroom = modal.find('#class_room').val();
+    result.forEach(function(value, index, array) {
+        value.classroom = classroom;
+    })
+    // create classes
+    var request = addCourseClasses(viewData.course._id, result);
+    request.done(function(data, textStatus, jqXHR) {
+        data.forEach(function(value, index, array) {
+            viewData.course.classes.push(value);
+        });
+        bootbox.alert('班级课程添加成功');
+    });
     modal.modal('hide');
 };
 
@@ -337,7 +381,7 @@ function removeCourseClasses(coureID, fields) {
 };
 
 function getCourseClasses(coureID) {
-    var request = $.getJSON('/api/classes', {'courseID': coureID});
+    var request = $.getJSON('/api/classes', { 'courseID': coureID });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取班级课程失败', jqXHR);
     })
@@ -384,6 +428,11 @@ function resetAddClassDlg(event) {
     if (!viewData.course.hasOwnProperty('classes')) {
         Vue.set(viewData.course, 'classes', [])
     }
+    markError(modal, '#class_date', false);
+    markError(modal, '#class_begin', false);
+    markError(modal, '#class_end', false);
+    markError(modal, '.weekdays', false);
+    // TODO, select the classroom as the same as course
 };
 
 function genClassName() {
@@ -405,5 +454,10 @@ function createClass(datetime) {
         date: datetime.toISOString(),
         classroom: viewData.course.classroom
     };
+};
+
+function genRepeatClass(datetime, startdate, enddate, days) {
+    // TODO
+    return [];
 };
 },{}]},{},[1]);

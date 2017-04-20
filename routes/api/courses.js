@@ -219,8 +219,11 @@ router.post('/:courseID/classes', function(req, res, next) {
                 })
             });
             return value;
-        })
-
+        });
+        if (classes.length === 0) {
+            // none classes needed to be created
+            return res.json([]);
+        }
         req.db.collection("classes").insert(classes, function(err, docs) {
             if (err) {
                 var error = new Error("add course's classes fails");
