@@ -92,7 +92,7 @@ block page
               h4(style='margin: 3px 0') {{item.name}}
               a(href='javascript:void(0)',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-calendar
-              span.small {{item.name | formatDateTime}} - {{item.classroom}}
+              span.small {{item.date | formatDateTime}} - {{item.classroom | formatClassroom}}
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item._id)') 移除
           small(style='color:#777') 共0节
     div(style='height:20px')
@@ -131,6 +131,11 @@ block page
                   input.form-control(text='text',name='brith')
                   span.input-group-addon
                     span.glyphicon.glyphicon-calendar
+            div.form-group
+              label.control-label.col-sm-2 教室:
+              select#class_room.form-control.col-sm-4(style='margin-left:15px;width:auto')
+                - each room in classroom
+                  option(value=room.id)= room.name
             div.form-group(style='margin-bottom:7px')
               div.col-sm-offset-2.col-sm-10
                 div.checkbox

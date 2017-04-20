@@ -7,12 +7,19 @@
 
 var viewData = {
     course: {},
-    error: null
+    error: null,
+    classrooms: {}
 }
+
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
+
+    //get list of classroom
+    $('#class_room option').each(function(index, element){
+        viewData.classrooms[element.value] = element.text;
+    });
 
     var request = getCourse($('#course_app').data('course-id'));
     request.done(function(data, textStatus, jqXHR) {
@@ -97,6 +104,9 @@ function initPage(course) {
             formatDateTime: function(value) {
                 if (!value) return '?';
                 return moment(value).format('lll');
+            },
+            formatClassroom: function(value) {
+                return viewData.classrooms[value];
             }
         },
         watch: {
@@ -229,10 +239,12 @@ function handleClickAddClass() {
     var modal = $(this).closest('.modal');
     var isRepeated = modal.find('input[name=recurrence]').is(':checked');
     var datetime = modal.find('#class_date').data("DateTimePicker").date();
+    var classroom = modal.find('#class_room').val();
     if (isRepeated) {
         //TODO
     } else {
         var item = createClass(datetime);
+        item.classroom = classroom;
         var request = addCourseClasses(viewData.course._id, item);
         request.done(function(data, textStatus, jqXHR) {
             data.forEach(function(value, index, array) {
