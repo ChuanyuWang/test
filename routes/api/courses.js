@@ -143,7 +143,7 @@ router.post('/:courseID/members', function(req, res, next) {
             return next(error);
         }
         console.log("add %j members to course %s", req.body, req.params.courseID);
-        //TODO, update classes booking
+        addCourseMembers(req.db, req.params.courseID, members, true);
         res.json(doc);
     });
 });
@@ -172,7 +172,7 @@ router.delete('/:courseID/members', function(req, res, next) {
             return next(error);
         }
         console.log("delete %j members from course %s", req.body, req.params.courseID);
-        //TODO, update classes booking
+        removeCourseMembers(req.db, req.params.courseID, members, true);
         res.json(doc);
     });
 });
@@ -272,6 +272,74 @@ function convertDateObject(doc) {
         doc["createDate"] = new Date(doc["createDate"]);
     }
     return doc;
+};
+
+function removeCourseMembers(db, courseID, members, onlyLatter) {
+    var ids = members.map(function(val, index, array) {
+        return val.id;
+    });
+    db.collection('classes').update({
+        'courseID': courseID,
+        date: {
+            $gte: new Date()
+        }
+    }, {
+        $pull: {
+            booking: {
+                member: { $in: ids }
+            }
+        }
+    }, function(err, result) {
+        if (err) {
+            return console.error(err);
+        }
+        console.log(result);
+    });
+};
+
+function addCourseMembers(db, courseID, members, onlyLatter) {
+    var ids = members.map(function(val, index, array) {
+        return val.id;
+    });
+    var bookings = members.map(function(val, index, array) {
+        return {
+            'member': val.id,
+            'quantity': 1,
+            'bookDate': new Date()
+        };
+    });
+    db.collection('classes').update({
+        'courseID': courseID,
+        date: {
+            $gte: new Date()
+        }
+    }, {
+        $pull: {
+            booking: {
+                member: { $in: ids }
+            }
+        }
+    }, function(err, result) {
+        if (err) {
+            return console.error(err);
+        }
+        console.log(result);
+        db.collection('classes').update({
+            'courseID': courseID,
+            date: { $gte: new Date() }
+        }, {
+            $push: {
+                booking: {
+                    $each: bookings
+                }
+            }
+        }, function(err, result) {
+            if (err) {
+                return console.error(err);
+            }
+            console.log(result);
+        });
+    });
 };
 
 module.exports = router;

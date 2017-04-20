@@ -69,7 +69,7 @@ router.get('/', function (req, res) {
                 })
                 return;
             }
-            console.log("find members who books class %s: %j", req.query.classid, users);
+            console.log("find %s members who book class %s", users.length, req.query.classid);
             
             // Find all the valid booking which member exists
             var book_items = [];

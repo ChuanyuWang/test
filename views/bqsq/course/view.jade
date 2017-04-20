@@ -104,7 +104,11 @@ block page
             span(aria-hidden="true") &times
           h4.modal-title 添加班级成员
         div.modal-body
-          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='10',data-unique-id="_id",data-search-align='left',data-click-to-select='true')
+          div.checkbox(style='position:absolute;top:25px;left:20px')
+            label
+              input(type='checkbox',name='onlyLatter',checked,disabled)
+              |仅参加尚未开始的课程
+          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='10',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
             thead
               tr
                 //th(data-field='_id',data-visible='false') ID
