@@ -233,6 +233,28 @@ router.post('/:courseID/classes', function(req, res, next) {
     });
 });
 
+router.delete('/:courseID/classes', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    var items = Array.isArray(req.body) ? req.body : [req.body];
+    var ids = items.map(function(value, index, array) {
+        return mongojs.ObjectId(value.id);
+    });
+    classes.remove({
+        _id: { $in: ids },
+        courseID: req.params.courseID
+    }, {
+        justOne: false
+    }, function(err, result) {
+        if (err) {
+            var error = new Error("delete course's classes fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("delete %j classes from course %s", req.body, req.params.courseID);
+        res.json(result);
+    });
+});
+
 router.delete('/:courseID', function(req, res, next) {
     return next(new Error("Not implementation"));
 });

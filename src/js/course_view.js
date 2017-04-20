@@ -119,7 +119,17 @@ function initPage(course) {
             },
             removeClass: function(id) {
                 var vm = this;
-                //TODO
+                var request = removeCourseClasses(vm.course._id, { 'id': id });
+                request.done(function(data, textStatus, jqXHR) {
+                    var classes = vm.course.classes;
+                    for (var i = 0; i < classes.length; i++) {
+                        if (classes[i]._id == id) {
+                            classes.splice(i, 1);
+                            break;
+                        }
+                    }
+                    bootbox.alert('删除班级课程成功');
+                });
             },
             removeMember: function(id) {
                 var vm = this;
@@ -295,6 +305,19 @@ function addCourseClasses(coureID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("添加课程失败", jqXHR);
+    })
+    return request;
+};
+
+function removeCourseClasses(coureID, fields) {
+    var request = $.ajax("/api/courses/" + coureID + '/classes', {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("删除班级课程失败", jqXHR);
     })
     return request;
 };
