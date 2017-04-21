@@ -458,7 +458,7 @@ function handleModifyClass(event) {
 
 // event handler defined in home.jade file for removing booking item
 window.handleDeleteBook = {
-    'click .remove': function(e, value, row, index) {
+    'click .remove-booking': function(e, value, row, index) {
         var class_id = $(e.target).closest('table').data('classid');
 
         $.ajax("/api/booking/" + class_id, {
