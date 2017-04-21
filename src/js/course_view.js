@@ -453,7 +453,8 @@ function resetAddClassDlg(event) {
     markError(modal, '#class_begin', false);
     markError(modal, '#class_end', false);
     markError(modal, '.weekdays', false);
-    // TODO, select the classroom as the same as course
+    // select the classroom as the same as course
+    modal.find('#class_room option[value=' + viewData.course.classroom +']').prop("selected", true);
 };
 
 function genClassNames(count) {
