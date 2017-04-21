@@ -259,7 +259,7 @@ function handleClickAddMember() {
             result.forEach(function(value, index, array) {
                 viewData.course.members.push(value);
             });
-            bootbox.alert('添加班级成员成功');
+            //bootbox.alert('添加班级成员成功');
         });
     }
 
@@ -330,7 +330,7 @@ function handleClickAddClass() {
         data.forEach(function(value, index, array) {
             viewData.course.classes.push(value);
         });
-        bootbox.alert('班级课程添加成功');
+        //bootbox.alert('班级课程添加成功');
     });
     modal.modal('hide');
 };
