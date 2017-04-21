@@ -216,6 +216,8 @@ function displayClass(item) {
 
     if (item.cost && item.cost > 0) {
         var cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
+    } else if (item.courseID) {
+        var cls_cost ='';
     } else {
         //TODO, display 故事会 for martin tenant's free course
         if (location.pathname.indexOf("martin") == 1) {
