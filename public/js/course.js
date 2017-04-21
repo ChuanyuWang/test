@@ -158,10 +158,7 @@ function actionFormatter(value, row, index) {
         '<button type="button" class="end btn btn-danger btn-xs">',
         '  <span class="glyphicon glyphicon-ban-circle"></span> 结束',
         '</button>',
-        '<button type="button" style="margin:0px 3px" class="edit btn btn-warning btn-xs">',
-        '  <span class="glyphicon glyphicon-edit"></span> 修改',
-        '</button>',
-        '<button type="button" class="view btn btn-primary btn-xs">',
+        '<button type="button" style="margin-left:6px" class="view btn btn-primary btn-xs">',
         '  <span class="glyphicon glyphicon-expand"></span> 查看',
         '</button>'
     ].join('');
