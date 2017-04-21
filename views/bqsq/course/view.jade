@@ -77,7 +77,7 @@ block page
             li.list-group-item(v-for="member in course.members")
               a(:href='"../member/" + member.id',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-user
-              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member.id)') 移除
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
               | {{member.name}}
           small(style='color:#777') 共{{membersCount}}人
     div.page-header
@@ -94,7 +94,7 @@ block page
               a(href='javascript:void(0)',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-calendar
               span.small {{item.date | formatDateTime}} - {{item.classroom | formatClassroom}}
-              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item._id)') 移除
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
           small(style='color:#777') 共{{classesCount}}节
     div(style='height:20px')
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
@@ -109,7 +109,7 @@ block page
             label
               input(type='checkbox',name='onlyLatter',checked,disabled)
               |仅参加尚未开始的课程
-          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='10',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
+          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
             thead
               tr
                 //th(data-field='_id',data-visible='false') ID

@@ -11,7 +11,6 @@ var viewData = {
     classrooms: {}
 }
 
-
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
@@ -112,8 +111,7 @@ function initPage(course) {
                 return viewData.classrooms[value];
             }
         },
-        watch: {
-        },
+        watch: {},
         methods: {
             saveBasicInfo: function() {
                 this.error = null;
@@ -134,15 +132,10 @@ function initPage(course) {
                 var vm = this;
                 bootbox.confirm({
                     title: "删除班级",
-                    message: "删除班级中所有课程，包括已经开始的课程",
+                    message: "删除班级中所有课程，包括已经开始的课程？",
                     buttons: {
                         confirm: {
-                            label: "确定",
-                            className: "btn-danger",
-                        },
-                        cancel: {
-                            label: "取消",
-                            className: "btn-default",
+                            className: "btn-danger"
                         }
                     },
                     callback: function(ok) {
@@ -155,32 +148,56 @@ function initPage(course) {
                     }
                 });
             },
-            removeClass: function(id) {
+            removeClass: function(item) {
                 var vm = this;
-                var request = removeCourseClasses(vm.course._id, { 'id': id });
-                request.done(function(data, textStatus, jqXHR) {
-                    var classes = vm.course.classes;
-                    for (var i = 0; i < classes.length; i++) {
-                        if (classes[i]._id == id) {
-                            classes.splice(i, 1);
-                            break;
+                bootbox.confirm({
+                    title: "删除课程",
+                    message: '删除' + moment(item.date).format('ll dddd') + ' 课程吗?',
+                    buttons: {
+                        confirm: {
+                            className: "btn-danger"
                         }
+                    },
+                    callback: function(ok) {
+                        if (!ok) return;
+                        var request = removeCourseClasses(vm.course._id, { 'id': item._id });
+                        request.done(function(data, textStatus, jqXHR) {
+                            var classes = vm.course.classes;
+                            for (var i = 0; i < classes.length; i++) {
+                                if (classes[i]._id == item._id) {
+                                    classes.splice(i, 1);
+                                    break;
+                                }
+                            }
+                            //bootbox.alert('删除班级课程成功');
+                        });
                     }
-                    bootbox.alert('删除班级课程成功');
                 });
             },
-            removeMember: function(id) {
+            removeMember: function(item) {
                 var vm = this;
-                var request = removeCourseMember(vm.course._id, { 'id': id });
-                request.done(function(data, textStatus, jqXHR) {
-                    var members = vm.course.members;
-                    for (var i = 0; i < members.length; i++) {
-                        if (members[i].id == id) {
-                            members.splice(i, 1);
-                            break;
+                bootbox.confirm({
+                    title: "移除班级成员",
+                    message: '从班级中移除' + item.name + '，并删除此成员所有未开始的课程吗?',
+                    buttons: {
+                        confirm: {
+                            className: "btn-danger"
                         }
+                    },
+                    callback: function(ok) {
+                        if (!ok) return;
+                        var request = removeCourseMember(vm.course._id, { 'id': item.id });
+                        request.done(function(data, textStatus, jqXHR) {
+                            var members = vm.course.members;
+                            for (var i = 0; i < members.length; i++) {
+                                if (members[i].id == item.id) {
+                                    members.splice(i, 1);
+                                    break;
+                                }
+                            }
+                            //bootbox.alert('删除班级成员成功');
+                        });
                     }
-                    bootbox.alert('删除班级成员成功');
                 });
             },
             closeAlert: function(e) {
@@ -260,7 +277,6 @@ function handleClickAddMember() {
             //bootbox.alert('添加班级成员成功');
         });
     }
-
     modal.modal('hide');
 };
 
@@ -412,7 +428,7 @@ function removeCourseClasses(coureID, fields) {
 };
 
 function removeCourse(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID , {
+    var request = $.ajax("/api/courses/" + coureID, {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -477,7 +493,7 @@ function resetAddClassDlg(event) {
     markError(modal, '#class_end', false);
     markError(modal, '.weekdays', false);
     // select the classroom as the same as course
-    modal.find('#class_room option[value=' + viewData.course.classroom +']').prop("selected", true);
+    modal.find('#class_room option[value=' + viewData.course.classroom + ']').prop("selected", true);
 };
 
 function genClassNames(count) {
