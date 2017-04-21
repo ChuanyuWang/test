@@ -257,7 +257,38 @@ router.delete('/:courseID/classes', function(req, res, next) {
 });
 
 router.delete('/:courseID', function(req, res, next) {
-    return next(new Error("Not implementation"));
+    var courses = req.db.collection("courses");
+    courses.remove({
+        _id: mongojs.ObjectId(req.params.courseID)
+    }, {
+        justOne: true
+    }, function(err, result) {
+        if (err) {
+            var error = new Error("delete course fails");
+            error.innerError = err;
+            return next(error);
+        }
+        // remove all classes with courseID
+        req.db.collection("classes").remove({
+            courseID: req.params.courseID
+        }, {
+            justOne: false
+        }, function(err, result) {
+            if (err) {
+                console.error("delete course's classes fails");
+            }
+            console.log("delete classes of course %s", req.params.courseID);
+        });
+        // check the result and respond
+        if (result.n == 1) {
+            console.log("course %s is deleted", req.params.courseID);
+            res.json(result);
+        } else {
+            var error = new Error("can't find course %s and delete it", req.params.courseID);
+            error.status = 400;
+            return next(error);
+        }
+    });
 });
 
 /**

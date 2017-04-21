@@ -87,7 +87,7 @@ function init() {
 };
 
 function initPage(course) {
-    viewData.course = course;
+    viewData.course = course || {};
 
     // bootstrap the course view page
     var courseViewer = new Vue({
@@ -130,6 +130,7 @@ function initPage(course) {
                 }
             },
             deleteCourse: function() {
+                var vm = this;
                 bootbox.confirm({
                     title: "删除班级",
                     message: "删除班级中所有课程，包括已经开始的课程",
@@ -143,8 +144,13 @@ function initPage(course) {
                             className: "btn-default",
                         }
                     },
-                    callback: function(result) {
-                        console.log('TODO');
+                    callback: function(ok) {
+                        if (ok) {
+                            var request = removeCourse(vm.course._id);
+                            request.done(function(data, textStatus, jqXHR) {
+                                window.location.href = '../course';
+                            });
+                        }
                     }
                 });
             },
@@ -207,6 +213,7 @@ function initPage(course) {
 };
 
 function loadCourseClasses(course) {
+    if (!course) return;
     var request = getCourseClasses(course._id);
     request.done(function(data, textStatus, jqXHR) {
         // initialize classes property
@@ -399,6 +406,19 @@ function removeCourseClasses(coureID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("删除班级课程失败", jqXHR);
+    })
+    return request;
+};
+
+function removeCourse(coureID, fields) {
+    var request = $.ajax("/api/courses/" + coureID , {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("删除班级失败", jqXHR);
     })
     return request;
 };

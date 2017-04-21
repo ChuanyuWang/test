@@ -36,7 +36,7 @@ block page
       li.active 查看班级
     div.page-header
       h3(style='margin-top:0;display:inline-block') 基本信息
-      button.btn.btn-danger(type='button',style='float:right',@click='deleteCourse') 删除班级
+      button.btn.btn-danger(type='button',style='float:right',:disabled='!course._id',@click='deleteCourse') 删除班级
     form.form-horizontal
       div.form-group
         label.col-sm-2.control-label 状态:
@@ -61,7 +61,7 @@ block page
           textarea.form-control(rows='3', v-model.trim='course.remark')
       div.form-group
         div.col-sm-offset-2.col-sm-10
-          button.btn.btn-success(type='button',v-on:click='saveBasicInfo') 保存
+          button.btn.btn-success(type='button',:disabled='!course._id',v-on:click='saveBasicInfo') 保存
           div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='error')
             strong 错误! 
             |{{error}}
