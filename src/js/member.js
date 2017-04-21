@@ -222,9 +222,8 @@ function highlightExpire(row, index) {
 function viewFormatter(value, row, index) {
     var url = window.location.pathname + '/' + row._id;
     return [
-        //TODO, update title according to different color
-        '<a href="' + url + '" title="查看会员详情">',
-        '<i class="glyphicon glyphicon-user"></i> 查看详情',
+        '<a href="' + url + '" title="查看会员详情" class="btn btn-primary btn-xs">',
+        '<i class="glyphicon glyphicon-expand"></i> 查看',
         '</a>'
     ].join('');
 };
