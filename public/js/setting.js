@@ -32,8 +32,8 @@
             columns: [{}, {}, {
                 formatter: visibilityFormatter
             }, {
-                formatter: deleteFormatter,
-                events: handleDeleteClassroom
+                formatter: actionFormatter,
+                events: handleActions
             }]
         });
 
@@ -43,16 +43,16 @@
                 // create a new classroom
                 var modal = $(this);
                 modal.find('.modal-title').text("添加教室");
-                modal.find('input[name=id]').val("").closest(".form-group").removeClass("has-error");
+                modal.find('input[name=id]').val("").prop("disabled", false).closest(".form-group").removeClass("has-error");
                 modal.find('input[name=name]').val("").closest(".form-group").removeClass("has-error");
 
                 modal.find('#add_room').show();
-            } else if (button.data('action') == "edit") {
-                //TODO
+                modal.find('#edit_room').hide();
             }
         });
 
         $('#add_room').click(handleAddNewClassRoom);
+        $('#edit_room').click(handleEditClassRoom);
         // handle user refresh the chart
         $('#refresh').click(refreshChart);
         // handle user change the chart filters
@@ -99,6 +99,35 @@
         }
     };
 
+    function handleEditClassRoom(event) {
+        var modal = $(this).closest('.modal');
+        var room = {};
+
+        // validate the input
+        var hasError = false;
+        // get the classroom id
+        room.id = modal.find('input[name=id]').val().trim();
+        // get the classroom name
+        room.name = modal.find('input[name=name]').val().trim();
+        if (!room.name || room.name.length == 0) {
+            modal.find('input[name=name]').closest(".form-group").addClass("has-error");
+            hasError = true;
+        } else {
+            modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
+        }
+
+        // get the classroom visibility
+        room.visibility = modal.find('input[name=visibility]:checked').val();
+
+        if (!hasError) {
+            modal.modal('hide');
+            var request = editClassroom(room);
+            request.done(function(data, textStatus, jqXHR) {
+                $('#classroom_table').bootstrapTable('refresh');
+            });
+        }
+    };
+
     function addNewClassroom(room) {
         $.ajax("/api/setting/classrooms", {
             type: "POST",
@@ -108,19 +137,40 @@
                 $('#classroom_table').bootstrapTable('insertRow', { index: 0, row: room });
             },
             error: function(jqXHR, status, err) {
-                bootbox.dialog({
+                bootbox.alert({
                     message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
                     title: "添加教室失败",
                     buttons: {
-                        danger: {
-                            label: "确定",
-                            className: "btn-danger",
+                        ok: {
+                            className: "btn-danger"
                         }
                     }
                 });
             },
             dataType: "json"
         });
+    };
+
+    function editClassroom(room) {
+        var request = $.ajax("/api/setting/classrooms/" + room.id, {
+            type: "PATCH",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(room),
+            dataType: "json"
+        });
+        request.fail(function(jqXHR, textStatus, errorThrown) {
+            bootbox.alert({
+                message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+                title: "修改教室失败",
+                buttons: {
+                    ok: {
+                        // alert dialog with danger button by default
+                        className: "btn-danger"
+                    }
+                }
+            });
+        });
+        return request;
     };
 
     function refreshChart() {
@@ -257,23 +307,24 @@
         else return '否';
     };
 
-    function deleteFormatter(value, row, index) {
+    function actionFormatter(value, row, index) {
         return [
-            '<a class="remove text-danger" href="javascript:void(0)" title="删除">',
-            '<i class="glyphicon glyphicon-remove"></i>',
-            '</a>'
+            '<button type="button" class="edit-room btn btn-primary btn-xs">',
+            '  <span class="glyphicon glyphicon-expand"></span> 修改',
+            '</button>',
+            '<button type="button" style="margin-left:6px" class="remove-room btn btn-danger btn-xs">',
+            '  <span class="glyphicon glyphicon-ban-circle"></span> 删除',
+            '</button>'
         ].join('');
     };
 
     // event handler defined in setting.jade file for removing classroom
-    var handleDeleteClassroom = {
-        'click .remove': function(e, value, row, index) {
+    var handleActions = {
+        'click .remove-room': function(e, value, row, index) {
             bootbox.confirm({
                 message: "确定永久删除此教室吗？<br><small>删除后，教室中的课程将无法显示或预约，并且已经预约的课时也不会返还到会员卡中</small>",
-                callback: function(result) {
-                    if (!result) { // user cancel
-                        return;
-                    }
+                callback: function(ok) {
+                    if (!ok) return;
 
                     $.ajax("/api/setting/classrooms/" + row.id, {
                         type: "DELETE",
@@ -307,6 +358,18 @@
                     }
                 }
             });
+        },
+        'click .edit-room': function(e, value, row, index) {
+            // edit a classroom
+            var modal = $('#clsroom_dlg');
+            modal.find('.modal-title').text("修改教室");
+            modal.find('input[name=id]').val(row.id).prop("disabled", true).closest(".form-group").removeClass("has-error");
+            modal.find('input[name=name]').val(row.name).closest(".form-group").removeClass("has-error");
+            modal.find('input[name=visibility]').prop('checked', row.visibility == 'internal');
+            modal.find('#add_room').hide();
+            modal.find('#edit_room').show();
+
+            modal.modal('show');
         }
     };
 })(jQuery);

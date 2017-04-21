@@ -45,7 +45,7 @@ block page
               th(data-field='id',data-sortable='true') 教室ID
               th(data-field='name') 教室名字
               th(data-field='visibility') 内部预约
-              th(data-title='删除',data-align='center')
+              th(data-title='操作',data-align='center')
       div.tab-pane(role="tabpanel",id="general",style="padding:7px")
         p 暂未开放
       div.tab-pane(role="tabpanel",id="analytics",style="padding:7px")
@@ -90,4 +90,4 @@ block page
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_room.btn.btn-success(type="button") 添加
-          //button#edit_member.btn.btn-success(type="button") 修改
+          button#edit_room.btn.btn-primary(type="button") 修改

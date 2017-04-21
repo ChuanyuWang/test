@@ -145,6 +145,30 @@ router.route('/classrooms/:roomID')
 .put(function (req, res) {
     //TODO, update a classroom
     next(new Error('not implemented'));
+})
+.patch(function(req, res, next) {
+    var tenants = config_db.collection('tenants');
+    tenants.findAndModify({
+        query: {
+            name : req.user.tenant,
+            'classroom.id': req.params.roomID
+        },
+        update: {
+            $set: {
+                'classroom.$.name': req.body.name,
+                'classroom.$.visibility': req.body.visibility
+            }
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("update tenant's classroom fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("update tenant %s classroom %s", req.user.tenant, req.params.roomID);
+        res.json(doc);
+    });
 });
 
 function migrateFreeClass(room, database) {

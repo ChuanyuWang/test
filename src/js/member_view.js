@@ -127,6 +127,8 @@ $(document).ready(function() {
 function init() {
     console.log("init view member ~~~");
     moment.locale('zh-CN');
+    bootbox.setLocale('zh_CN');
+
     // event listener of adding new comment
     $('#comment_dlg #add_comment').click(handleClickAddComment);
     $('#comment_dlg').on('shown.bs.modal', function(event) {
@@ -255,7 +257,7 @@ function getMemberInfo(id) {
     var request = $.getJSON("/api/members/" + id, '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("获取会员信息失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -263,7 +265,7 @@ function getMemberComments(id) {
     var request = $.getJSON("/api/members/" + id + '/comments', '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("获取会员备忘失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -275,12 +277,11 @@ function getMemberComments(id) {
  */
 function showAlert(title, jqXHR, className) {
     //console.error(jqXHR);
-    bootbox.dialog({
+    bootbox.alert({
         message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
         title: title || '错误',
         buttons: {
-            danger: {
-                label: "确定",
+            ok: {
                 // alert dialog with danger button by default
                 className: className || "btn-danger"
             }
