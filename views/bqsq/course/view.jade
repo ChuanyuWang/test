@@ -95,7 +95,7 @@ block page
                 i.glyphicon.glyphicon-calendar
               span.small {{item.date | formatDateTime}} - {{item.classroom | formatClassroom}}
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item._id)') 移除
-          small(style='color:#777') 共0节
+          small(style='color:#777') 共{{classesCount}}节
     div(style='height:20px')
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog

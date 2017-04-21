@@ -94,6 +94,9 @@ function initPage(course) {
         computed: {
             membersCount: function() {
                 return this.course.members ? this.course.members.length : 0;
+            },
+            classesCount: function() {
+                return this.course.classes ? this.course.classes.length : 0;
             }
         },
         filters: {
