@@ -21,6 +21,22 @@ module.exports = function() {
                 return moment(date).format('HH:mm');
             }
         },
-        methods: {}
+        methods: {
+            reservation: function(cItem) {
+                if (cItem) {
+                    var booking = cItem.booking || [];
+                    if (booking.length === 0) return 0;
+                    else {
+                        var reservation = 0;
+                        booking.forEach(function(val, index, array) {
+                            reservation += (val.quantity || 0);
+                        });
+                        return reservation;
+                    }
+                } else {
+                    return undefined;
+                }
+            }
+        }
     });
 };

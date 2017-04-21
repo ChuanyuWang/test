@@ -32,6 +32,26 @@ module.exports = {
         } else {
             return undefined;
         }
+    },
+    /**
+     * Calculate the remaining capacity of class object
+     * 
+     * @cItem {Object} cItem class object
+     */
+    classRemaining: function(cItem) {
+        if (cItem) {
+            var booking = cItem.booking || [];
+            if (booking.length === 0) return cItem.capacity || 0;
+            else {
+                var reservation = 0;
+                booking.forEach(function(val, index, array) {
+                    reservation += (val.quantity || 0);
+                });
+                return (cItem.capacity || 0) - reservation;
+            }
+        } else {
+            return undefined;
+        }
     }
 };
 },{}],2:[function(require,module,exports){
@@ -58,7 +78,23 @@ module.exports = function() {
                 return moment(date).format('HH:mm');
             }
         },
-        methods: {}
+        methods: {
+            reservation: function(cItem) {
+                if (cItem) {
+                    var booking = cItem.booking || [];
+                    if (booking.length === 0) return 0;
+                    else {
+                        var reservation = 0;
+                        booking.forEach(function(val, index, array) {
+                            reservation += (val.quantity || 0);
+                        });
+                        return reservation;
+                    }
+                } else {
+                    return undefined;
+                }
+            }
+        }
     });
 };
 
@@ -231,9 +267,7 @@ function handleAddNewClass(event) {
     var modal = $(this).closest('.modal');
     var hasError = false;
     // validate the input
-    var classItem = {
-        reservation: 0
-    };
+    var classItem = {};
     classItem.name = modal.find('#cls_name').val();
     if (!classItem.name || classItem.name.length == 0) {
         modal.find('#cls_name').closest(".form-group").addClass("has-error");
@@ -535,8 +569,7 @@ window.handleDeleteBook = {
             success: function(data) {
                 // update the cache
                 var class_item = cls_cache[class_id];
-                // TODO, check the return 'data' as new class item
-                class_item.reservation -= row.quantity;
+                class_item.booking = data.booking;
                 $('#member_table').bootstrapTable('removeByUniqueId', row.member);
                 showSuccessMsg("成功取消预约");
             },

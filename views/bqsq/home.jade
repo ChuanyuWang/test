@@ -62,13 +62,13 @@ block page
   script#classlist-template(type='text/x-template')
     div
       template(v-for='classItem in data')
-        div.class-item-div(v-bind:class="[classItem.reservation > 0 ? 'bg-success' : 'bg-info']")
+        div.class-item-div(v-bind:class="[reservation(classItem) > 0 ? 'bg-success' : 'bg-info']")
           span(style='color:#999').small {{classItem.date | displayTime}}开始
           p(style='padding-bottom:7px;cursor:pointer',v-on:click='$emit("view", classItem)',title='点击查看课程详情') {{classItem.name}}
           div.btn-group.btn-group-xs(style='align-self:flex-end')
-            button.btn.btn-primary(v-on:click='$emit("view", classItem)',:title='classItem.reservation + "人预约"')
+            button.btn.btn-primary(v-on:click='$emit("view", classItem)',:title='reservation(classItem) + "人预约"')
               |View
-              span.badge {{classItem.reservation}}
+              span.badge {{reservation(classItem)}}
             button.btn.btn-danger(v-on:click='$emit("delete", classItem)',title='删除')
               span.glyphicon.glyphicon-trash
       div(style='display:flex')

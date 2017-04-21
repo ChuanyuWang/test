@@ -166,9 +166,7 @@ function handleAddNewClass(event) {
     var modal = $(this).closest('.modal');
     var hasError = false;
     // validate the input
-    var classItem = {
-        reservation: 0
-    };
+    var classItem = {};
     classItem.name = modal.find('#cls_name').val();
     if (!classItem.name || classItem.name.length == 0) {
         modal.find('#cls_name').closest(".form-group").addClass("has-error");
@@ -470,8 +468,7 @@ window.handleDeleteBook = {
             success: function(data) {
                 // update the cache
                 var class_item = cls_cache[class_id];
-                // TODO, check the return 'data' as new class item
-                class_item.reservation -= row.quantity;
+                class_item.booking = data.booking;
                 $('#member_table').bootstrapTable('removeByUniqueId', row.member);
                 showSuccessMsg("成功取消预约");
             },

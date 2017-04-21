@@ -208,8 +208,6 @@ router.post('/:courseID/classes', function(req, res, next) {
             }
             value.cost = value.cost || 0;
             value.capacity = value.capacity || 8;
-            value.reservation = value.reservation || 0;
-            value.reservation = + members.length;
             value.booking = value.booking || [];
             members.forEach(function(m, index, array) {
                 value.booking.push({

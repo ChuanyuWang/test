@@ -19,8 +19,8 @@ router.get('/consumption', function (req, res, next) {
     var classes = req.db.collection("classes");
     classes.aggregate([{
         $match: {
-            "reservation": {
-                $gt: 0
+            "booking.0": { // array size >= 1
+                $exists: true
             },
             "date": {
                 $gte: new Date(year, 0),

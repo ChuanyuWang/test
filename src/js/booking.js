@@ -207,7 +207,7 @@ function addNewBook(bookInfo) {
             var classInfo = data['class'];
             cls_cache[classInfo._id] = classInfo;
             // TODO, update the button status according to latest return data
-            var remaining = classInfo.capacity - classInfo.reservation;
+            var remaining = common.classRemaining(classInfo);
             var book_col = $(".book-col[data-id=" + bookInfo.classid + "]");
             book_col.find("span").text(remaining < 0 ? 0 : remaining);
             if (remaining <= 0) {
@@ -305,7 +305,7 @@ function displayClass(item) {
                     getAgeLimit(item),
                     '</p>'].join('');
 
-    var remaining = item.capacity - item.reservation;
+    var remaining = common.classRemaining(item);
     if (date < moment().subtract(1, 'hours')) {
         // the class or event is finished one hours ago
         var btn_book = '<button class="btn btn-default finish-btn" disabled="disabled">结束</button>';

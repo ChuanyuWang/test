@@ -30,5 +30,25 @@ module.exports = {
         } else {
             return undefined;
         }
+    },
+    /**
+     * Calculate the remaining capacity of class object
+     * 
+     * @cItem {Object} cItem class object
+     */
+    classRemaining: function(cItem) {
+        if (cItem) {
+            var booking = cItem.booking || [];
+            if (booking.length === 0) return cItem.capacity || 0;
+            else {
+                var reservation = 0;
+                booking.forEach(function(val, index, array) {
+                    reservation += (val.quantity || 0);
+                });
+                return (cItem.capacity || 0) - reservation;
+            }
+        } else {
+            return undefined;
+        }
     }
 };

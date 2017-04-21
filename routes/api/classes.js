@@ -5,7 +5,14 @@ var util = require('../../util');
 var helper = require('../../helper');
 
 var NORMAL_FIELDS = {
-    booking: 0
+    name: 1,
+    date: 1,
+    courseID: 1,
+    cost: 1,
+    capacity: 1,
+    age: 1,
+    classroom: 1,
+    booking: 1
 };
 
 router.get('/', function(req, res, next) {
@@ -82,37 +89,37 @@ router.put('/:classID', helper.requireRole("admin"), function(req, res) {
     classes.update({
         _id: mongojs.ObjectId(req.params.classID)
     }, {
-            $set: req.body
-        }, function(err, result) {
-            if (err) {
-                var error = new Error("Update class fails");
-                error.innerError = err;
-                next(error);
-                return;
-            }
-            if (result.n == 1) {
-                console.log("class %s is updated by %j", req.params.classID, req.body);
-            } else {
-                console.error("class %s update fail by %s", req.params.classID, req.body);
-            }
-            res.json(result);
-        });
+        $set: req.body
+    }, function(err, result) {
+        if (err) {
+            var error = new Error("Update class fails");
+            error.innerError = err;
+            next(error);
+            return;
+        }
+        if (result.n == 1) {
+            console.log("class %s is updated by %j", req.params.classID, req.body);
+        } else {
+            console.error("class %s update fail by %s", req.params.classID, req.body);
+        }
+        res.json(result);
+    });
 });
-// remove a class or event which reservation is zero
-router.delete('/:classID', helper.requireRole("admin"), function(req, res) {
+// remove a class or event which there is no booking
+router.delete('/:classID', helper.requireRole("admin"), function(req, res, next) {
     var classes = req.db.collection("classes");
     classes.remove({
         _id: mongojs.ObjectId(req.params.classID),
-        reservation: {
-            $lte: 0
-        }
+        $or: [
+            { booking: { $size : 0 } },
+            { booking: null }
+        ]
     }, true, function(err, result) {
         console.log("remove result is %j", result);
         if (err) {
-            res.status(500).json({
-                'err': err
-            });
-            return;
+            var error = new Error("删除课程失败");
+            error.innerError = err;
+            return next(error);
         }
         if (result.n == 1) {
             console.log("class %s is deleted", req.params.classID);

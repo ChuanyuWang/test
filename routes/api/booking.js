@@ -221,13 +221,17 @@ router.post('/', function (req, res, next) {
                     return;
                 }
             }
-
-            if (cls.capacity - cls.reservation < req.body.quantity) {
-                var remaining = cls.capacity - cls.reservation;
-                remaining = remaining < 0 ? 0 : remaining;
+            // calculate the remaining
+            var booking = cls.booking || [];
+            var reservation = 0, remaining = 0;
+            booking.forEach(function(val, index, array) {
+                reservation += (val.quantity || 0);
+            })
+            remaining = cls.capacity - reservation;
+            if (remaining < req.body.quantity) {
                 res.status(400).json({
                     'code' : 2003,
-                    'message' : "名额不足，剩余 " + remaining + " 人",
+                    'message' : "名额不足，剩余 " + (remaining < 0 ? 0 : remaining) + " 人",
                     'err' : err
                 });
                 return;
@@ -349,31 +353,36 @@ router.delete ('/:classID', function (req, res, next) {
             }
         }
 
-        classes.update({
-            _id : mongojs.ObjectId(req.params.classID)
-        }, {
-            $pull : {
-                "booking" : {
-                    member : req.body.memberid
+        classes.findAndModify({
+            query:{
+                _id : mongojs.ObjectId(req.params.classID)
+            }, 
+            update: {
+                $pull : {
+                    "booking" : {
+                        member : req.body.memberid
+                    }
                 }
             },
-            $inc : {
-                reservation : -quantity
+            fields: {cost:1, booking: 1},
+            new: true
+        }, function (err, doc, lastErrorObject) {
+            if (err) {
+                var error = new Error("取消会员预约失败");
+                error.innerError = err;
+                return next(error);
             }
-        }, function (err, result) {
-            if (result.n == 1) {
-                //TODO, support multi membership card
-                //TODO, handle the callback when member is not existed.
-                //TODO, handle the callback when member is inactive.
-                tenantDB.collection("members").update({
-                    _id : mongojs.ObjectId(req.body.memberid),
-                    membership : { $size : 1 }
-                }, {
-                    $inc : { "membership.0.credit" : doc.cost * quantity}
-                });
-            }
-            //TODO, return the modified class item
-            res.json(result);
+            //TODO, support multi membership card
+            //TODO, handle the callback when member is not existed.
+            //TODO, handle the callback when member is inactive.
+            tenantDB.collection("members").update({
+                _id : mongojs.ObjectId(req.body.memberid),
+                membership : { $size : 1 }
+            }, {
+                $inc : { "membership.0.credit" : doc.cost * quantity}
+            });
+
+            res.json(doc);
         });
     });
 });
@@ -400,20 +409,16 @@ function createNewBook(tenantDB, res, user, cls, quantity) {
         update : {
             $push : {
                 booking : newbooking
-            },
-            $inc : {
-                reservation : quantity
             }
         },
         new : true
     }, function (err, doc, lastErrorObject) {
         if (err) {
-            res.status(500).json({
+            return res.status(500).json({
                 'code' : 3001,
                 'message' : "create booking record fails",
                 'err' : err
             });
-            return;
         }
 
         //TODO, support multi membership card

@@ -209,7 +209,7 @@ function addNewBook(bookInfo) {
             var classInfo = data['class'];
             cls_cache[classInfo._id] = classInfo;
             // TODO, update the button status according to latest return data
-            var remaining = classInfo.capacity - classInfo.reservation;
+            var remaining = common.classRemaining(classInfo);
             var book_col = $(".book-col[data-id=" + bookInfo.classid + "]");
             book_col.find("span").text(remaining < 0 ? 0 : remaining);
             if (remaining <= 0) {
@@ -307,7 +307,7 @@ function displayClass(item) {
                     getAgeLimit(item),
                     '</p>'].join('');
 
-    var remaining = item.capacity - item.reservation;
+    var remaining = common.classRemaining(item);
     if (date < moment().subtract(1, 'hours')) {
         // the class or event is finished one hours ago
         var btn_book = '<button class="btn btn-default finish-btn" disabled="disabled">结束</button>';
@@ -448,6 +448,26 @@ module.exports = {
     dateFormatter: function(value, row, index) {
         if (value) {
             return moment(value).format('ll');
+        } else {
+            return undefined;
+        }
+    },
+    /**
+     * Calculate the remaining capacity of class object
+     * 
+     * @cItem {Object} cItem class object
+     */
+    classRemaining: function(cItem) {
+        if (cItem) {
+            var booking = cItem.booking || [];
+            if (booking.length === 0) return cItem.capacity || 0;
+            else {
+                var reservation = 0;
+                booking.forEach(function(val, index, array) {
+                    reservation += (val.quantity || 0);
+                });
+                return (cItem.capacity || 0) - reservation;
+            }
         } else {
             return undefined;
         }
