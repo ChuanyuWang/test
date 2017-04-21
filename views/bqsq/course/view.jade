@@ -35,7 +35,8 @@ block page
         a(href="../course") 班级列表
       li.active 查看班级
     div.page-header
-      h3 基本信息
+      h3(style='margin-top:0;display:inline-block') 基本信息
+      button.btn.btn-danger(type='button',style='float:right',@click='deleteCourse') 删除班级
     form.form-horizontal
       div.form-group
         label.col-sm-2.control-label 状态:

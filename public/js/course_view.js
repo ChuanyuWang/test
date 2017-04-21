@@ -129,6 +129,25 @@ function initPage(course) {
                     });
                 }
             },
+            deleteCourse: function() {
+                bootbox.confirm({
+                    title: "删除班级",
+                    message: "删除班级中所有课程，包括已经开始的课程",
+                    buttons: {
+                        confirm: {
+                            label: "确定",
+                            className: "btn-danger",
+                        },
+                        cancel: {
+                            label: "取消",
+                            className: "btn-default",
+                        }
+                    },
+                    callback: function(result) {
+                        console.log('TODO');
+                    }
+                });
+            },
             removeClass: function(id) {
                 var vm = this;
                 var request = removeCourseClasses(vm.course._id, { 'id': id });
