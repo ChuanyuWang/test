@@ -310,10 +310,10 @@
     function actionFormatter(value, row, index) {
         return [
             '<button type="button" class="edit-room btn btn-primary btn-xs">',
-            '  <span class="glyphicon glyphicon-expand"></span> 修改',
+            '  <span class="glyphicon glyphicon-edit"></span> 修改',
             '</button>',
             '<button type="button" style="margin-left:6px" class="remove-room btn btn-danger btn-xs">',
-            '  <span class="glyphicon glyphicon-ban-circle"></span> 删除',
+            '  <span class="glyphicon glyphicon-trash"></span> 删除',
             '</button>'
         ].join('');
     };
