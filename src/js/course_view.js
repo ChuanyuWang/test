@@ -352,18 +352,18 @@ function handleClickAddClass() {
 /**
  * Retrieve course object according to ID
  * 
- * @param {String} coureID 
+ * @param {String} courseID 
  */
-function getCourse(coureID) {
-    var request = $.getJSON('/api/courses/' + coureID, null);
+function getCourse(courseID) {
+    var request = $.getJSON('/api/courses/' + courseID, null);
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取班级失败', jqXHR);
     })
     return request;
 };
 
-function updateCourse(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID, {
+function updateCourse(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID, {
         type: "PATCH",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -375,8 +375,8 @@ function updateCourse(coureID, fields) {
     return request;
 };
 
-function addCourseMembers(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/members', {
+function addCourseMembers(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID + '/members', {
         type: "POST",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -388,8 +388,8 @@ function addCourseMembers(coureID, fields) {
     return request;
 };
 
-function removeCourseMember(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/members', {
+function removeCourseMember(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID + '/members', {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -401,8 +401,8 @@ function removeCourseMember(coureID, fields) {
     return request;
 };
 
-function addCourseClasses(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/classes', {
+function addCourseClasses(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID + '/classes', {
         type: "POST",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -414,8 +414,8 @@ function addCourseClasses(coureID, fields) {
     return request;
 };
 
-function removeCourseClasses(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/classes', {
+function removeCourseClasses(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID + '/classes', {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -427,8 +427,8 @@ function removeCourseClasses(coureID, fields) {
     return request;
 };
 
-function removeCourse(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID, {
+function removeCourse(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID, {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
@@ -440,8 +440,8 @@ function removeCourse(coureID, fields) {
     return request;
 };
 
-function getCourseClasses(coureID) {
-    var request = $.getJSON('/api/classes', { 'courseID': coureID });
+function getCourseClasses(courseID) {
+    var request = $.getJSON('/api/classes', { 'courseID': courseID });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取班级课程失败', jqXHR);
     })
