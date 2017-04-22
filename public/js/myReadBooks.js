@@ -180,7 +180,8 @@ function showMyBooks(isHistory, tab_id) {
         from : moment(0).toISOString(),
         to : moment().add(1, 'years').toISOString(),
         order : 'desc',
-        tenant: common.getTenantName()
+        tenant: common.getTenantName(),
+        hasBooks : true
     };
     $.ajax("/api/classes", {
         type : "GET",

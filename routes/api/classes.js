@@ -12,7 +12,8 @@ var NORMAL_FIELDS = {
     capacity: 1,
     age: 1,
     classroom: 1,
-    booking: 1
+    booking: 1,
+    books: 1
 };
 
 router.get('/', function(req, res, next) {
@@ -51,6 +52,12 @@ router.get('/', function(req, res, next) {
     // get all classes booked by this member
     if (req.query.memberid) {
         query['booking.member'] = req.query.memberid;
+    }
+    // get all classes booked by this member
+    if (req.query.hasOwnProperty('hasBooks')) {
+        query['books.0'] = { // array size >= 1
+            $exists: true
+        };
     }
     var classes = tenantDB.collection("classes");
     classes.find(query, NORMAL_FIELDS).sort({
