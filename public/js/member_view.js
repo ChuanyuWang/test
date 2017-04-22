@@ -91,7 +91,11 @@ module.exports = function() {
                 return this.type === 'ALL';
             }
         },
-        filters: {},
+        filters: {
+            formatCredit: function(value) {
+                return Math.round(value * 10)/10;
+            }
+        },
         methods: {
             alterCharge: function(value) {
                 if (typeof (this.delta) !== 'number') {

@@ -129,7 +129,7 @@ block page
       div.form-group
         label.control-label.col-sm-2 课时:
         div.col-sm-10
-          p.form-control-static {{item.credit}}次(剩余)
+          p.form-control-static {{item.credit | formatCredit}}次(剩余)
       div.form-group
         label.control-label.col-sm-2 增加/减少:
         div.col-sm-10(style="display:inline-flex")
