@@ -149,6 +149,7 @@ function init() {
 
     $('#classes_table').bootstrapTable({
         locale: 'zh-CN',
+        queryParams: classFilter,
         columns: [{}, {}, {
             formatter: common.dateFormatter
         }]
@@ -192,8 +193,6 @@ function loadClasses(e) {
         url: '/api/classes',
         query: {
             memberid: viewData.memberData._id,
-            from: begin.toISOString(),
-            to: end.toISOString(),
             order: 'desc'
         }
     });
@@ -287,6 +286,17 @@ function showAlert(title, jqXHR, className) {
             }
         }
     });
+};
+
+function classFilter(params) {
+    var filter = $('#loadClasses_mask .filter input:checked').val();
+    var begin = moment(0);
+    var end = moment().add(10, 'years');
+    if (filter === 'PAST') end = moment();
+    if (filter === 'FUTURE') begin = moment();
+    params.from = begin.toISOString();
+    params.to = end.toISOString();
+    return params;
 };
 
 function fieldFormatter(value, row, index) {

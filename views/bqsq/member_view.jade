@@ -116,6 +116,16 @@ block page
       a#loadClassesBtn(href='#',title='点击加载')
         span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
     div#loadClasses_mask(style='display:none')
+      div.filter(style='margin:0 0 7px 3px')
+        label.radio-inline
+          input(type="radio",name="classFilter",value="PAST",checked)
+          |已上课程
+        label.radio-inline
+          input(type="radio",name="classFilter",value="FUTURE")
+          |未上课程
+        label.radio-inline
+          input(type="radio",name="classFilter",value="ALL")
+          |全部
       table#classes_table(data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
         thead
           tr
