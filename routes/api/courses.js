@@ -318,7 +318,7 @@ function removeCourseMembers(db, courseID, members, onlyLatter) {
                 member: { $in: ids }
             }
         }
-    }, function(err, result) {
+    }, {multi: true}, function(err, result) {
         if (err) {
             return console.error(err);
         }
