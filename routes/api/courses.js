@@ -348,7 +348,7 @@ function addCourseMembers(db, courseID, members, onlyLatter) {
                 member: { $in: ids }
             }
         }
-    }, function(err, result) {
+    }, {multi: true}, function(err, result) {
         if (err) {
             return console.error(err);
         }
@@ -362,7 +362,7 @@ function addCourseMembers(db, courseID, members, onlyLatter) {
                     $each: bookings
                 }
             }
-        }, function(err, result) {
+        }, {multi: true}, function(err, result) {
             if (err) {
                 return console.error(err);
             }
