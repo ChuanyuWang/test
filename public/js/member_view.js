@@ -87,8 +87,8 @@ module.exports = function() {
             expireDate: function() {
                 return this.expire ? this.expire.format('ll') : null;
             },
-            checkAllRooms: function() {
-                return this.type === 'ALL';
+            isLimitedCard: function() {
+                return this.type === 'LIMITED';
             }
         },
         filters: {
