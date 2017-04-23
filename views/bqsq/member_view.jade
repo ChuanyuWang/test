@@ -166,7 +166,7 @@ block page
       div.form-group
         label.control-label.col-sm-2 类型:
         div.col-sm-5
-          select.form-control(name="card_type",v-model='type',@change='autoSelectRooms')
+          select.form-control(name="card_type",v-model='type')
             option(value='ALL') 通用卡
             option(value='LIMITED') 限定卡
       div.form-group(v-show='isLimitedCard')
