@@ -74,6 +74,21 @@ router.get('/', function(req, res, next) {
     });
 });
 
+router.get('/:classID', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    classes.findOne({
+        _id: mongojs.ObjectId(req.params.classID)
+    }, NORMAL_FIELDS, function(err, doc) {
+        if (err) {
+            var error = new Error("Get class fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("find class %j", doc);
+        res.json(doc);
+    });
+});
+
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 

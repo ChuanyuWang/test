@@ -1,0 +1,130 @@
+extends ../index
+
+append css
+  link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css")
+  link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css")
+
+append js
+  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  //script(src='/components/bootbox.js/bootbox.js')
+  script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
+  //script(src='/components/requirejs/require.js',data-main="/js/main")
+  script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
+  script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+  else
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
+  script(src='/js/class_view.js')
+  style.
+    .container .page-header {
+      margin: 15px 0;
+      padding-bottom: 3px;
+    }
+    .container .form-group {
+      margin-bottom: 7px;
+    }
+    .container .page-header span{
+    }
+    .container .page-header span:hover{
+      transition: all 0.5s ease-in-out;
+      transform: rotate(360deg);
+    }
+
+block page
+  div#class_app.container(style='padding-top:69px',data-class-id='#{classID}')
+    ol.breadcrumb
+      li
+        a(href="../home") 主页
+      li
+        a(href="../home") 课程表
+      li.active 查看课程
+    div.page-header
+      h3(style='margin-top:0;display:inline-block') 基本信息
+      button.btn.btn-danger(type='button',style='float:right',:disabled='!cls._id',@click='deleteClass') 删除课程
+    form.form-horizontal
+      div.form-group
+        label.control-label.col-sm-2 课程名称:
+        div.col-sm-5
+          input.form-control(type='text',v-model.trim='cls.name',placeholder='课程描述')
+      div.form-group
+        label.control-label.col-sm-2 教室:
+        select.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='cls.classroom')
+          - each room in classroom
+            option(value=room.id)= room.name
+      div.form-group
+        label.control-label.col-sm-2 所须课时:
+        div.col-sm-10
+          p.form-control-static {{cls.cost}}
+      div.form-group
+        label.control-label.col-sm-2 日期/时间:
+        div.col-sm-4
+          div#class_date.input-group.date
+            input.form-control(text='text')
+            span.input-group-addon
+              span.glyphicon.glyphicon-calendar
+      div.form-group
+        label.control-label.col-sm-2(for='') 年龄:
+        div.col-sm-10(style="display:inline-flex")
+          input.form-control(type='number',v-model='cls.age.min',min='0',style={'width':'60px'})
+          p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
+          input.form-control(type='number',v-model='cls.age.max',min='0',style={'width':'60px','margin-left':'3px'})
+          p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
+      div.form-group
+        label.control-label.col-sm-2 最大人数:
+        div.col-sm-3
+          input.form-control(type='number',min='0',v-model='cls.capacity')
+      div.form-group
+        div.col-sm-offset-2.col-sm-10
+          button.btn.btn-success(type='button',v-on:click='saveBasicInfo') 保存
+          div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='error')
+            strong 错误! 
+            |{{errors.basic}}
+    div.page-header
+      h3 预约
+    form.form-horizontal
+      div.form-group
+        div.col-sm-2
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#member_dlg')
+            span.glyphicon.glyphicon-plus 添加
+        div.col-sm-5
+          ul.list-group
+            li.list-group-item(v-for="booking in cls.booking")
+              span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
+              a.badge(:href='"../member/" + booking.member',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+              | {{booking.member}}
+          small(style='color:#777') 共{{membersCount}}人
+    div.page-header
+      h3 绘本
+    form.form-horizontal
+      div.form-group
+        div.col-sm-2
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#comment_dlg')
+            span.glyphicon.glyphicon-plus 添加
+        div.col-sm-10
+          template(v-for="item in cls.books")
+            div.media
+              div.media-left
+                span.glyphicon.glyphicon-book.text-primary(style='font-size:large;opacity:0.8')
+              div.media-body
+                h4.media-heading(style='font-size:small') {{item.title}}
+                p.small(style='color:#777') by {{item.teacher}}
+          small(style='color:#777') 共{{booksCount}}本
+  div#comment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 添加备忘
+        div.modal-body
+          form
+            div.form-group
+              label.control-label 新备忘:
+              textarea.form-control(rows='3', name='comment')
+              small(style='color:#777;float:right;margin-top:2px') 不超过256个字
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_comment.btn.btn-success(type="button") 添加

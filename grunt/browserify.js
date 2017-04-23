@@ -10,6 +10,10 @@ module.exports = {
         src: 'src/js/main.js',
         dest: 'public/js/main.js'
     },
+    class_view: {
+        src: 'src/js/class_view.js',
+        dest: 'public/js/class_view.js'
+    },
     members: {
         src: 'src/js/member.js',
         dest: 'public/js/member.js'
