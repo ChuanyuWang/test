@@ -17,7 +17,7 @@ module.exports = function() {
                 delta: 0,
                 type: this.item.type,
                 // Fix a bug, there is some invalid date which has boolean value
-                room: this.item.room === true ? [] : this.item.room,
+                room: typeof(this.item.room) === 'boolean' ? [] : this.item.room,
                 expire: this.item.expire ? moment(this.item.expire) : null,
                 error: null,
                 allRooms: []
