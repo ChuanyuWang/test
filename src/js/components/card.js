@@ -16,6 +16,8 @@ module.exports = function() {
             return {
                 delta: 0,
                 type: this.item.type,
+                // Fix a bug, there is some invalid date which has boolean value
+                room: this.item.room === true ? [] : this.item.room,
                 expire: this.item.expire ? moment(this.item.expire) : null,
                 error: null,
                 allRooms: []
@@ -49,7 +51,7 @@ module.exports = function() {
             autoSelectRooms: function() {
                 if (this.type == 'ALL') {
                     // auto select all rooms
-                    this.item.room = this.allRooms;
+                    this.room = this.allRooms;
                 }
             },
             validteBeforeSave: function() {
@@ -68,7 +70,7 @@ module.exports = function() {
                 }
                 var toBeSaved = {
                     "type": this.type,
-                    "room": this.item.room,
+                    "room": this.room,
                     "expire": this.expire && this.expire.toISOString(),
                     "credit": this.item.credit + this.delta
                 };

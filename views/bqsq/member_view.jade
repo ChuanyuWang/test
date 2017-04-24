@@ -81,7 +81,7 @@ block page
     template(v-if='memberData.membership&&memberData.membership.length')
       card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
     template(v-else)
-      card(@save="saveCardInfo",:item='{credit:0}',:index=-1,key='-1')
+      card(@save="saveCardInfo",:item='{credit:0,room:[]}',:index=-1,key='-1')
     div.page-header
       h3 备忘
     form.form-horizontal
@@ -175,7 +175,7 @@ block page
           - each room in classroom
             div.checkbox
               label
-                input(type="checkbox", value=room.id,v-model='item.room')
+                input(type="checkbox", value=room.id,v-model='room')
                 = room.name
       div.form-group
         div.col-sm-offset-2.col-sm-10
