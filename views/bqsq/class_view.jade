@@ -50,7 +50,7 @@ block page
           input.form-control(type='text',v-model.trim='cls.name',placeholder='课程描述')
       div.form-group
         label.control-label.col-sm-2 教室:
-        select.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='cls.classroom')
+        select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.classroom')
           - each room in classroom
             option(value=room.id)= room.name
       div.form-group
@@ -89,7 +89,7 @@ block page
           button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#member_dlg')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
-          ul.list-group
+          ul.list-group(style='margin-bottom:0px')
             li.list-group-item(v-for="booking in cls.booking")
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
@@ -101,7 +101,7 @@ block page
     form.form-horizontal
       div.form-group
         div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#comment_dlg')
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#newBook_dlg')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-10
           template(v-for="item in cls.books")
@@ -112,19 +112,50 @@ block page
                 h4.media-heading(style='font-size:small') {{item.title}}
                 p.small(style='color:#777') by {{item.teacher}}
           small(style='color:#777') 共{{booksCount}}本
-  div#comment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+  div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
         div.modal-header
           button.close(type="button",data-dismiss="modal",aria-label="Close")
             span(aria-hidden="true") &times
-          h4.modal-title 添加备忘
+          h4.modal-title 添加预约
         div.modal-body
-          form
-            div.form-group
-              label.control-label 新备忘:
-              textarea.form-control(rows='3', name='comment')
-              small(style='color:#777;float:right;margin-top:2px') 不超过256个字
+          div.checkbox(style='position:absolute;top:25px;left:20px')
+            label
+              input(type='checkbox',name='onlyActive',checked,disabled)
+              |仅显示激活会员
+          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
+            thead
+              tr
+                //th(data-field='_id',data-visible='false') ID
+                th(data-radio='true')
+                th(data-field='name',data-sortable='true') 宝宝姓名
+                th(data-field='contact') 联系方式
+                th(data-field='membership') 剩余课时
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_comment.btn.btn-success(type="button") 添加
+          button#add_member.btn.btn-success(type="button") 确定
+  div#newBook_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 添加绘本
+        div.modal-body
+          form.form-horizontal
+            div.form-group
+              label.control-label.col-sm-2 绘本名称:
+              div.col-sm-10
+                input.form-control(type='text',name='book_name',placeholder='绘本名称')
+            div.form-group
+              label.control-label.col-sm-2 上课老师:
+              div.col-sm-10
+                input.form-control(type='text',name='book_teacher',placeholder='请输入')
+            div.form-group
+              label.control-label.col-sm-2 内容:
+              div.col-sm-10
+                input.form-control(type='text',name='book_info',placeholder='请输入')
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#add_pictureBook.btn.btn-success(type="button") 添加

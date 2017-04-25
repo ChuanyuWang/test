@@ -45,6 +45,7 @@ function init() {
             formatter: creditFormatter
         }]
     });
+
     $('#class_date').datetimepicker({
         locale: 'zh-CN',
         format: 'lll'
@@ -59,28 +60,20 @@ function init() {
     });
 
     // event listener of adding new comment
-    $('#member_dlg #add_member').click(handleClickAddMember);
-    $('#member_dlg').on('shown.bs.modal', function(event) {
-        //$(this).find('table').bootstrapTable('refresh', { url: '/api/members', query: { status: 'active' } });
-        // check selected members
-        if (viewData.course.members) {
-            var checkedItems = viewData.course.members.map(function(value, index, array) {
-                return value.id
-            });
-            $(this).find('table').bootstrapTable('checkBy', { field: '_id', values: checkedItems });
-        }
+    $('#newBook_dlg #add_pictureBook').click(handleAddNewBook);
+    $('#newBook_dlg').on('show.bs.modal', function(event) {
+        $(this).find('.form-group').removeClass('has-error');
     });
 
-    // event listener of adding new class
-    $('#class_dlg #add_class').click(handleClickAddClass);
-    $('#class_dlg').on('show.bs.modal', resetAddClassDlg);
-    $('#class_dlg input[name=recurrence]').on('change', function(e) {
-        $('#class_dlg div.recurrence-panel').toggle(250);
-        if ($(this).is(':checked')) {
-            $('#class_date').data("DateTimePicker").format('LT');
-        } else {
-            $('#class_date').data("DateTimePicker").format('lll');
-        }
+    // event listener of adding new comment
+    $('#member_dlg #add_member').click(handleClickAddMember);
+    $('#member_dlg').on('shown.bs.modal', function(event) {
+        // check booked members
+        var members = viewData.cls.booking || [];
+        var checkedItems = members.map(function(value, index, array) {
+            return value.member;
+        });
+        $(this).find('table').bootstrapTable('checkBy', { field: '_id', values: checkedItems });
     });
 };
 
@@ -254,23 +247,45 @@ function loadCourseClasses(course) {
     });
 };
 
+function handleAddNewBook(e) {
+    var modal = $(this).closest('.modal');
+    var book= {};
+    book.title = modal.find('input[name=book_name]').val().trim();
+    if (!book.title) {
+        markError(modal, 'input[name=book_name]', true);
+        return;
+    } else {
+        markError(modal, 'input[name=book_name]', false);
+    }
+    book.teacher = modal.find('input[name=book_teacher]').val().trim();
+    if (!book.teacher) {
+        markError(modal, 'input[name=book_teacher]', true);
+        return;
+    } else {
+        markError(modal, 'input[name=book_teacher]', false);
+    }
+    book.info = modal.find('input[name=book_info]').val().trim();
+    //TODO, 
+    modal.modal('hide');
+};
+
 function handleClickAddMember() {
     var modal = $(this).closest('.modal');
     var selections = modal.find('table').bootstrapTable('getAllSelections');
 
-    var members = viewData.course.members || [];
+    var members = viewData.cls.booking || [];
     var addedOnes = selections.filter(function(element, index, array) {
         // filter the new added member
         return !members.some(function(value, index, array) {
             // find one matched member and return true
-            return value.id == element._id;
+            return value.member == element._id;
         });
     });
 
     if (addedOnes.length > 0) {
-        // initialize members property
-        if (!viewData.course.hasOwnProperty('members')) {
-            Vue.set(viewData.course, 'members', [])
+        // initialize booking property
+        if (!viewData.cls.hasOwnProperty('booking')) {
+            Vue.set(viewData.course, 'booking', [])
         }
         var result = addedOnes.map(function(value, index, array) {
             return {
@@ -284,7 +299,6 @@ function handleClickAddMember() {
             result.forEach(function(value, index, array) {
                 viewData.course.members.push(value);
             });
-            //bootbox.alert('添加班级成员成功');
         });
     }
     modal.modal('hide');
@@ -298,66 +312,6 @@ function markError(container, selector, hasError) {
     }
 };
 
-function handleClickAddClass() {
-    var modal = $(this).closest('.modal');
-    var datetime = modal.find('#class_date').data("DateTimePicker").date();
-    if (!datetime || !datetime.isValid()) {
-        markError(modal, '#class_date', true);
-        return;
-    } else {
-        markError(modal, '#class_date', false);
-    }
-    var result = [];
-    var isRepeated = modal.find('input[name=recurrence]').is(':checked');
-    if (isRepeated) {
-        var startdate = modal.find('#class_begin').data("DateTimePicker").date();
-        if (!startdate || !startdate.isValid()) {
-            markError(modal, '#class_begin', true);
-            return;
-        } else {
-            markError(modal, '#class_begin', false);
-        }
-        var enddate = modal.find('#class_end').data("DateTimePicker").date();
-        if (!enddate || !enddate.isValid()) {
-            markError(modal, '#class_end', true);
-            return;
-        } else {
-            markError(modal, '#class_end', false);
-        }
-        var days = [];
-        modal.find('.weekdays input:checked').each(function(index, element) {
-            days.push(element.value);
-        });
-        if (days.length == 0) {
-            markError(modal, '.weekdays', true);
-            return;
-        } else {
-            markError(modal, '.weekdays', false);
-        }
-        if (enddate.diff(startdate, 'days') > 180) return bootbox.alert('开始和结束日期不能超过180天');
-        result = genRepeatClass(datetime, startdate, enddate, days);
-    } else {
-        result.push({
-            name: genClassNames(1)[0],
-            date: datetime.toISOString()
-        });
-    }
-    if (result.length === 0) return bootbox.alert('没有符合所选条件的课程');
-    // assign classroom
-    var classroom = modal.find('#class_room').val();
-    result.forEach(function(value, index, array) {
-        value.classroom = classroom;
-    })
-    // create classes
-    var request = addCourseClasses(viewData.course._id, result);
-    request.done(function(data, textStatus, jqXHR) {
-        data.forEach(function(value, index, array) {
-            viewData.course.classes.push(value);
-        });
-        //bootbox.alert('班级课程添加成功');
-    });
-    modal.modal('hide');
-};
 
 /**
  * Retrieve classID object according to ID
@@ -479,20 +433,6 @@ function showAlert(title, jqXHR, className) {
     });
 };
 
-function creditFormatter(value, row, index) {
-    var membership = row.membership;
-    if (membership && membership[0]) {
-        // A better way of 'toFixed(1)'
-        if (typeof (membership[0].credit) == 'number') {
-            return Math.round(membership[0].credit * 10) / 10;
-        } else {
-            return membership[0].credit;
-        }
-    } else {
-        return undefined;
-    }
-};
-
 function resetAddClassDlg(event) {
     var modal = $(this);
     if (!viewData.course.hasOwnProperty('classes')) {
@@ -506,47 +446,16 @@ function resetAddClassDlg(event) {
     modal.find('#class_room option[value=' + viewData.course.classroom + ']').prop("selected", true);
 };
 
-function genClassNames(count) {
-    var count = count || 0;
-    var result = [];
-    var existed = viewData.course.classes || [];
-    var suffix = existed.length + 1;
-    for (var i = 0; i < count; i++) {
-        var name = viewData.course.name + '-' + suffix;
-        while (existed.some(function(val, index, array) {
-            return val.name == name;
-        })) {
-            suffix++;
-            name = viewData.course.name + '-' + suffix;
+function creditFormatter(value, row, index) {
+    var membership = row.membership;
+    if (membership && membership[0]) {
+        // A better way of 'toFixed(1)'
+        if (typeof (membership[0].credit) == 'number') {
+            return Math.round(membership[0].credit * 10) / 10;
+        } else {
+            return membership[0].credit;
         }
-        result.push(name);
-        suffix++;
+    } else {
+        return undefined;
     }
-    return result;
-};
-
-function genRepeatClass(datetime, startdate, enddate, days) {
-    var dates = [];
-    var current = moment(startdate);
-    while (current.isSameOrBefore(enddate)) {
-        if (days.some(function(value, index, array) {
-            return value == current.day();
-        })) {
-            var date = moment(current).set({
-                'hours': datetime.hours(),
-                'minutes': datetime.minutes(),
-                'seconds': datetime.seconds(),
-                'milliseconds': datetime.milliseconds()
-            });
-            dates.push(date);
-        }
-        current.add(1, 'day');
-    }
-    var names = genClassNames(dates.length);
-    return names.map(function(value, index, array) {
-        return {
-            name: value,
-            date: dates[index].toISOString()
-        }
-    });
 };
