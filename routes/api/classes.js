@@ -127,6 +127,36 @@ router.put('/:classID', helper.requireRole("admin"), function(req, res) {
         res.json(result);
     });
 });
+
+router.patch('/:classID', helper.requireRole("admin"), function(req, res) {
+    // booking can only added by post/delete 'api/booking?classID=xxx' 
+    if (req.body.hasOwnProperty('booking')) {
+        var error = new Error('booking can only added by API "api/booking?classID=xxx"');
+        error.status = 400;
+        return next(error);
+    }
+    convertDateObject(req.body);
+    var classes = req.db.collection("classes");
+    classes.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.classID)
+        },
+        update: {
+            $set: req.body
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Update class fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("class %s is updated by %j", req.params.classID, req.body);
+        res.json(doc);
+    });
+});
+
 // remove a class or event which there is no booking
 router.delete('/:classID', helper.requireRole("admin"), function(req, res, next) {
     var classes = req.db.collection("classes");
@@ -155,5 +185,20 @@ router.delete('/:classID', helper.requireRole("admin"), function(req, res, next)
         }
     });
 });
+
+/**
+ * make sure the datetime object is stored as ISODate
+ * @param {Object} doc 
+ */
+function convertDateObject(doc) {
+    if (!doc) {
+        return doc;
+    }
+    // if date is null, then keep null value in mongodb
+    if (doc.date) {
+        doc.date = new Date(doc.date);
+    }
+    return doc;
+};
 
 module.exports = router;

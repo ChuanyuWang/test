@@ -25,13 +25,6 @@ append js
     .container .form-group {
       margin-bottom: 7px;
     }
-    .container .page-header span{
-    }
-    .container .page-header span:hover{
-      transition: all 0.5s ease-in-out;
-      transform: rotate(360deg);
-    }
-
 block page
   div#class_app.container(style='padding-top:69px',data-class-id='#{classID}')
     ol.breadcrumb
@@ -53,6 +46,10 @@ block page
         select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.classroom')
           - each room in classroom
             option(value=room.id)= room.name
+      div.form-group(v-show='cls.courseID')
+        label.control-label.col-sm-2 所属班级:
+        div.col-sm-10
+          a(:href='"../course/" +cls.courseID',style='line-height:34px') 查看
       div.form-group
         label.control-label.col-sm-2 所须课时:
         div.col-sm-10
@@ -65,22 +62,22 @@ block page
             span.input-group-addon
               span.glyphicon.glyphicon-calendar
       div.form-group
-        label.control-label.col-sm-2(for='') 年龄:
+        label.control-label.col-sm-2 年龄:
         div.col-sm-10(style="display:inline-flex")
-          input.form-control(type='number',v-model='cls.age.min',min='0',style={'width':'60px'})
+          input.form-control(type='number',v-model.number='cls.age.min',min='0',style={'width':'70px'})
           p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
-          input.form-control(type='number',v-model='cls.age.max',min='0',style={'width':'60px','margin-left':'3px'})
+          input.form-control(type='number',v-model.number='cls.age.max',min='0',style={'width':'70px','margin-left':'3px'})
           p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
       div.form-group
         label.control-label.col-sm-2 最大人数:
-        div.col-sm-3
-          input.form-control(type='number',min='0',v-model='cls.capacity')
+        div.col-sm-2
+          input.form-control(type='number',min='0',v-model.number='cls.capacity')
       div.form-group
         div.col-sm-offset-2.col-sm-10
           button.btn.btn-success(type='button',v-on:click='saveBasicInfo') 保存
-          div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='error')
+          div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-show='error')
             strong 错误! 
-            |{{errors.basic}}
+            |{{error}}
     div.page-header
       h3 预约
     form.form-horizontal

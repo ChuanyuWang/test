@@ -16,11 +16,6 @@ var viewData = {
 $(document).ready(function() {
     init();
 
-    //get list of classroom
-    $('#class_room option').each(function(index, element) {
-        viewData.classrooms[element.value] = element.text;
-    });
-
     var request = getClass($('#class_app').data('class-id'));
     request.done(function(data, textStatus, jqXHR) {
         initPage(data);
@@ -50,22 +45,14 @@ function init() {
         locale: 'zh-CN',
         format: 'lll'
     });
-    $('#class_begin').datetimepicker({
-        locale: 'zh-CN',
-        format: 'll'
-    });
-    $('#class_end').datetimepicker({
-        locale: 'zh-CN',
-        format: 'll'
-    });
 
-    // event listener of adding new comment
+    // event listener of adding new book
     $('#newBook_dlg #add_pictureBook').click(handleAddNewBook);
     $('#newBook_dlg').on('show.bs.modal', function(event) {
         $(this).find('.form-group').removeClass('has-error');
     });
 
-    // event listener of adding new comment
+    // event listener of adding new reservation
     $('#member_dlg #add_member').click(handleClickAddMember);
     $('#member_dlg').on('shown.bs.modal', function(event) {
         // check booked members
@@ -79,6 +66,8 @@ function init() {
 
 function initPage(cls) {
     viewData.cls = cls || {};
+    viewData.cls.age = viewData.cls.age || {};
+    viewData.cls.booking = viewData.cls.booking || [];
 
     // bootstrap the class view page
     var classViewer = new Vue({
@@ -90,6 +79,12 @@ function initPage(cls) {
             },
             booksCount: function() {
                 return this.cls.books ? this.cls.books.length : 0;
+            },
+            age: function() {
+                return {
+                    min: this.cls.age.min ? parseInt(this.cls.age.min) : null,
+                    max: this.cls.age.max ? parseInt(this.cls.age.max) : null
+                }
             }
         },
         filters: {
@@ -100,9 +95,6 @@ function initPage(cls) {
             formatDateTime: function(value) {
                 if (!value) return '?';
                 return moment(value).format('lll');
-            },
-            formatClassroom: function(value) {
-                return viewData.classrooms[value];
             }
         },
         watch: {
@@ -115,17 +107,27 @@ function initPage(cls) {
         },
         methods: {
             saveBasicInfo: function() {
+                var vm = this;
                 this.error = null;
-                if (this.course.name.length == 0) this.error = '名称不能为空';
+                if (this.cls.name.length == 0) return this.error = '名称不能为空';
+                if (!this.date || !this.date.isValid()) return this.error = '日期/时间格式不正确';
+                if (this.cls.capacity < 0) return this.error = '最大人数不能小于零';
+                if (this.age.min < 0) return this.error = '最小年龄不能小于零';
+                if (this.age.max < 0) return this.error = '最大年龄不能小于零';
+                if (this.age.max < this.age.min) return this.error = '最大年龄不能小于最小年龄';
                 if (!this.error) {
-                    var request = updateCourse(this.course._id, {
-                        status: this.course.status,
-                        name: this.course.name,
-                        classroom: this.course.classroom,
-                        remark: this.course.remark
+                    var request = updateClass(this.cls._id, {
+                        name: this.cls.name,
+                        date: this.date.toISOString(),
+                        classroom: this.cls.classroom,
+                        capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
+                        age : this.age
                     });
                     request.done(function(data, textStatus, jqXHR) {
-                        bootbox.alert('班级基本资料更新成功');
+                        bootbox.alert('课程基本资料更新成功');
+                        // update according to result
+                        vm.cls.age = data.age;
+                        vm.cls.capacity = data.capacity;
                     });
                 }
             },
@@ -217,13 +219,14 @@ function initPage(cls) {
         },
         mounted: function() {
             // 'this' is refer to vm instance
-            var vm = this, datepicker = $(vm.$el).find('#class_date');
+            var vm = this, datepicker = $(this.$el).find('#class_date');
             datepicker.datetimepicker({
                 format: 'lll',
                 locale: 'zh-CN',
                 sideBySide: true
             });
             datepicker.data('DateTimePicker').date(this.cls.date ? moment(this.cls.date) : null);
+            vm.date = datepicker.data('DateTimePicker').date();
 
             datepicker.on('dp.change', function(e) {
                 // when user clears the input box, the 'e.date' is false value
@@ -326,15 +329,15 @@ function getClass(classID) {
     return request;
 };
 
-function updateCourse(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID, {
+function updateClass(coureID, fields) {
+    var request = $.ajax("/api/classes/" + coureID, {
         type: "PATCH",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("更新班级失败", jqXHR);
+        showAlert("更新课程失败", jqXHR);
     })
     return request;
 };
