@@ -284,7 +284,8 @@ router.delete('/:courseID', function(req, res, next) {
             console.log("course %s is deleted", req.params.courseID);
             res.json(result);
         } else {
-            var error = new Error("can't find course %s and delete it", req.params.courseID);
+            console.log("can't find course %s to be deleted", req.params.courseID);
+            var error = new Error("can't find course to be deleted");
             error.status = 400;
             return next(error);
         }

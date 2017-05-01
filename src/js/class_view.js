@@ -121,7 +121,7 @@ function initPage(cls) {
                         date: this.date.toISOString(),
                         classroom: this.cls.classroom,
                         capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
-                        age : this.age
+                        age: this.age
                     });
                     request.done(function(data, textStatus, jqXHR) {
                         bootbox.alert('课程基本资料更新成功');
@@ -133,9 +133,26 @@ function initPage(cls) {
             },
             deleteClass: function() {
                 var vm = this;
+                if (vm.cls.courseID) {
+                    return bootbox.confirm({
+                        title: "确定删除班级中的课程吗？",
+                        message: "课程<strong>" + vm.cls.name + "</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程",
+                        buttons: {
+                            confirm: {
+                                label: '查看班级',
+                                className: "btn-success"
+                            }
+                        },
+                        callback: function(ok) {
+                            if (ok) {
+                                window.location.href = '../course/' + vm.cls.courseID;
+                            }
+                        }
+                    });
+                }
                 bootbox.confirm({
-                    title: "确定要删除课程吗？",
-                    message: "删除班级中所有课程，包括已经开始的课程？",
+                    title: "确定删除课程吗？",
+                    message: "只能删除没有会员预约的课程，如果有预约，请先取消预约",
                     buttons: {
                         confirm: {
                             className: "btn-danger"
@@ -143,9 +160,9 @@ function initPage(cls) {
                     },
                     callback: function(ok) {
                         if (ok) {
-                            var request = removeCourse(vm.course._id);
+                            var request = removeClass(vm.cls._id);
                             request.done(function(data, textStatus, jqXHR) {
-                                window.location.href = '../course';
+                                window.location.href = '../home';
                             });
                         }
                     }
@@ -252,7 +269,7 @@ function loadCourseClasses(course) {
 
 function handleAddNewBook(e) {
     var modal = $(this).closest('.modal');
-    var book= {};
+    var book = {};
     book.title = modal.find('input[name=book_name]').val().trim();
     if (!book.title) {
         markError(modal, 'input[name=book_name]', true);
@@ -394,15 +411,15 @@ function removeCourseClasses(coureID, fields) {
     return request;
 };
 
-function removeCourse(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID, {
+function removeClass(classID, fields) {
+    var request = $.ajax("/api/classes/" + classID, {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除班级失败", jqXHR);
+        showAlert("删除课程失败", jqXHR);
     })
     return request;
 };

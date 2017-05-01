@@ -133,8 +133,8 @@ function initPage(course) {
             deleteCourse: function() {
                 var vm = this;
                 bootbox.confirm({
-                    title: "删除班级",
-                    message: "删除班级中所有课程，包括已经开始的课程？",
+                    title: "确定删除班级吗？",
+                    message: "班级中所有课程，包括已经开始的课程都将被删除，不保留记录",
                     buttons: {
                         confirm: {
                             className: "btn-danger"

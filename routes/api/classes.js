@@ -177,11 +177,10 @@ router.delete('/:classID', helper.requireRole("admin"), function(req, res, next)
             console.log("class %s is deleted", req.params.classID);
             res.json(result);
         } else {
-            res.status(400).json({
-                'code': 2008,
-                'message': "不能删除已经预约的课程或活动",
-                'err': err
-            });
+            console.log("can't find class %s to be deleted", req.params.classID);
+            var error = new Error("不能删除已经预约的课程或活动");
+            error.status = 400;
+            return next(error);
         }
     });
 });
