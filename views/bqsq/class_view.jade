@@ -49,7 +49,7 @@ block page
       div.form-group(v-show='cls.courseID')
         label.control-label.col-sm-2 所属班级:
         div.col-sm-10
-          a(:href='"../course/" +cls.courseID',style='line-height:34px') 查看
+          a.button.btn-primary.btn-sm(:href='"../course/" +cls.courseID',style='line-height:34px') 查看
       div.form-group
         label.control-label.col-sm-2 所须课时:
         div.col-sm-10
@@ -89,7 +89,7 @@ block page
           ul.list-group(style='margin-bottom:0px')
             li.list-group-item(v-for="booking in cls.booking")
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
-              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 取消
               a.badge(:href='"../member/" + booking.member',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
               | {{booking.member}}
           small(style='color:#777') 共{{membersCount}}人
