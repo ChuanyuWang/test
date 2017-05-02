@@ -9,19 +9,24 @@ var viewData = {
     cls: {},
     date: null,
     error: null,
-    classrooms: {}
+    classrooms: {},
+    reservations: []
 }
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
-
+    // load class object
     var request = getClass($('#class_app').data('class-id'));
     request.done(function(data, textStatus, jqXHR) {
         initPage(data);
     });
-    request.done(function(data, textStatus, jqXHR) {
-        //loadCourseClasses(data);
+    // load class reservations
+    var request2 = getReservations($('#class_app').data('class-id'));
+    request2.done(function(data, textStatus, jqXHR) {
+        data.forEach(function(value, index, array) {
+            viewData.reservations.push(value);
+        });
     });
 });
 
@@ -56,7 +61,7 @@ function init() {
     $('#member_dlg #add_member').click(handleClickAddMember);
     $('#member_dlg').on('shown.bs.modal', function(event) {
         // check booked members
-        var members = viewData.cls.booking || [];
+        var members = viewData.reservations || [];
         var checkedItems = members.map(function(value, index, array) {
             return value.member;
         });
@@ -67,7 +72,6 @@ function init() {
 function initPage(cls) {
     viewData.cls = cls || {};
     viewData.cls.age = viewData.cls.age || {};
-    viewData.cls.booking = viewData.cls.booking || [];
 
     // bootstrap the class view page
     var classViewer = new Vue({
@@ -75,7 +79,7 @@ function initPage(cls) {
         data: viewData,
         computed: {
             membersCount: function() {
-                return this.cls.booking ? this.cls.booking.length : 0;
+                return this.reservations ? this.reservations.length : 0;
             },
             booksCount: function() {
                 return this.cls.books ? this.cls.books.length : 0;
@@ -219,19 +223,6 @@ function initPage(cls) {
                         });
                     }
                 });
-            },
-            closeAlert: function(e) {
-                if (this.course.status == 'closed') {
-                    bootbox.alert({
-                        message: "结束此班级后会删除所有未开始的课程<br><small>确定后，请点击保存进行修改</small>",
-                        buttons: {
-                            ok: {
-                                label: "确定",
-                                className: "btn-danger"
-                            }
-                        }
-                    });
-                }
             }
         },
         mounted: function() {
@@ -250,20 +241,6 @@ function initPage(cls) {
                 vm.date = e.date === false ? null : e.date;
             });
         }
-    });
-};
-
-function loadCourseClasses(course) {
-    if (!course) return;
-    var request = getCourseClasses(course._id);
-    request.done(function(data, textStatus, jqXHR) {
-        // initialize classes property
-        if (!course.hasOwnProperty('classes')) {
-            Vue.set(course, 'classes', [])
-        }
-        data.forEach(function(value, index, array) {
-            course.classes.push(value);
-        });
     });
 };
 
@@ -293,7 +270,7 @@ function handleClickAddMember() {
     var modal = $(this).closest('.modal');
     var selections = modal.find('table').bootstrapTable('getAllSelections');
 
-    var members = viewData.cls.booking || [];
+    var members = viewData.reservations || [];
     var addedOnes = selections.filter(function(element, index, array) {
         // filter the new added member
         return !members.some(function(value, index, array) {
@@ -303,10 +280,6 @@ function handleClickAddMember() {
     });
 
     if (addedOnes.length > 0) {
-        // initialize booking property
-        if (!viewData.cls.hasOwnProperty('booking')) {
-            Vue.set(viewData.course, 'booking', [])
-        }
         var result = addedOnes.map(function(value, index, array) {
             return {
                 id: value._id,
@@ -331,7 +304,6 @@ function markError(container, selector, hasError) {
         container.find(selector).closest(".form-group").removeClass("has-error");
     }
 };
-
 
 /**
  * Retrieve classID object according to ID
@@ -424,10 +396,10 @@ function removeClass(classID, fields) {
     return request;
 };
 
-function getCourseClasses(coureID) {
-    var request = $.getJSON('/api/classes', { 'courseID': coureID });
+function getReservations(classID) {
+    var request = $.getJSON('/api/booking', { 'classid': classID });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert('获取班级课程失败', jqXHR);
+        showAlert('获取课程预约失败', jqXHR);
     })
     return request;
 };

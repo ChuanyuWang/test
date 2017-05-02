@@ -87,11 +87,11 @@ block page
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           ul.list-group(style='margin-bottom:0px')
-            li.list-group-item(v-for="booking in cls.booking")
+            li.list-group-item(v-for="booking in reservations")
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 取消
               a.badge(:href='"../member/" + booking.member',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-              | {{booking.member}}
+              | {{booking.userName}}
           small(style='color:#777') 共{{membersCount}}人
     div.page-header
       h3 绘本
@@ -117,11 +117,10 @@ block page
             span(aria-hidden="true") &times
           h4.modal-title 添加预约
         div.modal-body
-          div.checkbox(style='position:absolute;top:25px;left:20px')
-            label
-              input(type='checkbox',name='onlyActive',checked,disabled)
-              |仅显示激活会员
-          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
+          div#toolbar.btn-group(style='display:inline-flex')
+            label(style='margin-right:4px') 人数:
+            input#quantity.form-control(type='number',name='quantity',min='1',step='1',style='width:90px',value=1)
+          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true',data-toolbar='#toolbar')
             thead
               tr
                 //th(data-field='_id',data-visible='false') ID
@@ -130,6 +129,7 @@ block page
                 th(data-field='contact') 联系方式
                 th(data-field='membership') 剩余课时
         div.modal-footer
+          p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_member.btn.btn-success(type="button") 确定
   div#newBook_dlg.modal.fade(tabindex='-1',data-backdrop='static')
