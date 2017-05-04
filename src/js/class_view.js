@@ -40,6 +40,7 @@ function init() {
 
     $('#member_table').bootstrapTable({
         url: '/api/members?status=active',
+        maintainSelected: true,
         locale: 'zh-CN',
         columns: [{}, {}, {}, {
             formatter: creditFormatter
@@ -59,13 +60,8 @@ function init() {
 
     // event listener of adding new reservation
     $('#member_dlg #add_member').click(handleClickAddMember);
-    $('#member_dlg').on('shown.bs.modal', function(event) {
-        // check booked members
-        var members = viewData.reservations || [];
-        var checkedItems = members.map(function(value, index, array) {
-            return value.member;
-        });
-        $(this).find('table').bootstrapTable('checkBy', { field: '_id', values: checkedItems });
+    $('#member_dlg').on('show.bs.modal', function(event) {
+        $(this).find('input[name=quantity]').val(1).closest(".btn-group").removeClass("has-error");
     });
 };
 
@@ -172,7 +168,7 @@ function initPage(cls) {
                     }
                 });
             },
-            removeClass: function(item) {
+            removeBook: function(item) {
                 var vm = this;
                 bootbox.confirm({
                     title: "删除课程",
@@ -186,23 +182,22 @@ function initPage(cls) {
                         if (!ok) return;
                         var request = removeCourseClasses(vm.course._id, { 'id': item._id });
                         request.done(function(data, textStatus, jqXHR) {
-                            var classes = vm.course.classes;
-                            for (var i = 0; i < classes.length; i++) {
-                                if (classes[i]._id == item._id) {
-                                    classes.splice(i, 1);
+                            var reservations = vm.reservations;
+                            for (var i = 0; i < reservations.length; i++) {
+                                if (reservations[i].member == item.member) {
+                                    reservations.splice(i, 1);
                                     break;
                                 }
                             }
-                            //bootbox.alert('删除班级课程成功');
                         });
                     }
                 });
             },
-            removeMember: function(item) {
+            cancelReservation: function(item) {
                 var vm = this;
                 bootbox.confirm({
-                    title: "移除班级成员",
-                    message: '从班级中移除' + item.name + '，并删除此成员所有未开始的课程吗?',
+                    title: '确定取消会员预约吗？',
+                    message: '取消会员的预约，并且返还扣除的课时，无法在课程开始后取消',
                     buttons: {
                         confirm: {
                             className: "btn-danger"
@@ -210,16 +205,15 @@ function initPage(cls) {
                     },
                     callback: function(ok) {
                         if (!ok) return;
-                        var request = removeCourseMember(vm.course._id, { 'id': item.id });
+                        var request = deleteReservation(vm.cls._id, { 'memberid': item.member });
                         request.done(function(data, textStatus, jqXHR) {
-                            var members = vm.course.members;
-                            for (var i = 0; i < members.length; i++) {
-                                if (members[i].id == item.id) {
-                                    members.splice(i, 1);
+                            var reservations = vm.reservations;
+                            for (var i = 0; i < reservations.length; i++) {
+                                if (reservations[i].member == item.member) {
+                                    reservations.splice(i, 1);
                                     break;
                                 }
                             }
-                            //bootbox.alert('删除班级成员成功');
                         });
                     }
                 });
@@ -269,6 +263,13 @@ function handleAddNewBook(e) {
 function handleClickAddMember() {
     var modal = $(this).closest('.modal');
     var selections = modal.find('table').bootstrapTable('getAllSelections');
+    if (selections.length == 0) return bootbox.alert('请选择会员');
+
+    // check the quantity of reservation
+    var quantity = parseInt(modal.find('input[name=quantity]').val());
+    if (isNaN(quantity) || quantity <= 0) {
+        return modal.find('input[name=quantity]').closest(".btn-group").addClass("has-error");
+    }
 
     var members = viewData.reservations || [];
     var addedOnes = selections.filter(function(element, index, array) {
@@ -282,19 +283,23 @@ function handleClickAddMember() {
     if (addedOnes.length > 0) {
         var result = addedOnes.map(function(value, index, array) {
             return {
-                id: value._id,
-                name: value.name
+                classid: viewData.cls._id,
+                contact: value.contact,
+                name: value.name,
+                quantity: quantity
             };
         });
-
-        var request = addCourseMembers(viewData.course._id, result);
+        // add one member's reservation
+        var request = addReservation(result[0]);
         request.done(function(data, textStatus, jqXHR) {
-            result.forEach(function(value, index, array) {
-                viewData.course.members.push(value);
-            });
+            var newAdded = findReservation(data['class'], data['member']);
+            if (newAdded) viewData.reservations.push(newAdded);
+            bootbox.alert('预约成功');
         });
+        modal.modal('hide');
+    } else {
+        bootbox.alert('所选会员已经预约');
     }
-    modal.modal('hide');
 };
 
 function markError(container, selector, hasError) {
@@ -331,28 +336,28 @@ function updateClass(coureID, fields) {
     return request;
 };
 
-function addCourseMembers(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/members', {
+function addReservation(fields) {
+    var request = $.ajax("/api/booking", {
         type: "POST",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("添加班级成员失败", jqXHR);
+        showAlert("预约失败", jqXHR);
     })
     return request;
 };
 
-function removeCourseMember(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/members', {
+function deleteReservation(classID, fields) {
+    var request = $.ajax("/api/booking/" + classID, {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除班级成员失败", jqXHR);
+        showAlert("取消会员预约失败", jqXHR);
     })
     return request;
 };
@@ -425,17 +430,17 @@ function showAlert(title, jqXHR, className) {
     });
 };
 
-function resetAddClassDlg(event) {
-    var modal = $(this);
-    if (!viewData.course.hasOwnProperty('classes')) {
-        Vue.set(viewData.course, 'classes', [])
-    }
-    markError(modal, '#class_date', false);
-    markError(modal, '#class_begin', false);
-    markError(modal, '#class_end', false);
-    markError(modal, '.weekdays', false);
-    // select the classroom as the same as course
-    modal.find('#class_room option[value=' + viewData.course.classroom + ']').prop("selected", true);
+function findReservation(cls, member) {
+    if (!cls || !member) return null;
+    var booking = cls.booking || [];
+    var found = booking.filter(function(value, index, array) {
+        return value.member == member._id;
+    });
+    if (found.length != 1) return null;
+    var item = found[0];
+    item.userName = member.name;
+    item.contact = member.contact;
+    return item;
 };
 
 function creditFormatter(value, row, index) {

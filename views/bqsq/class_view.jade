@@ -89,7 +89,7 @@ block page
           ul.list-group(style='margin-bottom:0px')
             li.list-group-item(v-for="booking in reservations")
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
-              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 取消
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='cancelReservation(booking)') 取消
               a.badge(:href='"../member/" + booking.member',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
               | {{booking.userName}}
           small(style='color:#777') 共{{membersCount}}人
@@ -119,7 +119,7 @@ block page
         div.modal-body
           div#toolbar.btn-group(style='display:inline-flex')
             label(style='margin-right:4px') 人数:
-            input#quantity.form-control(type='number',name='quantity',min='1',step='1',style='width:90px',value=1)
+            input.form-control(type='number',name='quantity',min='1',step='1',style='width:90px',value=1)
           table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true',data-toolbar='#toolbar')
             thead
               tr

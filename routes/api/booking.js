@@ -64,10 +64,9 @@ router.get('/', function (req, res) {
             }
         }, function (err, users) {
             if (err) {
-                res.status(500).json({
+                return res.status(500).json({
                     'err' : err
                 })
-                return;
             }
             console.log("find %s members who book class %s", users.length, req.query.classid);
             
@@ -119,7 +118,7 @@ router.post('/', function (req, res, next) {
         contact : req.body.contact
     };
     // find the user who want to book a class
-    members.findOne(user_query, function (err, doc) {
+    members.findOne(user_query, {history: 0}, function (err, doc) {
         if (err) {
             var error = new Error('Find member fails');
             error.innerError = err;
