@@ -75,7 +75,12 @@ function initPage(cls) {
         data: viewData,
         computed: {
             membersCount: function() {
-                return this.reservations ? this.reservations.length : 0;
+                var count = 0
+                var all = this.reservations || [];
+                all.forEach(function(value, index, array) {
+                    count += value.quantity || 0;
+                });
+                return count;
             },
             booksCount: function() {
                 return this.cls.books ? this.cls.books.length : 0;
