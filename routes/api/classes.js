@@ -185,6 +185,54 @@ router.delete('/:classID', helper.requireRole("admin"), function(req, res, next)
     });
 });
 
+router.post('/:classID/books', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    var books = Array.isArray(req.body) ? req.body : [req.body];
+    classes.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.classID)
+        },
+        update: {
+            $push: { books: { $each: books } }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("add class's books fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("add %j books to class %s", req.body, req.params.classID);
+        res.json(doc);
+    });
+});
+
+router.delete('/:classID/books', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    var booktoBeDeleted = req.body || {};
+    classes.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.classID)
+        },
+        update: {
+            $pull: {
+                books: booktoBeDeleted
+            }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("delete class's books fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("delete %j book from class %s", req.body, req.params.classID);
+        res.json(doc);
+    });
+});
+
 /**
  * make sure the datetime object is stored as ISODate
  * @param {Object} doc 

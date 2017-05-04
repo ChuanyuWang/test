@@ -178,8 +178,8 @@ function initPage(cls) {
             removeBook: function(item) {
                 var vm = this;
                 bootbox.confirm({
-                    title: "删除课程",
-                    message: '删除' + moment(item.date).format('ll dddd') + ' 课程吗?',
+                    title: "确定删除绘本吗？",
+                    message: '从当前课程中删除绘本《' + item.title + '》',
                     buttons: {
                         confirm: {
                             className: "btn-danger"
@@ -187,15 +187,9 @@ function initPage(cls) {
                     },
                     callback: function(ok) {
                         if (!ok) return;
-                        var request = removeCourseClasses(vm.course._id, { 'id': item._id });
+                        var request = deleteBook(vm.cls._id, item);
                         request.done(function(data, textStatus, jqXHR) {
-                            var reservations = vm.reservations;
-                            for (var i = 0; i < reservations.length; i++) {
-                                if (reservations[i].member == item.member) {
-                                    reservations.splice(i, 1);
-                                    break;
-                                }
-                            }
+                            vm.cls.books = data.books;
                         });
                     }
                 });
@@ -250,20 +244,21 @@ function handleAddNewBook(e) {
     var book = {};
     book.title = modal.find('input[name=book_name]').val().trim();
     if (!book.title) {
-        markError(modal, 'input[name=book_name]', true);
-        return;
+        return markError(modal, 'input[name=book_name]', true);
     } else {
         markError(modal, 'input[name=book_name]', false);
     }
     book.teacher = modal.find('input[name=book_teacher]').val().trim();
     if (!book.teacher) {
-        markError(modal, 'input[name=book_teacher]', true);
-        return;
+        return markError(modal, 'input[name=book_teacher]', true);
     } else {
         markError(modal, 'input[name=book_teacher]', false);
     }
     book.info = modal.find('input[name=book_info]').val().trim();
-    //TODO, 
+    var request = addBooks(viewData.cls._id, book);
+    request.done(function(data, textStatus, jqXHR) {
+        viewData.cls.books = data.books;
+    });
     modal.modal('hide');
 };
 
@@ -369,28 +364,28 @@ function deleteReservation(classID, fields) {
     return request;
 };
 
-function addCourseClasses(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/classes', {
+function addBooks(classID, fields) {
+    var request = $.ajax("/api/classes/" + classID + '/books', {
         type: "POST",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("添加课程失败", jqXHR);
+        showAlert("添加绘本失败", jqXHR);
     })
     return request;
 };
 
-function removeCourseClasses(coureID, fields) {
-    var request = $.ajax("/api/courses/" + coureID + '/classes', {
+function deleteBook(classID, fields) {
+    var request = $.ajax("/api/classes/" + classID + '/books', {
         type: "DELETE",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除班级课程失败", jqXHR);
+        showAlert("删除绘本失败", jqXHR);
     })
     return request;
 };

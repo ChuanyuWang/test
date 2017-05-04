@@ -100,14 +100,15 @@ block page
         div.col-sm-2
           button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#newBook_dlg')
             span.glyphicon.glyphicon-plus 添加
-        div.col-sm-10
+        div.col-sm-5
           template(v-for="item in cls.books")
             div.media
               div.media-left
                 span.glyphicon.glyphicon-book.text-primary(style='font-size:large;opacity:0.8')
               div.media-body
                 h4.media-heading(style='font-size:small') {{item.title}}
-                p.small(style='color:#777') by {{item.teacher}}
+                p.small(style='color:#777') {{item.info}} by {{item.teacher}}
+                  span.badge(style='background-color:#d9534f;cursor:pointer;float:right;margin-right:16px',@click='removeBook(item)') 删除
           small(style='color:#777') 共{{booksCount}}本
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
