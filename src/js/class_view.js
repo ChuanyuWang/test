@@ -5,6 +5,8 @@
  * --------------------------------------------------------------------------
  */
 
+var class_service = require('./services/classes');
+
 var viewData = {
     cls: {},
     date: null,
@@ -17,12 +19,12 @@ var viewData = {
 $(document).ready(function() {
     init();
     // load class object
-    var request = getClass($('#class_app').data('class-id'));
+    var request = class_service.getClass($('#class_app').data('class-id'));
     request.done(function(data, textStatus, jqXHR) {
         initPage(data);
     });
     // load class reservations
-    var request2 = getReservations($('#class_app').data('class-id'));
+    var request2 = class_service.getReservations($('#class_app').data('class-id'));
     request2.done(function(data, textStatus, jqXHR) {
         data.forEach(function(value, index, array) {
             viewData.reservations.push(value);
@@ -56,6 +58,7 @@ function init() {
     $('#newBook_dlg #add_pictureBook').click(handleAddNewBook);
     $('#newBook_dlg').on('show.bs.modal', function(event) {
         $(this).find('.form-group').removeClass('has-error');
+        $(this).find('input[type=text]').val(null);
     });
 
     // event listener of adding new reservation
@@ -68,6 +71,7 @@ function init() {
 function initPage(cls) {
     viewData.cls = cls || {};
     viewData.cls.age = viewData.cls.age || {};
+    viewData.cls.books = viewData.cls.books || [];
 
     // bootstrap the class view page
     var classViewer = new Vue({
@@ -121,7 +125,7 @@ function initPage(cls) {
                 if (this.age.max < 0) return this.error = '最大年龄不能小于零';
                 if (this.age.max < this.age.min) return this.error = '最大年龄不能小于最小年龄';
                 if (!this.error) {
-                    var request = updateClass(this.cls._id, {
+                    var request = class_service.updateClass(this.cls._id, {
                         name: this.cls.name,
                         date: this.date.toISOString(),
                         classroom: this.cls.classroom,
@@ -165,7 +169,7 @@ function initPage(cls) {
                     },
                     callback: function(ok) {
                         if (ok) {
-                            var request = removeClass(vm.cls._id);
+                            var request = class_service.removeClass(vm.cls._id);
                             request.done(function(data, textStatus, jqXHR) {
                                 window.location.href = '../home';
                             });
@@ -185,7 +189,7 @@ function initPage(cls) {
                     },
                     callback: function(ok) {
                         if (!ok) return;
-                        var request = deleteBook(vm.cls._id, item);
+                        var request = class_service.deleteBook(vm.cls._id, item);
                         request.done(function(data, textStatus, jqXHR) {
                             vm.cls.books = data.books;
                         });
@@ -204,7 +208,7 @@ function initPage(cls) {
                     },
                     callback: function(ok) {
                         if (!ok) return;
-                        var request = deleteReservation(vm.cls._id, { 'memberid': item.member });
+                        var request = class_service.deleteReservation(vm.cls._id, { 'memberid': item.member });
                         request.done(function(data, textStatus, jqXHR) {
                             var reservations = vm.reservations;
                             for (var i = 0; i < reservations.length; i++) {
@@ -253,7 +257,7 @@ function handleAddNewBook(e) {
         markError(modal, 'input[name=book_teacher]', false);
     }
     book.info = modal.find('input[name=book_info]').val().trim();
-    var request = addBooks(viewData.cls._id, book);
+    var request = class_service.addBooks(viewData.cls._id, book);
     request.done(function(data, textStatus, jqXHR) {
         viewData.cls.books = data.books;
     });
@@ -290,7 +294,7 @@ function handleClickAddMember() {
             };
         });
         // add one member's reservation
-        var request = addReservation(result[0]);
+        var request = class_service.addReservation(result[0]);
         request.done(function(data, textStatus, jqXHR) {
             var newAdded = findReservation(data['class'], data['member']);
             if (newAdded) viewData.reservations.push(newAdded);
@@ -308,126 +312,6 @@ function markError(container, selector, hasError) {
     } else {
         container.find(selector).closest(".form-group").removeClass("has-error");
     }
-};
-
-/**
- * Retrieve classID object according to ID
- * 
- * @param {String} classID 
- */
-function getClass(classID) {
-    var request = $.getJSON('/api/classes/' + classID, null);
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert('获取课程失败', jqXHR);
-    });
-    return request;
-};
-
-function updateClass(coureID, fields) {
-    var request = $.ajax("/api/classes/" + coureID, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("更新课程失败", jqXHR);
-    });
-    return request;
-};
-
-function addReservation(fields) {
-    var request = $.ajax("/api/booking", {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("预约失败", jqXHR);
-    });
-    return request;
-};
-
-function deleteReservation(classID, fields) {
-    var request = $.ajax("/api/booking/" + classID, {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("取消会员预约失败", jqXHR);
-    });
-    return request;
-};
-
-function addBooks(classID, fields) {
-    var request = $.ajax("/api/classes/" + classID + '/books', {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("添加绘本失败", jqXHR);
-    });
-    return request;
-};
-
-function deleteBook(classID, fields) {
-    var request = $.ajax("/api/classes/" + classID + '/books', {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除绘本失败", jqXHR);
-    });
-    return request;
-};
-
-function removeClass(classID, fields) {
-    var request = $.ajax("/api/classes/" + classID, {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除课程失败", jqXHR);
-    });
-    return request;
-};
-
-function getReservations(classID) {
-    var request = $.getJSON('/api/booking', { 'classid': classID });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert('获取课程预约失败', jqXHR);
-    });
-    return request;
-};
-
-/**
- * 
- * @param {String} title 
- * @param {Object} jqXHR 
- * @param {String} className default is 'btn-danger'
- */
-function showAlert(title, jqXHR, className) {
-    //console.error(jqXHR);
-    bootbox.dialog({
-        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-        title: title || '错误',
-        buttons: {
-            danger: {
-                label: "确定",
-                // alert dialog with danger button by default
-                className: className || "btn-danger"
-            }
-        }
-    });
 };
 
 function findReservation(cls, member) {
