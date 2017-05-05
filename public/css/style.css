@@ -63,6 +63,9 @@ html {
   display: flex;
   flex-direction: column;
 }
+.class-item-div p:hover {
+  text-decoration: underline;
+}
 .class-row {
   margin-left: -7px;
   margin-right: -7px;

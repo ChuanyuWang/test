@@ -52,6 +52,9 @@ $(document).ready(function() {
             getDateTime: function(section, dayOffset) {
                 return moment(this.monday).add(dayOffset, 'days').toDate();
             },
+            viewClass: function(classItem) {
+                window.location.href = './class/' + classItem._id;
+            },
             deleteClass: function(classItem) {
                 var vm = this;
                 if (classItem.courseID) {
@@ -279,6 +282,8 @@ function handleAddNewClass(event) {
             success: function(data) {
                 updateClasses(data);
                 modal.modal('hide');
+                // jump to new class page
+                //window.location.href = './class/' + data._id;
             },
             error: function(jqXHR, status, err) {
                 showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);

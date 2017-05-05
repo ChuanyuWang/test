@@ -12,8 +12,7 @@ module.exports = function() {
             data: Array // array of class object
         },
         data: function() {
-            return {
-            };
+            return {};
         },
         computed: {},
         filters: {
@@ -36,6 +35,10 @@ module.exports = function() {
                 } else {
                     return undefined;
                 }
+            },
+            books: function(cItem) {
+                var books = cItem.books || [];
+                return books.length;
             }
         }
     });
