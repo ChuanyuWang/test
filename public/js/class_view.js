@@ -321,7 +321,7 @@ function getClass(classID) {
     var request = $.getJSON('/api/classes/' + classID, null);
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取课程失败', jqXHR);
-    })
+    });
     return request;
 };
 
@@ -334,7 +334,7 @@ function updateClass(coureID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("更新课程失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -347,7 +347,7 @@ function addReservation(fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("预约失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -360,7 +360,7 @@ function deleteReservation(classID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("取消会员预约失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -373,7 +373,7 @@ function addBooks(classID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("添加绘本失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -386,7 +386,7 @@ function deleteBook(classID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("删除绘本失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -399,7 +399,7 @@ function removeClass(classID, fields) {
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("删除课程失败", jqXHR);
-    })
+    });
     return request;
 };
 
@@ -407,7 +407,7 @@ function getReservations(classID) {
     var request = $.getJSON('/api/booking', { 'classid': classID });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert('获取课程预约失败', jqXHR);
-    })
+    });
     return request;
 };
 
