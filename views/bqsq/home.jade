@@ -57,7 +57,7 @@ block page
         tr(v-for='(section, i) in sections')
           td {{section.name}}
           td(v-for='(col, j) in columns',style='padding:0')
-            class-list(:data='getClassess(j, section.startTime, section.duration)',v-on:view="viewClass",v-on:delete="deleteClass",v-on:add="addClass(j,section.startTime)")
+            class-list(:data='getClassess(j, section.startTime, section.duration)',v-on:delete="deleteClass",v-on:add="addClass(j,section.startTime)")
 
   script#classlist-template(type='text/x-template')
     div
@@ -66,7 +66,7 @@ block page
           span(style='color:#999').small {{classItem.date | displayTime}}开始
           p(style='padding-bottom:7px;cursor:pointer',v-on:click='$emit("view", classItem)',title='点击查看课程详情') {{classItem.name}}
           div.btn-group.btn-group-xs(style='align-self:flex-end')
-            button.btn.btn-primary(v-on:click='$emit("view", classItem)',:title='reservation(classItem) + "人预约"')
+            a.btn.btn-primary(:href='"./class/" + classItem._id',:title='reservation(classItem) + "人预约"')
               |查看
               span.badge(style='margin-left:3px') {{reservation(classItem)}}
             button.btn.btn-danger(v-on:click='$emit("delete", classItem)',title='删除')

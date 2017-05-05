@@ -91,7 +91,7 @@ block page
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='cancelReservation(booking)') 取消
               a.badge(:href='"../member/" + booking.member',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-              | {{booking.userName}} <small>({{booking.quantity}}人)<small>
+              | {{booking.userName}} <small>({{booking.quantity}}人)</small>
           small(style='color:#777') 共{{membersCount}}人
     div.page-header
       h3 绘本
