@@ -359,9 +359,10 @@ var service = {};
  * @param {String} classID 
  */
 service.getClass = function(classID) {
-    var request = $.ajax({
+    var request = $.ajax('/api/classes/' + classID, {
+        type: "GET",
+        //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
         dataType: "json",
-        url: '/api/classes/' + classID,
         data: '',
         cache: false // disable browser cache
     });
@@ -450,9 +451,10 @@ service.removeClass = function(classID, fields) {
 };
 
 service.getReservations = function(classID) {
-    var request = $.ajax({
+    var request = $.ajax('/api/booking', {
+        type: "GET",
+        //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
         dataType: "json",
-        url: '/api/booking',
         data: { 'classid': classID },
         cache: false // disable browser cache
     });

@@ -5,6 +5,8 @@
  */
 var common = require('./common');
 var initClassCell = require('./components/class-cell');
+var class_service = require('./services/classes');
+
 var classTableData = {
     monday: null, // moment date object
     columns: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
@@ -51,7 +53,56 @@ $(document).ready(function() {
                 return moment(this.monday).add(dayOffset, 'days').toDate();
             },
             deleteClass: function(classItem) {
-                handleRemoveClass(classItem);
+                var vm = this;
+                if (classItem.courseID) {
+                    return bootbox.confirm({
+                        title: "确定删除班级中的课程吗？",
+                        message: "课程<strong>" + classItem.name + "</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程",
+                        buttons: {
+                            confirm: {
+                                label: '查看班级',
+                                className: "btn-success"
+                            }
+                        },
+                        callback: function(ok) {
+                            if (ok) {
+                                window.location.href = './course/' + classItem.courseID;
+                            }
+                        }
+                    });
+                }
+                bootbox.confirm({
+                    title: "确定删除课程吗？",
+                    message: "只能删除没有会员预约的课程，如果有预约，请先取消预约",
+                    buttons: {
+                        confirm: {
+                            className: "btn-danger"
+                        }
+                    },
+                    callback: function(ok) {
+                        if (ok) {
+                            var request = class_service.removeClass(classItem._id);
+                            request.done(function(data, textStatus, jqXHR) {
+                                vm.removeClasses(classItem);
+                                showSuccessMsg("删除成功");
+                            });
+                        }
+                    }
+                });
+            },
+            removeClasses: function(oldClass) {
+                var found = false;
+                for (var i = 0; i < this.classes.length; i++) {
+                    if (this.classes[i]._id == oldClass._id) {
+                        // remove the old one
+                        this.classes.splice(i, 1);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    console.error("can't find the oldClass");
+                }
             },
             addClass: function(dayOffset, startTime) {
                 // the first class should start from 8:00 in the morning
@@ -237,36 +288,6 @@ function handleAddNewClass(event) {
     }
 };
 
-function handleRemoveClass(class_item) {
-    //TODO, consider course class
-    var item_id = class_item._id;
-
-    //TODO, make this confirm as danger style
-    bootbox.confirm("删除此课程吗？", function(result) {
-        if (!result) { // user cancel
-            return;
-        }
-
-        $.ajax("/api/classes/" + item_id, {
-            type: "DELETE",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({ dummy: 1 }),
-            success: function(data) {
-                // TODO, check the 'data' and remove class
-                removeClasses(class_item);
-                showSuccessMsg("删除成功");
-            },
-            error: function(jqXHR, status, err) {
-                showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
-            },
-            complete: function(jqXHR, status) {
-                //TODO
-            },
-            dataType: "json"
-        });
-    });
-};
-
 function updateClasses(newClass) {
     var found = false;
     for (var i = 0; i < classTableData.classes.length; i++) {
@@ -280,21 +301,6 @@ function updateClasses(newClass) {
     if (!found) {
         // add as a new class item
         classTableData.classes.push(newClass);
-    }
-};
-
-function removeClasses(oldClass) {
-    var found = false;
-    for (var i = 0; i < classTableData.classes.length; i++) {
-        if (classTableData.classes[i]._id == oldClass._id) {
-            // remove the old one
-            classTableData.classes.splice(i, 1);
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        console.error("can't find the oldClass");
     }
 };
 
@@ -314,7 +320,7 @@ function updateSchedule(control) {
             classTableData.classes = data || [];
         },
         error: function(jqXHR, status, err) {
-            console.error(jqXHR.responseText);
+            console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
         },
         complete: function(jqXHR, status) {
             if (control) {

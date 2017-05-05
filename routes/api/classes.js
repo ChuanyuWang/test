@@ -106,28 +106,6 @@ router.post('/', helper.requireRole("admin"), function(req, res) {
     });
 });
 
-router.put('/:classID', helper.requireRole("admin"), function(req, res) {
-    var classes = req.db.collection("classes");
-    classes.update({
-        _id: mongojs.ObjectId(req.params.classID)
-    }, {
-        $set: req.body
-    }, function(err, result) {
-        if (err) {
-            var error = new Error("Update class fails");
-            error.innerError = err;
-            next(error);
-            return;
-        }
-        if (result.n == 1) {
-            console.log("class %s is updated by %j", req.params.classID, req.body);
-        } else {
-            console.error("class %s update fail by %s", req.params.classID, req.body);
-        }
-        res.json(result);
-    });
-});
-
 router.patch('/:classID', helper.requireRole("admin"), function(req, res) {
     // booking can only added by post/delete 'api/booking?classID=xxx' 
     if (req.body.hasOwnProperty('booking')) {

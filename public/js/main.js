@@ -106,6 +106,8 @@ module.exports = function() {
  */
 var common = require('./common');
 var initClassCell = require('./components/class-cell');
+var class_service = require('./services/classes');
+
 var classTableData = {
     monday: null, // moment date object
     columns: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
@@ -152,7 +154,56 @@ $(document).ready(function() {
                 return moment(this.monday).add(dayOffset, 'days').toDate();
             },
             deleteClass: function(classItem) {
-                handleRemoveClass(classItem);
+                var vm = this;
+                if (classItem.courseID) {
+                    return bootbox.confirm({
+                        title: "确定删除班级中的课程吗？",
+                        message: "课程<strong>" + classItem.name + "</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程",
+                        buttons: {
+                            confirm: {
+                                label: '查看班级',
+                                className: "btn-success"
+                            }
+                        },
+                        callback: function(ok) {
+                            if (ok) {
+                                window.location.href = './course/' + classItem.courseID;
+                            }
+                        }
+                    });
+                }
+                bootbox.confirm({
+                    title: "确定删除课程吗？",
+                    message: "只能删除没有会员预约的课程，如果有预约，请先取消预约",
+                    buttons: {
+                        confirm: {
+                            className: "btn-danger"
+                        }
+                    },
+                    callback: function(ok) {
+                        if (ok) {
+                            var request = class_service.removeClass(classItem._id);
+                            request.done(function(data, textStatus, jqXHR) {
+                                vm.removeClasses(classItem);
+                                showSuccessMsg("删除成功");
+                            });
+                        }
+                    }
+                });
+            },
+            removeClasses: function(oldClass) {
+                var found = false;
+                for (var i = 0; i < this.classes.length; i++) {
+                    if (this.classes[i]._id == oldClass._id) {
+                        // remove the old one
+                        this.classes.splice(i, 1);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    console.error("can't find the oldClass");
+                }
             },
             addClass: function(dayOffset, startTime) {
                 // the first class should start from 8:00 in the morning
@@ -338,36 +389,6 @@ function handleAddNewClass(event) {
     }
 };
 
-function handleRemoveClass(class_item) {
-    //TODO, consider course class
-    var item_id = class_item._id;
-
-    //TODO, make this confirm as danger style
-    bootbox.confirm("删除此课程吗？", function(result) {
-        if (!result) { // user cancel
-            return;
-        }
-
-        $.ajax("/api/classes/" + item_id, {
-            type: "DELETE",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({ dummy: 1 }),
-            success: function(data) {
-                // TODO, check the 'data' and remove class
-                removeClasses(class_item);
-                showSuccessMsg("删除成功");
-            },
-            error: function(jqXHR, status, err) {
-                showErrorMsg(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
-            },
-            complete: function(jqXHR, status) {
-                //TODO
-            },
-            dataType: "json"
-        });
-    });
-};
-
 function updateClasses(newClass) {
     var found = false;
     for (var i = 0; i < classTableData.classes.length; i++) {
@@ -381,21 +402,6 @@ function updateClasses(newClass) {
     if (!found) {
         // add as a new class item
         classTableData.classes.push(newClass);
-    }
-};
-
-function removeClasses(oldClass) {
-    var found = false;
-    for (var i = 0; i < classTableData.classes.length; i++) {
-        if (classTableData.classes[i]._id == oldClass._id) {
-            // remove the old one
-            classTableData.classes.splice(i, 1);
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        console.error("can't find the oldClass");
     }
 };
 
@@ -415,7 +421,7 @@ function updateSchedule(control) {
             classTableData.classes = data || [];
         },
         error: function(jqXHR, status, err) {
-            console.error(jqXHR.responseText);
+            console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
         },
         complete: function(jqXHR, status) {
             if (control) {
@@ -437,4 +443,159 @@ function showErrorMsg(msg) {
     alert_bar.find('span').text(msg);
     alert_bar.finish().show().fadeOut(2000);
 };
-},{"./common":1,"./components/class-cell":2}]},{},[3]);
+},{"./common":1,"./components/class-cell":2,"./services/classes":4}],4:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * classes.js provide API for classes service
+ * --------------------------------------------------------------------------
+ */
+
+var util = require('./util');
+
+var service = {};
+
+/**
+ * Retrieve classID object according to ID
+ * 
+ * @param {String} classID 
+ */
+service.getClass = function(classID) {
+    var request = $.ajax('/api/classes/' + classID, {
+        type: "GET",
+        //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+        dataType: "json",
+        data: '',
+        cache: false // disable browser cache
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert('获取课程失败', jqXHR);
+    });
+    return request;
+};
+
+service.updateClass = function(coureID, fields) {
+    var request = $.ajax("/api/classes/" + coureID, {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("更新课程失败", jqXHR);
+    });
+    return request;
+};
+
+service.addReservation = function(fields) {
+    var request = $.ajax("/api/booking", {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("预约失败", jqXHR);
+    });
+    return request;
+};
+
+service.deleteReservation = function(classID, fields) {
+    var request = $.ajax("/api/booking/" + classID, {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("取消会员预约失败", jqXHR);
+    });
+    return request;
+};
+
+service.addBooks = function(classID, fields) {
+    var request = $.ajax("/api/classes/" + classID + '/books', {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("添加绘本失败", jqXHR);
+    });
+    return request;
+};
+
+service.deleteBook = function(classID, fields) {
+    var request = $.ajax("/api/classes/" + classID + '/books', {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("删除绘本失败", jqXHR);
+    });
+    return request;
+};
+
+service.removeClass = function(classID, fields) {
+    var request = $.ajax("/api/classes/" + classID, {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("删除课程失败", jqXHR);
+    });
+    return request;
+};
+
+service.getReservations = function(classID) {
+    var request = $.ajax('/api/booking', {
+        type: "GET",
+        //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+        dataType: "json",
+        data: { 'classid': classID },
+        cache: false // disable browser cache
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert('获取课程预约失败', jqXHR);
+    });
+    return request;
+};
+
+module.exports = service;
+},{"./util":5}],5:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * util.js provide common utils for all services
+ * --------------------------------------------------------------------------
+ */
+ 
+var util = {};
+
+/**
+ * 
+ * @param {String} title 
+ * @param {Object} jqXHR 
+ * @param {String} className default is 'btn-danger'
+ */
+util.showAlert = function(title, jqXHR, className) {
+    //console.error(jqXHR);
+    bootbox.dialog({
+        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+        title: title || '错误',
+        buttons: {
+            danger: {
+                label: "确定",
+                // alert dialog with danger button by default
+                className: className || "btn-danger"
+            }
+        }
+    });
+};
+
+module.exports = util;
+
+},{}]},{},[3]);
