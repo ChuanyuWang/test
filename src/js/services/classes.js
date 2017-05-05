@@ -3,9 +3,9 @@
  * classes.js provide API for classes service
  * --------------------------------------------------------------------------
  */
- 
+
 var util = require('./util');
- 
+
 var service = {};
 
 /**
@@ -14,7 +14,12 @@ var service = {};
  * @param {String} classID 
  */
 service.getClass = function(classID) {
-    var request = $.getJSON('/api/classes/' + classID, null);
+    var request = $.ajax({
+        dataType: "json",
+        url: '/api/classes/' + classID,
+        data: '',
+        cache: false // disable browser cache
+    });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert('获取课程失败', jqXHR);
     });
@@ -100,7 +105,12 @@ service.removeClass = function(classID, fields) {
 };
 
 service.getReservations = function(classID) {
-    var request = $.getJSON('/api/booking', { 'classid': classID });
+    var request = $.ajax({
+        dataType: "json",
+        url: '/api/booking',
+        data: { 'classid': classID },
+        cache: false // disable browser cache
+    });
     request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert('获取课程预约失败', jqXHR);
     });
