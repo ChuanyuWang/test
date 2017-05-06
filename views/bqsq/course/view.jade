@@ -79,6 +79,11 @@ block page
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
               a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
               | {{member.name}}
+              div.small(style='color:#777') 学习进度
+              div.progress(style='margin-bottom:0px')
+                div.progress-bar.progress-bar-success(:style='{width: Math.round(progressStatus[member.id].done*100/progressStatus[member.id].total) + "%"}',:title='"已上" + progressStatus[member.id].done + "节"') {{progressStatus[member.id].done}}
+                div.progress-bar.progress-bar-danger(:style='{width: Math.round(progressStatus[member.id].absent*100/progressStatus[member.id].total) + "%"}',:title='"缺席" + progressStatus[member.id].absent + "节"') {{progressStatus[member.id].absent}}
+                div(style='float:left;text-align:center',:style='{width: Math.floor(progressStatus[member.id].left*100/progressStatus[member.id].total) + "%"}',:title='"剩余" + progressStatus[member.id].left + "节"') {{progressStatus[member.id].left}}
           small(style='color:#777') 共{{membersCount}}人
     div.page-header
       h3 课程
@@ -89,12 +94,13 @@ block page
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           ul.list-group(style='margin-bottom:0px')
-            li.list-group-item(v-for="item in course.classes")
+            li.list-group-item(v-for="item in sortedClasses")
               h4(style='margin: 3px 0') {{item.name}}
-              a(href='javascript:void(0)',style='margin-right:3px',target='_blank')
+              a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-calendar
               span.small {{item.date | formatDateTime}} - {{item.classroom | formatClassroom}}
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
+              a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
           small(style='color:#777') 共{{classesCount}}节
     div(style='height:20px')
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')

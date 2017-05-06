@@ -98,6 +98,41 @@ function initPage(course) {
             },
             classesCount: function() {
                 return this.course.classes ? this.course.classes.length : 0;
+            },
+            sortedClasses: function() {
+                var classes = this.course.classes || [];
+                return classes.sort(function(a, b) {
+                    if (moment(a.date).isSameOrBefore(b.date)) return -1;
+                    else return 1;
+                });
+            },
+            progressStatus: function() {
+                var progress = {}, vm = this;
+                var members = this.course.members || [];
+                if (members.length == 0) return progress;
+                var now = moment();
+
+                members.forEach(function(member, index, array) {
+                    var status = {
+                        done: 0,
+                        absent: 0,
+                        left: vm.sortedClasses.length,
+                        total: vm.sortedClasses.length
+                    };
+                    vm.sortedClasses.some(function(cls, index, array) {
+                        if (moment(cls.date).isSameOrBefore(now)) {
+                            status.left--;
+                            if (vm.isAbsent(cls, member)) status.absent++;
+                            else status.done++;
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    })
+                    //status.total = status.done + status.absent + status.left;
+                    progress[member.id] = status;
+                });
+                return progress;
             }
         },
         filters: {
@@ -115,6 +150,13 @@ function initPage(course) {
         },
         watch: {},
         methods: {
+            isAbsent: function(cls, member) {
+                var booking = cls.booking || [];
+                var hasReservation = function(value, index, array) {
+                    return value.member === member.id;
+                };
+                return !booking.some(hasReservation);
+            },
             saveBasicInfo: function() {
                 this.error = null;
                 if (this.course.name.length == 0) this.error = '名称不能为空';
