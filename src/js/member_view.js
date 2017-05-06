@@ -150,7 +150,9 @@ function init() {
     $('#classes_table').bootstrapTable({
         locale: 'zh-CN',
         queryParams: classFilter,
-        columns: [{}, {}, {
+        columns: [{
+            formatter: linkNameFormatter
+        }, {}, {
             formatter: common.dateFormatter
         }]
     });
@@ -307,6 +309,14 @@ function fieldFormatter(value, row, index) {
     } else {
         return value;
     }
+};
+
+function linkNameFormatter(value, row, index) {
+    return [
+        '<a href="../class/' + row._id + '" target="_blank">',
+        ' <i class="text-primary glyphicon glyphicon-calendar"></i>' + value,
+        '</a>'
+    ].join('');
 };
 
 function deltaFormatter(value, row, index) {

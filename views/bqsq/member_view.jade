@@ -126,7 +126,7 @@ block page
         label.radio-inline
           input(type="radio",name="classFilter",value="ALL")
           |全部
-      table#classes_table(data-striped='true',data-pagination='true',data-page-size='10',data-unique-id="_id")
+      table#classes_table(data-striped='true',data-sort-name='date',data-sort-order='desc',data-pagination='true',data-page-size='10',data-unique-id="_id")
         thead
           tr
             //th(data-field='_id',data-visible='false') ID
