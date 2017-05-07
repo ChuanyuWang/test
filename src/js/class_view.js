@@ -123,7 +123,7 @@ function initPage(cls) {
                 if (this.cls.capacity < 0) return this.error = '最大人数不能小于零';
                 if (this.age.min < 0) return this.error = '最小年龄不能小于零';
                 if (this.age.max < 0) return this.error = '最大年龄不能小于零';
-                if (this.age.max < this.age.min) return this.error = '最大年龄不能小于最小年龄';
+                if (typeof this.age.max === 'number' && typeof this.age.min === 'number' && this.age.max < this.age.min) return this.error = '最大年龄不能小于最小年龄';
                 if (!this.error) {
                     var request = class_service.updateClass(this.cls._id, {
                         name: this.cls.name,
