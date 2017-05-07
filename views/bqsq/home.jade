@@ -35,10 +35,14 @@ append js
 block page
   div.container(style={'padding-top': '50px'})
     div.row(style={'margin-top': '15px'})
-      div.col-sm-4
+      div.col-sm-4.btn-group
         button#previous_week.btn.btn-primary.btn-sm 上一周
         button#current_week.btn.btn-primary.btn-sm 本周
         button#next_week.btn.btn-primary.btn-sm 下一周
+        div#weekPicker.input-group.input-group-sm.date
+          input.form-control(type="text")
+          span.input-group-addon
+            span.glyphicon.glyphicon-calendar
       div.col-sm-2.pull-right
         select#chooseRoom.form-control.input-sm(style='float:right')
           - each room in classroom

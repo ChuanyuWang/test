@@ -227,21 +227,21 @@ $(document).ready(function() {
 
     // listen to the previous week and next week button
     $('#previous_week').click(function(event) {
-        $("this").prop("disabled", true);
         classTableData.monday.subtract(7, 'days');
-        updateSchedule($("this"));
+        // update the datetimepicker control
+        $('#weekPicker').data('DateTimePicker').date(classTableData.monday);
     });
 
     $('#next_week').click(function(event) {
-        $("this").prop("disabled", true);
         classTableData.monday.add(7, 'days');
-        updateSchedule($("this"));
+        // update the datetimepicker control
+        $('#weekPicker').data('DateTimePicker').date(classTableData.monday);
     });
 
     $('#current_week').click(function(event) {
-        $("this").prop("disabled", true);
         classTableData.monday = getMonday(moment());
-        updateSchedule($("this"));
+        // update the datetimepicker control
+        $('#weekPicker').data('DateTimePicker').date(classTableData.monday);
     });
 
     // handle user change the classroom
@@ -260,9 +260,24 @@ function init() {
         locale: 'zh-CN',
         format: 'LT'
     });
-    classTableData.monday = getMonday(moment());
+    $('#weekPicker').datetimepicker({
+        showTodayButton: false,
+        locale: 'zh-CN',
+        format: 'll',
+        defaultDate: moment()
+    });
+    $('#weekPicker').on('dp.change', function(e) {
+        // when user clears the input box, the 'e.date' is false value
+        if (e.date && e.date.isValid()) {
+            console.log("date change");
+            classTableData.monday = getMonday(e.date);
+            updateSchedule();
+        }
+    });
     initClassRoomList();
-    updateSchedule();
+    classTableData.monday = getMonday(moment());
+    $('#weekPicker').data('DateTimePicker').date(classTableData.monday);
+    //updateSchedule();
 };
 
 function initClassRoomList() {
