@@ -49,9 +49,6 @@ $(document).ready(function() {
                 }
                 return result;
             },
-            getDateTime: function(section, dayOffset) {
-                return moment(this.monday).add(dayOffset, 'days').toDate();
-            },
             viewClass: function(classItem) {
                 window.location.href = './class/' + classItem._id;
             },
@@ -165,7 +162,6 @@ function init() {
     $('#weekPicker').on('dp.change', function(e) {
         // when user clears the input box, the 'e.date' is false value
         if (e.date && e.date.isValid()) {
-            console.log("date change");
             classTableData.monday = getMonday(e.date);
             updateSchedule();
         }

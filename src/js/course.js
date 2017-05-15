@@ -62,19 +62,6 @@ function handleEndCourse(e, value, row, index) {
  * @param {Number} index the row index
  * @public
  */
-function handleEditCourse(e, value, row, index) {
-    //TODO
-};
-
-/**
- * event handler of clicking end course button 
- * 
- * @param {Object} e the jQuery event
- * @param {Object} value the field value
- * @param {Object} row the row record data
- * @param {Number} index the row index
- * @public
- */
 function handleViewCourse(e, value, row, index) {
     window.location.href = window.location.pathname + '/' + row._id;
 };
@@ -82,7 +69,6 @@ function handleViewCourse(e, value, row, index) {
 // global event handler for table inline action
 var handleActionClicks = {
     'click .end': handleEndCourse,
-    'click .edit': handleEditCourse,
     'click .view': handleViewCourse,
 };
 
