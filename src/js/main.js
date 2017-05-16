@@ -159,6 +159,9 @@ function init() {
         format: 'll',
         defaultDate: moment()
     });
+    classTableData.monday = getMonday(moment());
+    $('#weekPicker').data('DateTimePicker').date(classTableData.monday);
+    // listen to the date change event after setting date !!!
     $('#weekPicker').on('dp.change', function(e) {
         // when user clears the input box, the 'e.date' is false value
         if (e.date && e.date.isValid()) {
@@ -167,9 +170,8 @@ function init() {
         }
     });
     initClassRoomList();
-    classTableData.monday = getMonday(moment());
-    $('#weekPicker').data('DateTimePicker').date(classTableData.monday);
-    //updateSchedule();
+    // manual update the page so that page is able to be updated in "back" case
+    updateSchedule();
 };
 
 function initClassRoomList() {
