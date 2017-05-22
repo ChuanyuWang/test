@@ -1,37 +1,3 @@
-/* Copyright 2016-2017 Chuanyu Wang */
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/**
- * --------------------------------------------------------------------------
- * util.js provide common utils for all services
- * --------------------------------------------------------------------------
- */
- 
-var util = {};
-
-/**
- * 
- * @param {String} title error dialog title
- * @param {Object} jqXHR XHR object of jQuery ajax call
- * @param {String} className default is 'btn-danger'
- */
-util.showAlert = function(title, jqXHR, className) {
-    //console.error(jqXHR);
-    bootbox.alert({
-        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-        title: title || '错误',
-        buttons: {
-            danger: {
-                label: "确定",
-                // alert dialog with danger button by default
-                className: className || "btn-danger"
-            }
-        }
-    });
-};
-
-module.exports = util;
-
-},{}],2:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * setting.js setting page main entry module
@@ -375,4 +341,3 @@ var handleActions = {
         modal.modal('show');
     }
 };
-},{"./services/util":1}]},{},[2]);

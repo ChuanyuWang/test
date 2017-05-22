@@ -8,13 +8,13 @@ var util = {};
 
 /**
  * 
- * @param {String} title 
- * @param {Object} jqXHR 
+ * @param {String} title error dialog title
+ * @param {Object} jqXHR XHR object of jQuery ajax call
  * @param {String} className default is 'btn-danger'
  */
 util.showAlert = function(title, jqXHR, className) {
     //console.error(jqXHR);
-    bootbox.dialog({
+    bootbox.alert({
         message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
         title: title || '错误',
         buttons: {

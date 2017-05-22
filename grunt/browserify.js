@@ -45,5 +45,9 @@ module.exports = {
     course_view: {
         src: 'src/js/course_view.js',
         dest: 'public/js/course_view.js'
+    },
+    setting: {
+        src: 'src/js/setting.js',
+        dest: 'public/js/setting.js'
     }
 };
