@@ -19,11 +19,14 @@ append css
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  //script(src="//cdn.bootcss.com/i18next-browser-languagedetector/1.0.1/i18nextBrowserLanguageDetector.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
   if ENV_DEVELOPMENT
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+    script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.js")
   else
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
+    script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.min.js")
   script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")

@@ -4,8 +4,10 @@
  * --------------------------------------------------------------------------
  */
 var common = require('./common');
+var locales = require('./locales');
 var initClassCell = require('./components/class-cell');
 var class_service = require('./services/classes');
+var LngDetector = require('./locales/i18nextBrowserLanguageDetector.min');
 
 var classTableData = {
     monday: null, // moment date object
@@ -147,6 +149,14 @@ $(document).ready(function() {
 
 function init() {
     console.log("welcome~~~");
+    // initialize the i18n module
+    if (i18next) {
+        i18next.use(LngDetector).init({
+            fallbackLng: "en",
+            resources: locales
+        });
+    }
+
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
     $('#cls_time').datetimepicker({
