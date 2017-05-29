@@ -20,7 +20,7 @@ util.showAlert = function(title, jqXHR, className) {
         message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
         title: title || '错误',
         buttons: {
-            danger: {
+            ok: {
                 label: "确定",
                 // alert dialog with danger button by default
                 className: className || "btn-danger"
@@ -39,6 +39,7 @@ module.exports = util;
  */
 var util = require('./services/util');
 var consumeChart = null;
+var passiveChart = null;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -62,6 +63,7 @@ function init() {
     });
     // initialize chart instance
     consumeChart = echarts.init(document.getElementById('consume_chart'), 'vintage');
+    passiveChart = echarts.init(document.getElementById('chart2'), 'vintage');
 
     // initialize the classroom table
     $('#classroom_table').bootstrapTable({
@@ -92,17 +94,21 @@ function init() {
     $('#add_room').click(handleAddNewClassRoom);
     $('#edit_room').click(handleEditClassRoom);
     // handle user refresh the chart
-    $('#refresh').click(refreshChart);
+    $('div.tab-pane#analytics #refresh').click(refreshChart);
     // handle user change the chart filters
     $('div.tab-pane#analytics select').change(function(event) {
         refreshChart();
     });
     // refresh the chart when user switch to analytics tab first time
-    $('a[href="#analytics"]').on('shown.bs.tab', function(e) {
+    $('a[href="#analytics"]').one('shown.bs.tab', function(e) {
         refreshChart();
         //e.target // newly activated tab
         //e.relatedTarget // previous active tab
-    })
+    });
+    // refresh the chart when user switch to analytics tab first time
+    $('a[href="#hint"]').one('shown.bs.tab', function(e) {
+        refreshPassiveChart();
+    });
 };
 
 function handleAddNewClassRoom(event) {
@@ -312,6 +318,75 @@ function drawChart(data, year, unitName) {
 
     // Apply the chart options to create/update chart instance
     consumeChart.setOption(option);
+};
+
+var effectiveMembers = {}; // default value
+
+function refreshPassiveChart() {
+    var request = $.get("/api/analytics/passive", null, "json");
+    request.done(function(data, textStatus, jqXHR) {
+        var userList = [];
+        var chartData = [];
+        var effectiveMembers = {}; //reset
+        var rawUserData = data.effectiveMembers || [];
+        rawUserData.forEach(function(value, index, array) {
+            effectiveMembers[value._id] = value;
+        });
+        var lastBook = data.lastBook || [];
+        for (var i = lastBook.length - 1; i >= 0; i--) {
+            var value = lastBook[i];
+            effectiveMembers[value._id].hasBooking = true;
+            var last = moment(value.last);
+            var toNow = moment().diff(last, 'days');
+            if (toNow <= 0) continue; // ignore negative
+            userList.push(effectiveMembers[value._id].name);
+            chartData.push(toNow);
+        }
+        // resize the chart according to its parent dom size
+        passiveChart.resize();
+        // define the options of charts
+        var option = {
+            title: {
+                text: '长期未约课会员排名-前20',
+                subtext: '(不包含过期或未激活会员)',
+                top: 'top',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            toolbox: {
+                feature: {
+                    dataView: { readOnly: true }
+                }
+            },
+            legend: {
+                data: ['未约课天数'],
+                top: 'bottom'
+            },
+            xAxis: {
+                name: "天",
+                type: 'value'
+            },
+            yAxis: {
+                name: "宝宝姓名",
+                type: 'category',
+                data: userList,
+            },
+            series: [{
+                name: '未约课天数',
+                type: 'bar',
+                barGap: 0,
+                data: chartData
+            }]
+        };
+
+        // Apply the chart options to create/update chart instance
+        passiveChart.setOption(option);
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("刷新图表失败", jqXHR);
+    });
 };
 
 function visibilityFormatter(value, row, index) {

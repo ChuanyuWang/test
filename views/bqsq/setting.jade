@@ -17,13 +17,16 @@ append css
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css")
 
 append js
-  //script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
   script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
-  script(src="//cdn.bootcss.com/echarts/3.3.2/echarts.common.min.js")
+  if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/echarts/3.3.2/echarts.common.js")
+  else
+    script(src="//cdn.bootcss.com/echarts/3.3.2/echarts.common.min.js")
   script(src='/js/setting.js')
 
 block page
@@ -35,6 +38,8 @@ block page
         a(href="#classroom",role='tab',data-toggle='tab') 教室
       li(role='presentation')
         a(href="#analytics",role='tab',data-toggle='tab') 统计
+      li(role='presentation')
+        a(href="#hint",role='tab',data-toggle='tab') 分析
     div.tab-content
       div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
         div#toolbar.btn-group(role='group')
@@ -64,6 +69,9 @@ block page
               option(value=2016) 2016
         div.row(style="margin-top:15px")
           div#consume_chart(style="height:400px")
+      div.tab-pane(role="tabpanel",id="hint",style="padding:7px")
+        div.row(style="margin-top:15px")
+          div#chart2.col-md-6(style="height:400px")
   div#clsroom_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content

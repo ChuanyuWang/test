@@ -486,7 +486,7 @@ util.showAlert = function(title, jqXHR, className) {
         message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
         title: title || '错误',
         buttons: {
-            danger: {
+            ok: {
                 label: "确定",
                 // alert dialog with danger button by default
                 className: className || "btn-danger"
