@@ -9,6 +9,8 @@ var common = require('./common');
 var cls_cache = {};
 // open id of Weichat user
 var _openid = undefined;
+// current classroom ID
+var classroomID = null;
 
 // DOM Ready =============================================================
 $(document).ready(function () {
@@ -100,30 +102,32 @@ function init() {
     document.addEventListener('touchmove', handleMove, true);
     */
 
-    // select the specific classroom in the dropdown list
+    // check the classroom id from URL param
+    var _ALL_CLASSROOM_ = getAllClassroom();
     var room = getParam('classroom');
-    if (room) {
-        var option_ele = $('#chooseRoom option[value=' + room.trim() + ']');
-        if (option_ele.length == 1) {
-            option_ele.prop('selected', true);
+    var roomName = '';
+    if (room && _ALL_CLASSROOM_[room]) {
+        classroomID = room;
+        roomName = _ALL_CLASSROOM_[room];
+    }
+    else if (!classroomID) {
+        // find the first classroom as default one
+        var keys = Object.keys(_ALL_CLASSROOM_);
+        if (keys.length > 0) {
+            classroomID = keys[0];
+            roomName = _ALL_CLASSROOM_[classroomID];
         }
     }
-    document.title = '会员约课-' + $('#chooseRoom option:selected').text();
-    // handle user change the classroom after set the selected option
-    $('#chooseRoom').change(function (event) {
-        // update the title
-        document.title = '会员约课-' + $(this).find('option:selected').text();
-        updateSchedule();
-    });
+    document.title = '会员约课-' + roomName;
     updateSchedule();
 };
 
-function getCurrentClassRoom() {
-    var classroom = $('#chooseRoom option:selected');
-    if (classroom.length == 1) {
-        return classroom.val();
-    }
-    return null;
+function getAllClassroom() {
+    var result = {};
+    $('div#obj select#rooms option').each(function(index, elem) {
+        result[elem.value] = elem.text;
+    });
+    return result;
 };
 
 function getMonday(date) {
@@ -344,7 +348,7 @@ function updateSchedule(control) {
         data : {
             from : begin.toISOString(),
             to : end.toISOString(),
-            classroom : getCurrentClassRoom(),
+            classroom : classroomID,
             tenant : common.getTenantName()
         },
         success : function (data) {

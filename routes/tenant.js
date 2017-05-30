@@ -37,7 +37,7 @@ router.get('/booking', function (req, res) {
         title : '会员约课',
         timeKey : timeKey,
         openid : user ? user.openid : '',
-        classroom : req.tenant.classroom ? req.tenant.classroom : []
+        classroom : req.tenant.classroom || []
     });
 });
 
