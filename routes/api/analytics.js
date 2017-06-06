@@ -260,7 +260,7 @@ router.get('/passive', function(req, res, next) {
             }
         }, {
             $sort: {
-                "last": 1 // have to sort the class by its date, from old to new
+                "last": -1 // have to sort the class by its date, from old to new
             }
         }, {
             $limit : 20

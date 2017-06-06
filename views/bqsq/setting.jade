@@ -24,9 +24,9 @@ append js
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
   if ENV_DEVELOPMENT
-    script(src="//cdn.bootcss.com/echarts/3.3.2/echarts.common.js")
+    script(src="//cdn.bootcss.com/echarts/3.6.1/echarts.js")
   else
-    script(src="//cdn.bootcss.com/echarts/3.3.2/echarts.common.min.js")
+    script(src="//cdn.bootcss.com/echarts/3.6.1/echarts.min.js")
   script(src='/js/setting.js')
 
 block page
@@ -71,7 +71,10 @@ block page
           div#consume_chart(style="height:400px")
       div.tab-pane(role="tabpanel",id="hint",style="padding:7px")
         div.row(style="margin-top:15px")
-          div#chart2.col-md-6(style="height:400px")
+          div#chart2.col-md-6(style="height:450px")
+          div#chart3.col-md-6(style="height:450px")
+        div.row(style="margin-top:15px")
+          div#chart4.col-md-12(style="height:400px")
   div#clsroom_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content
