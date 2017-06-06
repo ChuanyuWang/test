@@ -322,6 +322,12 @@ function refreshPassiveChart() {
 };
 
 function renderPassiveChart1(userList, chartData) {
+    // only display the top 20
+    var topN = 20;
+    if (userList.length > topN) {
+        userList.splice(0, userList.length - topN);
+        chartData.splice(0, chartData.length - topN);
+    }
     // resize the chart according to its parent dom size
     passiveChart.resize();
     // define the options of charts
@@ -430,6 +436,10 @@ function renderPassiveChart2(all) {
     passiveChart2.setOption(option);
 };
 
+function round(value) {
+    return Math.round(value * 10) / 10;
+}
+
 function renderPassiveChart3(all) {
     // refer to http://echarts.baidu.com/demo.html#scatter-aqi-color
     var chartData = [];
@@ -441,7 +451,7 @@ function renderPassiveChart3(all) {
         var days2expire = moment(card.expire).diff(now, 'days');
         if (days2expire > 100) continue;
         days2expire = days2expire == 0 ? 1 : days2expire;
-        chartData.push([days2expire, card.credit, Math.round(card.credit * 10 / days2expire) / 10, user.name]);
+        chartData.push([days2expire, round(card.credit), round(card.credit / days2expire), user.name]);
     }
     // resize the chart according to its parent dom size
     passiveChart3.resize();
