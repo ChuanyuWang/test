@@ -9,6 +9,7 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var config = require('./config');
 var db_config = require('./config.db');
+var i18n = require('i18n');
 
 // load routes
 var routes = require('./routes/index');
@@ -48,6 +49,19 @@ app.use(bodyParser.urlencoded({
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('express-session')({ secret: 'keyboard dog', resave: false, saveUninitialized: false }));
+
+//i18n configuration
+i18n.configure({
+    locales: ['zh'],
+    // where to store json files
+    directory: __dirname + '/locales',
+    defaultLocale: 'zh',
+    // query parameter to switch locale (ie. /home?lang=ch)
+    queryParameter: 'lang',
+    // watch for changes in json files to reload locale on updates
+    autoReload: true
+});
+app.use(i18n.init);
 
 // Initialize Passport and restore authentication state, if any, from the session.
 app.use(passport.initialize());
@@ -91,7 +105,6 @@ app.use(function(err, req, res, next) {
 
 // development error handler
 // will print stacktrace
-
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);

@@ -8,8 +8,8 @@ var util = require('../util');
 router.get('/', function (req, res) {
     if (!req.user) {
         res.render('index', {
-            title : '约课',
-            navTitle : '约课',
+            title : res.__('title'),
+            navTitle : res.__('title'),
             errorMsg : req.flash('error')
         });
     } else {

@@ -316,7 +316,8 @@ function init() {
     if (i18next) {
         i18next.use(LngDetector).init({
             fallbackLng: "en",
-            resources: locales
+            resources: locales,
+            detection: {lookupQuerystring:'lang'}
         });
     }
 
