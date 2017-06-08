@@ -70,3 +70,11 @@ module.exports.isAuthenticated = function(req, res, next) {
         res.status(401).send('Unauthorized Request');
     }
 };
+
+/**
+ * 
+ * @param {String} tenantName the name of tenant
+ */
+module.exports.getTenantLogo = function(tenantName) {
+    return '/img/' + tenantName + '-logo-2x.png';
+};

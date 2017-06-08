@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var util = require('../util');
+var helper = require('../helper');
 // var wechat = require('wechat');
 // var API = require('wechat-api');
 
@@ -36,6 +37,7 @@ router.get('/booking', function (req, res) {
     res.render('bqsq/booking', {
         title : '会员约课',
         timeKey : timeKey,
+        logoPath: helper.getTenantLogo(req.tenant.name),
         openid : user ? user.openid : '',
         classroom : req.tenant.classroom || []
     });

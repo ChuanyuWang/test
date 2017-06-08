@@ -98,19 +98,22 @@ router.get('/setting', helper.checkTenantUser, function (req, res) {
 router.get('/mybooking', function (req, res) {
     res.render('bqsq/mybooking', {
         title: '我的课程',
+        logoPath: helper.getTenantLogo(req.tenant.name),
         classroom: JSON.stringify(req.tenant.classroom ? req.tenant.classroom : [])
     });
 });
 
 router.get('/myReadBooks', function (req, res) {
     res.render('bqsq/myReadBooks', {
-        title: '我的英文绘本'
+        title: '我的英文绘本',
+        logoPath: helper.getTenantLogo(req.tenant.name)
     });
 });
 
 router.get('/trial', function (req, res) {
     res.render('bqsq/trial', {
-        title: '报名试听'
+        title: '报名试听',
+        logoPath: helper.getTenantLogo(req.tenant.name)
     });
 });
 
