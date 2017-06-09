@@ -91,7 +91,9 @@ router.get('/setting', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/setting', {
         title: '设置',
         user: req.user,
-        navTitle: req.tenant.displayName
+        navTitle: req.tenant.displayName,
+        baseUrl: req.protocol + '://' + req.hostname + req.baseUrl,
+        hostname: req.protocol + '://' + req.hostname,
     });
 });
 
