@@ -93,7 +93,7 @@ router.get('/setting', helper.checkTenantUser, function (req, res) {
         user: req.user,
         navTitle: req.tenant.displayName,
         baseUrl: req.protocol + '://' + req.hostname + req.baseUrl,
-        hostname: req.protocol + '://' + req.hostname,
+        hostname: req.hostname
     });
 });
 
