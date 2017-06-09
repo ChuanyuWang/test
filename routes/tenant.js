@@ -29,9 +29,15 @@ router.get('/booking', function (req, res) {
     function findUserOpenID(user) {
         return timeKey - user.time <= 1;
     }
-    
+
     var user = visited_user_list.find(findUserOpenID);
     visited_user_list = []; // important, clear the array
+
+    // get the list of public rooms
+    var all_rooms = req.tenant.classroom || [];
+    var public_rooms = all_rooms.filter(function(value, index, array) {
+        return value.visibility != 'internal';
+    });
 
     console.log("open booking page with user %j", user);
     res.render('bqsq/booking', {
@@ -39,7 +45,7 @@ router.get('/booking', function (req, res) {
         timeKey : timeKey,
         logoPath: helper.getTenantLogo(req.tenant.name),
         openid : user ? user.openid : '',
-        classroom : req.tenant.classroom || []
+        classroom : public_rooms
     });
 });
 

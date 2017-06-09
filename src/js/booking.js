@@ -119,6 +119,21 @@ function init() {
         }
     }
     document.title = '会员约课-' + roomName;
+    // select the classroom in droplist if there is filter control
+    var option_ele = $('#chooseRoom option[value=' + classroomID.trim() + ']');
+    if (option_ele.length == 1) {
+        option_ele.prop('selected', true);
+    }
+    // handle user change the classroom after set the selected option, if there is filter control
+    $('#chooseRoom').change(function (event) {
+        var selectedOptions = $(this).find('option:selected');
+        if (selectedOptions.length == 1) {
+            // update the title
+            document.title = '会员约课-' + selectedOptions.text();
+            classroomID = selectedOptions.val();
+            updateSchedule();
+        }
+    });
     updateSchedule();
 };
 
