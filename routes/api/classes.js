@@ -59,6 +59,14 @@ router.get('/', function(req, res, next) {
             $exists: true
         };
     }
+    // query all classes filter by minimum age, empty or null value will be ignored
+    if (parseInt(req.query.minAge)) {
+        query['$or'] = [
+             {'age.min': { $gte : parseInt(req.query.minAge) * 12 }},
+             {'age.min': null},
+             {'age.min': 0}
+        ];
+    }
     var classes = tenantDB.collection("classes");
     classes.find(query, NORMAL_FIELDS).sort({
         date: sort

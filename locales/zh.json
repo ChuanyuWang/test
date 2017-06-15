@@ -1,4 +1,7 @@
 {
     "title": "早教平台",
-    "setting_general": "入口"
+    "setting_general": "入口",
+    "age_filter_all": "全部",
+    "age_filter_2_years": "大于2岁",
+    "age_filter_3_years": "大于3岁"
 }

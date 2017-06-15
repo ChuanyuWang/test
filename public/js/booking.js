@@ -13,6 +13,10 @@ var cls_cache = {};
 var _openid = undefined;
 // current classroom ID
 var classroomID = null;
+// the Monday of query week
+var currentMonday = null;
+// the minimum age
+var minimumAge = null; // default is all
 
 // DOM Ready =============================================================
 $(document).ready(function () {
@@ -70,6 +74,12 @@ $(document).ready(function () {
     $('#current_week').click(function (event) {
         $("this").prop("disabled", true);
         currentMonday = getMonday(moment());
+        updateSchedule($("this"));
+    });
+    $('div.age-filter li>a').click(function(event) {
+        var label = this.innerText;
+        $('div.age-filter button').html(label + '<span class="caret"/>');
+        minimumAge = $(this).data('years') || null;
         updateSchedule($("this"));
     });
 });
@@ -366,7 +376,8 @@ function updateSchedule(control) {
             from : begin.toISOString(),
             to : end.toISOString(),
             classroom : classroomID,
-            tenant : common.getTenantName()
+            tenant : common.getTenantName(),
+            minAge : minimumAge
         },
         success : function (data) {
             for (var i = 0; i < data.length; i++) {
