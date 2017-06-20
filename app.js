@@ -59,7 +59,7 @@ i18n.configure({
     // query parameter to switch locale (ie. /home?lang=ch)
     queryParameter: 'lang',
     // watch for changes in json files to reload locale on updates
-    autoReload: true
+    autoReload: false // set as false, otherwise may fail git checkout
 });
 app.use(i18n.init);
 

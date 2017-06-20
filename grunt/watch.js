@@ -7,6 +7,9 @@ module.exports = {
         files: [
             'bin/www',
             'app.js',
+            'helper.js',
+            'util.js',
+            'locales/*.json',
             'routes/*.js',
             'routes/**/*.js',
             'models/*.js'
