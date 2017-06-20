@@ -60,9 +60,9 @@ router.get('/', function(req, res, next) {
         };
     }
     // query all classes filter by minimum age, empty or null value will be ignored
-    if (parseInt(req.query.minAge)) {
+    if (parseFloat(req.query.minAge)) {
         query['$or'] = [
-             {'age.min': { $gte : parseInt(req.query.minAge) * 12 }},
+             {'age.min': { $gte : parseInt(req.query.minAge * 12) }},
              {'age.min': null},
              {'age.min': 0}
         ];
