@@ -370,6 +370,67 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
     });
 });
 
+router.get('/:memberID/summary', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    classes.aggregate([{
+        $match: {
+            "booking.member": req.params.memberID
+        }
+    }, {
+        $project: {
+            "after": {
+                $cond: { if: { $gte: [ "$date", new Date() ] }, then: 1, else: 0 }
+            },
+            "before": {
+                $cond: { if: { $gte: [ "$date", new Date() ] }, then: 0, else: 1 }
+            },
+            'courseID' : 1
+        }
+    }, {
+        $group: {
+            _id: "$courseID", // group the data according to course
+            finished: {
+                $sum: "$before"
+            },
+            unfinished: {
+                $sum: "$after"
+            },
+            total: {
+                $sum: 1
+            }
+        }
+    }], function(err, docs) {
+        if (err) {
+            var error = new Error("get member summary fails");
+            error.innerError = err;
+            return next(error);
+        }
+        var courseList = docs.map(function(value, index, array) {
+            return mongojs.ObjectId(value._id);
+        });
+
+        var courses = req.db.collection("courses");
+        courses.find({ _id : {
+            $in : courseList
+        }}, {'name' : 1}, function(err, foundCourses) {
+            if (err) {
+                var error = new Error("Find courses fails when get member's summary");
+                error.innerError = err;
+                return next(error);
+            }
+
+            foundCourses.forEach(function(value, index, array) {
+                var courseAgg = docs.find(function(value2, index2, array2){
+                    return value._id.toString() == value2._id;
+                });
+                courseAgg.courseName = value.name;
+            });
+            console.log("get member summary: ", docs ? docs.length : 0);
+            res.json(docs);
+        });
+    });
+});
+
 router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
     return next(new Error("Not Supported"));
 });
