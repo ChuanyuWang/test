@@ -93,8 +93,9 @@ block page
           th= __('total')
       tbody(v-if='memberData.summary&&memberData.summary.length')
         tr(v-for='course in memberData.summary')
-          td {{course.courseName || "#{__('other_self_booking')}"}}
-            a.btn.btn-primary.btn-xs(v-show='course._id',:href='"../course/" + course._id',style='margin-left:3px')= __('view')
+          td(v-if='course._id') {{course.courseName || "#{__('deleted_course')}"}}
+            a.btn.btn-primary.btn-xs(:href='"../course/" + course._id',style='margin-left:3px')= __('view')
+          td(v-else)= __('other_self_booking')
           td {{course.finished}}
           td {{course.unfinished}}
           td {{course.total}}

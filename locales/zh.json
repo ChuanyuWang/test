@@ -13,5 +13,6 @@
 	"total": "总计",
 	"no_record": "没有记录",
     "other_self_booking": "自助预约课程",
-    "view": "查看"
+    "view": "查看",
+	"deleted_course": "Deleted course"
 }
