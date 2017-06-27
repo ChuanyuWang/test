@@ -1,9 +1,17 @@
 {
-    "title": "早教平台",
-    "setting_general": "入口",
-    "age_filter_all": "全部",
-    "age_filter_2_years": "大于2岁",
-    "age_filter_25_years": "大于2岁半",
-    "age_filter_3_years": "大于3岁",
-    "age_filter_4_years": "大于4岁"
+	"title": "早教平台",
+	"setting_general": "入口",
+	"age_filter_all": "全部",
+	"age_filter_2_years": "大于2岁",
+	"age_filter_25_years": "大于2岁半",
+	"age_filter_3_years": "大于3岁",
+	"age_filter_4_years": "大于4岁",
+	"course_summary_title": "参与的班级",
+	"course_name": "班级名称",
+	"finished": "已上",
+	"unfinished": "未上",
+	"total": "总计",
+	"no_record": "没有记录",
+    "other_self_booking": "自助预约课程",
+    "view": "查看"
 }

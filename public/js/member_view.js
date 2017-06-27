@@ -165,7 +165,8 @@ var common = require('./common');
 var viewData = {
     memberData: {
         membership: [],
-        comments: []
+        comments: [],
+        summary: []
     },
     birth: null,
     errors: null
@@ -274,6 +275,11 @@ $(document).ready(function() {
     var request = getMemberComments($('#member_app').data('member-id'));
     request.done(function(data, textStatus, jqXHR) {
         Vue.set(viewData.memberData, 'comments', data.comments)
+    });
+    // load the member's course summary
+    var request = getMemberSummary($('#member_app').data('member-id'));
+    request.done(function(data, textStatus, jqXHR) {
+        Vue.set(viewData.memberData, 'summary', data)
     });
 });
 
@@ -421,6 +427,14 @@ function getMemberComments(id) {
     var request = $.getJSON("/api/members/" + id + '/comments', '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
         showAlert("获取会员备忘失败", jqXHR);
+    });
+    return request;
+};
+
+function getMemberSummary(id) {
+    var request = $.getJSON("/api/members/" + id + '/summary', '');
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        showAlert("获取会员参与的班级失败", jqXHR);
     });
     return request;
 };
