@@ -272,14 +272,16 @@ $(document).ready(function() {
         viewData.memberData = data;
     });
 
-    var request = getMemberComments($('#member_app').data('member-id'));
     request.done(function(data, textStatus, jqXHR) {
-        Vue.set(viewData.memberData, 'comments', data.comments)
-    });
-    // load the member's course summary
-    var request = getMemberSummary($('#member_app').data('member-id'));
-    request.done(function(data, textStatus, jqXHR) {
-        Vue.set(viewData.memberData, 'summary', data)
+        var commentRequest = getMemberComments($('#member_app').data('member-id'));
+        commentRequest.done(function(data, textStatus, jqXHR) {
+            Vue.set(viewData.memberData, 'comments', data.comments)
+        });
+        // load the member's course summary
+        var summaryRequest = getMemberSummary($('#member_app').data('member-id'));
+        summaryRequest.done(function(data, textStatus, jqXHR) {
+            Vue.set(viewData.memberData, 'summary', data)
+        });
     });
 });
 
