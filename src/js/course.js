@@ -5,6 +5,7 @@
  */
 
 var common = require('./common');
+var util = require('./services/util');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -131,29 +132,8 @@ function addCourse(course) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("创建班级失败", jqXHR);
+        util.showAlert("创建班级失败", jqXHR);
     })
 
     return request;
-};
-
-/**
- * 
- * @param {String} title 
- * @param {Object} jqXHR 
- * @param {String} className default is 'btn-danger'
- */
-function showAlert(title, jqXHR, className) {
-    //console.error(jqXHR);
-    bootbox.dialog({
-        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-        title: title || '错误',
-        buttons: {
-            danger: {
-                label: "确定",
-                // alert dialog with danger button by default
-                className: className || "btn-danger"
-            }
-        }
-    });
 };

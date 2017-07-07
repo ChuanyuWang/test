@@ -62,6 +62,7 @@ module.exports = {
  */
 
 var common = require('./common');
+var util = require('./services/util');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -188,25 +189,33 @@ function addCourse(course) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("创建班级失败", jqXHR);
+        util.showAlert("创建班级失败", jqXHR);
     })
 
     return request;
 };
+},{"./common":1,"./services/util":3}],3:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * util.js provide common utils for all services
+ * --------------------------------------------------------------------------
+ */
+ 
+var util = {};
 
 /**
  * 
- * @param {String} title 
- * @param {Object} jqXHR 
+ * @param {String} title error dialog title
+ * @param {Object} jqXHR XHR object of jQuery ajax call
  * @param {String} className default is 'btn-danger'
  */
-function showAlert(title, jqXHR, className) {
+util.showAlert = function(title, jqXHR, className) {
     //console.error(jqXHR);
-    bootbox.dialog({
+    bootbox.alert({
         message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
         title: title || '错误',
         buttons: {
-            danger: {
+            ok: {
                 label: "确定",
                 // alert dialog with danger button by default
                 className: className || "btn-danger"
@@ -214,4 +223,7 @@ function showAlert(title, jqXHR, className) {
         }
     });
 };
-},{"./common":1}]},{},[2]);
+
+module.exports = util;
+
+},{}]},{},[2]);
