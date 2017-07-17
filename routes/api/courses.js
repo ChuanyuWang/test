@@ -38,8 +38,8 @@ router.get('/', function(req, res, next) {
     if (req.query.hasOwnProperty('name')) {
         query['name'] = req.query.name;
     }
-    // query courses by status
-    if (req.query.hasOwnProperty('status')) {
+    // query courses by status only if status query is defined and not null
+    if (req.query.status) {
         query["status"] = req.query.status;
     }
     courses.find(query, NORMAL_FIELDS, function(err, docs) {

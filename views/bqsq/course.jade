@@ -28,6 +28,16 @@ block page
   div.container(style='padding-top:58px')
     div#toolbar.btn-group(role='group')
       button.btn.btn-success(type='button',data-toggle='modal',data-target='#course_dlg') 创建
+      div.status-filter.btn-group
+        button.btn.btn-default.dropdown-toggle(type="button",data-toggle="dropdown")= __('course_status_all')
+          span.caret
+        ul.dropdown-menu
+          li
+            a(data-status=null)= __('course_status_all')
+          li
+            a(data-status="active")= __('course_status_active')
+          li
+            a(data-status="closed")= __('course_status_closed')
     table#course_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/courses',data-toolbar='#toolbar',data-unique-id="_id")
       thead
         tr

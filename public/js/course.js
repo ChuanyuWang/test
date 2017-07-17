@@ -64,6 +64,8 @@ module.exports = {
 var common = require('./common');
 var util = require('./services/util');
 
+var courseStatus = null;
+
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
@@ -83,8 +85,17 @@ function init() {
     });
     $('#add_course').click(handleAddNewCourse);
 
+    $('div.status-filter li>a').click(function(event) {
+        var label = this.innerText;
+        $('div.status-filter button').html(label + '<span class="caret"/>');
+        courseStatus = $(this).data('status') || null;
+        //updateSchedule($("this"));
+        $('#course_table').bootstrapTable('refresh');
+    });
+
     $('#course_table').bootstrapTable({
         locale: 'zh-CN',
+        queryParams: customQuery,
         columns: [{}, {
             formatter: common.dateFormatter
         }, {
@@ -149,6 +160,12 @@ function actionFormatter(value, row, index) {
         '  <span class="glyphicon glyphicon-expand"></span> 查看',
         '</button>'
     ].join('');
+};
+
+function customQuery(params) {
+    // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
+    params.status = courseStatus;
+    return params;
 };
 
 function handleAddNewCourse(event) {
