@@ -11,10 +11,6 @@ var config = require('./config');
 var db_config = require('./config.db');
 var i18n = require('i18n');
 
-// load routes
-var routes = require('./routes/index');
-//var users = require('./routes/user');
-
 // main application
 var app = express();
 
@@ -69,6 +65,7 @@ app.use(passport.session());
 app.use(flash());
 
 // add router
+var routes = require('./routes/index');
 app.use('/', routes);
 
 /// catch 404 and forward to error handler
