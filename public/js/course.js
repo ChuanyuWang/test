@@ -64,7 +64,8 @@ module.exports = {
 var common = require('./common');
 var util = require('./services/util');
 
-var courseStatus = null;
+// only display the active course by default
+var courseStatus = 'active';
 
 // DOM Ready =============================================================
 $(document).ready(function() {
