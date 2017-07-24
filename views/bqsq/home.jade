@@ -96,7 +96,7 @@ block page
         div.modal-header
           button.close(type="button",data-dismiss="modal",aria-label="Close")
             span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 添加课程
+          h4#myModalLabel.modal-title 添加常规课程
         div.modal-body
           form.form-horizontal
             div.form-group
@@ -127,6 +127,7 @@ block page
               div.col-sm-2
                 input#cls_capacity.form-control(type='number',name='cls_capacity',min='0')
         div.modal-footer
+          p.small(style='color:#777;float:left;margin-top:7px') *如果需要添加课程到指定班级，请到班级设置中添加
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#create_cls.btn.btn-success(type="button") 添加
   div#alert_bar.bb-alert.alert-danger.alert(style='display:none')

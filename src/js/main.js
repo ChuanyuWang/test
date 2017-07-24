@@ -59,7 +59,7 @@ $(document).ready(function() {
                 if (classItem.courseID) {
                     return bootbox.confirm({
                         title: "确定删除班级中的课程吗？",
-                        message: "课程<strong>" + classItem.name + "</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程",
+                        message: "课程<strong>" + classItem.name + "</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除此课程",
                         buttons: {
                             confirm: {
                                 label: '查看班级',
