@@ -105,7 +105,7 @@ function handleSaveBasic(event) {
         form.find('input[name=address]').closest(".form-group").removeClass("has-error");
     }
 
-    if (!hasError) return;
+    if (hasError) return;
 
     var request = $.ajax("/api/setting/basic", {
         type: "PATCH",
