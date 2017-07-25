@@ -34,6 +34,8 @@ block page
     ul.nav.nav-tabs(role='tablist')
       li(role='presentation')
         a(href="#general",role='tab',data-toggle='tab')= __('setting_general')
+      li(role='presentation')
+        a(href="#entry",role='tab',data-toggle='tab')= __('setting_entry')
       li.active(role='presentation')
         a(href="#classroom",role='tab',data-toggle='tab') 教室
       li(role='presentation')
@@ -41,6 +43,8 @@ block page
       li(role='presentation')
         a(href="#hint",role='tab',data-toggle='tab') 分析
     div.tab-content
+      div.tab-pane(role="tabpanel",id="general",style="padding:7px")
+        p 暂未开放
       div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
         div#toolbar.btn-group(role='group')
           button.btn.btn-success(type='button',data-toggle='modal',data-target='#clsroom_dlg', data-action='add') 添加
@@ -51,7 +55,7 @@ block page
               th(data-field='name') 教室名字
               th(data-field='visibility') 内部预约
               th(data-title='操作',data-align='center')
-      div.tab-pane(role="tabpanel",id="general",style="padding:7px")
+      div.tab-pane(role="tabpanel",id="entry",style="padding:7px")
         div.page-header(style='margin-top:0')
           h3 微信入口Url
         form.form-horizontal
