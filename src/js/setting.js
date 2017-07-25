@@ -62,6 +62,7 @@ function init() {
 
     $('#add_room').click(handleAddNewClassRoom);
     $('#edit_room').click(handleEditClassRoom);
+    $('#saveBasic').click(handleSaveBasic);
     // handle user refresh the chart
     $('div.tab-pane#analytics #refresh').click(refreshChart);
     // handle user change the chart filters
@@ -77,6 +78,43 @@ function init() {
     // refresh the chart when user switch to analytics tab first time
     $('a[href="#hint"]').one('shown.bs.tab', function(e) {
         refreshPassiveChart();
+    });
+};
+
+function handleSaveBasic(event) {
+    var form = $(this).closest('form');
+    var basicInfo = {};
+    // validate the input
+    var hasError = false;
+
+    // get the tenant contact
+    basicInfo.contact = form.find('input[name=contact]').val().trim();
+    if (!basicInfo.contact || basicInfo.contact.length == 0) {
+        form.find('input[name=contact]').closest(".form-group").addClass("has-error");
+        hasError = true;
+    } else {
+        form.find('input[name=contact]').closest(".form-group").removeClass("has-error");
+    }
+
+    // get the tenant address
+    basicInfo.address = form.find('input[name=address]').val().trim();
+    if (!basicInfo.address || basicInfo.address.length == 0) {
+        form.find('input[name=address]').closest(".form-group").addClass("has-error");
+        hasError = true;
+    } else {
+        form.find('input[name=address]').closest(".form-group").removeClass("has-error");
+    }
+
+    if (!hasError) return;
+
+    var request = $.ajax("/api/setting/basic", {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(basicInfo),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("更新综合设置失败", jqXHR);
     });
 };
 

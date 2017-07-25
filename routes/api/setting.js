@@ -4,6 +4,15 @@ var mongojs = require('mongojs');
 var util = require('../../util');
 var helper = require('../../helper');
 
+var TENANT_FIELDS = {
+    name: 1,
+    displayName: 1,
+    contact: 1,
+    address: 1,
+    addressLink: 1,
+    classroom: 1
+};
+
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function (req, res, next) {
@@ -26,7 +35,7 @@ router.get('/classrooms', function(req, res, next) {
 
     config_db.collection('tenants').findOne({
         name : tenantName
-    }, function(err, doc) {
+    }, {classroom: 1}, function(err, doc) {
         if (err) {
             var error = new Error("Get classroom list fails with tenant: " + tenantName);
             error.status = 400;
@@ -45,6 +54,36 @@ router.get('/classrooms', function(req, res, next) {
 
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
+
+router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
+    var body = req.body || {};
+    // tenant 'name' field is reserved and unique when created
+    if (body.hasOwnProperty('name')) {
+        var error = new Error('tenant "name" field is unique and immutable');
+        error.status = 400;
+        return next(error);
+    }
+
+    var tenants = config_db.collection('tenants');
+    tenants.findAndModify({
+        query: {
+            name: req.user.tenant
+        },
+        update: {
+            $set: body
+        },
+        fields: TENANT_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Update tenant basic setting fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("tenant %s is updated by %j", req.user.tenant, req.body);
+        res.json(doc);
+    });
+});
 
 router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
     //var newRoom = {id:'abc', name:''};

@@ -100,7 +100,10 @@ function getTenantInfo(req, res, next) {
         name : 'test',
         displayName : '大Q小q',
         version : 1,
-        classroom : []
+        classroom : [],
+        contact : '13661664265',
+        address : '宝翔路801号五彩城3楼307'
+        addressLink : 'http://j.map.baidu.com/39KKB'
     };
     */
     var config_db = util.connect('config');
