@@ -103,6 +103,10 @@ router.get('/mybooking', function (req, res) {
     res.render('bqsq/mybooking', {
         title: '我的课程',
         logoPath: helper.getTenantLogo(req.tenant.name),
+        contact: req.tenant.contact,
+        tel: helper.getTel(req.tenant.contact),
+        address: req.tenant.address,
+        addressLink: req.tenant.addressLink || '#',
         classroom: JSON.stringify(req.tenant.classroom ? req.tenant.classroom : [])
     });
 });
@@ -110,6 +114,10 @@ router.get('/mybooking', function (req, res) {
 router.get('/myReadBooks', function (req, res) {
     res.render('bqsq/myReadBooks', {
         title: '我的英文绘本',
+        contact: req.tenant.contact,
+        tel: helper.getTel(req.tenant.contact),
+        address: req.tenant.address,
+        addressLink: req.tenant.addressLink || '#',
         logoPath: helper.getTenantLogo(req.tenant.name)
     });
 });
@@ -117,6 +125,10 @@ router.get('/myReadBooks', function (req, res) {
 router.get('/trial', function (req, res) {
     res.render('bqsq/trial', {
         title: '报名试听',
+        contact: req.tenant.contact,
+        tel: helper.getTel(req.tenant.contact),
+        address: req.tenant.address,
+        addressLink: req.tenant.addressLink || '#',
         logoPath: helper.getTenantLogo(req.tenant.name)
     });
 });

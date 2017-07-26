@@ -42,7 +42,7 @@ module.exports.requireRole = function(role) {
             var err = new Error("Unauthorized Request");
             err.status = 401;
             next(err);
-        } else if(req.user.role === role)
+        } else if (req.user.role === role)
             // success
             next();
         else {
@@ -72,9 +72,17 @@ module.exports.isAuthenticated = function(req, res, next) {
 };
 
 /**
- * 
  * @param {String} tenantName the name of tenant
+ * @return {String}
  */
 module.exports.getTenantLogo = function(tenantName) {
     return '/img/' + tenantName + '-logo-2x.png';
+};
+
+/**
+ * Remove the non-digit character from tel string, e.g. 136-6166-6616 -> 13664666616
+ * @param {String} telString the telephone number
+ */
+module.exports.getTel = function(telString) {
+    return telString && telString.replace(/\D/g, '');
 };

@@ -44,6 +44,10 @@ router.get('/booking', function (req, res) {
         title : '会员约课',
         timeKey : timeKey,
         logoPath: helper.getTenantLogo(req.tenant.name),
+        contact: req.tenant.contact,
+        tel: helper.getTel(req.tenant.contact),
+        address: req.tenant.address,
+        addressLink: req.tenant.addressLink || '#',
         openid : user ? user.openid : '',
         classroom : public_rooms
     });

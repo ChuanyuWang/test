@@ -37,10 +37,10 @@ block content
           p#message
           p(style='color:#808080')
             small 客服电话: 
-              a(href='tel:13661622231') 136 6162 2231
+              a(href='tel:#{tel}')= contact
             br
             small 门店地址: 
-              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+              a(href='#{addressLink}')= address
         div.modal-footer
           button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
 
@@ -55,9 +55,9 @@ block content
           p#message 您的信息已经成功提交，我们的客服人员会在第一时间联系您
           p(style='color:#808080')
             small 客服电话: 
-              a(href='tel:13661622231') 136 6162 2231
+              a(href='tel:#{tel}')= contact
             br
             small 门店地址: 
-              a(href='http://j.map.baidu.com/39KKB') 宝翔路801号五彩城3楼307
+              a(href='#{addressLink}')= address
         div.modal-footer
           button#success_ok.btn.btn-success(type="button",data-dismiss="modal") 确定
