@@ -15,6 +15,10 @@ block navlist
       
 append css
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css")
+  style.
+    .container .form-group {
+      margin-bottom: 7px;
+    }
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
@@ -140,13 +144,13 @@ block page
               label.control-label.col-sm-2(for='classroom_name') 教室名字:
               div.col-sm-10
                 input#classroom_name.form-control(type='text',name='name',placeholder='教室名字')
-            div.form-group
               div.col-sm-offset-2.col-sm-10
                 div.checkbox
                   label
                     input(type='checkbox',name='visibility',value='internal')
                     |内部预约
         div.modal-footer
+          p.small(style='color:#777;float:left;margin-top:7px') *内部预约教室不对会员开放自助预约
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_room.btn.btn-success(type="button") 添加
           button#edit_room.btn.btn-primary(type="button") 修改
