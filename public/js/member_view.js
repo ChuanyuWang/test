@@ -161,6 +161,7 @@ module.exports = function() {
 
 var initCard = require('./components/card');
 var common = require('./common');
+var util = require('./services/util');
 
 var viewData = {
     memberData: {
@@ -372,7 +373,7 @@ function update(fields) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("更新会员失败", jqXHR);
+        util.showAlert("更新会员失败", jqXHR);
     })
     return request;
 };
@@ -385,7 +386,7 @@ function addComment(memberID, fields) {
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("添加会员备忘失败", jqXHR);
+        util.showAlert("添加会员备忘失败", jqXHR);
     });
     return request;
 }
@@ -399,7 +400,7 @@ function createCard(memberID, fields) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("创建会员卡失败", jqXHR);
+        util.showAlert("创建会员卡失败", jqXHR);
     });
     return request;
 }
@@ -412,7 +413,7 @@ function updateCard(memberID, index, fields) {
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("修改会员卡失败", jqXHR);
+        util.showAlert("修改会员卡失败", jqXHR);
     });
     return request;
 }
@@ -420,7 +421,7 @@ function updateCard(memberID, index, fields) {
 function getMemberInfo(id) {
     var request = $.getJSON("/api/members/" + id, '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("获取会员信息失败", jqXHR);
+        util.showAlert("获取会员信息失败", jqXHR);
     });
     return request;
 };
@@ -428,7 +429,7 @@ function getMemberInfo(id) {
 function getMemberComments(id) {
     var request = $.getJSON("/api/members/" + id + '/comments', '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("获取会员备忘失败", jqXHR);
+        util.showAlert("获取会员备忘失败", jqXHR);
     });
     return request;
 };
@@ -436,29 +437,9 @@ function getMemberComments(id) {
 function getMemberSummary(id) {
     var request = $.getJSON("/api/members/" + id + '/summary', '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("获取会员参与的班级失败", jqXHR);
+        util.showAlert("获取会员参与的班级失败", jqXHR);
     });
     return request;
-};
-
-/**
- * 
- * @param {String} title 
- * @param {Object} jqXHR 
- * @param {String} className default is 'btn-danger'
- */
-function showAlert(title, jqXHR, className) {
-    //console.error(jqXHR);
-    bootbox.alert({
-        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-        title: title || '错误',
-        buttons: {
-            ok: {
-                // alert dialog with danger button by default
-                className: className || "btn-danger"
-            }
-        }
-    });
 };
 
 function classFilter(params) {
@@ -511,4 +492,36 @@ function deltaFormatter(value, row, index) {
         ].join('');
     }
 };
-},{"./common":1,"./components/card":2}]},{},[3]);
+},{"./common":1,"./components/card":2,"./services/util":4}],4:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * util.js provide common utils for all services
+ * --------------------------------------------------------------------------
+ */
+ 
+var util = {};
+
+/**
+ * 
+ * @param {String} title error dialog title
+ * @param {Object} jqXHR XHR object of jQuery ajax call
+ * @param {String} className default is 'btn-danger'
+ */
+util.showAlert = function(title, jqXHR, className) {
+    //console.error(jqXHR);
+    bootbox.alert({
+        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
+        title: title || '错误',
+        buttons: {
+            ok: {
+                label: "确定",
+                // alert dialog with danger button by default
+                className: className || "btn-danger"
+            }
+        }
+    });
+};
+
+module.exports = util;
+
+},{}]},{},[3]);

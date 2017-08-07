@@ -142,12 +142,15 @@ block page
                   input.form-control(text='text',name='brith')
                   span.input-group-addon
                     span.glyphicon.glyphicon-calendar
-            div.form-group
+            div.form-group(style='margin-bottom:7px;display:none')
+              label.control-label.col-sm-2 所须课时:
+              div.col-sm-2
+                input.form-control(type='number',name='cost',min='0',step='0.1',value=0)
+            div.form-group(style='margin-bottom:7px')
               label.control-label.col-sm-2 教室:
               select#class_room.form-control.col-sm-4(style='margin-left:15px;width:auto')
                 - each room in classroom
                   option(value=room.id)= room.name
-            div.form-group(style='margin-bottom:7px')
               div.col-sm-offset-2.col-sm-10
                 div.checkbox
                   label

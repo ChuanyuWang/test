@@ -276,6 +276,48 @@ router.get('/:memberID/comments', function(req, res, next) {
     });
 });
 
+/**
+ * @description Update the existed with body 
+ * {
+ *     posted: ISODateTime(...), // the posted date is the same as original
+ *     author: 'Rick' , // only the same author can update his/her comment
+ *     text: 'This is so bogus ... ' // the updated comment text
+ * }
+ */
+router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
+    var members = req.db.collection("members");
+    if (!req.body.text || req.body.text.length <= 0) {
+        var error = new Error("Missing param 'text'");
+        error.status = 400;
+        return next(error);
+    }
+    var commentText = `comments.${req.params.commentIndex}.text`;
+    var commentUpdate = `comments.${req.params.commentIndex}.update`;
+    var queryString = {
+        _id: mongojs.ObjectId(req.params.memberID)
+    };
+    // non-admin user can only modify his/her own comment
+    if (req.user.role !== 'admin') {
+        queryString[`comments.${req.params.commentIndex}.author`] = req.user.name;
+    }
+    members.findAndModify({
+        query: queryString,
+        update: {
+            $set: { commentText : req.body.text, commentUpdate: new Date() },
+        },
+        fields: { comments: 1 },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Update comment fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("member %s update comment: %j", req.params.memberID, req.body);
+        res.json(doc);
+    });
+});
+
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
     var members = req.db.collection("members");
     convertDateObject(req.body);
