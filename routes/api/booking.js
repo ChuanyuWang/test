@@ -324,11 +324,11 @@ router.delete ('/:classID', function (req, res, next) {
         if (req.isAuthenticated()) {
             if (req.user.role === "admin") {
                 //only admin could delete the booking in any time
-                console.log("Admin %s cancel the booking of %s", req.user.name, req.body.memberid);
+                console.log("Admin %s cancel the booking of %s", req.user.username, req.body.memberid);
             } else if (Date.now() + 7200000 < doc.date.getTime()) {
                 // the other authenticated users could delete the booking before 2 hours, 
                 // 2 hours = 7200000 (2*60*60*1000)
-                console.log("User %s cancel the booking of %s", req.user.name, req.body.memberid);
+                console.log("User %s cancel the booking of %s", req.user.username, req.body.memberid);
             } else {
                 var error = new Error("不能在开始前2小时内取消课程或取消已经结束的课程");
                 error.status = 400;

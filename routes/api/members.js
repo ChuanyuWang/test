@@ -291,26 +291,39 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
         error.status = 400;
         return next(error);
     }
-    var commentText = `comments.${req.params.commentIndex}.text`;
-    var commentUpdate = `comments.${req.params.commentIndex}.update`;
+    if (parseInt(req.params.commentIndex) < 0) {
+        var error = new Error("comment index is 0 based");
+        error.status = 400;
+        return next(error);
+    }
+
     var queryString = {
         _id: mongojs.ObjectId(req.params.memberID)
     };
     // non-admin user can only modify his/her own comment
     if (req.user.role !== 'admin') {
-        queryString[`comments.${req.params.commentIndex}.author`] = req.user.name;
+        console.log(`User name is ${req.user.username}`);
+        queryString[`comments.${req.params.commentIndex}.author`] = req.user.username;
     }
+    var updateString = {
+        $set : {}
+    };
+    updateString.$set[`comments.${req.params.commentIndex}.text`] = req.body.text;
+    updateString.$set[`comments.${req.params.commentIndex}.updated`] = new Date();
     members.findAndModify({
         query: queryString,
-        update: {
-            $set: { commentText : req.body.text, commentUpdate: new Date() },
-        },
+        update: updateString,
         fields: { comments: 1 },
         new: true
     }, function(err, doc, lastErrorObject) {
         if (err) {
             var error = new Error("Update comment fails");
             error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var error = new Error("不能修改其它人的备忘，请联系管理员");
+            error.status = 400;
             return next(error);
         }
         console.log("member %s update comment: %j", req.params.memberID, req.body);

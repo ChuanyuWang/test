@@ -110,13 +110,15 @@ block page
           button.btn.btn-primary.btn-sm(type="button",:disabled='!memberData._id',data-toggle='modal',data-target='#comment_dlg')
             span.glyphicon.glyphicon-plus 新备忘
         div.col-sm-10
-          template(v-for="comment in memberData.comments")
+          template(v-for="(comment, key) in memberData.comments")
             div.media
               div.media-left
                 span.glyphicon.glyphicon-comment.text-primary(style='font-size:large;opacity:0.8')
               div.media-body
                 h4.media-heading(style='font-size:small') {{comment.text}}
-                p.small(style='color:#777') by {{comment.author}} at {{comment.posted | formatDateTime}}
+                p.small(style='color:#777;position:relative') by {{comment.author}} at {{comment.posted | formatDateTime}}
+                  button.btn.btn-default.btn-xs.edit(type='button',v-on:click='editComment(key)',style='margin:-3px 3px;position:absolute')
+                    span.glyphicon.glyphicon-pencil
           small(style='color:#777') 共{{commentCount}}条备忘
   div.container(data-member-id='#{memberID}')
     div.page-header
@@ -219,3 +221,19 @@ block page
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_comment.btn.btn-success(type="button") 添加
+  div#editComment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 修改备忘
+        div.modal-body
+          form
+            div.form-group
+              label.control-label 备忘:
+              textarea.form-control(rows='3', name='comment')
+              small(style='color:#777;float:right;margin-top:2px') 不超过256个字
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal") 取消
+          button#edit_comment.btn.btn-success(type="button") 更新

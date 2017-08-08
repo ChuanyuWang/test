@@ -96,6 +96,11 @@ $(document).ready(function() {
                         }
                     });
                 }
+            },
+            editComment: function(commentIndex) {
+                var comment = this.memberData.comments[commentIndex].text;
+                $('#editComment_dlg').find('textarea[name=comment]').val(comment).data('index', commentIndex);
+                $('#editComment_dlg').modal('show');
             }
         },
         mounted: function() {
@@ -140,7 +145,14 @@ function init() {
 
     // event listener of adding new comment
     $('#comment_dlg #add_comment').click(handleClickAddComment);
+    // event listener of adding new comment
+    $('#editComment_dlg #edit_comment').click(handleClickEditComment);
     $('#comment_dlg').on('shown.bs.modal', function(event) {
+        // focus on the commnet input control
+        $(this).find('textarea[name=comment]').focus();
+    });
+
+    $('#editComment_dlg').on('shown.bs.modal', function(event) {
         // focus on the commnet input control
         $(this).find('textarea[name=comment]').focus();
     });
@@ -183,6 +195,26 @@ function handleClickAddComment() {
         text: content
     };
     var request = addComment(viewData.memberData._id, comment);
+    request.done(function(data, textStatus, jqXHR) {
+        Vue.set(viewData.memberData, 'comments', data.comments)
+    });
+    modal.modal('hide');
+};
+
+function handleClickEditComment() {
+    var modal = $(this).closest('.modal');
+    var content = modal.find('textarea[name=comment]').val().trim();
+    var commentIndex = modal.find('textarea[name=comment]').data('index');
+    if (content.length === 0 || content.length > 255) {
+        modal.find('textarea[name=comment]').closest(".form-group").addClass("has-error");
+        return;
+    } else {
+        modal.find('textarea[name=comment]').closest(".form-group").removeClass("has-error");
+    }
+    var comment = {
+        text: content
+    };
+    var request = editComment(viewData.memberData._id, commentIndex, comment);
     request.done(function(data, textStatus, jqXHR) {
         Vue.set(viewData.memberData, 'comments', data.comments)
     });
@@ -234,7 +266,20 @@ function addComment(memberID, fields) {
         util.showAlert("添加会员备忘失败", jqXHR);
     });
     return request;
-}
+};
+
+function editComment(memberID, index, fields) {
+    var request = $.ajax('/api/members/' + memberID + '/comments/' + index, {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("修改会员备忘失败", jqXHR);
+    });
+    return request;
+};
 
 function createCard(memberID, fields) {
     var request = $.ajax("/api/members/" + memberID + '/memberships', {
@@ -248,7 +293,7 @@ function createCard(memberID, fields) {
         util.showAlert("创建会员卡失败", jqXHR);
     });
     return request;
-}
+};
 
 function updateCard(memberID, index, fields) {
     var request = $.ajax("/api/members/" + memberID + '/memberships/' + index, {
@@ -261,7 +306,7 @@ function updateCard(memberID, index, fields) {
         util.showAlert("修改会员卡失败", jqXHR);
     });
     return request;
-}
+};
 
 function getMemberInfo(id) {
     var request = $.getJSON("/api/members/" + id, '');
