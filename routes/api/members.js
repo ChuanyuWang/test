@@ -291,7 +291,7 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
         error.status = 400;
         return next(error);
     }
-    if (parseInt(req.params.commentIndex) < 0) {
+    if (parseInt(req.params.commentIndex) === NaN || parseInt(req.params.commentIndex) < 0) {
         var error = new Error("comment index is 0 based");
         error.status = 400;
         return next(error);
@@ -310,6 +310,7 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
     };
     updateString.$set[`comments.${req.params.commentIndex}.text`] = req.body.text;
     updateString.$set[`comments.${req.params.commentIndex}.updated`] = new Date();
+    updateString.$set[`comments.${req.params.commentIndex}.author`] = req.user.username;
     members.findAndModify({
         query: queryString,
         update: updateString,
