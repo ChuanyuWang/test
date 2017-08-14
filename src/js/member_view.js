@@ -70,19 +70,32 @@ $(document).ready(function() {
             },
             saveCardInfo: function(card, index) {
                 var vm = this;
-                if (index > -1) {
-                    var request = updateCard(this.memberData._id, index, card);
-                    request.done(function(data, textStatus, jqXHR) {
-                        bootbox.alert('会员卡更新成功');
-                        Vue.set(vm.memberData.membership, index, data.membership[index]);
-                    });
-                } else {
-                    var request = createCard(this.memberData._id, card);
-                    request.done(function(data, textStatus, jqXHR) {
-                        bootbox.alert('会员卡创建成功');
-                        vm.memberData.membership = data.membership;
-                    });
-                }
+                var confirmDlg = $('#historyComment_dlg');
+                // remove previous OK button's click listener
+                confirmDlg.find('button.btn-success').off('click');
+                confirmDlg.find('button.btn-success').one('click', function (event) {
+                    var modal = $(this).closest('.modal');
+                    var memo = modal.find('textarea[name=comment]').val().trim();
+                    card.memo = memo; // append the memo for this change if there is any
+                    // handle the click OK button
+                    if (index > -1) {
+                        var request = updateCard(vm.memberData._id, index, card);
+                        request.done(function(data, textStatus, jqXHR) {
+                            bootbox.alert('会员卡更新成功');
+                            Vue.set(vm.memberData.membership, index, data.membership[index]);
+                        });
+                    } else {
+                        var request = createCard(vm.memberData._id, card);
+                        request.done(function(data, textStatus, jqXHR) {
+                            bootbox.alert('会员卡创建成功');
+                            vm.memberData.membership = data.membership;
+                        });
+                    }
+                    // hide the confirm dialog in the end
+                    confirmDlg.modal('hide');
+                });
+                // pop up the confirm dialog with extra memo input
+                confirmDlg.modal('show');
             },
             deactivateAlert: function(e) {
                 if (this.memberData.status == 'inactive') {
@@ -97,9 +110,18 @@ $(document).ready(function() {
                     });
                 }
             },
+            addComment: function() {
+                $('#comment_dlg').find('textarea[name=comment]').val(null);
+                // event listener of adding new comment
+                $('#comment_dlg button.btn-success').off('click');
+                $('#comment_dlg button.btn-success').one('click', handleClickAddComment);
+                $('#comment_dlg').modal('show');
+            },
             editComment: function(commentIndex) {
                 var comment = this.memberData.comments[commentIndex].text;
-                $('#editComment_dlg').find('textarea[name=comment]').val(comment).data('index', commentIndex);
+                $('#editComment_dlg').find('textarea[name=comment]').val(comment);
+                $('#editComment_dlg button.btn-success').off('click');
+                $('#editComment_dlg button.btn-success').one('click', commentIndex, handleClickEditComment);
                 $('#editComment_dlg').modal('show');
             }
         },
@@ -143,15 +165,10 @@ function init() {
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
 
-    // event listener of adding new comment
-    $('#comment_dlg #add_comment').click(handleClickAddComment);
-    // event listener of adding new comment
-    $('#editComment_dlg #edit_comment').click(handleClickEditComment);
     $('#comment_dlg').on('shown.bs.modal', function(event) {
         // focus on the commnet input control
         $(this).find('textarea[name=comment]').focus();
     });
-
     $('#editComment_dlg').on('shown.bs.modal', function(event) {
         // focus on the commnet input control
         $(this).find('textarea[name=comment]').focus();
@@ -201,10 +218,11 @@ function handleClickAddComment() {
     modal.modal('hide');
 };
 
-function handleClickEditComment() {
+function handleClickEditComment(event) {
     var modal = $(this).closest('.modal');
     var content = modal.find('textarea[name=comment]').val().trim();
-    var commentIndex = modal.find('textarea[name=comment]').data('index');
+    // get the index of comment from event data
+    var commentIndex = event.data;
     if (content.length === 0 || content.length > 255) {
         modal.find('textarea[name=comment]').closest(".form-group").addClass("has-error");
         return;

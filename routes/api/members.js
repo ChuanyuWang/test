@@ -331,9 +331,22 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
         res.json(doc);
     });
 });
-
+/**
+ * @description req.body
+ * {
+    "type": "ALL",
+    "room": ["wucai", "a", "bb"],
+    "expire": "2014-03-12T16:00:00.000Z",
+    "credit": 10
+   }
+ */
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
     var members = req.db.collection("members");
+    //'memo' is reserved field for passing the memo for history item
+    if (req.body && req.body.hasOwnProperty('memo')) {
+        var memo = req.body.memo;
+        delete req.body.memo;
+    }
     convertDateObject(req.body);
     convertNumberValue(req.body);
     members.findAndModify({
@@ -354,7 +367,7 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
         console.log("membership %s is created by %j", req.body, req.user.username);
         // update the history when a new membership card is added
         var setQuery = {}, historyItems = [];
-        genMembershipSetQueries(req.user.username, doc.membership.length - 1, {}, req.body, setQuery, historyItems);
+        genMembershipSetQueries(req.user.username, doc.membership.length - 1, {}, req.body, setQuery, historyItems, memo);
         members.update({
             _id: mongojs.ObjectId(req.params.memberID)
         }, {
@@ -373,6 +386,11 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
 
 router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), function(req, res, next) {
     var members = req.db.collection("members");
+    //'memo' is reserved field for passing the memo for history item
+    if (req.body && req.body.hasOwnProperty('memo')) {
+        var memo = req.body.memo;
+        delete req.body.memo;
+    }
     convertDateObject(req.body);
     convertNumberValue(req.body);
 
@@ -397,7 +415,7 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
         var membershipCard = doc.membership[req.params.cardIndex];
 
         var setQuery = {}, historyItems = [];
-        genMembershipSetQueries(req.user.username, req.params.cardIndex, membershipCard, req.body, setQuery, historyItems);
+        genMembershipSetQueries(req.user.username, req.params.cardIndex, membershipCard, req.body, setQuery, historyItems, memo);
 
         //nothing changed, just return the original member object
         if (Object.keys(setQuery).length === 0) {
@@ -585,7 +603,17 @@ function checkDuplicate(collection, id, query, callback) {
     }
 }
 
-function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems) {
+/**
+ * 
+ * @param {String} username - The user name who did the modification
+ * @param {Number} cardIndex - The membership card index 0 based
+ * @param {Object} current - The current membership card
+ * @param {Object} newItem - The fields with new value
+ * @param {Array} setQuery - The generated array of set query
+ * @param {Array} historyItems - The generated array of history items to be pushed
+ * @param {String} memo - The memo for this change if there is any
+ */
+function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems, memo) {
     for (var key in newItem) {
         if (current.hasOwnProperty(key) && isEqual(current[key], newItem[key])) {
             // skip update of this field when it's the same
@@ -600,7 +628,8 @@ function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery
             user: username,
             target: targetField,
             old: current.hasOwnProperty(key) ? current[key] : null,
-            new: newItem[key]
+            new: newItem[key],
+            remark: memo
         });
     }
 };
