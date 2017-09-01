@@ -76,8 +76,7 @@ module.exports = function() {
                 // Fix a bug, there is some invalid date which has boolean value
                 room: typeof(this.item.room) === 'boolean' ? [] : this.item.room,
                 expire: this.item.expire ? moment(this.item.expire) : null,
-                error: null,
-                allRooms: []
+                error: null
             };
         },
         watch: {
@@ -104,12 +103,6 @@ module.exports = function() {
                     this.delta = parseFloat(this.delta) || 0;
                 }
                 this.delta += value;
-            },
-            autoSelectRooms: function() {
-                if (this.type == 'ALL') {
-                    // auto select all rooms
-                    this.room = this.allRooms;
-                }
             },
             validteBeforeSave: function() {
                 this.error = null;
@@ -144,9 +137,6 @@ module.exports = function() {
                 // update the expire value from datetimepicker control event
                 // when user clears the input box, the 'e.date' is false value
                 vm.expire = e.date === false ? null : e.date;
-            });
-            $(this.$el).find('#roomlist input').each(function(index, el) {
-                vm.allRooms.push(el.value);
             });
         }
     });
