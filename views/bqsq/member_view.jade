@@ -81,7 +81,7 @@ block page
     template(v-if='memberData.membership&&memberData.membership.length')
       card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
     template(v-else)
-      card(@save="saveCardInfo",:item='{credit:0,room:[]}',:index=-1,key='-1')
+      card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1')
     div.page-header
       h3= __('course_summary_title')
     table.table.table-bordered.table-striped.table-striped
