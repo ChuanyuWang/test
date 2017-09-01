@@ -18,131 +18,131 @@ var viewData = {
     errors: null
 }
 
+var vueApp = {
+    el: '#member_app',
+    computed: {
+        commentCount: function() {
+            return this.memberData.comments ? this.memberData.comments.length : 0;
+        }
+    },
+    filters: {
+        formatDate: function(value) {
+            if (!value) return '?';
+            return moment(value).format('ll');
+        },
+        formatDateTime: function(value) {
+            if (!value) return '?';
+            return moment(value).format('lll');
+        }
+    },
+    watch: {
+        'memberData.birthday': function() {
+            $('#birth_date').data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
+            // only update the birth in dp.change event
+            //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
+        }
+    },
+    methods: {
+        saveBasicInfo: function() {
+            this.errors = null;
+            if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
+            if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
+            if (this.birth && !this.birth.isValid()) this.errors = { basic: '生日格式不正确' };
+            if (!this.errors) {
+                var request = update({
+                    status: this.memberData.status,
+                    name: this.memberData.name,
+                    contact: this.memberData.contact,
+                    note: this.memberData.note,
+                    birthday: this.birth && this.birth.toISOString()
+                });
+                request.done(function(data, textStatus, jqXHR) {
+                    bootbox.alert('会员基本资料更新成功');
+                });
+            }
+        },
+        saveCardInfo: function(card, index) {
+            var vm = this;
+            var confirmDlg = $('#historyComment_dlg');
+            // remove previous OK button's click listener
+            confirmDlg.find('button.btn-success').off('click');
+            confirmDlg.find('button.btn-success').one('click', function (event) {
+                var modal = $(this).closest('.modal');
+                var memo = modal.find('textarea[name=comment]').val().trim();
+                card.memo = memo; // append the memo for this change if there is any
+                // handle the click OK button
+                if (index > -1) {
+                    var request = updateCard(vm.memberData._id, index, card);
+                    request.done(function(data, textStatus, jqXHR) {
+                        bootbox.alert('会员卡更新成功');
+                        Vue.set(vm.memberData.membership, index, data.membership[index]);
+                    });
+                } else {
+                    var request = createCard(vm.memberData._id, card);
+                    request.done(function(data, textStatus, jqXHR) {
+                        bootbox.alert('会员卡创建成功');
+                        vm.memberData.membership = data.membership;
+                    });
+                }
+                // hide the confirm dialog in the end
+                confirmDlg.modal('hide');
+            });
+            // pop up the confirm dialog with extra memo input
+            confirmDlg.modal('show');
+        },
+        deactivateAlert: function(e) {
+            if (this.memberData.status == 'inactive') {
+                bootbox.alert({
+                    message: "未激活会员将无法进行自助预约<br><small>确定后，请点击保存进行修改</small>",
+                    buttons: {
+                        ok: {
+                            label: "确定",
+                            className: "btn-danger"
+                        }
+                    }
+                });
+            }
+        },
+        addComment: function() {
+            $('#comment_dlg').find('textarea[name=comment]').val(null);
+            // event listener of adding new comment
+            $('#comment_dlg button.btn-success').off('click');
+            $('#comment_dlg button.btn-success').one('click', handleClickAddComment);
+            $('#comment_dlg').modal('show');
+        },
+        editComment: function(commentIndex) {
+            var comment = this.memberData.comments[commentIndex].text;
+            $('#editComment_dlg').find('textarea[name=comment]').val(comment);
+            $('#editComment_dlg button.btn-success').off('click');
+            $('#editComment_dlg button.btn-success').one('click', commentIndex, handleClickEditComment);
+            $('#editComment_dlg').modal('show');
+        }
+    },
+    mounted: function() {
+        // 'this' is refer to vm instance
+        var vm = this;
+        $(vm.$el).find('#birth_date').datetimepicker({
+            format: 'll',
+            locale: 'zh-CN'
+        });
+
+        $(vm.$el).find('#birth_date').on('dp.change', function(e) {
+            // when user clears the input box, the 'e.date' is false value
+            vm.birth = e.date === false ? null : e.date;
+        });
+    }
+};
+
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
     initCard();
 
-    // bootstrap the member view page
-    var memberViewer = new Vue({
-        el: '#member_app',
-        data: viewData,
-        computed: {
-            commentCount: function() {
-                return this.memberData.comments ? this.memberData.comments.length : 0;
-            }
-        },
-        filters: {
-            formatDate: function(value) {
-                if (!value) return '?';
-                return moment(value).format('ll');
-            },
-            formatDateTime: function(value) {
-                if (!value) return '?';
-                return moment(value).format('lll');
-            }
-        },
-        watch: {
-            'memberData.birthday': function() {
-                $('#birth_date').data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
-                // only update the birth in dp.change event
-                //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
-            }
-        },
-        methods: {
-            saveBasicInfo: function() {
-                this.errors = null;
-                if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
-                if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
-                if (this.birth && !this.birth.isValid()) this.errors = { basic: '生日格式不正确' };
-                if (!this.errors) {
-                    var request = update({
-                        status: this.memberData.status,
-                        name: this.memberData.name,
-                        contact: this.memberData.contact,
-                        note: this.memberData.note,
-                        birthday: this.birth && this.birth.toISOString()
-                    });
-                    request.done(function(data, textStatus, jqXHR) {
-                        bootbox.alert('会员基本资料更新成功');
-                    });
-                }
-            },
-            saveCardInfo: function(card, index) {
-                var vm = this;
-                var confirmDlg = $('#historyComment_dlg');
-                // remove previous OK button's click listener
-                confirmDlg.find('button.btn-success').off('click');
-                confirmDlg.find('button.btn-success').one('click', function (event) {
-                    var modal = $(this).closest('.modal');
-                    var memo = modal.find('textarea[name=comment]').val().trim();
-                    card.memo = memo; // append the memo for this change if there is any
-                    // handle the click OK button
-                    if (index > -1) {
-                        var request = updateCard(vm.memberData._id, index, card);
-                        request.done(function(data, textStatus, jqXHR) {
-                            bootbox.alert('会员卡更新成功');
-                            Vue.set(vm.memberData.membership, index, data.membership[index]);
-                        });
-                    } else {
-                        var request = createCard(vm.memberData._id, card);
-                        request.done(function(data, textStatus, jqXHR) {
-                            bootbox.alert('会员卡创建成功');
-                            vm.memberData.membership = data.membership;
-                        });
-                    }
-                    // hide the confirm dialog in the end
-                    confirmDlg.modal('hide');
-                });
-                // pop up the confirm dialog with extra memo input
-                confirmDlg.modal('show');
-            },
-            deactivateAlert: function(e) {
-                if (this.memberData.status == 'inactive') {
-                    bootbox.alert({
-                        message: "未激活会员将无法进行自助预约<br><small>确定后，请点击保存进行修改</small>",
-                        buttons: {
-                            ok: {
-                                label: "确定",
-                                className: "btn-danger"
-                            }
-                        }
-                    });
-                }
-            },
-            addComment: function() {
-                $('#comment_dlg').find('textarea[name=comment]').val(null);
-                // event listener of adding new comment
-                $('#comment_dlg button.btn-success').off('click');
-                $('#comment_dlg button.btn-success').one('click', handleClickAddComment);
-                $('#comment_dlg').modal('show');
-            },
-            editComment: function(commentIndex) {
-                var comment = this.memberData.comments[commentIndex].text;
-                $('#editComment_dlg').find('textarea[name=comment]').val(comment);
-                $('#editComment_dlg button.btn-success').off('click');
-                $('#editComment_dlg button.btn-success').one('click', commentIndex, handleClickEditComment);
-                $('#editComment_dlg').modal('show');
-            }
-        },
-        mounted: function() {
-            // 'this' is refer to vm instance
-            var vm = this;
-            $(vm.$el).find('#birth_date').datetimepicker({
-                format: 'll',
-                locale: 'zh-CN'
-            });
-
-            $(vm.$el).find('#birth_date').on('dp.change', function(e) {
-                // when user clears the input box, the 'e.date' is false value
-                vm.birth = e.date === false ? null : e.date;
-            });
-        }
-    });
-
     var request = getMemberInfo($('#member_app').data('member-id'));
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
+        // bootstrap the member view page
+        var memberViewer = new Vue({extends: vueApp, data: viewData});
     });
 
     request.done(function(data, textStatus, jqXHR) {
