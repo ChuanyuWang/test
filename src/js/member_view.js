@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var initCard = require('./components/card');
+var cardComp = require('./components/card');
 var common = require('./common');
 var util = require('./services/util');
 
@@ -19,7 +19,9 @@ var viewData = {
 }
 
 var vueApp = {
-    el: '#member_app',
+    components : {
+        'card' : cardComp
+    },
     computed: {
         commentCount: function() {
             return this.memberData.comments ? this.memberData.comments.length : 0;
@@ -136,13 +138,12 @@ var vueApp = {
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
-    initCard();
 
     var request = getMemberInfo($('#member_app').data('member-id'));
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
         // bootstrap the member view page
-        var memberViewer = new Vue({extends: vueApp, data: viewData});
+        var memberViewer = new Vue({extends: vueApp, data: viewData, el: '#member_app'});
     });
 
     request.done(function(data, textStatus, jqXHR) {
