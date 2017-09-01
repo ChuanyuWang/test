@@ -1,0 +1,50 @@
+//Define template for card component (Vue.js)
+script#card-template(type='text/x-template')
+  form.form-horizontal
+    div.form-group
+      label.control-label.col-sm-2 课时:
+      div.col-sm-10
+        p.form-control-static {{item.credit | formatCredit}}次(剩余)
+    div.form-group
+      label.control-label.col-sm-2 增加/减少:
+      div.col-sm-10(style="display:inline-flex")
+        button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",@click="alterCharge(-10)")
+          span.glyphicon.glyphicon-minus
+          | 10
+        button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",@click="alterCharge(-1)")
+          span.glyphicon.glyphicon-minus
+          | 1
+        input.form-control(type='number',v-model.number='delta',min='-100',max='100',step='0.1',style="width:85px;margin:0 2px")
+        button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",@click="alterCharge(1)")
+          span.glyphicon.glyphicon-plus
+          | 1
+        button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",@click="alterCharge(10)")
+          span.glyphicon.glyphicon-plus
+          | 10
+    div.form-group
+      label.control-label.col-sm-2 有效期至:
+      div.col-sm-4
+        div#expire_date.input-group.date
+          input.form-control(text='text',v-model='expireDate')
+          span.input-group-addon
+            span.glyphicon.glyphicon-calendar
+    div.form-group
+      label.control-label.col-sm-2 类型:
+      div.col-sm-5
+        select.form-control(name="card_type",v-model='type')
+          option(value='ALL') 通用卡
+          option(value='LIMITED') 限定卡
+    div.form-group(v-show='isLimitedCard')
+      label.control-label.col-sm-2 可用教室:
+      div#roomlist.col-sm-10
+        - each room in classroom
+          div.checkbox
+            label
+              input(type="checkbox", value=room.id,v-model='room')
+              = room.name
+    div.form-group
+      div.col-sm-offset-2.col-sm-10
+        button.btn.btn-success(type='button',v-on:click='validteBeforeSave') 保存
+        div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='error')
+          strong 错误! 
+          |{{error}}
