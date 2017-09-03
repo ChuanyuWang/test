@@ -5,6 +5,8 @@
  * --------------------------------------------------------------------------
  */
 
+var course_service = require('./services/courses');
+
 var viewData = {
     course: {},
     error: null,
@@ -20,7 +22,7 @@ $(document).ready(function() {
         viewData.classrooms[element.value] = element.text;
     });
 
-    var request = getCourse($('#course_app').data('course-id'));
+    var request = course_service.getCourse($('#course_app').data('course-id'));
     request.done(function(data, textStatus, jqXHR) {
         initPage(data);
     });
@@ -159,7 +161,7 @@ function initPage(course) {
                 this.error = null;
                 if (this.course.name.length == 0) this.error = '名称不能为空';
                 if (!this.error) {
-                    var request = updateCourse(this.course._id, {
+                    var request = course_service.updateCourse(this.course._id, {
                         status: this.course.status,
                         name: this.course.name,
                         classroom: this.course.classroom,
@@ -182,7 +184,7 @@ function initPage(course) {
                     },
                     callback: function(ok) {
                         if (ok) {
-                            var request = removeCourse(vm.course._id);
+                            var request = course_service.removeCourse(vm.course._id);
                             request.done(function(data, textStatus, jqXHR) {
                                 window.location.href = '../course';
                             });
@@ -202,7 +204,7 @@ function initPage(course) {
                     },
                     callback: function(ok) {
                         if (!ok) return;
-                        var request = removeCourseClasses(vm.course._id, { 'id': item._id });
+                        var request = course_service.removeCourseClasses(vm.course._id, { 'id': item._id });
                         request.done(function(data, textStatus, jqXHR) {
                             var classes = vm.course.classes;
                             for (var i = 0; i < classes.length; i++) {
@@ -228,7 +230,7 @@ function initPage(course) {
                     },
                     callback: function(ok) {
                         if (!ok) return;
-                        var request = removeCourseMember(vm.course._id, { 'id': item.id });
+                        var request = course_service.removeCourseMember(vm.course._id, { 'id': item.id });
                         request.done(function(data, textStatus, jqXHR) {
                             var members = vm.course.members;
                             for (var i = 0; i < members.length; i++) {
@@ -274,7 +276,7 @@ function initPage(course) {
 
 function loadCourseClasses(course) {
     if (!course) return;
-    var request = getCourseClasses(course._id);
+    var request = course_service.getCourseClasses(course._id);
     request.done(function(data, textStatus, jqXHR) {
         // initialize classes property
         if (!course.hasOwnProperty('classes')) {
@@ -311,7 +313,7 @@ function handleClickAddMember() {
             };
         });
 
-        var request = addCourseMembers(viewData.course._id, result);
+        var request = course_service.addCourseMembers(viewData.course._id, result);
         request.done(function(data, textStatus, jqXHR) {
             result.forEach(function(value, index, array) {
                 viewData.course.members.push(value);
@@ -381,7 +383,7 @@ function handleClickAddClass() {
         value.classroom = classroom;
     })
     // create classes
-    var request = addCourseClasses(viewData.course._id, result);
+    var request = course_service.addCourseClasses(viewData.course._id, result);
     request.done(function(data, textStatus, jqXHR) {
         data.forEach(function(value, index, array) {
             viewData.course.classes.push(value);
@@ -389,126 +391,6 @@ function handleClickAddClass() {
         //bootbox.alert('班级课程添加成功');
     });
     modal.modal('hide');
-};
-
-/**
- * Retrieve course object according to ID
- * 
- * @param {String} courseID 
- */
-function getCourse(courseID) {
-    var request = $.getJSON('/api/courses/' + courseID, null);
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert('获取班级失败', jqXHR);
-    })
-    return request;
-};
-
-function updateCourse(courseID, fields) {
-    var request = $.ajax("/api/courses/" + courseID, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("更新班级失败", jqXHR);
-    })
-    return request;
-};
-
-function addCourseMembers(courseID, fields) {
-    var request = $.ajax("/api/courses/" + courseID + '/members', {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("添加班级成员失败", jqXHR);
-    })
-    return request;
-};
-
-function removeCourseMember(courseID, fields) {
-    var request = $.ajax("/api/courses/" + courseID + '/members', {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除班级成员失败", jqXHR);
-    })
-    return request;
-};
-
-function addCourseClasses(courseID, fields) {
-    var request = $.ajax("/api/courses/" + courseID + '/classes', {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("添加课程失败", jqXHR);
-    })
-    return request;
-};
-
-function removeCourseClasses(courseID, fields) {
-    var request = $.ajax("/api/courses/" + courseID + '/classes', {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除班级课程失败", jqXHR);
-    })
-    return request;
-};
-
-function removeCourse(courseID, fields) {
-    var request = $.ajax("/api/courses/" + courseID, {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert("删除班级失败", jqXHR);
-    })
-    return request;
-};
-
-function getCourseClasses(courseID) {
-    var request = $.getJSON('/api/classes', { 'courseID': courseID });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        showAlert('获取班级课程失败', jqXHR);
-    })
-    return request;
-};
-
-/**
- * 
- * @param {String} title 
- * @param {Object} jqXHR 
- * @param {String} className default is 'btn-danger'
- */
-function showAlert(title, jqXHR, className) {
-    //console.error(jqXHR);
-    bootbox.dialog({
-        message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-        title: title || '错误',
-        buttons: {
-            danger: {
-                label: "确定",
-                // alert dialog with danger button by default
-                className: className || "btn-danger"
-            }
-        }
-    });
 };
 
 function creditFormatter(value, row, index) {
