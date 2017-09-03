@@ -13,13 +13,14 @@ module.exports = {
             'routes/**/*.js',
             'models/*.js'
         ],
-        tasks: ['develop'], //, 'delayed-livereload']
+        tasks: ['eslint:nodeFiles', 'develop'], //, 'delayed-livereload']
         options: {
             spawn: false
         }
     },
     public: {
-        files: ['public/js/*.js', 'public/css/*.css']
+        files: ['public/js/*.js', 'public/css/*.css'],
+        tasks: ['eslint:browserFiles']
     },
     less: {
         files: [

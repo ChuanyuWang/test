@@ -3,7 +3,9 @@ module.exports = {
         configFile: 'conf/eslint.json',
         //rulePaths: ['conf/rules'],
         //quiet: true
-        fix: true
+        fix: true,
+        color: true,
+        cache: true
     },
     nodeFiles: {
         files: {

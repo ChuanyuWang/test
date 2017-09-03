@@ -4,3 +4,4 @@ public/components
 logs/
 config.db.js
 .vscode
+.eslintcache
