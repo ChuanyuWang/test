@@ -24,7 +24,10 @@ $(document).ready(function() {
 
     var request = course_service.getCourse($('#course_app').data('course-id'));
     request.done(function(data, textStatus, jqXHR) {
-        initPage(data);
+        viewData.course = data || {};
+
+        // bootstrap the course view page
+        var courseViewer = new Vue({extends: courseApp, data: viewData, el: '#course_app'});
     });
     request.done(function(data, textStatus, jqXHR) {
         loadCourseClasses(data);
@@ -85,193 +88,186 @@ function init() {
     });
 };
 
-function initPage(course) {
-    viewData.course = course || {};
-
-    // bootstrap the course view page
-    var courseViewer = new Vue({
-        el: '#course_app',
-        data: viewData,
-        computed: {
-            membersCount: function() {
-                return this.course.members ? this.course.members.length : 0;
-            },
-            classesCount: function() {
-                return this.course.classes ? this.course.classes.length : 0;
-            },
-            sortedClasses: function() {
-                var classes = this.course.classes || [];
-                return classes.sort(function(a, b) {
-                    if (moment(a.date).isSameOrBefore(b.date)) return -1;
-                    else return 1;
-                });
-            },
-            progressStatus: function() {
-                var progress = {}, vm = this;
-                var members = this.course.members || [];
-                if (members.length == 0) return progress;
-                var now = moment();
-
-                members.forEach(function(member, index, array) {
-                    var status = {
-                        done: 0,
-                        absent: 0,
-                        left: vm.sortedClasses.length,
-                        total: vm.sortedClasses.length
-                    };
-                    vm.sortedClasses.some(function(cls, index, array) {
-                        if (moment(cls.date).isSameOrBefore(now)) {
-                            status.left--;
-                            if (vm.isAbsent(cls, member)) status.absent++;
-                            else status.done++;
-                            return false;
-                        } else {
-                            return true;
-                        }
-                    })
-                    //status.total = status.done + status.absent + status.left;
-                    progress[member.id] = status;
-                });
-                return progress;
-            }
+var courseApp = {
+    computed: {
+        membersCount: function() {
+            return this.course.members ? this.course.members.length : 0;
         },
-        filters: {
-            formatDate: function(value) {
-                if (!value) return '?';
-                return moment(value).format('ll');
-            },
-            formatDateTime: function(value) {
-                if (!value) return '?';
-                return moment(value).format('lll');
-            },
-            formatClassroom: function(value) {
-                return viewData.classrooms[value];
-            }
+        classesCount: function() {
+            return this.course.classes ? this.course.classes.length : 0;
         },
-        watch: {},
-        methods: {
-            isAbsent: function(cls, member) {
-                var booking = cls.booking || [];
-                var hasReservation = function(value, index, array) {
-                    return value.member === member.id;
+        sortedClasses: function() {
+            var classes = this.course.classes || [];
+            return classes.sort(function(a, b) {
+                if (moment(a.date).isSameOrBefore(b.date)) return -1;
+                else return 1;
+            });
+        },
+        progressStatus: function() {
+            var progress = {}, vm = this;
+            var members = this.course.members || [];
+            if (members.length == 0) return progress;
+            var now = moment();
+
+            members.forEach(function(member, index, array) {
+                var status = {
+                    done: 0,
+                    absent: 0,
+                    left: vm.sortedClasses.length,
+                    total: vm.sortedClasses.length
                 };
-                return !booking.some(hasReservation);
-            },
-            saveBasicInfo: function() {
-                this.error = null;
-                if (this.course.name.length == 0) this.error = '名称不能为空';
-                if (!this.error) {
-                    var request = course_service.updateCourse(this.course._id, {
-                        status: this.course.status,
-                        name: this.course.name,
-                        classroom: this.course.classroom,
-                        remark: this.course.remark
-                    });
-                    request.done(function(data, textStatus, jqXHR) {
-                        bootbox.alert('班级基本资料更新成功');
-                    });
-                }
-            },
-            deleteCourse: function() {
-                var vm = this;
-                bootbox.confirm({
-                    title: "确定删除班级吗？",
-                    message: "班级中所有课程，包括已经开始的课程都将被删除，不保留记录",
-                    buttons: {
-                        confirm: {
-                            className: "btn-danger"
-                        }
-                    },
-                    callback: function(ok) {
-                        if (ok) {
-                            var request = course_service.removeCourse(vm.course._id);
-                            request.done(function(data, textStatus, jqXHR) {
-                                window.location.href = '../course';
-                            });
-                        }
+                vm.sortedClasses.some(function(cls, index, array) {
+                    if (moment(cls.date).isSameOrBefore(now)) {
+                        status.left--;
+                        if (vm.isAbsent(cls, member)) status.absent++;
+                        else status.done++;
+                        return false;
+                    } else {
+                        return true;
                     }
+                })
+                //status.total = status.done + status.absent + status.left;
+                progress[member.id] = status;
+            });
+            return progress;
+        }
+    },
+    filters: {
+        formatDate: function(value) {
+            if (!value) return '?';
+            return moment(value).format('ll');
+        },
+        formatDateTime: function(value) {
+            if (!value) return '?';
+            return moment(value).format('lll');
+        },
+        formatClassroom: function(value) {
+            return viewData.classrooms[value];
+        }
+    },
+    watch: {},
+    methods: {
+        isAbsent: function(cls, member) {
+            var booking = cls.booking || [];
+            var hasReservation = function(value, index, array) {
+                return value.member === member.id;
+            };
+            return !booking.some(hasReservation);
+        },
+        saveBasicInfo: function() {
+            this.error = null;
+            if (this.course.name.length == 0) this.error = '名称不能为空';
+            if (!this.error) {
+                var request = course_service.updateCourse(this.course._id, {
+                    status: this.course.status,
+                    name: this.course.name,
+                    classroom: this.course.classroom,
+                    remark: this.course.remark
                 });
-            },
-            removeClass: function(item) {
-                var vm = this;
-                bootbox.confirm({
-                    title: "删除课程",
-                    message: '删除' + moment(item.date).format('ll dddd') + ' 课程吗?',
-                    buttons: {
-                        confirm: {
-                            className: "btn-danger"
-                        }
-                    },
-                    callback: function(ok) {
-                        if (!ok) return;
-                        var request = course_service.removeCourseClasses(vm.course._id, { 'id': item._id });
-                        request.done(function(data, textStatus, jqXHR) {
-                            var classes = vm.course.classes;
-                            for (var i = 0; i < classes.length; i++) {
-                                if (classes[i]._id == item._id) {
-                                    classes.splice(i, 1);
-                                    break;
-                                }
-                            }
-                            //bootbox.alert('删除班级课程成功');
-                        });
-                    }
+                request.done(function(data, textStatus, jqXHR) {
+                    bootbox.alert('班级基本资料更新成功');
                 });
-            },
-            removeMember: function(item) {
-                var vm = this;
-                bootbox.confirm({
-                    title: "移除班级成员",
-                    message: '从班级中移除' + item.name + '，并删除此成员所有未开始的课程吗?',
-                    buttons: {
-                        confirm: {
-                            className: "btn-danger"
-                        }
-                    },
-                    callback: function(ok) {
-                        if (!ok) return;
-                        var request = course_service.removeCourseMember(vm.course._id, { 'id': item.id });
-                        request.done(function(data, textStatus, jqXHR) {
-                            var members = vm.course.members;
-                            for (var i = 0; i < members.length; i++) {
-                                if (members[i].id == item.id) {
-                                    members.splice(i, 1);
-                                    break;
-                                }
-                            }
-                            //bootbox.alert('删除班级成员成功');
-                        });
-                    }
-                });
-            },
-            closeAlert: function(e) {
-                if (this.course.status == 'closed') {
-                    bootbox.alert({
-                        message: "结束此班级后会删除所有未开始的课程<br><small>确定后，请点击保存进行修改</small>",
-                        buttons: {
-                            ok: {
-                                label: "确定",
-                                className: "btn-danger"
-                            }
-                        }
-                    });
-                }
             }
         },
-        mounted: function() {
-            // 'this' is refer to vm instance
+        deleteCourse: function() {
             var vm = this;
-            $(vm.$el).find('#birth_date').datetimepicker({
-                format: 'll',
-                locale: 'zh-CN'
+            bootbox.confirm({
+                title: "确定删除班级吗？",
+                message: "班级中所有课程，包括已经开始的课程都将被删除，不保留记录",
+                buttons: {
+                    confirm: {
+                        className: "btn-danger"
+                    }
+                },
+                callback: function(ok) {
+                    if (ok) {
+                        var request = course_service.removeCourse(vm.course._id);
+                        request.done(function(data, textStatus, jqXHR) {
+                            window.location.href = '../course';
+                        });
+                    }
+                }
             });
-
-            $(vm.$el).find('#birth_date').on('dp.change', function(e) {
-                // when user clears the input box, the 'e.date' is false value
-                vm.birth = e.date === false ? null : e.date;
+        },
+        removeClass: function(item) {
+            var vm = this;
+            bootbox.confirm({
+                title: "删除课程",
+                message: '删除' + moment(item.date).format('ll dddd') + ' 课程吗?',
+                buttons: {
+                    confirm: {
+                        className: "btn-danger"
+                    }
+                },
+                callback: function(ok) {
+                    if (!ok) return;
+                    var request = course_service.removeCourseClasses(vm.course._id, { 'id': item._id });
+                    request.done(function(data, textStatus, jqXHR) {
+                        var classes = vm.course.classes;
+                        for (var i = 0; i < classes.length; i++) {
+                            if (classes[i]._id == item._id) {
+                                classes.splice(i, 1);
+                                break;
+                            }
+                        }
+                        //bootbox.alert('删除班级课程成功');
+                    });
+                }
             });
+        },
+        removeMember: function(item) {
+            var vm = this;
+            bootbox.confirm({
+                title: "移除班级成员",
+                message: '从班级中移除' + item.name + '，并删除此成员所有未开始的课程吗?',
+                buttons: {
+                    confirm: {
+                        className: "btn-danger"
+                    }
+                },
+                callback: function(ok) {
+                    if (!ok) return;
+                    var request = course_service.removeCourseMember(vm.course._id, { 'id': item.id });
+                    request.done(function(data, textStatus, jqXHR) {
+                        var members = vm.course.members;
+                        for (var i = 0; i < members.length; i++) {
+                            if (members[i].id == item.id) {
+                                members.splice(i, 1);
+                                break;
+                            }
+                        }
+                        //bootbox.alert('删除班级成员成功');
+                    });
+                }
+            });
+        },
+        closeAlert: function(e) {
+            if (this.course.status == 'closed') {
+                bootbox.alert({
+                    message: "结束此班级后会删除所有未开始的课程<br><small>确定后，请点击保存进行修改</small>",
+                    buttons: {
+                        ok: {
+                            label: "确定",
+                            className: "btn-danger"
+                        }
+                    }
+                });
+            }
         }
-    });
+    },
+    mounted: function() {
+        // 'this' is refer to vm instance
+        var vm = this;
+        $(vm.$el).find('#birth_date').datetimepicker({
+            format: 'll',
+            locale: 'zh-CN'
+        });
+
+        $(vm.$el).find('#birth_date').on('dp.change', function(e) {
+            // when user clears the input box, the 'e.date' is false value
+            vm.birth = e.date === false ? null : e.date;
+        });
+    }
 };
 
 function loadCourseClasses(course) {
