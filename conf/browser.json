@@ -14,7 +14,7 @@
     },
     "rules": {
         "no-console": "off",
-        "no-redeclare": "warn",
+        "no-redeclare": "off",
         "no-unused-vars": ["error", {
                 "vars": "all",
                 "args": "none",
