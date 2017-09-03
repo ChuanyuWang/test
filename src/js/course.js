@@ -51,7 +51,7 @@ function init() {
             events: handleActionClicks
         }]
     });
-};
+}
 
 /**
  * event handler of clicking end course button 
@@ -64,7 +64,7 @@ function init() {
  */
 function handleEndCourse(e, value, row, index) {
     //TODO
-};
+}
 
 /**
  * event handler of clicking end course button 
@@ -77,7 +77,7 @@ function handleEndCourse(e, value, row, index) {
  */
 function handleViewCourse(e, value, row, index) {
     window.location.href = window.location.pathname + '/' + row._id;
-};
+}
 
 // global event handler for table inline action
 var handleActionClicks = {
@@ -87,13 +87,13 @@ var handleActionClicks = {
 
 function membersFormatter(value, row, index) {
     return value && value.length ? value.length : 0;
-};
+}
 
 function statusFormatter(value, row, index) {
     if (value == "active") return '进行中';
     if (value == "closed") return '结束';
     return value;
-};
+}
 
 function actionFormatter(value, row, index) {
     return [
@@ -104,13 +104,13 @@ function actionFormatter(value, row, index) {
         '  <span class="glyphicon glyphicon-expand"></span> 查看',
         '</button>'
     ].join('');
-};
+}
 
 function customQuery(params) {
     // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
     params.status = courseStatus;
     return params;
-};
+}
 
 function handleAddNewCourse(event) {
     var modal = $(this).closest('.modal');
@@ -139,7 +139,7 @@ function handleAddNewCourse(event) {
             window.location.href = window.location.pathname + '/' + data._id;
         });
     }
-};
+}
 
 function addCourse(course) {
     var request = $.ajax("/api/courses", {
@@ -154,4 +154,4 @@ function addCourse(course) {
     })
 
     return request;
-};
+}

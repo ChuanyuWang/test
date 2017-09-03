@@ -10,7 +10,6 @@ module.exports = {
             'helper.js',
             'util.js',
             'locales/*.json',
-            'routes/*.js',
             'routes/**/*.js',
             'models/*.js'
         ],

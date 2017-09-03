@@ -5,7 +5,7 @@
  */
 var common = require('./common');
 // open id of Weichat user
-var _openid = undefined;
+//var _openid = undefined;
 var memberid = undefined;
 
 // DOM Ready =============================================================
@@ -25,7 +25,7 @@ function init() {
     //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
     
     toggleLoginForm(true);
-};
+}
 
 function handleLoginOK(event) {
     // prevent from submitting the form
@@ -92,11 +92,11 @@ function handleLoginOK(event) {
             dataType : "json"
         });
     }
-};
+}
 
 function updateUserInfo(user) {
     $('#user_info p').html('<b>' + user.name +'</b>小朋友');
-};
+}
 
 function toggleLoginForm(isShow) {
     // display the login form for user to input name and contact
@@ -113,7 +113,7 @@ function toggleLoginForm(isShow) {
         $('#user_info').show();
         $('#content').fadeIn(600);
     }
-};
+}
 
 function showMyBooks(isHistory, tab_id) {
     clearBooks();
@@ -150,7 +150,7 @@ function showMyBooks(isHistory, tab_id) {
         },
         dataType : "json"
     });
-};
+}
 
 // append a book at the last row of table
 function appendBook(item) {
@@ -174,17 +174,17 @@ function appendBook(item) {
             table.append(row_book);
         }
     }
-};
+}
 
 function displayNoClassWarning() {
     var list = $('#main');
 
     // append a warning bar
     list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>没有找到绘本</div>");
-};
+}
 
 function clearBooks() {
     // remove all rows in table except headers
     $('#content table tbody tr').remove();
     $('.alert-warning').remove();
-};
+}

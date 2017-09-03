@@ -22,7 +22,7 @@ $(document).ready(function() {
 
     initClassCell();
     // bootstrap the class table
-    var clsTable = new Vue({
+    new Vue({
         el: '#cls_table',
         data: classTableData,
         computed: {
@@ -183,7 +183,7 @@ function init() {
     initClassRoomList();
     // manual update the page so that page is able to be updated in "back" case
     updateSchedule();
-};
+}
 
 function initClassRoomList() {
     if (!getCurrentClassRoom()) {
@@ -193,7 +193,7 @@ function initClassRoomList() {
         // show class schedule according to the first classroom
         $('#cls_table').show();
     }
-};
+}
 
 function getCurrentClassRoom() {
     var classroom = $('#chooseRoom option:selected');
@@ -201,7 +201,7 @@ function getCurrentClassRoom() {
         return classroom.val();
     }
     return null;
-};
+}
 
 // Get the Monday of specific date, each week starts from Monday
 function getMonday(date) {
@@ -216,7 +216,7 @@ function getMonday(date) {
     //set the time to the very beginning of day
     _date.hours(0).minutes(0).seconds(0).milliseconds(0);
     return _date;
-};
+}
 
 function showAddNewClassDlg(startDateTime) {
     // reset dialog status when add a new class
@@ -250,7 +250,7 @@ function handleAddNewClass(event) {
     classItem.date.hours(time.hours());
     classItem.date.minutes(time.minutes());
     // get cost
-    classItem.cost = parseFloat(modal.find('input[name=cost]').val());;
+    classItem.cost = parseFloat(modal.find('input[name=cost]').val());
     if (isNaN(classItem.cost) || classItem.cost < 0) {
         modal.find('input[name=cost]').closest(".form-group").addClass("has-error");
         hasError = true;
@@ -315,7 +315,7 @@ function handleAddNewClass(event) {
             dataType: "json"
         });
     }
-};
+}
 
 function updateClasses(newClass) {
     var found = false;
@@ -331,7 +331,7 @@ function updateClasses(newClass) {
         // add as a new class item
         classTableData.classes.push(newClass);
     }
-};
+}
 
 function updateSchedule(control) {
     var begin = moment(classTableData.monday);
@@ -358,16 +358,16 @@ function updateSchedule(control) {
         },
         dataType: "json"
     });
-};
+}
 
 function showSuccessMsg(msg) {
     var alert_bar = $('#alert_bar').removeClass('alert-danger').addClass("alert-success");
     alert_bar.find('span').text(msg);
     alert_bar.finish().show().fadeOut(2000);
-};
+}
 
 function showErrorMsg(msg) {
     var alert_bar = $('#alert_bar').removeClass('alert-success').addClass("alert-danger");
     alert_bar.find('span').text(msg);
     alert_bar.finish().show().fadeOut(2000);
-};
+}

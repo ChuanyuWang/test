@@ -117,7 +117,7 @@ function init() {
         }, {}
         ]
     });
-};
+}
 
 // return true if an error occurs after validation, otherwise return false
 function validateInput(modal, memberInfo) {
@@ -144,7 +144,7 @@ function validateInput(modal, memberInfo) {
     memberInfo.note = modal.find('textarea[name=note]').val().trim();
 
     return hasError;
-};
+}
 
 function handleAddNewMember(event) {
     var modal = $(this).closest('.modal');
@@ -158,7 +158,7 @@ function handleAddNewMember(event) {
         modal.modal('hide');
         addNewMember(newMember);
     }
-};
+}
 
 function addNewMember(member) {
     $.ajax("/api/members", {
@@ -186,7 +186,7 @@ function addNewMember(member) {
         },
         dataType: "json"
     });
-};
+}
 
 function customQuery(params) {
     // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
@@ -195,7 +195,7 @@ function customQuery(params) {
     var status = $('div.statusFilter button.btn-info').data('filter');
     params.status = status;
     return params;
-};
+}
 
 function handleFilterStatus(event) {
     var btn = $(this);
@@ -209,7 +209,7 @@ function handleFilterStatus(event) {
     } else {
         $('#toolbar button[data-action=add]').hide();
     }
-};
+}
 
 function creditFormatter(value, row, index) {
     var membership = row.membership;
@@ -223,7 +223,7 @@ function creditFormatter(value, row, index) {
     } else {
         return undefined;
     }
-};
+}
 
 function expireFormatter(value, row, index) {
     var membership = row.membership;
@@ -234,7 +234,7 @@ function expireFormatter(value, row, index) {
     } else {
         return undefined;
     }
-};
+}
 
 function viewMember(membership) {
     console.log('abc');
@@ -244,7 +244,7 @@ function viewMember(membership) {
         return;
     }
     window.location.href = window.location.pathname + '/' + items[0]._id;
-};
+}
 
 function highlightExpire(row, index) {
     var card = row.membership && row.membership[0];
@@ -266,7 +266,7 @@ function highlightExpire(row, index) {
         }
     }
     return {};
-};
+}
 
 function viewFormatter(value, row, index) {
     var url = window.location.pathname + '/' + row._id;
@@ -275,5 +275,5 @@ function viewFormatter(value, row, index) {
         '<i class="glyphicon glyphicon-expand"></i> 查看',
         '</a>'
     ].join('');
-};
+}
 },{"./common":1}]},{},[2]);

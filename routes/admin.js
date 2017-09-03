@@ -28,6 +28,7 @@ router.post('/createUser', isAuthenticated, function (req, res) {
         if (err) {
             return res.status(500).send(err);
         }
+        console.log("Account %j is created successfully", account);
         res.send("success");
     });
 });
@@ -135,7 +136,7 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
 
 function upgradeFromZero(req, res, next, tenant_name) {
     //TODO, close the connection when all data update done
-    tenant_db = util.connect(tenant_name);
+    var tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
     members.find({}).forEach(function(err, doc){
@@ -191,11 +192,11 @@ function upgradeFromZero(req, res, next, tenant_name) {
         }
     });
     */
-};
+}
 
 function upgradeFromOne(req, res, next, tenant_name) {
     //TODO, close the connection when all data update done
-    tenant_db = util.connect(tenant_name);
+    var tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
     members.find({}).forEach(function(err, doc){
@@ -216,7 +217,7 @@ function upgradeFromOne(req, res, next, tenant_name) {
             }
         }
     });
-};
+}
 /**
  * Update the tenant from version 2 to 3, which append `status` field to all members documents
  * @param {Object} req
@@ -225,7 +226,7 @@ function upgradeFromOne(req, res, next, tenant_name) {
  * @param {String} tenant_name 
  */
 function upgradeFromTwo(req, res, next, tenant_name) {
-    tenant_db = util.connect(tenant_name);
+    var tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
     // query matches documents that either contain the status field whose value is null or that do not contain the status field.
@@ -239,7 +240,7 @@ function upgradeFromTwo(req, res, next, tenant_name) {
             console.debug(result);
         }
     });
-};
+}
 
 function checkTenantUser(req, res, next) {
     if (!req.user) {
@@ -250,7 +251,7 @@ function checkTenantUser(req, res, next) {
     } else {
         next();
     }
-};
+}
 
 function isAuthenticated(req, res, next) {
     if (req.user && req.user.username == 'chuanyu') { // special user as administrator
@@ -258,6 +259,6 @@ function isAuthenticated(req, res, next) {
     } else {
         res.status(401).send('Unauthorized Request');
     }
-};
+}
 
 module.exports = router;

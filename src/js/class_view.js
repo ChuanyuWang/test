@@ -66,7 +66,7 @@ function init() {
     $('#member_dlg').on('show.bs.modal', function(event) {
         $(this).find('input[name=quantity]').val(1).closest(".btn-group").removeClass("has-error");
     });
-};
+}
 
 function initPage(cls) {
     viewData.cls = cls || {};
@@ -74,7 +74,7 @@ function initPage(cls) {
     viewData.cls.books = viewData.cls.books || [];
 
     // bootstrap the class view page
-    var classViewer = new Vue({
+    new Vue({
         el: '#class_app',
         data: viewData,
         computed: {
@@ -239,7 +239,7 @@ function initPage(cls) {
             });
         }
     });
-};
+}
 
 function handleAddNewBook(e) {
     var modal = $(this).closest('.modal');
@@ -262,7 +262,7 @@ function handleAddNewBook(e) {
         viewData.cls.books = data.books;
     });
     modal.modal('hide');
-};
+}
 
 function handleClickAddMember() {
     var modal = $(this).closest('.modal');
@@ -304,7 +304,7 @@ function handleClickAddMember() {
     } else {
         bootbox.alert('所选会员已经预约');
     }
-};
+}
 
 function markError(container, selector, hasError) {
     if (hasError) {
@@ -312,7 +312,7 @@ function markError(container, selector, hasError) {
     } else {
         container.find(selector).closest(".form-group").removeClass("has-error");
     }
-};
+}
 
 function findReservation(cls, member) {
     if (!cls || !member) return null;
@@ -325,7 +325,7 @@ function findReservation(cls, member) {
     item.userName = member.name;
     item.contact = member.contact;
     return item;
-};
+}
 
 function creditFormatter(value, row, index) {
     var membership = row.membership;
@@ -339,4 +339,4 @@ function creditFormatter(value, row, index) {
     } else {
         return undefined;
     }
-};
+}

@@ -27,7 +27,7 @@ $(document).ready(function() {
         viewData.course = data || {};
 
         // bootstrap the course view page
-        var courseViewer = new Vue({extends: courseApp, data: viewData, el: '#course_app'});
+        new Vue({extends: courseApp, data: viewData, el: '#course_app'});
     });
     request.done(function(data, textStatus, jqXHR) {
         loadCourseClasses(data);
@@ -86,7 +86,7 @@ function init() {
             $('#class_date').data("DateTimePicker").format('lll');
         }
     });
-};
+}
 
 var courseApp = {
     computed: {
@@ -282,7 +282,7 @@ function loadCourseClasses(course) {
             course.classes.push(value);
         });
     });
-};
+}
 
 function handleClickAddMember() {
     var modal = $(this).closest('.modal');
@@ -318,7 +318,7 @@ function handleClickAddMember() {
         });
     }
     modal.modal('hide');
-};
+}
 
 function markError(container, selector, hasError) {
     if (hasError) {
@@ -326,7 +326,7 @@ function markError(container, selector, hasError) {
     } else {
         container.find(selector).closest(".form-group").removeClass("has-error");
     }
-};
+}
 
 function handleClickAddClass() {
     var modal = $(this).closest('.modal');
@@ -387,7 +387,7 @@ function handleClickAddClass() {
         //bootbox.alert('班级课程添加成功');
     });
     modal.modal('hide');
-};
+}
 
 function creditFormatter(value, row, index) {
     var membership = row.membership;
@@ -401,7 +401,7 @@ function creditFormatter(value, row, index) {
     } else {
         return undefined;
     }
-};
+}
 
 function resetAddClassDlg(event) {
     var modal = $(this);
@@ -414,7 +414,7 @@ function resetAddClassDlg(event) {
     markError(modal, '.weekdays', false);
     // select the classroom as the same as course
     modal.find('#class_room option[value=' + viewData.course.classroom + ']').prop("selected", true);
-};
+}
 
 function genClassNames(count) {
     var count = count || 0;
@@ -433,7 +433,7 @@ function genClassNames(count) {
         suffix++;
     }
     return result;
-};
+}
 
 function genRepeatClass(datetime, startdate, enddate, days) {
     var dates = [];
@@ -459,4 +459,4 @@ function genRepeatClass(datetime, startdate, enddate, days) {
             date: dates[index].toISOString()
         }
     });
-};
+}

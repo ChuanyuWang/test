@@ -18,7 +18,7 @@ function init() {
     //moment.locale('zh-CN');
     //bootbox.setLocale('zh_CN');
     $('#reg_btn').click(handleSubmit);
-};
+}
 
 function handleSubmit(event) {
     var form = $('#opportunity');
@@ -60,7 +60,7 @@ function handleSubmit(event) {
         user_info.source = getParam('source');
         addOpportunity(user_info);
     }
-};
+}
 
 function addOpportunity(opportunity) {
     opportunity.tenant = common.getTenantName();
@@ -79,10 +79,10 @@ function addOpportunity(opportunity) {
         },
         dataType : "json"
     });
-};
+}
 
 function getParam(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var param = window.location.search.substr(1).match(reg);
     return param ? decodeURI(param[2]) : null;
-};
+}

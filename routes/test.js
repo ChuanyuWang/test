@@ -103,7 +103,7 @@ router.get('/api/currentuser', function (req, res) {
     }
     var timeKey = parseInt(req.query.timeKey);
     function findUserOpenID(user) {
-        return Math.abs(user.time - time) <= 1;
+        return Math.abs(user.time - timeKey) <= 1;
     }
     
     var user = visited_user_list.find(findUserOpenID);

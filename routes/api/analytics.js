@@ -182,19 +182,9 @@ router.get('/deposit', function(req, res, next) {
 });
 
 router.get('/passive', function(req, res, next) {
-    //[Default] get the current year consumption by month
-    var year = (new Date()).getFullYear();
     var now = new Date();
-    var unit = 'month';
     var begin = new Date(0);
     //begin.setFullYear(now.getFullYear() - 1); // last year
-
-    if (req.query.hasOwnProperty("year")) {
-        year = parseInt(req.query.year);
-    }
-    if (req.query.hasOwnProperty("unit")) {
-        unit = req.query.unit;
-    }
     if (req.query.hasOwnProperty("begin")) {
         begin = new Date(req.query.begin);
     }

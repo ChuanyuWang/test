@@ -3,7 +3,7 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var util = require('../../util');
 
-router.get('/', function (req, res) {
+router.get('/', function (req, res, next) {
     var tenantDB = null;
     if (req.query.hasOwnProperty('tenant')) {
         tenantDB = util.connect(req.query.tenant);
@@ -442,6 +442,6 @@ function createNewBook(tenantDB, res, user, cls, quantity) {
             member : user
         });
     });
-};
+}
 
 module.exports = router;

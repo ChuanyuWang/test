@@ -114,7 +114,7 @@ router.post('/', helper.requireRole("admin"), function(req, res) {
     });
 });
 
-router.patch('/:classID', helper.requireRole("admin"), function(req, res) {
+router.patch('/:classID', helper.requireRole("admin"), function(req, res, next) {
     // booking can only added by post/delete 'api/booking?classID=xxx' 
     if (req.body.hasOwnProperty('booking')) {
         var error = new Error('booking can only added by API "api/booking?classID=xxx"');
@@ -232,6 +232,6 @@ function convertDateObject(doc) {
         doc.date = new Date(doc.date);
     }
     return doc;
-};
+}
 
 module.exports = router;

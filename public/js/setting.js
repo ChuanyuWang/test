@@ -40,6 +40,8 @@ module.exports = util;
 var util = require('./services/util');
 var consumeChart = null;
 var passiveChart = null;
+var passiveChart2 = null;
+var passiveChart3 = null;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -113,7 +115,7 @@ function init() {
     $('a[href="#hint"]').one('shown.bs.tab', function(e) {
         refreshPassiveChart();
     });
-};
+}
 
 function handleSaveBasic(event) {
     var form = $(this).closest('form');
@@ -150,7 +152,7 @@ function handleSaveBasic(event) {
     request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert("更新综合设置失败", jqXHR);
     });
-};
+}
 
 function handleAddNewClassRoom(event) {
     var modal = $(this).closest('.modal');
@@ -182,7 +184,7 @@ function handleAddNewClassRoom(event) {
         modal.modal('hide');
         addNewClassroom(newRoom);
     }
-};
+}
 
 function handleEditClassRoom(event) {
     var modal = $(this).closest('.modal');
@@ -211,7 +213,7 @@ function handleEditClassRoom(event) {
             $('#classroom_table').bootstrapTable('refresh');
         });
     }
-};
+}
 
 function addNewClassroom(room) {
     $.ajax("/api/setting/classrooms", {
@@ -226,7 +228,7 @@ function addNewClassroom(room) {
         },
         dataType: "json"
     });
-};
+}
 
 function editClassroom(room) {
     var request = $.ajax("/api/setting/classrooms/" + room.id, {
@@ -239,7 +241,7 @@ function editClassroom(room) {
         util.showAlert("修改教室失败", jqXHR);
     });
     return request;
-};
+}
 
 function refreshChart() {
     var filter = {
@@ -264,7 +266,7 @@ function refreshChart() {
     var consumptionQuery = $.get("/api/analytics/consumption", filter, "json");
     var depositQuery = $.get("/api/analytics/deposit", filter, "json");
     $.when(consumptionQuery, depositQuery).then(drawChartFunc, errorFunc);
-};
+}
 
 function preChartData(consumptionData, depositData) {
     var chartData = {
@@ -314,7 +316,7 @@ function preChartData(consumptionData, depositData) {
     }
 
     return chartData;
-};
+}
 
 function drawChart(data, year, unitName) {
     // resize the chart according to its parent dom size
@@ -359,7 +361,7 @@ function drawChart(data, year, unitName) {
 
     // Apply the chart options to create/update chart instance
     consumeChart.setOption(option);
-};
+}
 
 function refreshPassiveChart() {
     // all effective members, {'<id>':{_id:String, membership:Object,since:string,name:String,contact:String}}
@@ -391,7 +393,7 @@ function refreshPassiveChart() {
     request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert("刷新图表失败", jqXHR);
     });
-};
+}
 
 function renderPassiveChart1(userList, chartData) {
     // only display the top 20
@@ -441,7 +443,7 @@ function renderPassiveChart1(userList, chartData) {
 
     // Apply the chart options to create/update chart instance
     passiveChart.setOption(option);
-};
+}
 
 function renderPassiveChart2(all) {
     var noBookingUsers = [];
@@ -506,7 +508,7 @@ function renderPassiveChart2(all) {
 
     // Apply the chart options to create/update chart instance
     passiveChart2.setOption(option);
-};
+}
 
 function round(value) {
     return Math.round(value * 10) / 10;
@@ -610,12 +612,12 @@ function renderPassiveChart3(all) {
 
     // Apply the chart options to create/update chart instance
     passiveChart3.setOption(option);
-};
+}
 
 function visibilityFormatter(value, row, index) {
     if (value == 'internal') return '是';
     else return '否';
-};
+}
 
 function actionFormatter(value, row, index) {
     return [
@@ -626,7 +628,7 @@ function actionFormatter(value, row, index) {
         '  <span class="glyphicon glyphicon-trash"></span> 删除',
         '</button>'
     ].join('');
-};
+}
 
 // event handler defined in setting.jade file for removing classroom
 var handleActions = {

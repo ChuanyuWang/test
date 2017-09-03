@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var mongojs = require('mongojs');
 var util = require('../../util');
 var helper = require('../../helper');
 
@@ -142,11 +141,11 @@ router.post('/classrooms', helper.requireRole("admin"), function(req, res, next)
 
 router.route('/classrooms/:roomID')
 .all(helper.requireRole("admin"))
-.get(function(req, res){
+.get(function(req, res, next){
     //TODO, get a classroom
     next(new Error('not implemented'));
 })
-.delete (function (req, res) {
+.delete (function (req, res, next) {
     var tenants = config_db.collection('tenants');
     tenants.update({
         name : req.user.tenant
@@ -181,7 +180,7 @@ router.route('/classrooms/:roomID')
         res.json(result);
     });
 })
-.put(function (req, res) {
+.put(function (req, res, next) {
     //TODO, update a classroom
     next(new Error('not implemented'));
 })
@@ -227,6 +226,6 @@ function migrateFreeClass(room, database) {
         }
         console.log("%d class is/are linked to classroom %s", result.n, room.id);
     });
-};
+}
 
 module.exports = router;

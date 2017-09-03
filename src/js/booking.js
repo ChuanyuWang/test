@@ -21,12 +21,12 @@ $(document).ready(function () {
     init();
     
     // try to get the openid of weixin user
-    window._openid = getCurrentUser();
+    window._openid = getCurrentUser(); /*global getCurrentUser*/
     if (!_openid || _openid.length == 0) {
         $.ajax("api/currentuser", {
             type : "GET",
             data : {
-                timeKey : getTimeKey()
+                timeKey : getTimeKey() /*global getTimeKey*/
             },
             success : function (data) {
                 _openid = data.openid; // could be null
@@ -145,7 +145,7 @@ function init() {
         }
     });
     updateSchedule();
-};
+}
 
 function getAllClassroom() {
     var result = {};
@@ -153,7 +153,7 @@ function getAllClassroom() {
         result[elem.value] = elem.text;
     });
     return result;
-};
+}
 
 function getMonday(date) {
     var _date = moment(date);
@@ -167,7 +167,7 @@ function getMonday(date) {
     //set the time to the very beginning of day
     _date.hours(0).minutes(0).seconds(0).milliseconds(0);
     return _date;
-};
+}
 
 function handleBookOK(event) {
     var modal = $(this).closest('.modal');
@@ -222,7 +222,7 @@ function handleBookOK(event) {
         }
         addNewBook(bookInfo);
     }
-};
+}
 
 function addNewBook(bookInfo) {
     bookInfo.tenant = common.getTenantName();
@@ -251,12 +251,12 @@ function addNewBook(bookInfo) {
         },
         dataType : "json"
     });
-};
+}
 
 function displayError(error, bookInfo) {
     $('#error_dlg').find("p#message").text(error.message);
     $('#error_dlg').modal('show');
-};
+}
 
 function displaySuccess(member, classInfo) {
     var message = "您已预约" + moment(classInfo.date).format('MMMDoah:mm') + "活动，请准时参加";
@@ -293,7 +293,7 @@ function displaySuccess(member, classInfo) {
             dataType : "json"
         });
     }
-};
+}
 
 // append a class for booking at the end of page
 function displayClass(item) {
@@ -361,7 +361,7 @@ function displayClass(item) {
             btn_tip + 
         '</div>' +
         '</div>');
-};
+}
 
 function updateSchedule(control) {
     clearSchedule();
@@ -398,7 +398,7 @@ function updateSchedule(control) {
         },
         dataType : "json"
     });
-};
+}
 
 function scrollToToday() {
     var btns = $('div.class-row button[disabled!=disabled]');
@@ -415,7 +415,7 @@ function scrollToToday() {
             scrollTop: position
         }, 1000);
     }
-};
+}
 
 function displayNoClassWarning(Monday) {
     var list = $('#main');
@@ -423,14 +423,14 @@ function displayNoClassWarning(Monday) {
     list.append('<div class="class-separator"></div>');
     // append a warning bar
     list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>本周没有课程，请查看下一周</div>");
-};
+}
 
 function clearSchedule() {
     // remove all classes and separators
     $('#main .class-separator').remove();
     $('#main .class-row').remove();
     $('#main .alert-warning').remove();
-};
+}
 
 function getAgeLimit(cls) {
     if (cls.age && cls.age.min && cls.age.max) {
@@ -441,10 +441,10 @@ function getAgeLimit(cls) {
         return "年龄小于" + cls.age.max + "月";
     }
     return "";
-};
+}
 
 function getParam(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
     var param = window.location.search.substr(1).match(reg);
     return param ? decodeURI(param[2]) : null;
-};
+}

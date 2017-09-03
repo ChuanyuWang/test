@@ -284,7 +284,7 @@ $(document).ready(function() {
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
         // bootstrap the member view page
-        var memberViewer = new Vue({extends: vueApp, data: viewData, el: '#member_app'});
+        new Vue({extends: vueApp, data: viewData, el: '#member_app'});
     });
 
     request.done(function(data, textStatus, jqXHR) {
@@ -339,7 +339,7 @@ function init() {
 
     $('#loadHistoryBtn').click(loadHistory);
     $('#loadClassesBtn').click(loadClasses);
-};
+}
 
 function handleClickAddComment() {
     var modal = $(this).closest('.modal');
@@ -358,7 +358,7 @@ function handleClickAddComment() {
         Vue.set(viewData.memberData, 'comments', data.comments)
     });
     modal.modal('hide');
-};
+}
 
 function handleClickEditComment(event) {
     var modal = $(this).closest('.modal');
@@ -379,19 +379,17 @@ function handleClickEditComment(event) {
         Vue.set(viewData.memberData, 'comments', data.comments)
     });
     modal.modal('hide');
-};
+}
 
 function loadHistory(e) {
     e.preventDefault();
     $('#loadHistory_mask').show(600);
     $('#history_table').bootstrapTable('refresh', { url: '/api/members/' + viewData.memberData._id + '/history' });
-};
+}
 
 function loadClasses(e) {
     e.preventDefault();
     $('#loadClasses_mask').show(600);
-    var begin = moment(0);
-    var end = moment().add(10, 'years');
     $('#classes_table').bootstrapTable('refresh', {
         url: '/api/classes',
         query: {
@@ -399,7 +397,7 @@ function loadClasses(e) {
             order: 'desc'
         }
     });
-};
+}
 
 function update(fields) {
     var request = $.ajax("/api/members/" + viewData.memberData._id, {
@@ -413,7 +411,7 @@ function update(fields) {
         util.showAlert("更新会员失败", jqXHR);
     })
     return request;
-};
+}
 
 function addComment(memberID, fields) {
     var request = $.ajax("/api/members/" + memberID + '/comments', {
@@ -426,7 +424,7 @@ function addComment(memberID, fields) {
         util.showAlert("添加会员备忘失败", jqXHR);
     });
     return request;
-};
+}
 
 function editComment(memberID, index, fields) {
     var request = $.ajax('/api/members/' + memberID + '/comments/' + index, {
@@ -439,7 +437,7 @@ function editComment(memberID, index, fields) {
         util.showAlert("修改会员备忘失败", jqXHR);
     });
     return request;
-};
+}
 
 function createCard(memberID, fields) {
     var request = $.ajax("/api/members/" + memberID + '/memberships', {
@@ -453,7 +451,7 @@ function createCard(memberID, fields) {
         util.showAlert("创建会员卡失败", jqXHR);
     });
     return request;
-};
+}
 
 function updateCard(memberID, index, fields) {
     var request = $.ajax("/api/members/" + memberID + '/memberships/' + index, {
@@ -466,7 +464,7 @@ function updateCard(memberID, index, fields) {
         util.showAlert("修改会员卡失败", jqXHR);
     });
     return request;
-};
+}
 
 function getMemberInfo(id) {
     var request = $.getJSON("/api/members/" + id, '');
@@ -474,7 +472,7 @@ function getMemberInfo(id) {
         util.showAlert("获取会员信息失败", jqXHR);
     });
     return request;
-};
+}
 
 function getMemberComments(id) {
     var request = $.getJSON("/api/members/" + id + '/comments', '');
@@ -482,7 +480,7 @@ function getMemberComments(id) {
         util.showAlert("获取会员备忘失败", jqXHR);
     });
     return request;
-};
+}
 
 function getMemberSummary(id) {
     var request = $.getJSON("/api/members/" + id + '/summary', '');
@@ -490,7 +488,7 @@ function getMemberSummary(id) {
         util.showAlert("获取会员参与的班级失败", jqXHR);
     });
     return request;
-};
+}
 
 function classFilter(params) {
     var filter = $('#loadClasses_mask .filter input:checked').val();
@@ -501,7 +499,7 @@ function classFilter(params) {
     params.from = begin.toISOString();
     params.to = end.toISOString();
     return params;
-};
+}
 
 function fieldFormatter(value, row, index) {
     if (value.indexOf('credit') > -1) {
@@ -511,7 +509,7 @@ function fieldFormatter(value, row, index) {
     } else {
         return value;
     }
-};
+}
 
 function linkNameFormatter(value, row, index) {
     return [
@@ -519,7 +517,7 @@ function linkNameFormatter(value, row, index) {
         ' <i class="text-primary glyphicon glyphicon-calendar"></i>' + value,
         '</a>'
     ].join('');
-};
+}
 
 function deltaFormatter(value, row, index) {
     if (row.target.indexOf('credit') > -1) {
@@ -541,7 +539,7 @@ function deltaFormatter(value, row, index) {
             row.new
         ].join('');
     }
-};
+}
 },{"./common":1,"./components/card":2,"./services/util":4}],4:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------

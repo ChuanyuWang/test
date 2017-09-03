@@ -73,12 +73,12 @@ $(document).ready(function () {
     init();
     
     // try to get the openid of weixin user
-    window._openid = getCurrentUser();
+    window._openid = getCurrentUser(); /*global getCurrentUser*/
     if (!_openid || _openid.length == 0) {
         $.ajax("api/currentuser", {
             type : "GET",
             data : {
-                timeKey : getTimeKey()
+                timeKey : getTimeKey() /*global getTimeKey*/
             },
             success : function (data) {
                 _openid = data.openid; // could be null
@@ -121,7 +121,7 @@ function init() {
     //$('#currentWeekRange').text(moment().format('[今天] MMMDo'));
     
     toggleLoginForm(true);
-};
+}
 
 function handleLoginOK(event) {
     event.preventDefault();
@@ -187,7 +187,7 @@ function handleLoginOK(event) {
             dataType : "json"
         });
     }
-};
+}
 
 // append a class for booking at the end of page
 function displayClass(item) {
@@ -213,13 +213,13 @@ function displayClass(item) {
 
     // insert a class in last row
     var cls_col = '<p>' + item.name + '</p>';
-
+    var cls_cost = '';
     if (item.cost && item.cost > 0) {
-        var cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
+        cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
     } else if (item.courseID) {
-        var cls_cost ='';
+        cls_cost ='';
     } else {
-        var cls_cost = '<span class="cls-free">公益活动</span>';
+        cls_cost = '<span class="cls-free">公益活动</span>';
     }
 
     var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
@@ -249,7 +249,7 @@ function displayClass(item) {
         '</div>' +
         '<div style="clear:both"></div>' + // add a empty div with clear:both style to make parent div has real height
         '</div>');
-};
+}
 
 function updateUserInfo(user) {
     var credit = 0;
@@ -262,7 +262,7 @@ function updateUserInfo(user) {
         credit = Math.round(credit * 10)/10;
     }
     $('#user_info p').html('你好，<b>' + user.name +'</b>小朋友 <small style="color:#808080">剩余课时: ' + credit + '</small>');
-};
+}
 
 function toggleLoginForm(isShow) {
     // display the login form for user to input name and contact
@@ -281,7 +281,7 @@ function toggleLoginForm(isShow) {
         $('#main .nav-tabs').fadeIn(600);
         $('#main .tab-content').fadeIn(600);
     }
-};
+}
 
 function showMyBooking(isHistory, tab_id) {
     var type = $('.nav-tabs .active a').attr('href');
@@ -290,7 +290,7 @@ function showMyBooking(isHistory, tab_id) {
     } else if (type == '#history') {
         updateSchedule(memberid, true);
     }
-};
+}
 
 function updateSchedule(memberid, isHistory) {
     clearSchedule();
@@ -334,14 +334,14 @@ function updateSchedule(memberid, isHistory) {
         },
         dataType : "json"
     });
-};
+}
 
 function displayNoClassWarning() {
     var list = $('#main');
 
     // append a warning bar
     list.append("<div class='alert alert-warning' role='alert' style='margin-top:7px'><strong>提示：</strong>没有找到预约课程</div>");
-};
+}
 
 function cancelBooking(class_id, member_id, button_div) {
     if (!class_id || !member_id || !button_div) {
@@ -397,21 +397,21 @@ function cancelBooking(class_id, member_id, button_div) {
     });
     
     $('#confirm_dlg').modal('show');
-};
+}
 
 function getClassroomName(roomID) {
-    var roomList = getClassroomList();
+    var roomList = getClassroomList(); /*global getClassroomList*/
     for (var i=0; i<roomList.length;i++) {
         if (roomID == roomList[i].id) {
             return roomList[i].name;
         }
     }
     return "";
-};
+}
 
 function clearSchedule() {
     // remove all classes and separators
     $('.class-row,.class-separator').remove();
     $('.alert-warning').remove();
-};
+}
 },{"./common":1}]},{},[2]);

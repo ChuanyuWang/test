@@ -302,7 +302,7 @@ function convertDateObject(doc) {
         doc["createDate"] = new Date(doc["createDate"]);
     }
     return doc;
-};
+}
 
 function removeCourseMembers(db, courseID, members, onlyLatter) {
     var ids = members.map(function(val, index, array) {
@@ -325,7 +325,7 @@ function removeCourseMembers(db, courseID, members, onlyLatter) {
         }
         console.log(result);
     });
-};
+}
 
 function addCourseMembers(db, courseID, members, onlyLatter) {
     var ids = members.map(function(val, index, array) {
@@ -370,6 +370,6 @@ function addCourseMembers(db, courseID, members, onlyLatter) {
             console.log(result);
         });
     });
-};
+}
 
 module.exports = router;

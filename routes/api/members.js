@@ -291,7 +291,7 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
         error.status = 400;
         return next(error);
     }
-    if (parseInt(req.params.commentIndex) === NaN || parseInt(req.params.commentIndex) < 0) {
+    if (isNaN(parseInt(req.params.commentIndex)) || parseInt(req.params.commentIndex) < 0) {
         var error = new Error("comment index is 0 based");
         error.status = 400;
         return next(error);
@@ -520,7 +520,7 @@ function convertNumberValue(doc) {
     if (doc.hasOwnProperty('credit')) {
         doc['credit'] = parseFloat(doc['credit']);
     }
-};
+}
 
 /**
  * make sure the datetime object is stored as ISODate
@@ -555,7 +555,7 @@ function convertDateObject(doc) {
     }
 
     return doc;
-};
+}
 
 function checkDuplicate(collection, id, query, callback) {
     var FIELDS = { name: 1, contact: 1 };
@@ -574,7 +574,7 @@ function checkDuplicate(collection, id, query, callback) {
         });
     } else if (query.hasOwnProperty('name') || query.hasOwnProperty('contact')) {
         collection.findOne({
-            _id: mongojs.ObjectId(req.params.memberID)
+            _id: mongojs.ObjectId(id)
         }, FIELDS, function(err, doc) {
             if (err) return callback(err);
             if (!doc) return callback(null, false);
@@ -632,7 +632,7 @@ function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery
             remark: memo
         });
     }
-};
+}
 
 function isEqual(a, b) {
     if (a === b) return true;
@@ -644,8 +644,8 @@ function isEqual(a, b) {
         });
     }
     return a == b;
-};
-
+}
+/*
 function getMemberBookQuantity(class_doc, member_id) {
     if (!class_doc || !class_doc.booking) {
         return NaN;
@@ -657,6 +657,6 @@ function getMemberBookQuantity(class_doc, member_id) {
         }
     }
     return NaN;
-};
+}*/
 
 module.exports = router;

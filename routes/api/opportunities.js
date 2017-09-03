@@ -108,6 +108,6 @@ function initDateField(item) {
             item[fields[i]] = new Date(item[fields[i]]);
         }
     }
-};
+}
 
 module.exports = router;
