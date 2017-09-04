@@ -319,17 +319,13 @@ function displayClass(item) {
     // insert a class in last row
     var cls_col = '<p>' + item.name + '</p>';
     
+    var cls_cost = '';
     if (item.cost && item.cost > 0) {
-        var cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
+        cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
     } else if (item.courseID) {
-        var cls_cost ='';
+        cls_cost ='';
     } else {
-        //TODO, display 故事会 for martin tenant's free course
-        if (location.pathname.indexOf("martin") == 1) {
-            var cls_cost = '<span class="cls-free">故事会</span>';
-        } else {
-            var cls_cost = '<span class="cls-free">公益活动</span>';
-        }
+        cls_cost = '<span class="cls-free">公益活动</span>';
     }
 
     var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
