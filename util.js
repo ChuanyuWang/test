@@ -32,11 +32,11 @@ module.exports = {
         });
 
         db.on('error', function (err) {
-            console.error('connect database "%s" with error', db, err);
+            console.error('connect database "%s" with error', db.toString(), err);
             state.db = null;
         })
         db.on('connect', function () {
-            console.log('database "%s" is connected', db);
+            console.log('database "%s" is connected', db.toString());
         })
         return db;
     }
