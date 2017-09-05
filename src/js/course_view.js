@@ -28,7 +28,7 @@ $(document).ready(function() {
         viewData.course = data || {};
 
         // bootstrap the course view page
-        new Vue({extends: courseApp, data: viewData, el: '#course_app'});
+        new Vue({ extends: courseApp, data: viewData, el: '#course_app' });
     });
     request.done(function(data, textStatus, jqXHR) {
         loadCourseClasses(data);
@@ -173,6 +173,49 @@ var courseApp = {
             this.$refs.modal.room = this.course.classroom;
             this.$refs.modal.show();
         },
+        genClassNames: function(count) {
+            var count = count || 0;
+            var result = [];
+            var existed = viewData.course.classes || [];
+            var suffix = existed.length + 1;
+            for (var i = 0; i < count; i++) {
+                var name = viewData.course.name + '-' + suffix;
+                while (existed.some(function(val, index, array) {
+                    return val.name == name;
+                })) {
+                    suffix++;
+                    name = viewData.course.name + '-' + suffix;
+                }
+                result.push(name);
+                suffix++;
+            }
+            return result;
+        },
+        genRepeatClass: function(datetime, startdate, enddate, days) {
+            var dates = [];
+            var current = moment(startdate);
+            while (current.isSameOrBefore(enddate)) {
+                if (days.some(function(value, index, array) {
+                    return value == current.day();
+                })) {
+                    var date = moment(current).set({
+                        'hours': datetime.hours(),
+                        'minutes': datetime.minutes(),
+                        'seconds': datetime.seconds(),
+                        'milliseconds': datetime.milliseconds()
+                    });
+                    dates.push(date);
+                }
+                current.add(1, 'day');
+            }
+            var names = this.genClassNames(dates.length);
+            return names.map(function(value, index, array) {
+                return {
+                    name: value,
+                    date: dates[index].toISOString()
+                }
+            });
+        },
         addClass: function(options) {
             var vm = this;
             var datetime = options.date;
@@ -182,10 +225,10 @@ var courseApp = {
                 var enddate = options.end;
                 var days = options.weekdays || [];
                 if (enddate.diff(startdate, 'days') > 180) return bootbox.alert('开始和结束日期不能超过180天');
-                result = genRepeatClass(datetime, startdate, enddate, days);
+                result = this.genRepeatClass(datetime, startdate, enddate, days);
             } else {
                 result.push({
-                    name: genClassNames(1)[0],
+                    name: this.genClassNames(1)[0],
                     date: datetime.toISOString()
                 });
             }
@@ -346,49 +389,4 @@ function creditFormatter(value, row, index) {
     } else {
         return undefined;
     }
-}
-
-function genClassNames(count) {
-    var count = count || 0;
-    var result = [];
-    var existed = viewData.course.classes || [];
-    var suffix = existed.length + 1;
-    for (var i = 0; i < count; i++) {
-        var name = viewData.course.name + '-' + suffix;
-        while (existed.some(function(val, index, array) {
-            return val.name == name;
-        })) {
-            suffix++;
-            name = viewData.course.name + '-' + suffix;
-        }
-        result.push(name);
-        suffix++;
-    }
-    return result;
-}
-
-function genRepeatClass(datetime, startdate, enddate, days) {
-    var dates = [];
-    var current = moment(startdate);
-    while (current.isSameOrBefore(enddate)) {
-        if (days.some(function(value, index, array) {
-            return value == current.day();
-        })) {
-            var date = moment(current).set({
-                'hours': datetime.hours(),
-                'minutes': datetime.minutes(),
-                'seconds': datetime.seconds(),
-                'milliseconds': datetime.milliseconds()
-            });
-            dates.push(date);
-        }
-        current.add(1, 'day');
-    }
-    var names = genClassNames(dates.length);
-    return names.map(function(value, index, array) {
-        return {
-            name: value,
-            date: dates[index].toISOString()
-        }
-    });
 }
