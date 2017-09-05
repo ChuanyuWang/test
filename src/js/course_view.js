@@ -236,6 +236,7 @@ var courseApp = {
             // assign classroom
             result.forEach(function(value, index, array) {
                 value.classroom = options.room;
+                value.cost = options.cost;
             })
             // create classes
             var request = course_service.addCourseClasses(viewData.course._id, result);
