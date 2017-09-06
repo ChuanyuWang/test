@@ -7,6 +7,7 @@
 
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
+var view_member_course_modal = require('./components/view-member-course-modal');
 
 var viewData = {
     course: {},
@@ -67,7 +68,8 @@ function init() {
 
 var courseApp = {
     components: {
-        'add-multi-class-modal': add_multi_class_modal
+        'add-multi-class-modal': add_multi_class_modal,
+        'view-member-course-modal': view_member_course_modal
     },
     computed: {
         membersCount: function() {
@@ -311,6 +313,10 @@ var courseApp = {
                     }
                 });
             }
+        },
+        showMemberCourse: function(member) {
+            //TODO
+            alert(member)
         }
     },
     mounted: function() {

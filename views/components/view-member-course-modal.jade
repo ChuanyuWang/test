@@ -1,0 +1,18 @@
+//Define template for view member's classes in one course modal dailog component (Vue.js)
+script#view-member-course-modal-template(type='text/x-template')
+  div#view-member-course-modal.modal.fade(tabindex='-1',data-backdrop='static')
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title= __('view_member_course_title')
+        div.modal-body
+          form.form-horizontal
+            div.form-group(style='margin-bottom:7px')
+              label.control-label.col-sm-2= __('member_name')
+              div.col-sm-6
+                p.form-control-static {{name}}
+        div.modal-footer
+          button.btn.btn-default(type="button",data-dismiss="modal")= __('dialog_cancel')
+          button.btn.btn-success(type="button",@click='handleOK')= __('dialog_ok')

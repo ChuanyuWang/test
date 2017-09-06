@@ -99,6 +99,45 @@ module.exports = {
 },{}],2:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
+ * view-member-course-modal.js modal dailog for view member's classes of one course
+ * --------------------------------------------------------------------------
+ */
+
+// the element ID of modal dialog
+var elementID = '#view-member-course-modal';
+
+module.exports = {
+    template: '#view-member-course-modal-template',
+    props: {
+        name: String, // member name
+        courseid: String // course id
+    },
+    data: function() {
+        return {};
+    },
+    watch: {},
+    computed: {},
+    filters: {},
+    methods: {
+        show: function(value) {
+            // TODO, clear error
+            $(elementID).modal('show');
+        },
+        handleOK: function() {
+            if (this.isValid) {
+                this.$emit("ok", this.$data);
+                $(elementID).modal('hide');
+            }
+        }
+    },
+    mounted: function() {
+        // 'this' is refer to vm instance
+        var vm = this;
+    }
+};
+},{}],3:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
  * course_view.js 
  * Entry module of view course page
  * --------------------------------------------------------------------------
@@ -106,6 +145,7 @@ module.exports = {
 
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
+var view_member_course_modal = require('./components/view-member-course-modal');
 
 var viewData = {
     course: {},
@@ -166,7 +206,8 @@ function init() {
 
 var courseApp = {
     components: {
-        'add-multi-class-modal': add_multi_class_modal
+        'add-multi-class-modal': add_multi_class_modal,
+        'view-member-course-modal': view_member_course_modal
     },
     computed: {
         membersCount: function() {
@@ -410,6 +451,10 @@ var courseApp = {
                     }
                 });
             }
+        },
+        showMemberCourse: function(member) {
+            //TODO
+            alert(member)
         }
     },
     mounted: function() {
@@ -490,7 +535,7 @@ function creditFormatter(value, row, index) {
         return undefined;
     }
 }
-},{"./components/add-multi-class-modal":1,"./services/courses":3}],3:[function(require,module,exports){
+},{"./components/add-multi-class-modal":1,"./components/view-member-course-modal":2,"./services/courses":4}],4:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * courses.js provide API for courses service
@@ -601,7 +646,7 @@ service.getCourseClasses = function(courseID) {
 };
 
 module.exports = service;
-},{"./util":4}],4:[function(require,module,exports){
+},{"./util":5}],5:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * util.js provide common utils for all services
@@ -633,4 +678,4 @@ util.showAlert = function(title, jqXHR, className) {
 
 module.exports = util;
 
-},{}]},{},[2]);
+},{}]},{},[3]);
