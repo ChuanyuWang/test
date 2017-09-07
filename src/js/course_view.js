@@ -316,7 +316,9 @@ var courseApp = {
         },
         showMemberCourse: function(member) {
             //TODO
-            alert(member)
+            //alert(member)
+            this.$refs.assignClassDlg.name = member.name;
+            this.$refs.assignClassDlg.show();
         }
     },
     mounted: function() {

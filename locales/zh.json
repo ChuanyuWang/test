@@ -22,5 +22,7 @@
 	"view_member_course_title": "分配会员在此班级的课程",
 	"member_name": "姓名",
 	"dialog_ok": "确定",
-	"dialog_cancel": "取消"
+	"dialog_cancel": "取消",
+	"completed": "已结束",
+	"not_started": "未开始"
 }

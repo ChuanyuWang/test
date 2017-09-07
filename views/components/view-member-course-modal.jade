@@ -13,6 +13,17 @@ script#view-member-course-modal-template(type='text/x-template')
               label.control-label.col-sm-2= __('member_name')
               div.col-sm-6
                 p.form-control-static {{name}}
+          div
+            ul.nav.nav-tabs(role='tablist')
+              li.active
+                a(data-toggle='tab',href='#notstarted')= __('not_started')
+              li
+                a(data-toggle='tab',href='#completed')= __('completed')
+            div.tab-content
+              div.tab-pane.active(id='notstarted')
+                p abc
+              div.tab-pane(id='completed')
+                p 456
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal")= __('dialog_cancel')
           button.btn.btn-success(type="button",@click='handleOK')= __('dialog_ok')
