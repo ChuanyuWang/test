@@ -3,6 +3,9 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var util = require('../../util');
 
+/**
+ * Get the member list who booked the class
+ */
 router.get('/', function (req, res, next) {
     var tenantDB = null;
     if (req.query.hasOwnProperty('tenant')) {
@@ -252,8 +255,6 @@ router.post('/', function (req, res, next) {
                 oldest.setMinutes(0);
                 oldest.setMonth(oldest.getMonth() - cls.age.max);
                 if (doc.birthday < oldest) {
-                    console.log(doc.birthday);
-                    console.log(oldest);
                     res.status(400).json({
                         // child is too old
                         'message' : "小朋友年龄超出指定要求，无法预约，如有问题，欢迎来电或到店咨询",

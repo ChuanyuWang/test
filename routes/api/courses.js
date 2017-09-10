@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 var helper = require('../../helper');
+var reservation = require('./lib/reservation');
 
 var NORMAL_FIELDS = {
     name: 1,
@@ -126,13 +127,13 @@ router.patch('/:courseID', function(req, res, next) {
 
 router.post('/:courseID/members', function(req, res, next) {
     var courses = req.db.collection("courses");
-    var members = Array.isArray(req.body) ? req.body : [req.body];
+    var added_members = Array.isArray(req.body) ? req.body : [req.body];
     courses.findAndModify({
         query: {
             _id: mongojs.ObjectId(req.params.courseID)
         },
         update: {
-            $push: { members: { $each: members } }
+            $push: { members: { $each: added_members } }
         },
         fields: NORMAL_FIELDS,
         new: true
@@ -143,8 +144,17 @@ router.post('/:courseID/members', function(req, res, next) {
             return next(error);
         }
         console.log("add %j members to course %s", req.body, req.params.courseID);
-        addCourseMembers(req.db, req.params.courseID, members, true);
-        res.json(doc);
+        getCourseClasses(req.params.courseID, req.db.collection('classes'), function(error, classes) {
+            if (error) return next(error);
+            getCourseMemebers(added_members, req.db.collection('members'), function(error, members) {
+                if (error) return next(error);
+
+                var result = reservation.add(members, classes, 1, true);
+                createReservation(req.db, result, function(error, addedClasses) {
+                    res.json({ "updateClasses": classes, "result": result });
+                });
+            });
+        });
     });
 });
 
@@ -180,56 +190,44 @@ router.delete('/:courseID/members', function(req, res, next) {
 router.post('/:courseID/classes', function(req, res, next) {
     var courses = req.db.collection("courses");
     var items = Array.isArray(req.body) ? req.body : [req.body];
+    // none classes needed to be created
+    if (items.length === 0) return res.json([]);
 
-    courses.findOne({
-        _id: mongojs.ObjectId(req.params.courseID)
-    }, NORMAL_FIELDS, function(err, doc) {
-        if (err) {
-            var error = new Error("Get course fails");
-            error.innerError = err;
-            return next(error);
-        }
-        if (!doc) {
-            var error = new Error("Course doesn't exist");
-            error.status = 400;
-            return next(error);
-        }
+    getCourse(req.params.courseID, courses, function(error, doc) {
+        if (error) return next(error);
+
         if (doc.status == 'closed') {
             var error = new Error("班级已经结束，不能添加课程");
             error.status = 400;
             return next(error);
         }
-
-        var members = doc.members || [];
-        var classes = items.map(function(value, index, array) {
+        // create new added classes
+        var added_classes = items.map(function(value, index, array) {
             value.courseID = req.params.courseID;
             if (value.hasOwnProperty("date")) {
                 value["date"] = new Date(value["date"]);
             }
             value.cost = value.cost || 0;
             value.capacity = value.capacity || 8;
-            value.booking = value.booking || [];
-            members.forEach(function(m, index, array) {
-                value.booking.push({
-                    member: m.id,
-                    quantity: 1,
-                    bookDate: new Date()
-                })
-            });
+            value.booking = []; // clear the booking for new added course's classes
             return value;
         });
-        if (classes.length === 0) {
-            // none classes needed to be created
-            return res.json([]);
-        }
-        req.db.collection("classes").insert(classes, function(err, docs) {
+        req.db.collection('classes').insert(added_classes, function(err, docs) {
             if (err) {
                 var error = new Error("add course's classes fails");
                 error.innerError = err;
                 return next(error);
             }
-            console.log("add %j classes to course %s", classes, req.params.courseID);
-            res.json(docs);
+            console.log("add %j classes to course %s", docs, req.params.courseID);
+            // Get course members for adding reservation
+            getCourseMemebers(doc.members, req.db.collection('members'), function(error, members) {
+                if (error) return next(error);
+
+                var result = reservation.add(members, docs, 1, true);
+                createReservation(req.db, result, function(error, addedClasses) {
+                    res.json({ "addedClasses": docs, "result": result });
+                });
+            });
         });
     });
 });
@@ -243,9 +241,7 @@ router.delete('/:courseID/classes', function(req, res, next) {
     classes.remove({
         _id: { $in: ids },
         courseID: req.params.courseID
-    }, {
-        justOne: false
-    }, function(err, result) {
+    }, { justOne: false }, function(err, result) {
         if (err) {
             var error = new Error("delete course's classes fails");
             error.innerError = err;
@@ -260,9 +256,7 @@ router.delete('/:courseID', function(req, res, next) {
     var courses = req.db.collection("courses");
     courses.remove({
         _id: mongojs.ObjectId(req.params.courseID)
-    }, {
-        justOne: true
-    }, function(err, result) {
+    }, { justOne: true }, function(err, result) {
         if (err) {
             var error = new Error("delete course fails");
             error.innerError = err;
@@ -272,13 +266,13 @@ router.delete('/:courseID', function(req, res, next) {
         req.db.collection("classes").remove({
             courseID: req.params.courseID
         }, {
-            justOne: false
-        }, function(err, result) {
-            if (err) {
-                console.error("delete course's classes fails");
-            }
-            console.log("delete classes of course %s", req.params.courseID);
-        });
+                justOne: false
+            }, function(err, result) {
+                if (err) {
+                    console.error("delete course's classes fails");
+                }
+                console.log("delete classes of course %s", req.params.courseID);
+            });
         // check the result and respond
         if (result.n == 1) {
             console.log("course %s is deleted", req.params.courseID);
@@ -310,65 +304,102 @@ function removeCourseMembers(db, courseID, members, onlyLatter) {
     });
     db.collection('classes').update({
         'courseID': courseID,
-        date: {
-            $gte: new Date()
-        }
+        date: { $gte: new Date() }
     }, {
-        $pull: {
-            booking: {
-                member: { $in: ids }
-            }
-        }
-    }, {multi: true}, function(err, result) {
-        if (err) {
-            return console.error(err);
-        }
-        console.log(result);
-    });
-}
-
-function addCourseMembers(db, courseID, members, onlyLatter) {
-    var ids = members.map(function(val, index, array) {
-        return val.id;
-    });
-    var bookings = members.map(function(val, index, array) {
-        return {
-            'member': val.id,
-            'quantity': 1,
-            'bookDate': new Date()
-        };
-    });
-    db.collection('classes').update({
-        'courseID': courseID,
-        date: {
-            $gte: new Date()
-        }
-    }, {
-        $pull: {
-            booking: {
-                member: { $in: ids }
-            }
-        }
-    }, {multi: true}, function(err, result) {
-        if (err) {
-            return console.error(err);
-        }
-        console.log(result);
-        db.collection('classes').update({
-            'courseID': courseID,
-            date: { $gte: new Date() }
-        }, {
-            $push: {
+            $pull: {
                 booking: {
-                    $each: bookings
+                    member: { $in: ids }
                 }
             }
-        }, {multi: true}, function(err, result) {
+        }, { multi: true }, function(err, result) {
             if (err) {
                 return console.error(err);
             }
             console.log(result);
         });
+}
+
+function getCourse(id, collection, callback) {
+    collection.findOne({
+        _id: mongojs.ObjectId(id)
+    }, NORMAL_FIELDS, function(err, doc) {
+        if (err) {
+            var error = new Error("Get course fails");
+            error.innerError = err;
+            return callback(error);
+        }
+        if (!doc) {
+            var error = new Error("Course doesn't exist");
+            error.status = 400;
+            return callback(error);
+        }
+
+        return callback(null, doc);
+    });
+}
+
+function getCourseMemebers(merberIDs, membersCol, callback) {
+    var course_members = merberIDs || [];
+    if (course_members.length == 0) return callback(null, []);
+    var memberIDs = course_members.map(function(value, index, array) {
+        return mongojs.ObjectId(value.id);
+    });
+    membersCol.find({
+        _id: { $in: memberIDs }
+    }, { name: 1, birthday: 1, status: 1, membership: 1 }, function(err, members) {
+        if (err) {
+            var error = new Error("get course's members fails");
+            error.innerError = err;
+            return callback(error);
+        }
+        return callback(null, members);
+    });
+}
+
+function getCourseClasses(courseID, classesCol, callback) {
+    classesCol.find({
+        'courseID': courseID,
+    }, function(err, docs) {
+        if (err) {
+            var error = new Error("get course's classes fails");
+            error.innerError = err;
+            return callback(error);
+        }
+        return callback(null, docs);
+    });
+}
+
+function createReservation(db, result, callback) {
+    //deduct the expense from membership card
+    var bulk1 = db.collection('members').initializeUnorderedBulkOp();
+    Object.keys(result.memberSummary).forEach(function(memberID) {
+        var res = result.memberSummary[memberID];
+        if (res.expense > 0) {
+            bulk1.find({ _id: mongojs.ObjectId(memberID) }).updateOne({
+                $inc: { "membership.0.credit": -res.expense }
+            });
+        }
+    });
+    bulk1.execute(function(err, res) {
+        //TODO, handle error
+        if (err) console.error(err);
+        else console.log(`deduct the expense from membership card with ${res}`);
+    });
+    //add the booking info into corresponding classes
+    var bulk2 = db.collection('classes').initializeUnorderedBulkOp();
+    Object.keys(result.classSummary).forEach(function(classID) {
+        var res = result.classSummary[classID];
+        if (res.newbookings.length > 0) {
+            bulk2.find({ _id: mongojs.ObjectId(classID) }).updateOne({
+                $push: { booking: { $each: res.newbookings } }
+            });
+        }
+    });
+    bulk2.execute(function(err, res) {
+        //TODO, handle error
+        if (err) console.error(err);
+        else console.log(`add booking info into classes with ${res}`);
+        callback(null, res)
     });
 }
 

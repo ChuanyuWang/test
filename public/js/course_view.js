@@ -382,9 +382,11 @@ var courseApp = {
             // create classes
             var request = course_service.addCourseClasses(viewData.course._id, result);
             request.done(function(data, textStatus, jqXHR) {
-                data.forEach(function(value, index, array) {
+                var addedClasses = data.addedClasses || [];
+                addedClasses.forEach(function(value, index, array) {
                     vm.course.classes.push(value);
                 });
+                // TODO, show data.result 
                 //bootbox.alert('班级课程添加成功');
             });
         },
@@ -519,6 +521,7 @@ function handleClickAddMember() {
             result.forEach(function(value, index, array) {
                 viewData.course.members.push(value);
             });
+            viewData.course.classes = data.updateClasses || [];
             //bootbox.alert('添加班级成员成功');
         });
     }
