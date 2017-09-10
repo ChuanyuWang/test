@@ -29,6 +29,7 @@ append js
 block page
   include ../../components/add-multi-class-modal
   include ../../components/view-member-course-modal
+  include ../../components/show-booking-result-modal
   div#course_app.container(style='padding-top:69px',data-course-id='#{courseID}')
     ol.breadcrumb
       li
@@ -108,6 +109,7 @@ block page
     div(style='height:20px')
     add-multi-class-modal(ref='modal',:classrooms='classrooms',@ok='addClass')
     view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
+    show-booking-result-modal(ref='summaryDlg')
   div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content

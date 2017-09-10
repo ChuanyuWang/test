@@ -99,6 +99,60 @@ module.exports = {
 },{}],2:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
+ * show-booking-result-modal.js component for display the booking result
+ * --------------------------------------------------------------------------
+ */
+
+module.exports = {
+    template: '#show-booking-result-modal-template',
+    props: {
+    },
+    data: function() {
+        return {
+            result: {} // the result of adding members/classes into course
+        };
+    },
+    watch: {
+    },
+    computed: {
+        newBookingCount: function() {
+            var count = 0;
+            var classSummary = this.result.classSummary || {};
+            Object.keys(classSummary).forEach(function(classID) {
+                var res = classSummary[classID];
+                count += res.newbookings.length;
+            });
+            return count;
+        },
+        failBookingCount: function() {
+            var count = 0;
+            var memberSummary = this.result.memberSummary || {};
+            Object.keys(memberSummary).forEach(function(memberID) {
+                var res = memberSummary[memberID];
+                count += res.errors.length;
+            });
+            return count;
+        }
+    },
+    filters: {
+        getMemberName: function(value, result) {
+            var memberSummary = result.memberSummary || {};
+            if (!value) return ''
+            return memberSummary[value].name;
+        }
+    },
+    methods: {
+        show: function(result) {
+            this.result = result || {};
+            $(this.$el).modal('show');
+        }
+    },
+    mounted: function() {
+    }
+};
+},{}],3:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
  * view-member-course-modal.js modal dailog for view member's classes of one course
  * --------------------------------------------------------------------------
  */
@@ -136,7 +190,7 @@ module.exports = {
         //var vm = this;
     }
 };
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * course_view.js 
@@ -147,6 +201,7 @@ module.exports = {
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
 var view_member_course_modal = require('./components/view-member-course-modal');
+var show_booking_result_modal = require('./components/show-booking-result-modal');
 
 var viewData = {
     course: {},
@@ -208,7 +263,8 @@ function init() {
 var courseApp = {
     components: {
         'add-multi-class-modal': add_multi_class_modal,
-        'view-member-course-modal': view_member_course_modal
+        'view-member-course-modal': view_member_course_modal,
+        'show-booking-result-modal': show_booking_result_modal
     },
     computed: {
         membersCount: function() {
@@ -386,7 +442,7 @@ var courseApp = {
                 addedClasses.forEach(function(value, index, array) {
                     vm.course.classes.push(value);
                 });
-                // TODO, show data.result 
+                vm.$refs.summaryDlg.show(data.result || {});
                 //bootbox.alert('班级课程添加成功');
             });
         },
@@ -541,7 +597,7 @@ function creditFormatter(value, row, index) {
         return undefined;
     }
 }
-},{"./components/add-multi-class-modal":1,"./components/view-member-course-modal":2,"./services/courses":4}],4:[function(require,module,exports){
+},{"./components/add-multi-class-modal":1,"./components/show-booking-result-modal":2,"./components/view-member-course-modal":3,"./services/courses":5}],5:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * courses.js provide API for courses service
@@ -652,7 +708,7 @@ service.getCourseClasses = function(courseID) {
 };
 
 module.exports = service;
-},{"./util":5}],5:[function(require,module,exports){
+},{"./util":6}],6:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * util.js provide common utils for all services
@@ -684,4 +740,4 @@ util.showAlert = function(title, jqXHR, className) {
 
 module.exports = util;
 
-},{}]},{},[3]);
+},{}]},{},[4]);

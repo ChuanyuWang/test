@@ -8,6 +8,7 @@
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
 var view_member_course_modal = require('./components/view-member-course-modal');
+var show_booking_result_modal = require('./components/show-booking-result-modal');
 
 var viewData = {
     course: {},
@@ -69,7 +70,8 @@ function init() {
 var courseApp = {
     components: {
         'add-multi-class-modal': add_multi_class_modal,
-        'view-member-course-modal': view_member_course_modal
+        'view-member-course-modal': view_member_course_modal,
+        'show-booking-result-modal': show_booking_result_modal
     },
     computed: {
         membersCount: function() {
@@ -247,7 +249,7 @@ var courseApp = {
                 addedClasses.forEach(function(value, index, array) {
                     vm.course.classes.push(value);
                 });
-                // TODO, show data.result 
+                vm.$refs.summaryDlg.show(data.result || {});
                 //bootbox.alert('班级课程添加成功');
             });
         },
