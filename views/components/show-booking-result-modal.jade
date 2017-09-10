@@ -23,7 +23,8 @@ script#show-booking-result-modal-template(type='text/x-template')
               span.badge(style='margin-left:3px') {{failBookingCount}}
             div.panel-body(style='padding:7px')
               ul(style='padding-left:25px')
-                li(v-for='member in result.memberSummary',v-if='member.errors.length') {{member.name}}
+                li(v-for='(member, id) in result.memberSummary',v-if='member.errors.length')
+                  a(:href='"../member/" + id',target='_blank') {{member.name}}
                   span.badge(style='margin-left:3px;background-color:#d25957') {{member.errors.length}}节
                   ul(style='padding-left:25px')
                     li(v-for='value in member.errors') 预约课程{{value.class}}失败(1人)</br><i>{{value.message}}</i>
