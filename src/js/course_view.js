@@ -9,6 +9,7 @@ var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
 var view_member_course_modal = require('./components/view-member-course-modal');
 var show_booking_result_modal = require('./components/show-booking-result-modal');
+var member_select_modal = require('./components/member-select-modal');
 
 var viewData = {
     course: {},
@@ -44,34 +45,14 @@ function init() {
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
-
-    $('#member_table').bootstrapTable({
-        url: '/api/members?status=active',
-        locale: 'zh-CN',
-        columns: [{}, {}, {}, {
-            formatter: creditFormatter
-        }]
-    });
-
-    // event listener of adding new comment
-    $('#member_dlg #add_member').click(handleClickAddMember);
-    $('#member_dlg').on('shown.bs.modal', function(event) {
-        //$(this).find('table').bootstrapTable('refresh', { url: '/api/members', query: { status: 'active' } });
-        // check selected members
-        if (viewData.course.members) {
-            var checkedItems = viewData.course.members.map(function(value, index, array) {
-                return value.id
-            });
-            $(this).find('table').bootstrapTable('checkBy', { field: '_id', values: checkedItems });
-        }
-    });
 }
 
 var courseApp = {
     components: {
         'add-multi-class-modal': add_multi_class_modal,
         'view-member-course-modal': view_member_course_modal,
-        'show-booking-result-modal': show_booking_result_modal
+        'show-booking-result-modal': show_booking_result_modal,
+        'member-select-modal': member_select_modal
     },
     computed: {
         membersCount: function() {
@@ -177,6 +158,12 @@ var courseApp = {
             this.$refs.modal.room = this.course.classroom;
             this.$refs.modal.show();
         },
+        showAddMemberDlg: function(params) {
+            var checkedItems = (this.course.members||[]).map(function(value, index, array) {
+                return value.id
+            });
+            this.$refs.memberSelectDlg.show(checkedItems);
+        },
         genClassNames: function(count) {
             var count = count || 0;
             var result = [];
@@ -279,6 +266,40 @@ var courseApp = {
                 }
             });
         },
+        addMembers: function(selectedMembers) {
+            var vm = this;
+            var members = this.course.members || [];
+            var addedOnes = selectedMembers.filter(function(element, index, array) {
+                // filter the new added member
+                return !members.some(function(value, index, array) {
+                    // find one matched member and return true
+                    return value.id == element._id;
+                });
+            });
+        
+            if (addedOnes.length > 0) {
+                // initialize members property
+                if (!this.course.hasOwnProperty('members')) {
+                    Vue.set(this.course, 'members', [])
+                }
+                var result = addedOnes.map(function(value, index, array) {
+                    return {
+                        id: value._id,
+                        name: value.name
+                    };
+                });
+        
+                var request = course_service.addCourseMembers(viewData.course._id, result);
+                request.done(function(data, textStatus, jqXHR) {
+                    result.forEach(function(value, index, array) {
+                        vm.course.members.push(value);
+                    });
+                    vm.course.classes = data.updateClasses || [];
+                    vm.$refs.summaryDlg.show(data.result || {});
+                    //bootbox.alert('添加班级成员成功');
+                });
+            }
+        },
         removeMember: function(item) {
             var vm = this;
             bootbox.confirm({
@@ -352,55 +373,4 @@ function loadCourseClasses(course) {
             course.classes.push(value);
         });
     });
-}
-
-function handleClickAddMember() {
-    var modal = $(this).closest('.modal');
-    var selections = modal.find('table').bootstrapTable('getAllSelections');
-
-    var members = viewData.course.members || [];
-    var addedOnes = selections.filter(function(element, index, array) {
-        // filter the new added member
-        return !members.some(function(value, index, array) {
-            // find one matched member and return true
-            return value.id == element._id;
-        });
-    });
-
-    if (addedOnes.length > 0) {
-        // initialize members property
-        if (!viewData.course.hasOwnProperty('members')) {
-            Vue.set(viewData.course, 'members', [])
-        }
-        var result = addedOnes.map(function(value, index, array) {
-            return {
-                id: value._id,
-                name: value.name
-            };
-        });
-
-        var request = course_service.addCourseMembers(viewData.course._id, result);
-        request.done(function(data, textStatus, jqXHR) {
-            result.forEach(function(value, index, array) {
-                viewData.course.members.push(value);
-            });
-            viewData.course.classes = data.updateClasses || [];
-            //bootbox.alert('添加班级成员成功');
-        });
-    }
-    modal.modal('hide');
-}
-
-function creditFormatter(value, row, index) {
-    var membership = row.membership;
-    if (membership && membership[0]) {
-        // A better way of 'toFixed(1)'
-        if (typeof (membership[0].credit) == 'number') {
-            return Math.round(membership[0].credit * 10) / 10;
-        } else {
-            return membership[0].credit;
-        }
-    } else {
-        return undefined;
-    }
 }

@@ -30,6 +30,7 @@ block page
   include ../../components/add-multi-class-modal
   include ../../components/view-member-course-modal
   include ../../components/show-booking-result-modal
+  include ../../components/member-select-modal
   div#course_app.container(style='padding-top:69px',data-course-id='#{courseID}')
     ol.breadcrumb
       li
@@ -73,7 +74,7 @@ block page
     form.form-horizontal
       div.form-group
         div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',data-toggle='modal',data-target='#member_dlg')
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',@click='showAddMemberDlg')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           ul.list-group(style='margin-bottom:0px')
@@ -110,26 +111,4 @@ block page
     add-multi-class-modal(ref='modal',:classrooms='classrooms',@ok='addClass')
     view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
     show-booking-result-modal(ref='summaryDlg')
-  div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 添加班级成员
-        div.modal-body
-          div.checkbox(style='position:absolute;top:25px;left:20px')
-            label
-              input(type='checkbox',name='onlyLatter',checked,disabled)
-              |仅参加尚未开始的课程
-          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
-            thead
-              tr
-                //th(data-field='_id',data-visible='false') ID
-                th(data-checkbox='true')
-                th(data-field='name',data-sortable='true') 宝宝姓名
-                th(data-field='contact') 联系方式
-                th(data-field='membership') 剩余课时
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_member.btn.btn-success(type="button") 确定
+    member-select-modal(ref='memberSelectDlg',@ok='addMembers')
