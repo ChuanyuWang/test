@@ -7,6 +7,10 @@
 module.exports = {
     template: '#member-select-modal-template',
     props: {
+        multiSelection : {
+            type: Boolean,
+            default: false
+        }
     },
     data: function() {
         return {};

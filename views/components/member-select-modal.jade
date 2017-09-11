@@ -16,7 +16,8 @@ script#member-select-modal-template(type='text/x-template')
             thead
               tr
                 //th(data-field='_id',data-visible='false') ID
-                th(data-checkbox='true')
+                th(v-if='multiSelection',data-checkbox='true')
+                th(v-else,data-radio='true')
                 th(data-field='name',data-sortable='true')= __('member_name')
                 th(data-field='contact')= __('member_contact')
                 th(data-field='membership') 剩余课时

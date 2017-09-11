@@ -106,6 +106,10 @@ module.exports = {
 module.exports = {
     template: '#member-select-modal-template',
     props: {
+        multiSelection : {
+            type: Boolean,
+            default: false
+        }
     },
     data: function() {
         return {};
@@ -338,7 +342,7 @@ var courseApp = {
                     uninvolved: 0,
                     total: vm.sortedClasses.length
                 };
-                vm.course.classes.forEach(function(cls, index, array) {
+                vm.sortedClasses.forEach(function(cls, index, array) {
                     if (vm.isAbsent(cls, member)) {
                         if (moment(cls.date).isSameOrBefore(now)) status.absent++;
                         else status.uninvolved++;
