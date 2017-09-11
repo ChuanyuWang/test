@@ -118,3 +118,7 @@ block page
     view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
     show-booking-result-modal(ref='summaryDlg')
     member-select-modal(ref='memberSelectDlg',@ok='addMembers',:multi-selection='true')
+      div.checkbox(slot='toolbar',style='position:absolute;top:25px;left:20px')
+        label
+          input(type='checkbox',checked,disabled)
+          |仅参加尚未开始的课程

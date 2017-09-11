@@ -8,10 +8,7 @@ script#member-select-modal-template(type='text/x-template')
             span(aria-hidden="true") &times
           h4.modal-title= __('member_select_title')
         div.modal-body
-          div.checkbox(style='position:absolute;top:25px;left:20px')
-            label
-              input(type='checkbox',name='onlyLatter',checked,disabled)
-              |仅参加尚未开始的课程
+          slot(name='toolbar')
           table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
             thead
               tr
@@ -22,5 +19,6 @@ script#member-select-modal-template(type='text/x-template')
                 th(data-field='contact')= __('member_contact')
                 th(data-field='membership') 剩余课时
         div.modal-footer
+          p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
           button.btn.btn-default(type="button",data-dismiss="modal")= __('dialog_cancel')
           button.btn.btn-success(type="button",@click='handleOK')= __('dialog_ok')
