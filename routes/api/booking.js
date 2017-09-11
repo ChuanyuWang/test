@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 var util = require('../../util');
+var reservation = require('./lib/reservation');
 
 /**
  * Get the member list who booked the class
@@ -136,150 +137,30 @@ router.post('/', function (req, res, next) {
         }
         console.log("member is found %j", doc);
 
-        if (doc.status == 'inactive') {
-            var error = new Error("此会员已被停用，无法在线预约；如果您还在有效期内，请来电或到店咨询");
-            error.status = 400;
-            return next(error);
-        }
-
-        //TODO, support multi membership card
-        var membership = null;
-        if (doc.membership && doc.membership.length > 0) {
-            membership = doc.membership[0];
-        }
-
         // find the class want to book
         var classes = tenantDB.collection("classes");
         classes.findOne({
             _id : mongojs.ObjectId(req.body.classid)
         }, function (err, cls) {
             if (err) {
-                res.status(500).json({
+                return res.status(500).json({
                     'err' : err
                 });
-                return;
             }
 
             if (!cls) {
-                res.status(400).json({
+                return res.status(400).json({
                     'code' : 2002,
                     'message' : "没有找到指定课程，请刷新重试",
                     'err' : err
                 });
-                return;
             }
             console.log("class is found %j", cls);
-            
-            // if it's a free course, then it's open for all kinds of membership
-            if (cls.cost == 0 && !membership) {
-                membership = {};
-                membership.expire = new Date(2999,1);
-                membership.credit = 999;
-                membership.type = "ALL";
-            }
-            
-            if (!membership) {
-                res.status(400).json({
-                    'code' : 2011,
-                    'message' : "您还未办理会员卡，如有问题，欢迎来电或到店咨询",
-                    'err' : err
-                });
-                return;
-            }
 
-            if (membership.expire && membership.expire < cls.date) {
-                //TODO, use client locale date instead of server
-                res.status(400).json({
-                    'code' : 2010,
-                    'message' : "您的会员卡有效期至" + membership.expire.toLocaleDateString() + "，无法预约，如有问题，欢迎来电或到店咨询",
-                    'err' : err
-                });
-                return;
-            }
-            
-            //check duplicate booking
-            if (cls.booking && cls.booking.length > 0) {
-                for (var i=0;i<cls.booking.length;i++) {
-                    if (cls.booking[i].member == doc._id.toString()) {
-                        res.status(400).json({
-                            'code' : 2006,
-                            'message' : "已经预约，请勿重复报名",
-                            'err' : err
-                        });
-                        return;
-                    }
-                }
-            }
-            
-            //check if the member is limited to some classroom
-            if (membership.type == "LIMITED") {
-                membership.room = membership.room || [];
-                if (membership.room.indexOf(cls.classroom) == -1) {
-                    res.status(400).json({
-                        'code' : 2012,
-                        'message' : "您的会员卡不能预约此店课程，如有问题，欢迎来电或到店咨询",
-                        'err' : err
-                    });
-                    return;
-                }
-            }
-            // calculate the remaining
-            var booking = cls.booking || [];
-            var reservation = 0, remaining = 0;
-            booking.forEach(function(val, index, array) {
-                reservation += (val.quantity || 0);
-            })
-            remaining = cls.capacity - reservation;
-            if (remaining < req.body.quantity) {
-                res.status(400).json({
-                    'code' : 2003,
-                    'message' : "名额不足，剩余 " + (remaining < 0 ? 0 : remaining) + " 人",
-                    'err' : err
-                });
-                return;
-            }
-
-            if (membership.credit < req.body.quantity * cls.cost) {
-                res.status(400).json({
-                    'code' : 2004,
-                    'message' : "您的剩余课时不足，无法预约，如有问题，欢迎来电或到店咨询",
-                    'err' : err
-                });
-                return;
-            }
-            
-            // check the age limitation for current member
-            if (cls.age && cls.age.max && doc.birthday) {
-                var oldest = new Date(cls.date.getTime());
-                oldest.setHours(0);
-                oldest.setMinutes(0);
-                oldest.setMonth(oldest.getMonth() - cls.age.max);
-                if (doc.birthday < oldest) {
-                    res.status(400).json({
-                        // child is too old
-                        'message' : "小朋友年龄超出指定要求，无法预约，如有问题，欢迎来电或到店咨询",
-                        'err' : err
-                    });
-                    return;
-                }
-            }
-            
-            if (cls.age && cls.age.min && doc.birthday) {
-                var youngest = new Date(cls.date.getTime());
-                youngest.setHours(0);
-                youngest.setMinutes(0);
-                youngest.setMonth(youngest.getMonth() - cls.age.min);
-                if (doc.birthday > youngest) {
-                    // child is too young
-                    res.status(400).json({
-                        'message' : "小朋友年龄不到指定要求，无法预约，如有问题，欢迎来电或到店咨询",
-                        'err' : err
-                    });
-                    return;
-                }
-            }
-
-            createNewBook(tenantDB, res, doc, cls, req.body.quantity);
+            reservation.addOne(doc, cls, req.body.quantity, function(error, result) {
+                if (error) return next(error);
+                createNewBook(tenantDB, res, doc, cls, req.body.quantity);
+            });
         });
     });
 });

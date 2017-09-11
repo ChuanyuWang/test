@@ -172,8 +172,14 @@ reservation.add = function(memberOrMembers, classOrClasses, quantity, skipPastCl
     };
 }
 
-reservation.addOne = function(members, classes, quantity) {
-
+reservation.addOne = function(member, classToBook, quantity, callback) {
+    var error = {};
+    if (validate(member, classToBook, quantity, error)) {
+        callback(null, {});
+    } else {
+        error.message = error.cause.message;
+        callback(error.cause, {});
+    }
 }
 
 reservation.remove = function(memberOrMembers, classOrClasses) {
