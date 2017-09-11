@@ -244,7 +244,7 @@ var courseApp = {
             var vm = this;
             bootbox.confirm({
                 title: "删除课程",
-                message: '删除' + moment(item.date).format('ll dddd') + ' 课程吗?',
+                message: '删除' + moment(item.date).format('ll dddd') + ' 课程吗?<br><small>同时返还相关课时到预约会员的会员卡中</small>',
                 buttons: {
                     confirm: {
                         className: "btn-danger"
@@ -304,7 +304,7 @@ var courseApp = {
             var vm = this;
             bootbox.confirm({
                 title: "移除班级成员",
-                message: '从班级中移除' + item.name + '，并删除此成员所有未开始的课程吗?',
+                message: '从班级中移除' + item.name + '，并取消此成员所有未开始的课程吗?<br><small>同时返还相关课时到会员卡中</small>',
                 buttons: {
                     confirm: {
                         className: "btn-danger"
