@@ -61,6 +61,14 @@ var courseApp = {
         classesCount: function() {
             return this.course.classes ? this.course.classes.length : 0;
         },
+        completedClassesCount: function() {
+            var now = moment(), count = 0;
+            this.sortedClasses.some(function(value, index, array) {
+                if (moment(value.date).isBefore(now)) count++;
+                else return true;
+            });
+            return count;
+        },
         sortedClasses: function() {
             var classes = this.course.classes || [];
             return classes.sort(function(a, b) {
@@ -78,20 +86,20 @@ var courseApp = {
                 var status = {
                     done: 0,
                     absent: 0,
-                    left: vm.sortedClasses.length,
+                    left: 0,
+                    uninvolved: 0,
                     total: vm.sortedClasses.length
                 };
-                vm.sortedClasses.some(function(cls, index, array) {
-                    if (moment(cls.date).isSameOrBefore(now)) {
-                        status.left--;
-                        if (vm.isAbsent(cls, member)) status.absent++;
-                        else status.done++;
-                        return false;
+                vm.course.classes.forEach(function(cls, index, array) {
+                    if (vm.isAbsent(cls, member)) {
+                        if (moment(cls.date).isSameOrBefore(now)) status.absent++;
+                        else status.uninvolved++;
                     } else {
-                        return true;
+                        if (moment(cls.date).isSameOrBefore(now)) status.done++;
+                        else status.left++;
                     }
                 })
-                //status.total = status.done + status.absent + status.left;
+                //status.total = status.done + status.absent + status.left + status.uninvolved;
                 progress[member.id] = status;
             });
             return progress;
