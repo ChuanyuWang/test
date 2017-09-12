@@ -13,7 +13,6 @@ var member_select_modal = require('./components/member-select-modal');
 
 var viewData = {
     course: {},
-    error: null,
     classrooms: {}
 }
 
@@ -103,6 +102,18 @@ var courseApp = {
                 progress[member.id] = status;
             });
             return progress;
+        },
+        errors: function() {
+            var errors = {};
+            if (this.course.name.length == 0)
+                errors.name = '名称不能为空';
+            return errors;
+        },
+        hasError: function() {
+            var errors = this.errors
+            return Object.keys(errors).some(function(key) {
+                return true;
+            })
         }
     },
     filters: {
@@ -128,19 +139,16 @@ var courseApp = {
             return !booking.some(hasReservation);
         },
         saveBasicInfo: function() {
-            this.error = null;
-            if (this.course.name.length == 0) this.error = '名称不能为空';
-            if (!this.error) {
-                var request = course_service.updateCourse(this.course._id, {
-                    status: this.course.status,
-                    name: this.course.name,
-                    classroom: this.course.classroom,
-                    remark: this.course.remark
-                });
-                request.done(function(data, textStatus, jqXHR) {
-                    bootbox.alert('班级基本资料更新成功');
-                });
-            }
+            if (this.hasError) return false;
+            var request = course_service.updateCourse(this.course._id, {
+                status: this.course.status,
+                name: this.course.name,
+                classroom: this.course.classroom,
+                remark: this.course.remark
+            });
+            request.done(function(data, textStatus, jqXHR) {
+                bootbox.alert('班级基本资料更新成功');
+            });
         },
         deleteCourse: function() {
             var vm = this;
