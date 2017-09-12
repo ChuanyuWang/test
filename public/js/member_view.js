@@ -276,13 +276,15 @@ var vueApp = {
     },
     mounted: function() {
         // 'this' is refer to vm instance
-        var vm = this;
-        $(vm.$el).find('#birth_date').datetimepicker({
+        var vm = this, datepicker = $(vm.$el).find('#birth_date');
+        datepicker.datetimepicker({
             format: 'll',
             locale: 'zh-CN'
         });
+        datepicker.data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
+        vm.birth = datepicker.data('DateTimePicker').date();
 
-        $(vm.$el).find('#birth_date').on('dp.change', function(e) {
+        datepicker.on('dp.change', function(e) {
             // when user clears the input box, the 'e.date' is false value
             vm.birth = e.date === false ? null : e.date;
         });
