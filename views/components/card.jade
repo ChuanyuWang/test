@@ -5,9 +5,9 @@ script#card-template(type='text/x-template')
       label.control-label.col-sm-2 课时:
       div.col-sm-10
         p.form-control-static {{item.credit | formatCredit}}次(剩余)
-    div.form-group
+    div.form-group(:class='{"has-error": errors.delta}')
       label.control-label.col-sm-2 增加/减少:
-      div.col-sm-10(style="display:inline-flex")
+      div.col-sm-10(style="display:inline-flex",data-toggle="tooltip",data-placement="right",:title="errors.delta")
         button.btn.btn-sm.btn-danger(type="button",style="margin:2px;padding:3px",@click="alterCharge(-10)")
           span.glyphicon.glyphicon-minus
           | 10
@@ -21,16 +21,16 @@ script#card-template(type='text/x-template')
         button.btn.btn-sm.btn-success(type="button",style="margin:2px;padding:3px",@click="alterCharge(10)")
           span.glyphicon.glyphicon-plus
           | 10
-    div.form-group
+    div.form-group(:class='{"has-error": errors.expire}')
       label.control-label.col-sm-2 有效期至:
-      div.col-sm-4
+      div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.expire")
         div#expire_date.input-group.date
           input.form-control(text='text',v-model='expireDate')
           span.input-group-addon
             span.glyphicon.glyphicon-calendar
-    div.form-group
+    div.form-group(:class='{"has-error": errors.type}')
       label.control-label.col-sm-2 类型:
-      div.col-sm-5
+      div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.type")
         select.form-control(name="card_type",v-model='type')
           option(value='ALL') 通用卡
           option(value='LIMITED') 限定卡
@@ -44,7 +44,4 @@ script#card-template(type='text/x-template')
               = room.name
     div.form-group
       div.col-sm-offset-2.col-sm-10
-        button.btn.btn-success(type='button',v-on:click='validteBeforeSave') 保存
-        div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='error')
-          strong 错误! 
-          |{{error}}
+        button.btn.btn-success(type='button',v-on:click='onSave',:disabled='hasError') 保存

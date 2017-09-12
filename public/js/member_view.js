@@ -73,8 +73,7 @@ module.exports = {
             type: this.item.type,
             // Fix a bug, there is some invalid date which has boolean value
             room: typeof (this.item.room) === 'boolean' ? [] : this.item.room,
-            expire: this.item.expire ? moment(this.item.expire) : null,
-            error: null
+            expire: this.item.expire ? moment(this.item.expire) : null
         };
     },
     watch: {
@@ -88,6 +87,22 @@ module.exports = {
         },
         isLimitedCard: function() {
             return this.type === 'LIMITED';
+        },
+        errors: function() {
+            var errors = {};
+            if (typeof (this.delta) !== 'number')
+                errors.delta = '增加/减少的课时数不正确';
+            if (!this.expire || !this.expire.isValid())
+                errors.expire = '请指定会员有效期';
+            if (!this.type)
+                errors.type = '请选择会员卡类型';
+            return errors;
+        },
+        hasError: function() {
+            var errors = this.errors
+            return Object.keys(errors).some(function(key) {
+                return true;
+            })
         }
     },
     filters: {
@@ -102,20 +117,8 @@ module.exports = {
             }
             this.delta += value;
         },
-        validteBeforeSave: function() {
-            this.error = null;
-            if (typeof (this.delta) !== 'number') {
-                this.error = '增加/减少的课时数不正确';
-                return;
-            }
-            if (!this.expire || !this.expire.isValid()) {
-                this.error = '请指定会员有效期';
-                return;
-            }
-            if (!this.type) {
-                this.error = '请选择会员卡类型';
-                return;
-            }
+        onSave: function() {
+            if (this.hasError) return;
             var toBeSaved = {
                 "type": this.type,
                 "room": this.room,
