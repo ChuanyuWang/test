@@ -11,7 +11,6 @@ var member_select_modal = require('./components/member-select-modal');
 var viewData = {
     cls: {},
     date: null,
-    error: null,
     quantity: 1,
     classrooms: {},
     reservations: []
@@ -41,7 +40,7 @@ function init() {
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
-    
+
     // event listener of adding new book
     $('#newBook_dlg #add_pictureBook').click(handleAddNewBook);
     $('#newBook_dlg').on('show.bs.modal', function(event) {
@@ -79,6 +78,23 @@ function initPage(cls) {
                     min: this.cls.age.min ? parseInt(this.cls.age.min) : null,
                     max: this.cls.age.max ? parseInt(this.cls.age.max) : null
                 }
+            },
+            errors: function() {
+                var errors = {};
+                if (this.cls.name.length == 0) errors.name = '名称不能为空';
+                if (!this.date || !this.date.isValid()) errors.date = '日期/时间格式不正确';
+                if (this.cls.capacity < 0) errors.capacity = '最大人数不能小于零';
+                if (this.age.min < 0) errors.age = '最小年龄不能小于零';
+                if (this.age.max < 0) errors.age = '最大年龄不能小于零';
+                if (typeof this.age.max === 'number' && typeof this.age.min === 'number' && this.age.max < this.age.min)
+                    errors.age = '最大年龄不能小于最小年龄';
+                return errors;
+            },
+            hasError: function() {
+                var errors = this.errors
+                return Object.keys(errors).some(function(key) {
+                    return true;
+                })
             }
         },
         filters: {
@@ -101,29 +117,22 @@ function initPage(cls) {
         },
         methods: {
             saveBasicInfo: function() {
+                if (this.hasError) return false;
+
                 var vm = this;
-                this.error = null;
-                if (this.cls.name.length == 0) return this.error = '名称不能为空';
-                if (!this.date || !this.date.isValid()) return this.error = '日期/时间格式不正确';
-                if (this.cls.capacity < 0) return this.error = '最大人数不能小于零';
-                if (this.age.min < 0) return this.error = '最小年龄不能小于零';
-                if (this.age.max < 0) return this.error = '最大年龄不能小于零';
-                if (typeof this.age.max === 'number' && typeof this.age.min === 'number' && this.age.max < this.age.min) return this.error = '最大年龄不能小于最小年龄';
-                if (!this.error) {
-                    var request = class_service.updateClass(this.cls._id, {
-                        name: this.cls.name,
-                        date: this.date.toISOString(),
-                        classroom: this.cls.classroom,
-                        capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
-                        age: this.age
-                    });
-                    request.done(function(data, textStatus, jqXHR) {
-                        bootbox.alert('课程基本资料更新成功');
-                        // update according to result
-                        vm.cls.age = data.age;
-                        vm.cls.capacity = data.capacity;
-                    });
-                }
+                var request = class_service.updateClass(this.cls._id, {
+                    name: this.cls.name,
+                    date: this.date.toISOString(),
+                    classroom: this.cls.classroom,
+                    capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
+                    age: this.age
+                });
+                request.done(function(data, textStatus, jqXHR) {
+                    bootbox.alert('课程基本资料更新成功');
+                    // update according to result
+                    vm.cls.age = data.age;
+                    vm.cls.capacity = data.capacity;
+                });
             },
             deleteClass: function() {
                 var vm = this;
@@ -153,12 +162,12 @@ function initPage(cls) {
                         }
                     },
                     callback: function(ok) {
-                        if (ok) {
-                            var request = class_service.removeClass(vm.cls._id);
-                            request.done(function(data, textStatus, jqXHR) {
-                                window.location.href = '../home';
-                            });
-                        }
+                        if (!ok) return;
+                        var request = class_service.removeClass(vm.cls._id);
+                        request.done(function(data, textStatus, jqXHR) {
+                            window.location.href = '../home';
+                        });
+
                     }
                 });
             },
@@ -199,7 +208,7 @@ function initPage(cls) {
                         return value.member == element._id;
                     });
                 });
-            
+
                 if (addedOnes.length > 0) {
                     var result = addedOnes.map(function(value, index, array) {
                         return {
