@@ -43,12 +43,7 @@ function init() {
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
-
-    $('#class_date').datetimepicker({
-        locale: 'zh-CN',
-        format: 'lll'
-    });
-
+    
     // event listener of adding new book
     $('#newBook_dlg #add_pictureBook').click(handleAddNewBook);
     $('#newBook_dlg').on('show.bs.modal', function(event) {
