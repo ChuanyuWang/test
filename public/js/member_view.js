@@ -155,17 +155,32 @@ var viewData = {
         comments: [],
         summary: []
     },
-    birth: null,
-    errors: null
+    birth: null
 }
 
 var vueApp = {
-    components : {
-        'card' : cardComp
+    components: {
+        'card': cardComp
     },
     computed: {
         commentCount: function() {
             return this.memberData.comments ? this.memberData.comments.length : 0;
+        },
+        errors: function() {
+            var errors = {};
+            if (this.memberData.name.length == 0)
+                errors.name = '姓名不能为空';
+            if (this.memberData.contact.length == 0)
+                errors.contact = '联系方式不能为空';
+            if (this.birth && !this.birth.isValid())
+                errors.birthday = '生日格式不正确';
+            return errors;
+        },
+        hasError: function() {
+            var errors = this.errors
+            return Object.keys(errors).some(function(key) {
+                return true;
+            })
         }
     },
     filters: {
@@ -187,29 +202,24 @@ var vueApp = {
     },
     methods: {
         saveBasicInfo: function() {
-            this.errors = null;
-            if (this.memberData.name.length == 0) this.errors = { basic: '姓名不能为空' };
-            if (this.memberData.contact.length == 0) this.errors = { basic: '联系方式不能为空' };
-            if (this.birth && !this.birth.isValid()) this.errors = { basic: '生日格式不正确' };
-            if (!this.errors) {
-                var request = update({
-                    status: this.memberData.status,
-                    name: this.memberData.name,
-                    contact: this.memberData.contact,
-                    note: this.memberData.note,
-                    birthday: this.birth && this.birth.toISOString()
-                });
-                request.done(function(data, textStatus, jqXHR) {
-                    bootbox.alert('会员基本资料更新成功');
-                });
-            }
+            if (this.hasError) return false;
+            var request = update({
+                status: this.memberData.status,
+                name: this.memberData.name,
+                contact: this.memberData.contact,
+                note: this.memberData.note,
+                birthday: this.birth && this.birth.toISOString()
+            });
+            request.done(function(data, textStatus, jqXHR) {
+                bootbox.alert('会员基本资料更新成功');
+            });
         },
         saveCardInfo: function(card, index) {
             var vm = this;
             var confirmDlg = $('#historyComment_dlg');
             // remove previous OK button's click listener
             confirmDlg.find('button.btn-success').off('click');
-            confirmDlg.find('button.btn-success').one('click', function (event) {
+            confirmDlg.find('button.btn-success').one('click', function(event) {
                 var modal = $(this).closest('.modal');
                 var memo = modal.find('textarea[name=comment]').val().trim();
                 card.memo = memo; // append the memo for this change if there is any
@@ -284,7 +294,7 @@ $(document).ready(function() {
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
         // bootstrap the member view page
-        new Vue({extends: vueApp, data: viewData, el: '#member_app'});
+        new Vue({ extends: vueApp, data: viewData, el: '#member_app' });
     });
 
     request.done(function(data, textStatus, jqXHR) {

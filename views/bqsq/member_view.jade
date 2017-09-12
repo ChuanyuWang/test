@@ -46,20 +46,20 @@ block page
         select.col-sm-5.form-control(v-model='memberData.status',@change='deactivateAlert',style='margin-left:15px;width:auto')
           option.text-success(value='active') 激活
           option.text-danger(value='inactive') 未激活
-      div.form-group
+      div.form-group(:class='{"has-error": errors.name}')
         label.col-sm-2.control-label 姓名:
-        div.col-sm-5
+        div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
           input.form-control(v-model.trim='memberData.name', placeholder='小朋友姓名')
         div.col-sm-5
           p.form-control-static(style='color:#808080')
             small {{memberData.since | formatDate}}注册会员
-      div.form-group
+      div.form-group(:class='{"has-error": errors.contact}')
         label.col-sm-2.control-label 联系方式:
-        div.col-sm-5
+        div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.contact")
           input.form-control(v-model.trim='memberData.contact', placeholder='135xxx')
-      div.form-group
+      div.form-group(:class='{"has-error": errors.birthday}')
         label.control-label.col-sm-2 宝宝生日:
-        div.col-sm-4
+        div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
           div#birth_date.input-group.date
             input.form-control(text='text')
             span.input-group-addon
@@ -70,10 +70,7 @@ block page
           textarea.form-control(rows='3', name='note',v-model.trim='memberData.note')
       div.form-group
         div.col-sm-offset-2.col-sm-10
-          button.btn.btn-success(type='button',v-on:click='saveBasicInfo') 保存
-          div.alert.alert-danger(style='position:absolute;top:0px;left:100px;right:15px;padding:10px',v-if='errors')
-            strong 错误! 
-            |{{errors.basic}}
+          button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
     div.page-header
       h3 会员卡
     template(v-if='memberData.membership&&memberData.membership.length')
