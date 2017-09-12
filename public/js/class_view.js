@@ -8,11 +8,13 @@
  */
 
 var class_service = require('./services/classes');
+var member_select_modal = require('./components/member-select-modal');
 
 var viewData = {
     cls: {},
     date: null,
     error: null,
+    quantity: 1,
     classrooms: {},
     reservations: []
 }
@@ -42,15 +44,6 @@ function init() {
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
 
-    $('#member_table').bootstrapTable({
-        url: '/api/members?status=active',
-        maintainSelected: true,
-        locale: 'zh-CN',
-        columns: [{}, {}, {}, {
-            formatter: creditFormatter
-        }]
-    });
-
     $('#class_date').datetimepicker({
         locale: 'zh-CN',
         format: 'lll'
@@ -61,12 +54,6 @@ function init() {
     $('#newBook_dlg').on('show.bs.modal', function(event) {
         $(this).find('.form-group').removeClass('has-error');
         $(this).find('input[type=text]').val(null);
-    });
-
-    // event listener of adding new reservation
-    $('#member_dlg #add_member').click(handleClickAddMember);
-    $('#member_dlg').on('show.bs.modal', function(event) {
-        $(this).find('input[name=quantity]').val(1).closest(".btn-group").removeClass("has-error");
     });
 }
 
@@ -79,6 +66,9 @@ function initPage(cls) {
     new Vue({
         el: '#class_app',
         data: viewData,
+        components: {
+            'member-select-modal': member_select_modal
+        },
         computed: {
             membersCount: function() {
                 var count = 0
@@ -198,6 +188,45 @@ function initPage(cls) {
                     }
                 });
             },
+            showSelectMemberDlg: function(params) {
+                this.$refs.memberSelectDlg.show();
+            },
+            addReservation: function(selectedItems) {
+                // reset the quantity of reservation
+                if (this.quantity === '') this.quantity = 1;
+
+                var vm = this;
+                if (selectedItems.length == 0) return bootbox.alert('请选择会员');
+
+                var members = vm.reservations || [];
+                var addedOnes = selectedItems.filter(function(element, index, array) {
+                    // filter the new added member
+                    return !members.some(function(value, index, array) {
+                        // find one matched member and return true
+                        return value.member == element._id;
+                    });
+                });
+            
+                if (addedOnes.length > 0) {
+                    var result = addedOnes.map(function(value, index, array) {
+                        return {
+                            classid: viewData.cls._id,
+                            contact: value.contact,
+                            name: value.name,
+                            quantity: vm.quantity
+                        };
+                    });
+                    // add one member's reservation
+                    var request = class_service.addReservation(result[0]);
+                    request.done(function(data, textStatus, jqXHR) {
+                        var newAdded = findReservation(data['class'], data['member']);
+                        if (newAdded) vm.reservations.push(newAdded);
+                        bootbox.alert('预约成功');
+                    });
+                } else {
+                    bootbox.alert('所选会员已经预约');
+                }
+            },
             cancelReservation: function(item) {
                 var vm = this;
                 bootbox.confirm({
@@ -266,48 +295,6 @@ function handleAddNewBook(e) {
     modal.modal('hide');
 }
 
-function handleClickAddMember() {
-    var modal = $(this).closest('.modal');
-    var selections = modal.find('table').bootstrapTable('getAllSelections');
-    if (selections.length == 0) return bootbox.alert('请选择会员');
-
-    // check the quantity of reservation
-    var quantity = parseInt(modal.find('input[name=quantity]').val());
-    if (isNaN(quantity) || quantity <= 0) {
-        return modal.find('input[name=quantity]').closest(".btn-group").addClass("has-error");
-    }
-
-    var members = viewData.reservations || [];
-    var addedOnes = selections.filter(function(element, index, array) {
-        // filter the new added member
-        return !members.some(function(value, index, array) {
-            // find one matched member and return true
-            return value.member == element._id;
-        });
-    });
-
-    if (addedOnes.length > 0) {
-        var result = addedOnes.map(function(value, index, array) {
-            return {
-                classid: viewData.cls._id,
-                contact: value.contact,
-                name: value.name,
-                quantity: quantity
-            };
-        });
-        // add one member's reservation
-        var request = class_service.addReservation(result[0]);
-        request.done(function(data, textStatus, jqXHR) {
-            var newAdded = findReservation(data['class'], data['member']);
-            if (newAdded) viewData.reservations.push(newAdded);
-            bootbox.alert('预约成功');
-        });
-        modal.modal('hide');
-    } else {
-        bootbox.alert('所选会员已经预约');
-    }
-}
-
 function markError(container, selector, hasError) {
     if (hasError) {
         container.find(selector).closest(".form-group").addClass("has-error");
@@ -328,21 +315,75 @@ function findReservation(cls, member) {
     item.contact = member.contact;
     return item;
 }
+},{"./components/member-select-modal":2,"./services/classes":3}],2:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * member-select-modal.js component for select one or multi members
+ * --------------------------------------------------------------------------
+ */
 
-function creditFormatter(value, row, index) {
-    var membership = row.membership;
-    if (membership && membership[0]) {
-        // A better way of 'toFixed(1)'
-        if (typeof (membership[0].credit) == 'number') {
-            return Math.round(membership[0].credit * 10) / 10;
-        } else {
-            return membership[0].credit;
+module.exports = {
+    template: '#member-select-modal-template',
+    props: {
+        multiSelection: {
+            type: Boolean,
+            default: false
         }
-    } else {
-        return undefined;
+    },
+    data: function() {
+        return {};
+    },
+    watch: {
+    },
+    computed: {
+    },
+    filters: {
+    },
+    methods: {
+        show: function(selectedIDs) {
+            if (selectedIDs && selectedIDs.length) {
+                // clear existed selected items
+                var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
+                selections = selections.map(function(value) {
+                    return value._id;
+                });
+                $(this.$el).find('table.member-table').bootstrapTable('uncheckBy', { field: '_id', values: selections });
+                // select the pass ones
+                $(this.$el).find('table.member-table').bootstrapTable('checkBy', { field: '_id', values: selectedIDs });
+            }
+            $(this.$el).modal('show');
+        },
+        handleOK: function() {
+            $(this.$el).modal('hide');
+            var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
+            this.$emit("ok", selections);
+        },
+        creditFormatter: function(value, row, index) {
+            var membership = row.membership;
+            if (membership && membership[0]) {
+                // A better way of 'toFixed(1)'
+                if (typeof (membership[0].credit) == 'number') {
+                    return Math.round(membership[0].credit * 10) / 10;
+                } else {
+                    return membership[0].credit;
+                }
+            } else {
+                return undefined;
+            }
+        }
+    },
+    mounted: function() {
+        var vm = this;
+        $(vm.$el).find('table.member-table').bootstrapTable({
+            url: '/api/members?status=active', // only display active members
+            locale: 'zh-CN',
+            columns: [{}, {}, {}, {
+                formatter: vm.creditFormatter
+            }]
+        });
     }
-}
-},{"./services/classes":2}],2:[function(require,module,exports){
+};
+},{}],3:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * classes.js provide API for classes service
@@ -465,7 +506,7 @@ service.getReservations = function(classID) {
 };
 
 module.exports = service;
-},{"./util":3}],3:[function(require,module,exports){
+},{"./util":4}],4:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * util.js provide common utils for all services

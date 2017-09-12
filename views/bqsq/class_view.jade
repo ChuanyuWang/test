@@ -23,6 +23,7 @@ append js
       padding-bottom: 3px;
     }
 block page
+  include ../components/member-select-modal
   div#class_app.container(style='padding-top:69px',data-class-id='#{classID}')
     ol.breadcrumb
       li
@@ -80,7 +81,7 @@ block page
     form.form-horizontal
       div.form-group
         div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#member_dlg')
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='showSelectMemberDlg')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           ul.list-group(style='margin-bottom:0px')
@@ -108,29 +109,10 @@ block page
                 p.small(style='color:#777') {{item.info}} by {{item.teacher}}
                   span.badge(style='background-color:#d9534f;cursor:pointer;float:right;margin-right:16px',@click='removeBook(item)') 删除
           small(style='color:#777') 共{{booksCount}}本
-  div#member_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 添加预约
-        div.modal-body
-          div#toolbar.btn-group(style='display:inline-flex')
-            label(style='margin-right:4px') 人数:
-            input.form-control(type='number',name='quantity',min='1',step='1',style='width:90px',value=1)
-          table#member_table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true',data-toolbar='#toolbar')
-            thead
-              tr
-                //th(data-field='_id',data-visible='false') ID
-                th(data-radio='true')
-                th(data-field='name',data-sortable='true') 宝宝姓名
-                th(data-field='contact') 联系方式
-                th(data-field='membership') 剩余课时
-        div.modal-footer
-          p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_member.btn.btn-success(type="button") 确定
+    member-select-modal(ref='memberSelectDlg',@ok='addReservation')
+      div.btn-group(slot='toolbar',style='display:inline-flex;position:absolute;top:25px;left:20px')
+        label(style='margin-right:4px;line-height:34px') 人数:
+        input.form-control(type='number',min='1',step='1',style='width:90px',v-model.number='quantity')
   div#newBook_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
