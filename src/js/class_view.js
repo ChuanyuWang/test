@@ -109,7 +109,6 @@ function initPage(cls) {
         },
         watch: {
             'cls.date': function() {
-                console.log('set cls.date');
                 $('#class_date').data('DateTimePicker').date(this.cls.date ? moment(this.cls.date) : null);
                 // only update the birth in dp.change event
                 //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
