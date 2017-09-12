@@ -304,7 +304,7 @@ function createNewBook(tenantDB, res, user, cls, quantity) {
 
         //TODO, support multi membership card
         var membership = null;
-        if (user.membership && user.membership.length > 0) {
+        if (user.membership && user.membership.length > 0 && doc.cost > 0) {
             membership = user.membership[0];
         
             // update the credit value in membership
