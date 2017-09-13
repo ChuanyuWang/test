@@ -13,7 +13,7 @@ script#add-multi-class-modal-template(type='text/x-template')
               label.control-label.col-sm-2 时间/日期:
               div.col-sm-6
                 div#class_date.input-group.date
-                  input.form-control(text='text')
+                  input.form-control(type='text')
                   span.input-group-addon
                     span.glyphicon.glyphicon-calendar
             div.form-group(:class='{"has-error": !validation.cost}')
@@ -42,14 +42,14 @@ script#add-multi-class-modal-template(type='text/x-template')
                 label.control-label.col-sm-2 开始日期:
                 div.col-sm-5
                   div#class_begin.input-group.date
-                    input.form-control(text='text',name='begin')
+                    input.form-control(type='text',name='begin')
                     span.input-group-addon
                       span.glyphicon.glyphicon-calendar
               div.form-group(:class='{"has-error": !validation.end}')
                 label.control-label.col-sm-2 结束:
                 div.col-sm-5
                   div#class_end.input-group.date
-                    input.form-control(text='text',name='end')
+                    input.form-control(type='text',name='end')
                     span.input-group-addon
                       span.glyphicon.glyphicon-calendar
         div.modal-footer

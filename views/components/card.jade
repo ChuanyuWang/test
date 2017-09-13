@@ -25,7 +25,7 @@ script#card-template(type='text/x-template')
       label.control-label.col-sm-2 有效期至:
       div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.expire")
         div#expire_date.input-group.date
-          input.form-control(text='text',v-model='expireDate')
+          input.form-control(type='text',v-model='expireDate')
           span.input-group-addon
             span.glyphicon.glyphicon-calendar
     div.form-group(:class='{"has-error": errors.type}')

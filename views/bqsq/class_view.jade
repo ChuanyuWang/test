@@ -56,7 +56,7 @@ block page
         label.control-label.col-sm-2 日期/时间:
         div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.date")
           div#class_date.input-group.date
-            input.form-control(text='text')
+            input.form-control(type='text')
             span.input-group-addon
               span.glyphicon.glyphicon-calendar
       div.form-group(:class='{"has-error": errors.age}')
