@@ -3,9 +3,13 @@
  * card.js component for membership card
  * --------------------------------------------------------------------------
  */
+var date_picker = require('./date-picker');
 
 module.exports = {
     template: '#card-template',
+    components: {
+        'date-picker': date_picker
+    },
     props: {
         index: Number, // index of membership card
         item: Object // object of membership card object
@@ -25,9 +29,6 @@ module.exports = {
         }
     },
     computed: {
-        expireDate: function() {
-            return this.expire ? this.expire.format('ll') : null;
-        },
         isLimitedCard: function() {
             return this.type === 'LIMITED';
         },
@@ -72,15 +73,6 @@ module.exports = {
         }
     },
     mounted: function() {
-        var vm = this;
-        $(this.$el).find('#expire_date').datetimepicker({
-            format: 'll',
-            locale: 'zh-CN'
-        });
-        $(this.$el).find('#expire_date').on('dp.change', function(e) {
-            // update the expire value from datetimepicker control event
-            // when user clears the input box, the 'e.date' is false value
-            vm.expire = e.date === false ? null : e.date;
-        });
+        //var vm = this;
     }
 };

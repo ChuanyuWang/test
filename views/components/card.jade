@@ -1,4 +1,5 @@
 //Define template for card component (Vue.js)
+include ./date-picker
 script#card-template(type='text/x-template')
   form.form-horizontal
     div.form-group
@@ -24,10 +25,7 @@ script#card-template(type='text/x-template')
     div.form-group(:class='{"has-error": errors.expire}')
       label.control-label.col-sm-2 有效期至:
       div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.expire")
-        div#expire_date.input-group.date
-          input.form-control(type='text',v-model='expireDate')
-          span.input-group-addon
-            span.glyphicon.glyphicon-calendar
+        date-picker(v-model='expire')
     div.form-group(:class='{"has-error": errors.type}')
       label.control-label.col-sm-2 类型:
       div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.type")
