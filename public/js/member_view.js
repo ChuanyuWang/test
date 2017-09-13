@@ -144,11 +144,116 @@ module.exports = {
 },{}],3:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
+ * card.js component for membership card
+ * --------------------------------------------------------------------------
+ */
+
+module.exports = {
+  template: '#date-picker-template',
+  props: {
+    value: {
+      default: null,
+      required: true,
+      validator: function(value) {
+        return value === null || value instanceof Date || typeof value === 'string' || value instanceof String || value instanceof moment
+      }
+    },
+    // http://eonasdan.github.io/bootstrap-datetimepicker/Options/
+    config: {
+      type: Object,
+      default: function (){ return {"format": "ll", "locale": "zh-CN"}}
+    },
+    placeholder: {
+      type: String,
+      default: ''
+    },
+    inputClass: {
+      type: [String, Object],
+      default: ''
+    },
+    name: {
+      type: String,
+      default: 'datetime'
+    },
+    required: {
+      type: Boolean,
+      default: false
+    },
+    readOnly: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    id: {
+      type: String
+    },
+  },
+  data: function() {
+    return {
+      dp: null,
+    };
+  },
+  mounted: function() {
+    // Return early if date-picker is already loaded
+    if (this.dp) return;
+    // Init date-picker
+    var $elem = $(this.$el);
+    $elem.datetimepicker(this.config);
+    // Store data control
+    this.dp = $elem.data('DateTimePicker');
+    // Set initial value
+    this.dp.date(moment(this.value));
+    // Watch for changes
+    $elem.on('dp.change', this.onChange);
+  },
+  beforeDestroy: function() {
+    // Free up memory
+    if (this.dp) {
+      this.dp.destroy();
+      this.dp = null;
+    }
+  },
+  watch: {
+    /**
+     * Listen to change from outside of component and update DOM
+     *
+     * @param newValue
+     */
+    value: function(newValue) {
+      this.dp && this.dp.date(newValue || null)
+    },
+    /**
+     * Watch for any change in options and set them
+     *
+     * @param newConfig Object
+     */
+    config: function(newConfig) {
+      this.dp && this.dp.options(Object.assign(this.dp.options(), newConfig));
+    }
+  },
+  methods: {
+    /**
+     * Update v-model upon change triggered by date-picker itself
+     *
+     * @param event
+     */
+    onChange: function(event) {
+      this.$emit('input', event.date || null);
+    }
+  }
+};
+},{}],4:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
  * member_view.js single member view page main entry module
  * --------------------------------------------------------------------------
  */
 
 var cardComp = require('./components/card');
+var date_picker = require('./components/date-picker');
 var common = require('./common');
 var util = require('./services/util');
 
@@ -157,13 +262,13 @@ var viewData = {
         membership: [],
         comments: [],
         summary: []
-    },
-    birth: null
+    }
 }
 
 var vueApp = {
     components: {
-        'card': cardComp
+        'card': cardComp,
+        'date-picker': date_picker
     },
     computed: {
         commentCount: function() {
@@ -175,7 +280,7 @@ var vueApp = {
                 errors.name = '姓名不能为空';
             if (this.memberData.contact.length == 0)
                 errors.contact = '联系方式不能为空';
-            if (this.birth && !this.birth.isValid())
+            if (this.memberData.birthday && !moment(this.memberData.birthday).isValid())
                 errors.birthday = '生日格式不正确';
             return errors;
         },
@@ -196,13 +301,6 @@ var vueApp = {
             return moment(value).format('lll');
         }
     },
-    watch: {
-        'memberData.birthday': function() {
-            $('#birth_date').data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
-            // only update the birth in dp.change event
-            //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
-        }
-    },
     methods: {
         saveBasicInfo: function() {
             if (this.hasError) return false;
@@ -211,7 +309,7 @@ var vueApp = {
                 name: this.memberData.name,
                 contact: this.memberData.contact,
                 note: this.memberData.note,
-                birthday: this.birth && this.birth.toISOString()
+                birthday: this.memberData.birthday && moment(this.memberData.birthday).toISOString()
             });
             request.done(function(data, textStatus, jqXHR) {
                 bootbox.alert('会员基本资料更新成功');
@@ -276,18 +374,7 @@ var vueApp = {
     },
     mounted: function() {
         // 'this' is refer to vm instance
-        var vm = this, datepicker = $(vm.$el).find('#birth_date');
-        datepicker.datetimepicker({
-            format: 'll',
-            locale: 'zh-CN'
-        });
-        datepicker.data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
-        vm.birth = datepicker.data('DateTimePicker').date();
-
-        datepicker.on('dp.change', function(e) {
-            // when user clears the input box, the 'e.date' is false value
-            vm.birth = e.date === false ? null : e.date;
-        });
+        //var vm = this;
     }
 };
 
@@ -555,7 +642,7 @@ function deltaFormatter(value, row, index) {
         ].join('');
     }
 }
-},{"./common":1,"./components/card":2,"./services/util":4}],4:[function(require,module,exports){
+},{"./common":1,"./components/card":2,"./components/date-picker":3,"./services/util":5}],5:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * util.js provide common utils for all services
@@ -587,4 +674,4 @@ util.showAlert = function(title, jqXHR, className) {
 
 module.exports = util;
 
-},{}]},{},[3]);
+},{}]},{},[4]);

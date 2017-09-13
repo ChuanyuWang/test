@@ -31,6 +31,7 @@ append js
 
 block page
   include ../components/card
+  include ../components/date-picker
   div#member_app.container(style='padding-top:69px',data-member-id='#{memberID}')
     ol.breadcrumb
       li
@@ -60,10 +61,7 @@ block page
       div.form-group(:class='{"has-error": errors.birthday}')
         label.control-label.col-sm-2 宝宝生日:
         div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
-          div#birth_date.input-group.date
-            input.form-control(text='text')
-            span.input-group-addon
-              span.glyphicon.glyphicon-calendar
+          date-picker(v-model='memberData.birthday')
       div.form-group
         label.control-label.col-sm-2 简介:
         div.col-sm-10
@@ -74,7 +72,7 @@ block page
     div.page-header
       h3 会员卡
     template(v-if='memberData.membership&&memberData.membership.length')
-      card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i')
+      card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i')
     template(v-else)
       card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1')
     div.page-header

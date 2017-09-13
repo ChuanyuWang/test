@@ -5,6 +5,7 @@
  */
 
 var cardComp = require('./components/card');
+var date_picker = require('./components/date-picker');
 var common = require('./common');
 var util = require('./services/util');
 
@@ -13,13 +14,13 @@ var viewData = {
         membership: [],
         comments: [],
         summary: []
-    },
-    birth: null
+    }
 }
 
 var vueApp = {
     components: {
-        'card': cardComp
+        'card': cardComp,
+        'date-picker': date_picker
     },
     computed: {
         commentCount: function() {
@@ -31,7 +32,7 @@ var vueApp = {
                 errors.name = '姓名不能为空';
             if (this.memberData.contact.length == 0)
                 errors.contact = '联系方式不能为空';
-            if (this.birth && !this.birth.isValid())
+            if (this.memberData.birthday && !moment(this.memberData.birthday).isValid())
                 errors.birthday = '生日格式不正确';
             return errors;
         },
@@ -52,13 +53,6 @@ var vueApp = {
             return moment(value).format('lll');
         }
     },
-    watch: {
-        'memberData.birthday': function() {
-            $('#birth_date').data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
-            // only update the birth in dp.change event
-            //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
-        }
-    },
     methods: {
         saveBasicInfo: function() {
             if (this.hasError) return false;
@@ -67,7 +61,7 @@ var vueApp = {
                 name: this.memberData.name,
                 contact: this.memberData.contact,
                 note: this.memberData.note,
-                birthday: this.birth && this.birth.toISOString()
+                birthday: this.memberData.birthday && moment(this.memberData.birthday).toISOString()
             });
             request.done(function(data, textStatus, jqXHR) {
                 bootbox.alert('会员基本资料更新成功');
@@ -132,18 +126,7 @@ var vueApp = {
     },
     mounted: function() {
         // 'this' is refer to vm instance
-        var vm = this, datepicker = $(vm.$el).find('#birth_date');
-        datepicker.datetimepicker({
-            format: 'll',
-            locale: 'zh-CN'
-        });
-        datepicker.data('DateTimePicker').date(this.memberData.birthday ? moment(this.memberData.birthday) : null);
-        vm.birth = datepicker.data('DateTimePicker').date();
-
-        datepicker.on('dp.change', function(e) {
-            // when user clears the input box, the 'e.date' is false value
-            vm.birth = e.date === false ? null : e.date;
-        });
+        //var vm = this;
     }
 };
 
