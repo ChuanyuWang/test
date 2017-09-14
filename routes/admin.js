@@ -2,29 +2,30 @@ var express = require('express');
 var router = express.Router();
 var Account = require('../account');
 var util = require('../util');
+var mongojs = require('mongojs');
 
 var VERSION = 3;
 var config_db = null;
 // initialize the 'config' database for setting router
-router.use(function (req, res, next) {
+router.use(function(req, res, next) {
     config_db = config_db || util.connect('config');
     next();
 });
 
 /* GET users listing. */
-router.get('/home', checkTenantUser, function (req, res) {
-    res.render('admin',{
-        title : '控制台',
-        user : req.user,
-        navTitle : "控制台"
+router.get('/home', checkTenantUser, function(req, res) {
+    res.render('admin', {
+        title: '控制台',
+        user: req.user,
+        navTitle: "控制台"
     });
 });
 
-router.post('/createUser', isAuthenticated, function (req, res) {
+router.post('/createUser', isAuthenticated, function(req, res) {
     //TODO, check the tenant name existed
     Account.register(new Account({
-            username : req.body.user, tenant : req.body.tenant, displayName : req.body.display, role : req.body.role
-        }), req.body.password, function (err, account) {
+        username: req.body.user, tenant: req.body.tenant, displayName: req.body.display, role: req.body.role
+    }), req.body.password, function(err, account) {
         if (err) {
             return res.status(500).send(err);
         }
@@ -35,7 +36,7 @@ router.post('/createUser', isAuthenticated, function (req, res) {
 
 // list the tenant
 router.get('/api/tenants', isAuthenticated, function(req, res, next) {
-    config_db.collection("tenants").find({}, function(err, docs){
+    config_db.collection("tenants").find({}, function(err, docs) {
         if (err) {
             var error = new Error("Get tenant list fails");
             error.innerError = err;
@@ -53,7 +54,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         error.status = 400;
         return next(error);
     }
-    
+
     var namePattern = /^[a-z]+$/; // only letter or number
     if (!namePattern.test(req.body.name)) {
         var error = new Error("tenant name only supports letter");
@@ -62,7 +63,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
     }
     var tenants = config_db.collection('tenants');
     tenants.findOne({
-        name : req.body.name
+        name: req.body.name
     }, function(err, doc) {
         if (doc) {
             var error = new Error("find existed tenant, duplicated tenant name");
@@ -71,7 +72,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         }
 
         req.body.version = VERSION;
-        tenants.insert(req.body, function (err, doc){
+        tenants.insert(req.body, function(err, doc) {
             if (err) {
                 var error = new Error("create tenant fails");
                 error.innerError = err;
@@ -90,18 +91,18 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
         error.status = 400;
         return next(error);
     }
-    config_db.collection("tenants").findOne({name:req.body.tenant}, function(err, doc){
+    config_db.collection("tenants").findOne({ name: req.body.tenant }, function(err, doc) {
         if (err) {
             var error = new Error("Find tenant fails");
             error.innerError = err;
             return next(error);
         }
         console.log("Find tenant %j", doc);
-        
+
         if (!doc.version) {
             upgradeFromZero(req, res, next, doc.name);
             doc.version = 1;
-            config_db.collection("tenants").save(doc, function(err, doc){
+            config_db.collection("tenants").save(doc, function(err, doc) {
                 if (err) {
                     return next(new Error("save tenant version fails"));
                 }
@@ -111,7 +112,7 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
         } if (doc.version == 1) {
             upgradeFromOne(req, res, next, doc.name);
             doc.version = 2;
-            config_db.collection("tenants").save(doc, function(err, doc){
+            config_db.collection("tenants").save(doc, function(err, doc) {
                 if (err) {
                     return next(new Error("save tenant version fails"));
                 }
@@ -121,12 +122,22 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
         } else if (doc.version == 2) {
             upgradeFromTwo(req, res, next, doc.name);
             doc.version = 3;
-            config_db.collection("tenants").save(doc, function(err, doc){
+            config_db.collection("tenants").save(doc, function(err, doc) {
                 if (err) {
                     return next(new Error("save tenant version fails"));
                 }
                 //TODO, send the complete message when all data update
                 res.send("Tenant update to 3.0");
+            });
+        } else if (doc.version == 3) {
+            upgradeFromThree(req, res, next, doc.name);
+            //doc.version = 4;
+            config_db.collection("tenants").save(doc, function(err, doc) {
+                if (err) {
+                    return next(new Error("save tenant version fails"));
+                }
+                //TODO, send the complete message when all data update
+                res.send("Tenant update to 4.0");
             });
         } else {
             res.send("Tenant is already update to date");
@@ -139,7 +150,7 @@ function upgradeFromZero(req, res, next, tenant_name) {
     var tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
-    members.find({}).forEach(function(err, doc){
+    members.find({}).forEach(function(err, doc) {
         if (err) {
             console.error(err);
         } else {
@@ -151,9 +162,9 @@ function upgradeFromZero(req, res, next, tenant_name) {
             }
         }
     });
-    
+
     var classes = tenant_db.collection('classes');
-    classes.find({}).forEach(function(err, doc){
+    classes.find({}).forEach(function(err, doc) {
         if (err) {
             console.error(err);
         } else {
@@ -165,7 +176,7 @@ function upgradeFromZero(req, res, next, tenant_name) {
             }
         }
     });
-    
+
     /*
     members.find({}, function(err, docs){
         if (err) {
@@ -199,7 +210,7 @@ function upgradeFromOne(req, res, next, tenant_name) {
     var tenant_db = util.connect(tenant_name);
 
     var members = tenant_db.collection('members');
-    members.find({}).forEach(function(err, doc){
+    members.find({}).forEach(function(err, doc) {
         if (err) {
             console.error(err);
         } else {
@@ -207,10 +218,10 @@ function upgradeFromOne(req, res, next, tenant_name) {
                 doc.membership = [];
                 // assign each member a default member card with no limitation
                 var defaultCard = {
-                    type : "ALL",
-                    room : [],
-                    expire : doc.expire,
-                    credit : doc.credit
+                    type: "ALL",
+                    room: [],
+                    expire: doc.expire,
+                    credit: doc.credit
                 };
                 doc.membership.push(defaultCard);
                 members.save(doc);
@@ -231,7 +242,7 @@ function upgradeFromTwo(req, res, next, tenant_name) {
     var members = tenant_db.collection('members');
     // query matches documents that either contain the status field whose value is null or that do not contain the status field.
     // assign default status as 'active'
-    members.update({status:null}, {$set : {status : 'active'}}, {multi : true}, function(err, result){
+    members.update({ status: null }, { $set: { status: 'active' } }, { multi: true }, function(err, result) {
         if (err) {
             console.error(err);
         } else {
@@ -239,6 +250,65 @@ function upgradeFromTwo(req, res, next, tenant_name) {
             // e.g. { ok: 1, nModified: 3, n: 3 }
             console.debug(result);
         }
+    });
+}
+
+function upgradeFromThree(req, res, next, tenant_name) {
+    var tenant_db = util.connect(tenant_name);
+
+    // Fix the reference field "courseID" and "booking.member" in collection("classes")
+    var classes = tenant_db.collection('classes');
+    var bulk1 = classes.initializeUnorderedBulkOp();
+    // query matches documents that has at least one member reservation
+    classes.find({
+        $or: [
+            { 'courseID': { $exists: true } },
+            { 'booking.0': { $exists: true } }
+        ]
+    }, { courseID: 1, booking: 1 }, function(err, docs) {
+        if (err) return console.error(err); // TODO, handle error
+        docs.forEach(function(doc) {
+            var query = { $set: {} };
+            if (doc.courseID) {
+                // fix the courseID field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
+                query.$set['courseID'] = mongojs.ObjectId(doc.courseID);
+            }
+            if (doc.booking && doc.booking.length > 0) {
+                // fix the member field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
+                doc.booking.forEach(function(value, index, array) {
+                    query.$set[`booking.${index}.member`] = mongojs.ObjectId(value.member);
+                })
+            }
+            bulk1.find({ _id: doc._id }).updateOne(query);
+        });
+        bulk1.execute(function(err, result) {
+            //TODO, handle error
+            if (err) console.error(err);
+            else console.log("update courseID and booking.member in all classes %j", result);
+        });
+    });
+
+    // Fix the reference field "members.id" in collection("courses")
+    var courses = tenant_db.collection('courses');
+    var bulk2 = courses.initializeUnorderedBulkOp();
+    // query matches documents that has at least one member
+    courses.find({
+        'members.0': { $exists: true }
+    }, { members: 1 }, function(err, docs) {
+        if (err) return console.error(err); // TODO, handle error
+        docs.forEach(function(doc) {
+            var query = { $set: {} };
+            // fix the member field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
+            doc.members.forEach(function(value, index, array) {
+                query.$set[`members.${index}.id`] = mongojs.ObjectId(value.id);
+            })
+            bulk2.find({ _id: doc._id }).updateOne(query);
+        });
+        bulk2.execute(function(err, result) {
+            //TODO, handle error
+            if (err) console.error(err);
+            else console.log("update members.id in all courses %j", result);
+        });
     });
 }
 
