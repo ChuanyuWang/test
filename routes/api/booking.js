@@ -186,7 +186,7 @@ router.delete ('/:classID', function (req, res, next) {
     var classes = tenantDB.collection("classes");
     classes.findOne({
         _id : mongojs.ObjectId(req.params.classID),
-        "booking.member" : req.body.memberid
+        "booking.member" : mongojs.ObjectId(req.body.memberid)
     }, function (err, doc) {
         if (err) {
             res.status(500).json({
@@ -228,7 +228,7 @@ router.delete ('/:classID', function (req, res, next) {
 
         // find the booking quantity of member
         for (var i=0;i<doc.booking.length;i++) {
-            if (doc.booking[i].member == req.body.memberid) {
+            if (doc.booking[i].member.toString() == req.body.memberid) {
                 var quantity = doc.booking[i].quantity;
                 break;
             }
@@ -241,7 +241,7 @@ router.delete ('/:classID', function (req, res, next) {
             update: {
                 $pull : {
                     "booking" : {
-                        member : req.body.memberid
+                        member : mongojs.ObjectId(req.body.memberid)
                     }
                 }
             },
@@ -278,7 +278,7 @@ router.delete ('/:classID', function (req, res, next) {
  */
 function createNewBook(tenantDB, res, user, cls, quantity) {
     var newbooking = {
-        member : user._id.toString(),
+        member : user._id,
         quantity : quantity,
         bookDate : new Date()
     };

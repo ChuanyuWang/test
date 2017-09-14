@@ -28,8 +28,8 @@ router.use(helper.isAuthenticated);
         "remark": "summar only",
         "classroom": "room1",
         "members": [
-            { "id": "123", "name": "Hellen", note:"only available in morning" },
-            { "id": "456", "name": "Peter" }
+            { "id": ObjectID("123"), "name": "Hellen", note:"only available in morning" },
+            { "id": ObjectID("456"), "name": "Peter" }
         ]
     }
  */
@@ -128,6 +128,10 @@ router.patch('/:courseID', function(req, res, next) {
 router.post('/:courseID/members', function(req, res, next) {
     var courses = req.db.collection("courses");
     var added_members = Array.isArray(req.body) ? req.body : [req.body];
+    added_members = added_members.map(function(value, index, array) {
+        value.id = mongojs.ObjectId(value.id);
+        return value;
+    });
     courses.findAndModify({
         query: {
             _id: mongojs.ObjectId(req.params.courseID)
@@ -165,7 +169,7 @@ router.delete('/:courseID/members', function(req, res, next) {
         return next(error);
     }
     //TODO, support remove multi members
-    var memberIDs = [req.body.id];
+    var memberIDs = [mongojs.ObjectId(req.body.id)];
     var courses = req.db.collection("courses");
     courses.findAndModify({
         query: {
@@ -208,7 +212,7 @@ router.post('/:courseID/classes', function(req, res, next) {
         }
         // create new added classes
         var added_classes = items.map(function(value, index, array) {
-            value.courseID = req.params.courseID;
+            value.courseID = doc._id;
             if (value.hasOwnProperty("date")) {
                 value["date"] = new Date(value["date"]);
             }
@@ -266,7 +270,7 @@ router.delete('/:courseID/classes', function(req, res, next) {
             // return the cost to membership card
             var bulk1 = req.db.collection('members').initializeUnorderedBulkOp();
             booking.forEach(function(booking_item) {
-                bulk1.find({ _id: mongojs.ObjectId(booking_item.member) }).updateOne({
+                bulk1.find({ _id: booking_item.member }).updateOne({
                     $inc: { "membership.0.credit": doc.cost * booking_item.quantity }
                 });
             });
@@ -292,15 +296,11 @@ router.delete('/:courseID', function(req, res, next) {
         }
         // remove all classes with courseID
         req.db.collection("classes").remove({
-            courseID: req.params.courseID
-        }, {
-                justOne: false
-            }, function(err, result) {
-                if (err) {
-                    console.error("delete course's classes fails");
-                }
-                console.log("delete classes of course %s", req.params.courseID);
-            });
+            courseID: mongojs.ObjectId(req.params.courseID)
+        }, {justOne: false}, function(err, result) {
+            if (err) console.error("delete course's classes fails");
+            else console.log("delete classes of course %s", req.params.courseID);
+        });
         // check the result and respond
         if (result.n == 1) {
             console.log("course %s is deleted", req.params.courseID);
@@ -328,9 +328,9 @@ function convertDateObject(doc) {
 
 function removeCourseMember(db, courseID, memberID, callback) {
     db.collection('classes').find({
-        'courseID': courseID,
+        'courseID': mongojs.ObjectId(courseID),
         date: { $gte: new Date() },
-        'booking.member': memberID
+        'booking.member': mongojs.ObjectId(memberID)
     }, function(err, docs) {
         if (err) return callback(new Error(`Get course classes of ${memberID} fail`));
 
@@ -339,7 +339,7 @@ function removeCourseMember(db, courseID, memberID, callback) {
             if (cls.cost > 0) {
                 var bookings = cls.booking || [];
                 var booking_item = bookings.find(function(val) {
-                    return val.member === memberID;
+                    return val.member.toString() == memberID;
                 });
                 expense += cls.cost * booking_item.quantity;
             }
@@ -365,9 +365,9 @@ function removeCourseMember(db, courseID, memberID, callback) {
         if (docs.length > 0) {
             // cancel the booking reservation
             db.collection('classes').update({
-                'courseID': courseID,
+                'courseID': mongojs.ObjectId(courseID),
                 date: { $gte: new Date() }
-            }, { $pull: { booking: { member: memberID } } }, { multi: true }, function(err, result) {
+            }, { $pull: { booking: { member: mongojs.ObjectId(memberID) } } }, { multi: true }, function(err, result) {
                 //TODO, handle error
                 if (err) console.error(err);
                 return callback(null, result);
@@ -417,7 +417,7 @@ function getCourseMemebers(merberIDs, membersCol, callback) {
 
 function getCourseClasses(courseID, classesCol, callback) {
     classesCol.find({
-        'courseID': courseID,
+        'courseID': mongojs.ObjectId(courseID),
     }, function(err, docs) {
         if (err) {
             var error = new Error("get course's classes fails");

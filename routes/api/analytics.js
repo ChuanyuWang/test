@@ -213,7 +213,7 @@ router.get('/passive', function(req, res, next) {
         }
         console.log("find effective members: ", users ? users.length : 0);
         var memberList = users.map(function(value, index, array) {
-            return value._id.toString();
+            return value._id;
         });
 
         var classes = req.db.collection("classes");

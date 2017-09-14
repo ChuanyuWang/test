@@ -448,7 +448,7 @@ router.get('/:memberID/summary', function(req, res, next) {
     var classes = req.db.collection("classes");
     classes.aggregate([{
         $match: {
-            "booking.member": req.params.memberID
+            "booking.member": mongojs.ObjectId(req.params.memberID)
         }
     }, {
         $project: {

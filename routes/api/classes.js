@@ -37,7 +37,7 @@ router.get('/', function(req, res, next) {
         };
     } else if (req.query.hasOwnProperty('courseID')) {
         // query specific course
-        query['courseID'] = req.query.courseID ? req.query.courseID : null;
+        query['courseID'] = req.query.courseID ? mongojs.ObjectId(req.query.courseID) : null;
     } else {
         res.status(400).send('Missing param "from", "to" or "coureID"');
         return;
@@ -51,7 +51,7 @@ router.get('/', function(req, res, next) {
     }
     // get all classes booked by this member
     if (req.query.memberid) {
-        query['booking.member'] = req.query.memberid;
+        query['booking.member'] = mongojs.ObjectId(req.query.memberid);
     }
     // get all classes booked by this member
     if (req.query.hasOwnProperty('hasBooks')) {

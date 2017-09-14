@@ -8,7 +8,7 @@ function validate(member, cls, quantity, error) {
     //check duplicate booking
     if (cls.booking && cls.booking.length > 0) {
         for (var i = 0; i < cls.booking.length; i++) {
-            if (cls.booking[i].member == member._id.toString()) {
+            if (cls.booking[i].member == member._id) {
                 error.cause = new Error("已经预约，请勿重复报名");
                 return false;
             }
@@ -100,7 +100,7 @@ function validate(member, cls, quantity, error) {
 
 function generateBooking(member, cls, quantity) {
     var newbooking = {
-        member: member._id.toString(),
+        member: member._id,
         quantity: quantity,
         bookDate: new Date()
     };
