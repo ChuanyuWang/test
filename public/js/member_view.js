@@ -108,7 +108,8 @@ module.exports = {
     },
     filters: {
         formatCredit: function(value) {
-            return Math.round(value * 10) / 10;
+            var n = Math.round(value * 10) / 10;
+            return n === 0 ? 0 : n; // handle the "-0" case
         }
     },
     methods: {

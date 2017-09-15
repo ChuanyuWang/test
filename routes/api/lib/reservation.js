@@ -1,6 +1,7 @@
 //var mongojs = require('mongojs');
 
 var reservation = {};
+var EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
 
 function validate(member, cls, quantity, error) {
     error.class = cls.name;
@@ -90,7 +91,7 @@ function validate(member, cls, quantity, error) {
         }
     }
 
-    if (membership.credit < quantity * cls.cost) {
+    if (membership.credit + EPSILON < quantity * cls.cost) {
         error.cause = new Error("您的剩余课时不足，无法预约，如有问题，欢迎来电或到店咨询");
         return false;
     }

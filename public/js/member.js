@@ -216,7 +216,8 @@ function creditFormatter(value, row, index) {
     if (membership && membership[0]) {
         // A better way of 'toFixed(1)'
         if (typeof (membership[0].credit) == 'number') {
-            return Math.round(membership[0].credit * 10) / 10;
+            var n = Math.round(membership[0].credit * 10) / 10;
+            return n === 0 ? 0 : n; // handle the "-0" case
         } else {
             return membership[0].credit;
         }
