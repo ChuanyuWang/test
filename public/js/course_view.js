@@ -122,14 +122,14 @@ module.exports = {
     },
     methods: {
         show: function(selectedIDs) {
+            // clear existed selected items
+            var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
+            selections = selections.map(function(value) {
+                return value._id;
+            });
+            $(this.$el).find('table.member-table').bootstrapTable('uncheckBy', { field: '_id', values: selections });
             if (selectedIDs && selectedIDs.length) {
-                // clear existed selected items
-                var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
-                selections = selections.map(function(value) {
-                    return value._id;
-                });
-                $(this.$el).find('table.member-table').bootstrapTable('uncheckBy', { field: '_id', values: selections });
-                // select the pass ones
+                // select the pass in ones
                 $(this.$el).find('table.member-table').bootstrapTable('checkBy', { field: '_id', values: selectedIDs });
             }
             $(this.$el).modal('show');
