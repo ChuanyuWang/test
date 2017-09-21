@@ -131,7 +131,7 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
             });
         } else if (doc.version == 3) {
             upgradeFromThree(req, res, next, doc.name);
-            //doc.version = 4;
+            doc.version = 4;
             config_db.collection("tenants").save(doc, function(err, doc) {
                 if (err) {
                     return next(new Error("save tenant version fails"));
@@ -267,7 +267,7 @@ function upgradeFromThree(req, res, next, tenant_name) {
         ]
     }, { courseID: 1, booking: 1 }, function(err, docs) {
         if (err) return console.error(err); // TODO, handle error
-        for (var i = 0;i<999;i++) {
+        for (var i = 999;i<docs.length;i++) {
             var doc = docs[i];
         //docs.forEach(function(doc) {
             var query = { $set: {} };
