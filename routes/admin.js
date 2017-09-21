@@ -4,7 +4,7 @@ var Account = require('../account');
 var util = require('../util');
 var mongojs = require('mongojs');
 
-var VERSION = 3;
+var VERSION = 4;
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function(req, res, next) {
@@ -131,7 +131,7 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
             });
         } else if (doc.version == 3) {
             upgradeFromThree(req, res, next, doc.name);
-            //doc.version = 4;
+            doc.version = 4;
             config_db.collection("tenants").save(doc, function(err, doc) {
                 if (err) {
                     return next(new Error("save tenant version fails"));
