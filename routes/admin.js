@@ -131,7 +131,7 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
             });
         } else if (doc.version == 3) {
             upgradeFromThree(req, res, next, doc.name);
-            doc.version = 4;
+            //doc.version = 4;
             config_db.collection("tenants").save(doc, function(err, doc) {
                 if (err) {
                     return next(new Error("save tenant version fails"));
@@ -267,7 +267,9 @@ function upgradeFromThree(req, res, next, tenant_name) {
         ]
     }, { courseID: 1, booking: 1 }, function(err, docs) {
         if (err) return console.error(err); // TODO, handle error
-        docs.forEach(function(doc) {
+        for (var i = 0;i<999;i++) {
+            var doc = docs[i];
+        //docs.forEach(function(doc) {
             var query = { $set: {} };
             if (doc.courseID) {
                 // fix the courseID field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
@@ -280,7 +282,8 @@ function upgradeFromThree(req, res, next, tenant_name) {
                 })
             }
             bulk1.find({ _id: doc._id }).updateOne(query);
-        });
+        }
+        //});
         bulk1.execute(function(err, result) {
             //TODO, handle error
             if (err) console.error(err);
