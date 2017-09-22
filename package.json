@@ -7,7 +7,8 @@
   "scripts": {
     "grunt": "grunt",
     "bower": "bower",
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "mongo-express": "env ME_CONFIG_MONGODB_ENABLE_ADMIN=true ME_CONFIG_MONGODB_ADMINUSERNAME=admin ME_CONFIG_MONGODB_ADMINPASSWORD=pass mongo-express"
   },
   "dependencies": {
     "body-parser": "^1.13.3",
@@ -40,6 +41,9 @@
     "load-grunt-config": "^0.19.2",
     "time-grunt": "^1.4.0",
     "grunt-eslint": "^20.1.0"
+  },
+  "optionalDependencies": {
+    "mongo-express": "^0.42.2"
   },
   "repository": {
     "type": "git",
