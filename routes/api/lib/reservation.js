@@ -9,7 +9,7 @@ function validate(member, cls, quantity, error) {
     //check duplicate booking
     if (cls.booking && cls.booking.length > 0) {
         for (var i = 0; i < cls.booking.length; i++) {
-            if (cls.booking[i].member == member._id) {
+            if (cls.booking[i].member.equals(member._id)) {
                 error.cause = new Error("已经预约，请勿重复报名");
                 return false;
             }
@@ -83,9 +83,9 @@ function validate(member, cls, quantity, error) {
     }
 
     //check if the member is limited to some classroom
-    if (membership.type == "LIMITED") {
+    if (membership.type === "LIMITED") {
         membership.room = membership.room || [];
-        if (membership.room.indexOf(cls.classroom) == -1) {
+        if (membership.room.indexOf(cls.classroom) === -1) {
             error.cause = new Error("您的会员卡不能预约此教室课程，如有问题，欢迎来电或到店咨询");
             return false;
         }
