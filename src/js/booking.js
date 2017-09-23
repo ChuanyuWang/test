@@ -263,7 +263,7 @@ function displaySuccess(member, classInfo) {
     //TODO, support multi membership card
     var credit = 0;
     if (member.membership && member.membership.length > 0) {
-        credit = member.membership[0].credit;
+        credit = Math.round(member.membership[0].credit * 10)/10;
         message += '<br>您还剩余' + credit + '课时';
     }
     if (member.membership && member.membership.length > 0) {
