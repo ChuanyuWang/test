@@ -52,12 +52,14 @@ function init() {
         columns: [{}, {}, {}, {
             formatter: common.dateFormatter
         }, {
-            formatter: creditFormatter
+            formatter: remainingFormatter
         }, {
             formatter: expireFormatter
         }, {
             formatter: viewFormatter
-        }, {}
+        }, {
+            formatter: creditFormatter
+        }, {}, {}
         ]
     });
 }
@@ -137,6 +139,8 @@ function customQuery(params) {
     params.filter = filter;
     var status = $('div.statusFilter button.btn-info').data('filter');
     params.status = status;
+    // Append the field 'unStartedClassCount' to returned members
+    params.appendLeft = true;
     return params;
 }
 
@@ -154,6 +158,12 @@ function handleFilterStatus(event) {
     }
 }
 
+function getCredit(member) {
+    var credit = member && member.membership && member.membership[0] && member.membership[0].credit || 0;
+    var n = Math.round(credit * 10) / 10;
+    return n === 0 ? 0 : n; // handle the "-0" case
+}
+
 function creditFormatter(value, row, index) {
     var membership = row.membership;
     if (membership && membership[0]) {
@@ -167,6 +177,18 @@ function creditFormatter(value, row, index) {
     } else {
         return undefined;
     }
+}
+
+function remainingFormatter(value, row, index) {
+    return [
+        '<b>',
+        Math.round(value * 10) / 10,
+        '</b> <small>(<i>',
+        getCredit(row),
+        ', ',
+        row.unStartedClassCount,
+        '节</i>)</small>'
+    ].join('');
 }
 
 function expireFormatter(value, row, index) {
