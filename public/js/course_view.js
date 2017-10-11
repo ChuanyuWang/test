@@ -1,5 +1,176 @@
 /* Copyright 2016-2017 Chuanyu Wang */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var Vue // late bind
+var version
+var map = (window.__VUE_HOT_MAP__ = Object.create(null))
+var installed = false
+var isBrowserify = false
+var initHookName = 'beforeCreate'
+
+exports.install = function (vue, browserify) {
+  if (installed) { return }
+  installed = true
+
+  Vue = vue.__esModule ? vue.default : vue
+  version = Vue.version.split('.').map(Number)
+  isBrowserify = browserify
+
+  // compat with < 2.0.0-alpha.7
+  if (Vue.config._lifecycleHooks.indexOf('init') > -1) {
+    initHookName = 'init'
+  }
+
+  exports.compatible = version[0] >= 2
+  if (!exports.compatible) {
+    console.warn(
+      '[HMR] You are using a version of vue-hot-reload-api that is ' +
+        'only compatible with Vue.js core ^2.0.0.'
+    )
+    return
+  }
+}
+
+/**
+ * Create a record for a hot module, which keeps track of its constructor
+ * and instances
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+exports.createRecord = function (id, options) {
+  var Ctor = null
+  if (typeof options === 'function') {
+    Ctor = options
+    options = Ctor.options
+  }
+  makeOptionsHot(id, options)
+  map[id] = {
+    Ctor: Ctor,
+    options: options,
+    instances: []
+  }
+}
+
+/**
+ * Make a Component options object hot.
+ *
+ * @param {String} id
+ * @param {Object} options
+ */
+
+function makeOptionsHot(id, options) {
+  injectHook(options, initHookName, function() {
+    var record = map[id]
+    if (!record.Ctor) {
+      record.Ctor = this.constructor
+    }
+    record.instances.push(this)
+  })
+  injectHook(options, 'beforeDestroy', function() {
+    var instances = map[id].instances
+    instances.splice(instances.indexOf(this), 1)
+  })
+}
+
+/**
+ * Inject a hook to a hot reloadable component so that
+ * we can keep track of it.
+ *
+ * @param {Object} options
+ * @param {String} name
+ * @param {Function} hook
+ */
+
+function injectHook(options, name, hook) {
+  var existing = options[name]
+  options[name] = existing
+    ? Array.isArray(existing) ? existing.concat(hook) : [existing, hook]
+    : [hook]
+}
+
+function tryWrap(fn) {
+  return function (id, arg) {
+    try {
+      fn(id, arg)
+    } catch (e) {
+      console.error(e)
+      console.warn(
+        'Something went wrong during Vue component hot-reload. Full reload required.'
+      )
+    }
+  }
+}
+
+exports.rerender = tryWrap(function (id, options) {
+  var record = map[id]
+  if (!options) {
+    record.instances.slice().forEach(function (instance) {
+      instance.$forceUpdate()
+    })
+    return
+  }
+  if (typeof options === 'function') {
+    options = options.options
+  }
+  if (record.Ctor) {
+    record.Ctor.options.render = options.render
+    record.Ctor.options.staticRenderFns = options.staticRenderFns
+    record.instances.slice().forEach(function (instance) {
+      instance.$options.render = options.render
+      instance.$options.staticRenderFns = options.staticRenderFns
+      instance._staticTrees = [] // reset static trees
+      instance.$forceUpdate()
+    })
+  } else {
+    record.options.render = options.render
+    record.options.staticRenderFns = options.staticRenderFns
+  }
+})
+
+exports.reload = tryWrap(function (id, options) {
+  var record = map[id]
+  if (options) {
+    if (typeof options === 'function') {
+      options = options.options
+    }
+    makeOptionsHot(id, options)
+    if (record.Ctor) {
+      if (version[1] < 2) {
+        // preserve pre 2.2 behavior for global mixin handling
+        record.Ctor.extendOptions = options
+      }
+      var newCtor = record.Ctor.super.extend(options)
+      record.Ctor.options = newCtor.options
+      record.Ctor.cid = newCtor.cid
+      record.Ctor.prototype = newCtor.prototype
+      if (newCtor.release) {
+        // temporary global mixin strategy used in < 2.0.0-alpha.6
+        newCtor.release()
+      }
+    } else {
+      for (var key in record.options) {
+        if (!(key in options)) {
+          delete record.options[key]
+        }
+      }
+      for (var key$1 in options) {
+        record.options[key$1] = options[key$1]
+      }
+    }
+  }
+  record.instances.slice().forEach(function (instance) {
+    if (instance.$vnode && instance.$vnode.context) {
+      instance.$vnode.context.$forceUpdate()
+    } else {
+      console.warn(
+        'Root or manually mounted instance modified. Full reload required.'
+      )
+    }
+  })
+})
+
+},{}],2:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * add-multi-class-modal.js component for add multi classes modal dailog
@@ -96,7 +267,7 @@ module.exports = {
         });
     }
 };
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * member-select-modal.js component for select one or multi members
@@ -165,7 +336,7 @@ module.exports = {
         });
     }
 };
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * show-booking-result-modal.js component for display the booking result
@@ -219,57 +390,119 @@ module.exports = {
     mounted: function() {
     }
 };
-},{}],4:[function(require,module,exports){
-/**
- * --------------------------------------------------------------------------
- * view-member-course-modal.js modal dailog for view member's classes of one course
- * --------------------------------------------------------------------------
- */
+},{}],5:[function(require,module,exports){
+(function (global){
+;(function(){
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-// the element ID of modal dialog
-var elementID = '#view-member-course-modal';
 
 module.exports = {
-    template: '#view-member-course-modal-template',
-    props: {
-        courseid: String // course id
+  props: {
+    courseid: String // course id
+  },
+  data: function() {
+    return {
+      name: '' // member name
+    };
+  },
+  watch: {},
+  computed: {
+    errors: function() {
+      var errors = {};
+      return errors;
     },
-    data: function() {
-        return {
-            name: '' // member name
-        };
-    },
-    watch: {},
-    computed: {},
-    filters: {},
-    methods: {
-        show: function(value) {
-            // TODO, clear error
-            $(elementID).modal('show');
-        },
-        handleOK: function() {
-            if (this.isValid) {
-                this.$emit("ok", this.$data);
-                $(elementID).modal('hide');
-            }
-        }
-    },
-    mounted: function() {
-        // 'this' is refer to vm instance
-        //var vm = this;
+    hasError: function() {
+      var errors = this.errors
+      return Object.keys(errors).some(function(key) {
+        return true;
+      })
     }
+  },
+  filters: {},
+  methods: {
+    show: function(value) {
+      // TODO, clear error
+      $(this.$el).modal('show');
+    },
+    handleOK: function() {
+      if (this.hasError) return;
+
+      this.$emit("ok", this.$data);
+      $(this.$el).modal('hide');
+    }
+  },
+  mounted: function() {
+    // 'this' is refer to vm instance
+    //var vm = this;
+  }
 };
-},{}],5:[function(require,module,exports){
+
+})()
+if (module.exports.__esModule) module.exports = module.exports.default
+var __vue__options__ = (typeof module.exports === "function"? module.exports.options: module.exports)
+if (__vue__options__.functional) {console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.")}
+__vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"modal fade",attrs:{"tabindex":"-1","data-backdrop":"static"}},[_c('div',{staticClass:"modal-dialog"},[_c('div',{staticClass:"modal-content"},[_c('div',{staticClass:"modal-header"},[_vm._m(0),_c('h4',{staticClass:"modal-title"},[_vm._v(_vm._s(_vm.$t('view_member_course_title')))])]),_c('div',{staticClass:"modal-body"},[_c('form',{staticClass:"form-horizontal"},[_c('div',{staticClass:"form-group"},[_c('label',{staticClass:"control-label col-sm-2"},[_vm._v(_vm._s(_vm.$t('member_name')))]),_c('div',{staticClass:"col-sm-6"},[_c('p',{staticClass:"form-control-static"},[_vm._v(_vm._s(_vm.name))])])])]),_c('div',[_c('ul',{staticClass:"nav nav-tabs",attrs:{"role":"tablist"}},[_c('li',{staticClass:"active"},[_c('a',{attrs:{"data-toggle":"tab","href":"#notstarted"}},[_vm._v(_vm._s(_vm.$t('not_started')))])]),_c('li',[_c('a',{attrs:{"data-toggle":"tab","href":"#completed"}},[_vm._v(_vm._s(_vm.$t('completed')))])])]),_vm._m(1)])]),_c('div',{staticClass:"modal-footer"},[_c('button',{staticClass:"btn btn-default",attrs:{"type":"button","data-dismiss":"modal"}},[_vm._v(_vm._s(_vm.$t('dialog_cancel')))]),_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":_vm.handleOK}},[_vm._v(_vm._s(_vm.$t('dialog_ok')))])])])])])}
+__vue__options__.staticRenderFns = [function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('button',{staticClass:"close",attrs:{"type":"button","data-dismiss":"modal","aria-label":"Close"}},[_c('span',{attrs:{"aria-hidden":"true"}},[_vm._v("×")])])},function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"tab-content"},[_c('div',{staticClass:"tab-pane active",attrs:{"id":"notstarted"}},[_c('p',[_vm._v("abc")])]),_c('div',{staticClass:"tab-pane",attrs:{"id":"completed"}},[_c('p',[_vm._v("456")])])])}]
+if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install((typeof window !== "undefined" ? window['Vue'] : typeof global !== "undefined" ? global['Vue'] : null), true)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-39f7d529", __vue__options__)
+  } else {
+    hotAPI.reload("data-v-39f7d529", __vue__options__)
+  }
+})()}
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"vue-hot-reload-api":1}],6:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * course_view.js 
  * Entry module of view course page
  * --------------------------------------------------------------------------
  */
-
+var i18nextplugin = require('./locales/i18nextplugin');
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
-var view_member_course_modal = require('./components/view-member-course-modal');
+var view_member_course_modal = require('./components/view-member-course-modal.vue');
 var show_booking_result_modal = require('./components/show-booking-result-modal');
 var member_select_modal = require('./components/member-select-modal');
 
@@ -303,6 +536,8 @@ $(document).ready(function() {
 
 function init() {
     console.log("course_view moudle init...");
+    // load the i18next plugin to Vue
+    Vue.use(i18nextplugin);
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
@@ -652,7 +887,63 @@ function loadCourseClasses(course) {
         });
     });
 }
-},{"./components/add-multi-class-modal":1,"./components/member-select-modal":2,"./components/show-booking-result-modal":3,"./components/view-member-course-modal":4,"./services/courses":6}],6:[function(require,module,exports){
+},{"./components/add-multi-class-modal":2,"./components/member-select-modal":3,"./components/show-booking-result-modal":4,"./components/view-member-course-modal.vue":5,"./locales/i18nextplugin":9,"./services/courses":11}],7:[function(require,module,exports){
+module.exports={
+}
+},{}],8:[function(require,module,exports){
+/* eslint-disable */
+/**
+ * --------------------------------------------------------------------------
+ * This is a i18next language detection plugin use to detect user language in the browser
+ * https://github.com/i18next/i18next-browser-languageDetector
+ * --------------------------------------------------------------------------
+ */
+!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):e.i18nextBrowserLanguageDetector=t()}(this,function(){"use strict";function e(e){return a.call(i.call(arguments,1),function(t){if(t)for(var o in t)void 0===e[o]&&(e[o]=t[o])}),e}function t(){return{order:["querystring","cookie","localStorage","navigator","htmlTag"],lookupQuerystring:"lng",lookupCookie:"i18next",lookupLocalStorage:"i18nextLng",caches:["localStorage"]}}var o={};o.classCallCheck=function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")},o.createClass=function(){function e(e,t){for(var o=0;o<t.length;o++){var n=t[o];n.enumerable=n.enumerable||!1,n.configurable=!0,"value"in n&&(n.writable=!0),Object.defineProperty(e,n.key,n)}}return function(t,o,n){return o&&e(t.prototype,o),n&&e(t,n),t}}();var n=[],a=n.forEach,i=n.slice,r={create:function(e,t,o,n){var a=void 0;if(o){var i=new Date;i.setTime(i.getTime()+60*o*1e3),a="; expires="+i.toGMTString()}else a="";n=n?"domain="+n+";":"",document.cookie=e+"="+t+a+";"+n+"path=/"},read:function(e){for(var t=e+"=",o=document.cookie.split(";"),n=0;n<o.length;n++){for(var a=o[n];" "===a.charAt(0);)a=a.substring(1,a.length);if(0===a.indexOf(t))return a.substring(t.length,a.length)}return null},remove:function(e){this.create(e,"",-1)}},u={name:"cookie",lookup:function(e){var t=void 0;if(e.lookupCookie&&"undefined"!=typeof document){var o=r.read(e.lookupCookie);o&&(t=o)}return t},cacheUserLanguage:function(e,t){t.lookupCookie&&"undefined"!=typeof document&&r.create(t.lookupCookie,e,t.cookieMinutes,t.cookieDomain)}},c={name:"querystring",lookup:function(e){var t=void 0;if("undefined"!=typeof window)for(var o=window.location.search.substring(1),n=o.split("&"),a=0;a<n.length;a++){var i=n[a].indexOf("=");if(i>0){var r=n[a].substring(0,i);r===e.lookupQuerystring&&(t=n[a].substring(i+1))}}return t}},l=void 0;try{l="undefined"!==window&&null!==window.localStorage;var s="i18next.translate.boo";window.localStorage.setItem(s,"foo"),window.localStorage.removeItem(s)}catch(g){l=!1}var f={name:"localStorage",lookup:function(e){var t=void 0;if(e.lookupLocalStorage&&l){var o=window.localStorage.getItem(e.lookupLocalStorage);o&&(t=o)}return t},cacheUserLanguage:function(e,t){t.lookupLocalStorage&&l&&window.localStorage.setItem(t.lookupLocalStorage,e)}},d={name:"navigator",lookup:function(e){var t=[];if("undefined"!=typeof navigator){if(navigator.languages)for(var o=0;o<navigator.languages.length;o++)t.push(navigator.languages[o]);navigator.userLanguage&&t.push(navigator.userLanguage),navigator.language&&t.push(navigator.language)}return t.length>0?t:void 0}},v={name:"htmlTag",lookup:function(e){var t=void 0,o=e.htmlTag||("undefined"!=typeof document?document.documentElement:null);return o&&"function"==typeof o.getAttribute&&(t=o.getAttribute("lang")),t}},h=function(){function n(e){var t=arguments.length<=1||void 0===arguments[1]?{}:arguments[1];o.classCallCheck(this,n),this.type="languageDetector",this.detectors={},this.init(e,t)}return o.createClass(n,[{key:"init",value:function(o){var n=arguments.length<=1||void 0===arguments[1]?{}:arguments[1],a=arguments.length<=2||void 0===arguments[2]?{}:arguments[2];this.services=o,this.options=e(n,this.options||{},t()),this.i18nOptions=a,this.addDetector(u),this.addDetector(c),this.addDetector(f),this.addDetector(d),this.addDetector(v)}},{key:"addDetector",value:function(e){this.detectors[e.name]=e}},{key:"detect",value:function(e){var t=this;e||(e=this.options.order);var o=[];e.forEach(function(e){if(t.detectors[e]){var n=t.detectors[e].lookup(t.options);n&&"string"==typeof n&&(n=[n]),n&&(o=o.concat(n))}});var n=void 0;return o.forEach(function(e){if(!n){var o=t.services.languageUtils.formatLanguageCode(e);t.services.languageUtils.isWhitelisted(o)&&(n=o)}}),n||this.i18nOptions.fallbackLng[0]}},{key:"cacheUserLanguage",value:function(e,t){var o=this;t||(t=this.options.caches),t&&t.forEach(function(t){o.detectors[t]&&o.detectors[t].cacheUserLanguage(e,o.options)})}}]),n}();return h.type="languageDetector",h});
+},{}],9:[function(require,module,exports){
+/**
+ * --------------------------------------------------------------------------
+ * i18nextplugin.js is Vue plugin provide global function t (i18next) to Vue
+ * --------------------------------------------------------------------------
+ */
+
+var i18nextBrowserLanguageDetector = require('./i18nextBrowserLanguageDetector.min');
+
+var resources = {
+    'en': { translation: require('./en') },
+    'zh': { translation: require('./zh_CN') }
+};
+
+var i18nextPlugin = {
+    install: function(Vue, options) {
+        if (i18next) {
+            i18next.use(i18nextBrowserLanguageDetector).init({
+                fallbackLng: "zh",
+                resources: resources,
+                detection: { lookupQuerystring: 'lang' }
+            }, function(err, t) {
+                if (err) return console.error('init i18next with error' + err);
+                Vue.i18next = i18next; // append the global function 'i18next' to Vue
+                Vue.prototype.$t = t; // an instance method 't'
+            });
+        } else {
+            console.error('i18next is not found');
+        }
+    }
+};
+
+module.exports = i18nextPlugin;
+
+},{"./en":7,"./i18nextBrowserLanguageDetector.min":8,"./zh_CN":10}],10:[function(require,module,exports){
+module.exports={
+  "member_name": "姓名",
+  "member_contact": "联系方式",
+  "dialog_ok": "确定",
+  "dialog_cancel": "取消",
+  "completed": "已结束",
+  "not_started": "未开始",
+  "view_member_course_title": "分配会员在此班级的课程"
+}
+},{}],11:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * courses.js provide API for courses service
@@ -763,7 +1054,7 @@ service.getCourseClasses = function(courseID) {
 };
 
 module.exports = service;
-},{"./util":7}],7:[function(require,module,exports){
+},{"./util":12}],12:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * util.js provide common utils for all services
@@ -795,4 +1086,4 @@ util.showAlert = function(title, jqXHR, className) {
 
 module.exports = util;
 
-},{}]},{},[5]);
+},{}]},{},[6]);

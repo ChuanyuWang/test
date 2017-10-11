@@ -14,8 +14,10 @@ append js
   script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   if ENV_DEVELOPMENT
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+    script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.js")
   else
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
+    script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.min.js")
   script(src='/js/course_view.js')
   style.
     .container .page-header {
@@ -25,7 +27,6 @@ append js
 
 block page
   include ../../components/add-multi-class-modal
-  include ../../components/view-member-course-modal
   include ../../components/show-booking-result-modal
   include ../../components/member-select-modal
   div#course_app.container(style='padding-top:69px',data-course-id='#{courseID}')

@@ -4,10 +4,10 @@
  * Entry module of view course page
  * --------------------------------------------------------------------------
  */
-
+var i18nextplugin = require('./locales/i18nextplugin');
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal');
-var view_member_course_modal = require('./components/view-member-course-modal');
+var view_member_course_modal = require('./components/view-member-course-modal.vue');
 var show_booking_result_modal = require('./components/show-booking-result-modal');
 var member_select_modal = require('./components/member-select-modal');
 
@@ -41,6 +41,8 @@ $(document).ready(function() {
 
 function init() {
     console.log("course_view moudle init...");
+    // load the i18next plugin to Vue
+    Vue.use(i18nextplugin);
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
