@@ -3,7 +3,11 @@ module.exports = {
         'watch': true,
         'banner': '/* Copyright 2016-2017 Chuanyu Wang */',
         'transform': [
-            //'browserify-shim'
+            'vueify',
+            'browserify-shim' // shim should be the last transformer
+        ],
+        plugin: [
+            //'browserify-hmr'
         ]
     },
     home: {
