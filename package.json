@@ -6,6 +6,8 @@
   "main": "app.js",
   "scripts": {
     "grunt": "grunt",
+    "dev": "grunt default",
+    "build": "grunt build",
     "bower": "bower",
     "start": "node ./bin/www",
     "mongo-express": "env ME_CONFIG_MONGODB_ENABLE_ADMIN=true ME_CONFIG_MONGODB_ADMINUSERNAME=admin ME_CONFIG_MONGODB_ADMINPASSWORD=pass mongo-express"
@@ -39,6 +41,7 @@
     "grunt-contrib-uglify": "^2.2.0",
     "grunt-contrib-watch": "~1.0.0",
     "grunt-develop": "^0.4.0",
+    "grunt-env": "^0.4.4",
     "grunt-eslint": "^20.1.0",
     "less": "~2.7.2",
     "load-grunt-config": "^0.19.2",

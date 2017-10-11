@@ -481,18 +481,18 @@ var __vue__options__ = (typeof module.exports === "function"? module.exports.opt
 if (__vue__options__.functional) {console.error("[vueify] functional components are not supported and should be defined in plain js files using render functions.")}
 __vue__options__.render = function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"modal fade",attrs:{"tabindex":"-1","data-backdrop":"static"}},[_c('div',{staticClass:"modal-dialog"},[_c('div',{staticClass:"modal-content"},[_c('div',{staticClass:"modal-header"},[_vm._m(0),_c('h4',{staticClass:"modal-title"},[_vm._v(_vm._s(_vm.$t('view_member_course_title')))])]),_c('div',{staticClass:"modal-body"},[_c('form',{staticClass:"form-horizontal"},[_c('div',{staticClass:"form-group"},[_c('label',{staticClass:"control-label col-sm-2"},[_vm._v(_vm._s(_vm.$t('member_name')))]),_c('div',{staticClass:"col-sm-6"},[_c('p',{staticClass:"form-control-static"},[_vm._v(_vm._s(_vm.name))])])])]),_c('div',[_c('ul',{staticClass:"nav nav-tabs",attrs:{"role":"tablist"}},[_c('li',{staticClass:"active"},[_c('a',{attrs:{"data-toggle":"tab","href":"#notstarted"}},[_vm._v(_vm._s(_vm.$t('not_started')))])]),_c('li',[_c('a',{attrs:{"data-toggle":"tab","href":"#completed"}},[_vm._v(_vm._s(_vm.$t('completed')))])])]),_vm._m(1)])]),_c('div',{staticClass:"modal-footer"},[_c('button',{staticClass:"btn btn-default",attrs:{"type":"button","data-dismiss":"modal"}},[_vm._v(_vm._s(_vm.$t('dialog_cancel')))]),_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":_vm.handleOK}},[_vm._v(_vm._s(_vm.$t('dialog_ok')))])])])])])}
 __vue__options__.staticRenderFns = [function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('button',{staticClass:"close",attrs:{"type":"button","data-dismiss":"modal","aria-label":"Close"}},[_c('span',{attrs:{"aria-hidden":"true"}},[_vm._v("×")])])},function render () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"tab-content"},[_c('div',{staticClass:"tab-pane active",attrs:{"id":"notstarted"}},[_c('p',[_vm._v("abc")])]),_c('div',{staticClass:"tab-pane",attrs:{"id":"completed"}},[_c('p',[_vm._v("456")])])])}]
-if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
+if (module.hot) {(function () {  var hotAPI = require("vueify/node_modules/vue-hot-reload-api")
   hotAPI.install((typeof window !== "undefined" ? window['Vue'] : typeof global !== "undefined" ? global['Vue'] : null), true)
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-39f7d529", __vue__options__)
+    hotAPI.createRecord("data-v-172514ac", __vue__options__)
   } else {
-    hotAPI.reload("data-v-39f7d529", __vue__options__)
+    hotAPI.reload("data-v-172514ac", __vue__options__)
   }
 })()}
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"vue-hot-reload-api":1}],6:[function(require,module,exports){
+},{"vueify/node_modules/vue-hot-reload-api":1}],6:[function(require,module,exports){
 /**
  * --------------------------------------------------------------------------
  * course_view.js 

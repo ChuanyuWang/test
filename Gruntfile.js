@@ -7,12 +7,14 @@ module.exports = function (grunt) {
   require('load-grunt-config')(grunt);
 
   grunt.registerTask('build', [
+    'env:dist',
     'less',
     'browserify',
     'uglify'
   ]);
 
   grunt.registerTask('default', [
+    'env:dev',
     'less',
     'eslint',
     'browserify',
