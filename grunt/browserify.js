@@ -53,5 +53,9 @@ module.exports = {
     setting: {
         src: 'src/js/setting.js',
         dest: 'public/js/setting.js'
+    },
+    opportunity: {
+        src: 'src/js/opportunity.js',
+        dest: 'public/js/opportunity.js'
     }
 };

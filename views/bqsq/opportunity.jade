@@ -31,39 +31,15 @@ block page
       //button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
       //button.btn.btn-primary(type='button',data-toggle='modal',data-target='#member_dlg', data-action='edit') 查看
       //button#del_member.btn.btn-danger(type='button') 删除
-    table#opps_table(data-toggle="table",data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/opportunities',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id")
+    table#opps_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/opportunities',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id")
       thead
         tr
           //th(data-checkbox='true')
           //th(data-field='_id',data-visible='false') ID
-          th(data-field='status',data-align='center',data-formatter='statusFormatter',data-events='handleChangeStatus')
+          th(data-field='status',data-align='center')
           th(data-field='name',data-sortable='true') 宝宝姓名
           th(data-field='contact') 联系方式
-          th(data-field='birthday',data-formatter='dateFormatter',data-sortable='true') 宝宝生日
-          th(data-field='since',data-formatter='dateFormatter',data-sortable='true') 登记时间
-          th(data-field='note',data-visible='true') 备注
-          th(data-field='source',data-visible='true') 来源
-
-  script(type='text/javascript').
-    function dateFormatter(value) {
-        if (value) {
-            return moment(value).format('ll');
-        } else {
-            return undefined;
-        }
-    };
-    function statusFormatter(value) {
-        if (value == 'open') {
-            return [
-                '<a class="phone text-success" href="javascript:void(0)" title="未联系">',
-                '<i class="glyphicon glyphicon-earphone"></i>',
-                '</a>'
-            ].join('');
-        } else {
-            return [
-                '<a class="phone text-danger" href="javascript:void(0)" title="已联系">',
-                '<i class="glyphicon glyphicon-earphone"></i>',
-                '</a>'
-            ].join('');
-        }
-    };
+          th(data-field='birthday',data-sortable='true') 宝宝生日
+          th(data-field='since',data-sortable='true') 登记时间
+          th(data-field='note') 备注
+          th(data-field='source') 来源
