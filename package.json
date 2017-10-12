@@ -34,6 +34,7 @@
     "wechat-api": "^1.27.1"
   },
   "devDependencies": {
+    "browserify-hmr": "^0.3.5",
     "browserify-shim": "^3.8.14",
     "grunt": "~1.0.1",
     "grunt-browserify": "^5.0.0",

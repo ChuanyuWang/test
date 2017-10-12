@@ -10,17 +10,17 @@ module.exports = {
             //'browserify-hmr'
         ]
     },
-    home: {
-        src: 'src/js/main.js',
-        dest: 'public/js/main.js'
-    },
-    class_view: {
-        src: 'src/js/class_view.js',
-        dest: 'public/js/class_view.js'
-    },
-    members: {
-        src: 'src/js/member.js',
-        dest: 'public/js/member.js'
+    app: {
+        files: {
+            'public/js/main.js': 'src/js/main.js',
+            'public/js/class_view.js': 'src/js/class_view.js',
+            'public/js/member.js': 'src/js/member.js'
+        },
+        options: {
+            plugin: [
+                ['browserify-hmr',{ noServe : true }]
+            ]
+        }
     },
     members_view: {
         src: 'src/js/member_view.js',
@@ -48,7 +48,12 @@ module.exports = {
     },
     course_view: {
         src: 'src/js/course_view.js',
-        dest: 'public/js/course_view.js'
+        dest: 'public/js/course_view.js',
+        options: {
+            plugin: [
+                ['browserify-hmr',{ noServe : false }]
+            ]
+        }
     },
     setting: {
         src: 'src/js/setting.js',
