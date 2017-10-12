@@ -57,5 +57,9 @@ module.exports = {
     opportunity: {
         src: 'src/js/opportunity.js',
         dest: 'public/js/opportunity.js'
+    },
+    admin: {
+        src: 'src/js/admin.js',
+        dest: 'public/js/admin.js'
     }
 };
