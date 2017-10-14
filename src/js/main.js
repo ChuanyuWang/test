@@ -5,7 +5,7 @@
  */
 var common = require('./common');
 var locales = require('./locales');
-var initClassCell = require('./components/class-cell');
+var classList = require('./components/class-list.vue');
 var class_service = require('./services/classes');
 var LngDetector = require('./locales/i18nextBrowserLanguageDetector.min');
 
@@ -19,12 +19,14 @@ var classTableData = {
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
-
-    initClassCell();
+    
     // bootstrap the class table
     new Vue({
         el: '#cls_table',
         data: classTableData,
+        components: {
+            'class-list': classList
+        },
         computed: {
             sortedClasses: function() {
                 return this.classes.sort(function(a, b) {
