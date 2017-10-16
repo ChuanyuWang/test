@@ -1,9 +1,3 @@
-/**
- * --------------------------------------------------------------------------
- * add-multi-class-modal.vue component for add multi classes modal dailog
- * --------------------------------------------------------------------------
- */
-
 <style>
 
 </style>
@@ -21,10 +15,8 @@ div#add-multi-class-modal.modal.fade(tabindex='-1',data-backdrop='static')
           div.form-group(:class='{"has-error": !validation.date}')
             label.control-label.col-sm-2 时间/日期:
             div.col-sm-6
-              div#class_date.input-group.date
-                input.form-control(type='text')
-                span.input-group-addon
-                  span.glyphicon.glyphicon-calendar
+              div.input-group.date
+                date-picker(v-model='date',:config='dateFormat')
           div.form-group(:class='{"has-error": !validation.cost}')
             label.control-label.col-sm-2 所须课时:
             div.col-sm-2
@@ -50,24 +42,28 @@ div#add-multi-class-modal.modal.fade(tabindex='-1',data-backdrop='static')
             div.form-group(:class='{"has-error": !validation.begin}')
               label.control-label.col-sm-2 开始日期:
               div.col-sm-5
-                div#class_begin.input-group.date
-                  input.form-control(type='text',name='begin')
-                  span.input-group-addon
-                    span.glyphicon.glyphicon-calendar
+                date-picker(v-model='begin')
             div.form-group(:class='{"has-error": !validation.end}')
               label.control-label.col-sm-2 结束:
               div.col-sm-5
-                div#class_end.input-group.date
-                  input.form-control(type='text',name='end')
-                  span.input-group-addon
-                    span.glyphicon.glyphicon-calendar
+                date-picker(v-model='end')
       div.modal-footer
         button.btn.btn-default(type="button",data-dismiss="modal") 取消
         button.btn.btn-success(type="button",@click='handleOK') 确定
 </template>
 
 <script>
+/**
+ * --------------------------------------------------------------------------
+ * add-multi-class-modal.vue component for add multi classes modal dailog
+ * --------------------------------------------------------------------------
+ */
+
+var date_picker = require('./date-picker.vue');
 module.exports = {
+  components: {
+      'date-picker': date_picker
+  },
   props: {
     classrooms: Object // list of available classrooms
   },
@@ -75,23 +71,14 @@ module.exports = {
     return {
       date: moment(),
       begin: moment(),
-      end: moment(),
+      end: moment().add(1, 'week'),
       room: '',
       cost: 0,
       weekdays: [],
       isRepeated: false
     };
   },
-  watch: {
-    isRepeated: function(newValue) {
-      var vm = this;
-      if (newValue) {
-        $(vm.$el).find('#class_date').data("DateTimePicker").format('LT');
-      } else {
-        $(vm.$el).find('#class_date').data("DateTimePicker").format('lll');
-      }
-    }
-  },
+  watch: {},
   computed: {
     validation: function() {
       return {
@@ -108,12 +95,14 @@ module.exports = {
       return Object.keys(validation).every(function(key) {
         return validation[key]
       })
+    },
+    dateFormat: function() {
+      return this.isRepeated ? {'format':'LT', "locale": "zh-CN"} : {'format':'lll', "locale": "zh-CN"};
     }
   },
   filters: {},
   methods: {
     show: function(value) {
-      // TODO, clear error
       $(this.$el).modal('show')
     },
     handleOK: function() {
@@ -125,35 +114,7 @@ module.exports = {
   },
   mounted: function() {
     // 'this' is refer to vm instance
-    var vm = this;
-    $(vm.$el).find('#class_date').datetimepicker({
-      defaultDate: moment(),
-      locale: 'zh-CN',
-      format: 'lll'
-    });
-    $(vm.$el).find('#class_begin').datetimepicker({
-      defaultDate: moment(),
-      locale: 'zh-CN',
-      format: 'll'
-    });
-    $(vm.$el).find('#class_end').datetimepicker({
-      defaultDate: moment().add(1, 'week'),
-      locale: 'zh-CN',
-      format: 'll'
-    });
-
-    $(vm.$el).find('#class_date').on('dp.change', function(e) {
-      // when user clears the input box, the 'e.date' is false value
-      vm.date = e.date === false ? null : e.date;
-    });
-    $(vm.$el).find('#class_begin').on('dp.change', function(e) {
-      // when user clears the input box, the 'e.date' is false value
-      vm.begin = e.date === false ? null : e.date;
-    });
-    $(vm.$el).find('#class_end').on('dp.change', function(e) {
-      // when user clears the input box, the 'e.date' is false value
-      vm.end = e.date === false ? null : e.date;
-    });
+    // var vm = this;
   }
 };
 </script>
