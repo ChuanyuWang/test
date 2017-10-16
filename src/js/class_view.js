@@ -5,8 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
+var i18nextplugin = require('./locales/i18nextplugin');
 var class_service = require('./services/classes');
-var member_select_modal = require('./components/member-select-modal');
+var member_select_modal = require('./components/member-select-modal.vue');
 
 var viewData = {
     cls: {},
@@ -37,6 +38,8 @@ $(document).ready(function() {
 
 function init() {
     console.log("course_view moudle init...");
+    // load the i18next plugin to Vue
+    Vue.use(i18nextplugin);
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');

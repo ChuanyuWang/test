@@ -13,8 +13,10 @@ append js
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
   script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.js")
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
   else
+    script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.min.js")
     script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
   script(src='/js/class_view.js')
   style.
@@ -23,7 +25,6 @@ append js
       padding-bottom: 3px;
     }
 block page
-  include ../components/member-select-modal
   div#class_app.container(style='padding-top:69px',data-class-id='#{classID}')
     ol.breadcrumb
       li

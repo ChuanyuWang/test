@@ -18,12 +18,5 @@
 	"deleted_course": "Deleted course",
 	"course_status_all": "全部",
 	"course_status_active": "进行中",
-	"course_status_closed": "已结束",
-	"member_select_title": "选择会员",
-	"member_name": "姓名",
-	"member_contact": "联系方式",
-	"dialog_ok": "确定",
-	"dialog_cancel": "取消",
-	"completed": "已结束",
-	"not_started": "未开始"
+	"course_status_closed": "已结束"
 }
