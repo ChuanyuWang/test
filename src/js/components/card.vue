@@ -36,11 +36,11 @@ form.form-horizontal
         option(value='LIMITED') 限定卡
   div.form-group(v-show='isLimitedCard')
     label.control-label.col-sm-2 可用教室:
-    div#roomlist.col-sm-10
+    div.col-sm-10
       div.checkbox(v-for='r in classrooms')
         label
           input(type="checkbox", :value='r.id',v-model='room')
-          {{r.name}}
+          | {{r.name}}
   div.form-group
     div.col-sm-offset-2.col-sm-10
       button.btn.btn-success(type='button',v-on:click='onSave',:disabled='hasError') 保存

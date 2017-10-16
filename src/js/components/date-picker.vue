@@ -24,7 +24,6 @@ div.input-group.date
  */
 
 module.exports = {
-  template: '#date-picker-template',
   props: {
     value: {
       default: null,
