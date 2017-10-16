@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * add-multi-class-modal.js component for add multi classes modal dailog
+ * add-multi-class-modal.vue component for add multi classes modal dailog
  * --------------------------------------------------------------------------
  */
 

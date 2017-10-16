@@ -28,9 +28,11 @@ append js
       transition: all 0.5s ease-in-out;
       transform: rotate(360deg);
     }
-
+  script(type='text/javascript').
+    function _getClassrooms() {
+        return !{JSON.stringify(classrooms)};
+    };
 block page
-  include ../components/card
   div#member_app.container(style='padding-top:69px',data-member-id='#{memberID}')
     ol.breadcrumb
       li
@@ -71,9 +73,9 @@ block page
     div.page-header
       h3 会员卡
     template(v-if='memberData.membership&&memberData.membership.length')
-      card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i')
+      card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='_getClassrooms()')
     template(v-else)
-      card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1')
+      card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1',:classrooms='_getClassrooms()')
     div.page-header
       h3= __('course_summary_title')
     table.table.table-bordered.table-striped.table-striped

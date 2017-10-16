@@ -75,7 +75,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next
         title: '查看会员',
         user: req.user,
         navTitle: req.tenant.displayName,
-        classroom: req.tenant.classroom || []
+        classrooms: req.tenant.classroom || []
     });
 });
 

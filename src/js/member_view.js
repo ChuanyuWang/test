@@ -4,8 +4,8 @@
  * --------------------------------------------------------------------------
  */
 
-var cardComp = require('./components/card');
-var date_picker = require('./components/date-picker');
+var cardComp = require('./components/card.vue');
+var date_picker = require('./components/date-picker.vue');
 var common = require('./common');
 var util = require('./services/util');
 

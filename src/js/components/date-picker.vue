@@ -1,6 +1,25 @@
+<style>
+
+</style>
+
+<template lang="jade">
+div.input-group.date
+  input.form-control(type="text",
+        :class="inputClass",
+        :id="id",
+        :name="name",
+        :placeholder="placeholder",
+        :required="required",
+        :readOnly="readOnly",
+        :disabled="disabled")
+  span.input-group-addon
+    span.glyphicon.glyphicon-calendar
+</template>
+
+<script>
 /**
  * --------------------------------------------------------------------------
- * card.js component for membership card
+ * date-picker.vue component for input date/time
  * --------------------------------------------------------------------------
  */
 
@@ -101,3 +120,4 @@ module.exports = {
     }
   }
 };
+</script>
