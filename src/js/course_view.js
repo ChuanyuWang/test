@@ -366,16 +366,7 @@ var courseApp = {
     },
     mounted: function() {
         // 'this' is refer to vm instance
-        var vm = this;
-        $(vm.$el).find('#birth_date').datetimepicker({
-            format: 'll',
-            locale: 'zh-CN'
-        });
-
-        $(vm.$el).find('#birth_date').on('dp.change', function(e) {
-            // when user clears the input box, the 'e.date' is false value
-            vm.birth = e.date === false ? null : e.date;
-        });
+        //var vm = this;
     }
 };
 
