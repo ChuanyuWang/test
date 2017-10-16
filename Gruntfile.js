@@ -13,7 +13,9 @@ module.exports = function (grunt) {
     'uglify'
   ]);
 
-  grunt.registerTask('default', [
+  grunt.registerTask('default', ['dev']);
+
+  grunt.registerTask('dev', [
     'env:dev',
     'less',
     'eslint',
