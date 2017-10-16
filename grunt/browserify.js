@@ -7,64 +7,24 @@ module.exports = {
             'browserify-shim' // shim should be the last transformer
         ],
         plugin: [
-            //'browserify-hmr'
+            //['browserify-hmr',{ noServe : false }]
         ]
     },
     app: {
         files: {
             'public/js/main.js': 'src/js/main.js',
             'public/js/class_view.js': 'src/js/class_view.js',
-            'public/js/member.js': 'src/js/member.js'
-        },
-        options: {
-            plugin: [
-                ['browserify-hmr',{ noServe : true }]
-            ]
+            'public/js/member.js': 'src/js/member.js',
+            'public/js/member_view.js': 'src/js/member_view.js',
+            'public/js/booking.js': 'src/js/booking.js',
+            'public/js/mybooking.js': 'src/js/mybooking.js',
+            'public/js/myreadbooks.js': 'src/js/mybooks.js',
+            'public/js/trial.js': 'src/js/trial.js',
+            'public/js/course.js': 'src/js/course.js',
+            'public/js/course_view.js': 'src/js/course_view.js',
+            'public/js/setting.js': 'src/js/setting.js',
+            'public/js/opportunity.js': 'src/js/opportunity.js',
+            'public/js/admin.js': 'src/js/admin.js'
         }
-    },
-    members_view: {
-        src: 'src/js/member_view.js',
-        dest: 'public/js/member_view.js'
-    },
-    booking: {
-        src: 'src/js/booking.js',
-        dest: 'public/js/booking.js'
-    },
-    mybooking: {
-        src: 'src/js/mybooking.js',
-        dest: 'public/js/mybooking.js'
-    },
-    mybooks: {
-        src: 'src/js/mybooks.js',
-        dest: 'public/js/myreadbooks.js'
-    },
-    trial: {
-        src: 'src/js/trial.js',
-        dest: 'public/js/trial.js'
-    },
-    course: {
-        src: 'src/js/course.js',
-        dest: 'public/js/course.js'
-    },
-    course_view: {
-        src: 'src/js/course_view.js',
-        dest: 'public/js/course_view.js',
-        options: {
-            plugin: [
-                ['browserify-hmr',{ noServe : false }]
-            ]
-        }
-    },
-    setting: {
-        src: 'src/js/setting.js',
-        dest: 'public/js/setting.js'
-    },
-    opportunity: {
-        src: 'src/js/opportunity.js',
-        dest: 'public/js/opportunity.js'
-    },
-    admin: {
-        src: 'src/js/admin.js',
-        dest: 'public/js/admin.js'
     }
 };
