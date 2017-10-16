@@ -5,5 +5,9 @@
   "dialog_cancel": "取消",
   "completed": "已结束",
   "not_started": "未开始",
-  "view_member_course_title": "分配会员在此班级的课程"
+  "view_member_course_title": "分配会员在此班级的课程",
+  "booking_summary_title": "自动分配课程确认",
+	"booking_summary_description": "当添加新课程或成员到班级时，自动分配未开始课程于所有班级成员，请确认分配结果并处理相关失败",
+	"booking_successful_summary": "成功预约课程",
+	"booking_fail_summary": "失败会员"
 }

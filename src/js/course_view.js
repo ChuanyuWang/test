@@ -8,7 +8,7 @@ var i18nextplugin = require('./locales/i18nextplugin');
 var course_service = require('./services/courses');
 var add_multi_class_modal = require('./components/add-multi-class-modal.vue');
 var view_member_course_modal = require('./components/view-member-course-modal.vue');
-var show_booking_result_modal = require('./components/show-booking-result-modal');
+var show_booking_result_modal = require('./components/show-booking-result-modal.vue');
 var member_select_modal = require('./components/member-select-modal');
 
 var viewData = {
