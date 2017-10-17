@@ -22,11 +22,11 @@ append js
   //script(src="//cdn.bootcss.com/i18next-browser-languagedetector/1.0.1/i18nextBrowserLanguageDetector.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
   if ENV_DEVELOPMENT
-    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
     script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.js")
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
   else
-    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
     script(src="//cdn.bootcss.com/i18next/8.2.1/i18next.min.js")
+    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
   script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
@@ -54,56 +54,18 @@ block page
     div#create_cls_panel.row(style='margin-top:15px;display:none')
       div.col-sm-12(style='height:200px;background-color:#eee')
         a.btn.btn-success(style='margin:83px auto;display:table',href='setting') 创建教室
-    table#cls_table.class-table.table.table-bordered(style='margin-top:15px;display:none')
-      thead
-        tr
-          th(style='width:60px;text-align:center') 时间
-          th(v-for='(col, index) in columns') {{col}}
-            div {{index | displayWeekDay(monday)}}
-      tbody
-        tr(v-for='(section, i) in sections')
-          td {{section.name}}
-          td(v-for='(col, j) in columns',style='padding:0')
-            class-list(:data='getClassess(j, section.startTime, section.duration)',v-on:view="viewClass",v-on:delete="deleteClass",v-on:add="addClass(j,section.startTime)")
-  div#cls_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
-    div.modal-dialog(role="document")
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 添加常规课程
-        div.modal-body
-          form.form-horizontal
-            div.form-group
-              label.control-label.col-sm-2(for='cls_name') 课程名称:
-              div.col-sm-10
-                input#cls_name.form-control(type='text',placeholder='课程描述',autofocus)
-            div.form-group
-              label.control-label.col-sm-2(for='cost') 所须课时:
-              div.col-sm-2
-                input.form-control(type='number',name='cost',min='0',step='0.1')
-            div.form-group
-              label.control-label.col-sm-2 时间:
-              div.col-sm-10
-                p#cls_date.form-control-static(style="width:100px;float:left")
-                div#cls_time.input-group.date(style="width:150px;float:left")
-                  input.form-control(type="text")
-                  span.input-group-addon
-                    span.glyphicon.glyphicon-time
-            div.form-group
-              label.control-label.col-sm-2(for='') 年龄:
-              div.col-sm-10(style="display:inline-flex")
-                input.form-control(type='number',name='age_min',min='0',style={'width':'60px'})
-                p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
-                input.form-control(type='number',name='age_max',min='0',style={'width':'60px','margin-left':'3px'})
-                p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
-            div.form-group
-              label.control-label.col-sm-2(for='cls_capacity') 最大人数:
-              div.col-sm-2
-                input#cls_capacity.form-control(type='number',name='cls_capacity',min='0')
-        div.modal-footer
-          p.small(style='color:#777;float:left;margin-top:7px') *如果需要添加课程到指定班级，请到班级设置中添加
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#create_cls.btn.btn-success(type="button") 添加
+    div#cls_app
+      create-class-modal(ref='createClsDlg',@ok='createClass')
+      table#cls_table.class-table.table.table-bordered(style='margin-top:15px;display:none')
+        thead
+          tr
+            th(style='width:60px;text-align:center') 时间
+            th(v-for='(col, index) in columns') {{col}}
+              div {{index | displayWeekDay(monday)}}
+        tbody
+          tr(v-for='(section, i) in sections')
+            td {{section.name}}
+            td(v-for='(col, j) in columns',style='padding:0')
+              class-list(:data='getClassess(j, section.startTime, section.duration)',v-on:view="viewClass",v-on:delete="deleteClass",v-on:add="addClass(j,section.startTime)")
   div#alert_bar.bb-alert.alert-danger.alert(style='display:none')
     span >some message<
