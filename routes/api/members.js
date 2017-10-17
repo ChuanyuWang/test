@@ -682,15 +682,19 @@ function getMemberLeftClasses(req, res, next) {
             error.innerError = err;
             return next(error);
         }
-        if (!docs || docs.length === 0) return next();
+        if (!docs || docs.length === 0) {
+            req.memberLeftClasses = {}; // append am empty object
+            return next();
+        }
 
+        // generate the left classes for each member
         var memberLeftClasses = {};
         docs.forEach(function(value, index, array) {
             memberLeftClasses[value._id] = value.total || 0;
         });
         req.memberLeftClasses = memberLeftClasses;
         console.log("Append remaining info to members");
-        next();
+        return next();
     });
 }
 /*
