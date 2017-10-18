@@ -3,10 +3,9 @@
 </style>
 
 <template lang="jade">
-div.input-group.date
+div.input-group.date(:id="id")
   input.form-control(type="text",
         :class="inputClass",
-        :id="id",
         :name="name",
         :placeholder="placeholder",
         :required="required",
