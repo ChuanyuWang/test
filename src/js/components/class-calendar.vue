@@ -35,7 +35,7 @@ div
 <script>
 /**
  * --------------------------------------------------------------------------
- * class-list.js display a list of classes in table > td
+ * class-calendar.js component display weekly schedule
  * --------------------------------------------------------------------------
  */
 
