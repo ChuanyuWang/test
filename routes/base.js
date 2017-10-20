@@ -7,7 +7,7 @@ router.get('/home', helper.checkTenantUser, function (req, res) {
         title: '课程表',
         user: req.user,
         navTitle: req.tenant.displayName,
-        classroom: req.tenant.classroom || []
+        classrooms: req.tenant.classroom || []
     });
 });
 
