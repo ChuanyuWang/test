@@ -6,8 +6,9 @@
 
 var cardComp = require('./components/card.vue');
 var date_picker = require('./components/date-picker.vue');
+//var comment_dlg = require('./components/comment-modal.vue');
 var common = require('./common');
-var util = require('./services/util');
+var memberService = require('./services/members');
 
 var viewData = {
     memberData: {
@@ -56,7 +57,7 @@ var vueApp = {
     methods: {
         saveBasicInfo: function() {
             if (this.hasError) return false;
-            var request = update({
+            var request = memberService.update(this.memberData._id, {
                 status: this.memberData.status,
                 name: this.memberData.name,
                 contact: this.memberData.contact,
@@ -78,13 +79,13 @@ var vueApp = {
                 card.memo = memo; // append the memo for this change if there is any
                 // handle the click OK button
                 if (index > -1) {
-                    var request = updateCard(vm.memberData._id, index, card);
+                    var request = memberService.updateCard(vm.memberData._id, index, card);
                     request.done(function(data, textStatus, jqXHR) {
                         bootbox.alert('会员卡更新成功');
                         Vue.set(vm.memberData.membership, index, data.membership[index]);
                     });
                 } else {
-                    var request = createCard(vm.memberData._id, card);
+                    var request = memberService.createCard(vm.memberData._id, card);
                     request.done(function(data, textStatus, jqXHR) {
                         bootbox.alert('会员卡创建成功');
                         vm.memberData.membership = data.membership;
@@ -134,7 +135,7 @@ var vueApp = {
 $(document).ready(function() {
     init();
 
-    var request = getMemberInfo($('#member_app').data('member-id'));
+    var request = memberService.getMemberInfo($('#member_app').data('member-id'));
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
         // bootstrap the member view page
@@ -142,12 +143,12 @@ $(document).ready(function() {
     });
 
     request.done(function(data, textStatus, jqXHR) {
-        var commentRequest = getMemberComments($('#member_app').data('member-id'));
+        var commentRequest = memberService.getMemberComments($('#member_app').data('member-id'));
         commentRequest.done(function(data, textStatus, jqXHR) {
             Vue.set(viewData.memberData, 'comments', data.comments)
         });
         // load the member's course summary
-        var summaryRequest = getMemberSummary($('#member_app').data('member-id'));
+        var summaryRequest = memberService.getMemberSummary($('#member_app').data('member-id'));
         summaryRequest.done(function(data, textStatus, jqXHR) {
             Vue.set(viewData.memberData, 'summary', data)
         });
@@ -207,7 +208,7 @@ function handleClickAddComment() {
     var comment = {
         text: content
     };
-    var request = addComment(viewData.memberData._id, comment);
+    var request = memberService.addComment(viewData.memberData._id, comment);
     request.done(function(data, textStatus, jqXHR) {
         Vue.set(viewData.memberData, 'comments', data.comments)
     });
@@ -228,7 +229,7 @@ function handleClickEditComment(event) {
     var comment = {
         text: content
     };
-    var request = editComment(viewData.memberData._id, commentIndex, comment);
+    var request = memberService.editComment(viewData.memberData._id, commentIndex, comment);
     request.done(function(data, textStatus, jqXHR) {
         Vue.set(viewData.memberData, 'comments', data.comments)
     });
@@ -251,97 +252,6 @@ function loadClasses(e) {
             order: 'desc'
         }
     });
-}
-
-function update(fields) {
-    var request = $.ajax("/api/members/" + viewData.memberData._id, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("更新会员失败", jqXHR);
-    })
-    return request;
-}
-
-function addComment(memberID, fields) {
-    var request = $.ajax("/api/members/" + memberID + '/comments', {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("添加会员备忘失败", jqXHR);
-    });
-    return request;
-}
-
-function editComment(memberID, index, fields) {
-    var request = $.ajax('/api/members/' + memberID + '/comments/' + index, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("修改会员备忘失败", jqXHR);
-    });
-    return request;
-}
-
-function createCard(memberID, fields) {
-    var request = $.ajax("/api/members/" + memberID + '/memberships', {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("创建会员卡失败", jqXHR);
-    });
-    return request;
-}
-
-function updateCard(memberID, index, fields) {
-    var request = $.ajax("/api/members/" + memberID + '/memberships/' + index, {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(fields),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("修改会员卡失败", jqXHR);
-    });
-    return request;
-}
-
-function getMemberInfo(id) {
-    var request = $.getJSON("/api/members/" + id, '');
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取会员信息失败", jqXHR);
-    });
-    return request;
-}
-
-function getMemberComments(id) {
-    var request = $.getJSON("/api/members/" + id + '/comments', '');
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取会员备忘失败", jqXHR);
-    });
-    return request;
-}
-
-function getMemberSummary(id) {
-    var request = $.getJSON("/api/members/" + id + '/summary', '');
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取会员参与的班级失败", jqXHR);
-    });
-    return request;
 }
 
 function classFilter(params) {
