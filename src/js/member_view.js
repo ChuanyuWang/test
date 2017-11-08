@@ -187,6 +187,8 @@ function init() {
             formatter: linkNameFormatter
         }, {}, {
             formatter: common.dateFormatter
+        },{
+            formatter: booksFormatter
         }]
     });
 
@@ -239,6 +241,16 @@ function linkNameFormatter(value, row, index) {
         ' <i class="text-primary glyphicon glyphicon-calendar"></i>' + value,
         '</a>'
     ].join('');
+}
+
+function booksFormatter(value, row, index) {
+    if ($.isArray(value)) {
+        var result = '';
+        value.forEach(function(book){
+            if (book.title) result += "《" + book.title + "》";
+        });
+        return result;
+    }
 }
 
 function deltaFormatter(value, row, index) {
