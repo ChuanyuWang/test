@@ -310,7 +310,6 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
     };
     // non-admin user can only modify his/her own comment
     if (req.user.role !== 'admin') {
-        console.log(`User name is ${req.user.username}`);
         queryString[`comments.${req.params.commentIndex}.author`] = req.user.username;
     }
     var updateString = {

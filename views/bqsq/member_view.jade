@@ -98,6 +98,7 @@ block page
           td(colspan='4',style='text-align:center')= __('no_record')
     div.page-header
       h3 备忘
+    comment-modal(ref='commentDlg')
     form.form-horizontal
       div.form-group
         div.col-sm-2
@@ -150,38 +151,7 @@ block page
             th(data-field='cost') 课时
             th(data-field='date',data-sortable='true') 课程日期
     div(style='height:20px')
-  div#comment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 添加备忘
-        div.modal-body
-          form
-            div.form-group
-              label.control-label 新备忘:
-              textarea.form-control(rows='3', name='comment')
-              small(style='color:#777;float:right;margin-top:2px') 不超过256个字
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_comment.btn.btn-success(type="button") 添加
-  div#editComment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 修改备忘
-        div.modal-body
-          form
-            div.form-group
-              label.control-label 备忘:
-              textarea.form-control(rows='3', name='comment')
-              small(style='color:#777;float:right;margin-top:2px') 不超过256个字
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#edit_comment.btn.btn-success(type="button") 更新
+
   div#historyComment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content

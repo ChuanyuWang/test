@@ -6,7 +6,7 @@
 
 var cardComp = require('./components/card.vue');
 var date_picker = require('./components/date-picker.vue');
-//var comment_dlg = require('./components/comment-modal.vue');
+var comment_dlg = require('./components/comment-modal.vue');
 var common = require('./common');
 var memberService = require('./services/members');
 
@@ -16,12 +16,13 @@ var viewData = {
         comments: [],
         summary: []
     }
-}
+};
 
 var vueApp = {
     components: {
         'card': cardComp,
-        'date-picker': date_picker
+        'date-picker': date_picker,
+        'comment-modal': comment_dlg
     },
     computed: {
         commentCount: function() {
@@ -111,23 +112,29 @@ var vueApp = {
             }
         },
         addComment: function() {
-            $('#comment_dlg').find('textarea[name=comment]').val(null);
-            // event listener of adding new comment
-            $('#comment_dlg button.btn-success').off('click');
-            $('#comment_dlg button.btn-success').one('click', handleClickAddComment);
-            $('#comment_dlg').modal('show');
+            var vm = this;
+            this.$refs.commentDlg.show(function(memo){
+                var comment = {
+                    text: memo
+                };
+                var request = memberService.addComment(vm.memberData._id, comment);
+                request.done(function(data, textStatus, jqXHR) {
+                    Vue.set(vm.memberData, 'comments', data.comments);
+                });
+            });
         },
         editComment: function(commentIndex) {
-            var comment = this.memberData.comments[commentIndex].text;
-            $('#editComment_dlg').find('textarea[name=comment]').val(comment);
-            $('#editComment_dlg button.btn-success').off('click');
-            $('#editComment_dlg button.btn-success').one('click', commentIndex, handleClickEditComment);
-            $('#editComment_dlg').modal('show');
+            var vm = this;
+            this.$refs.commentDlg.show(this.memberData.comments[commentIndex].text, function(memo){
+                var comment = {
+                    text: memo
+                };
+                var request = memberService.editComment(vm.memberData._id, commentIndex, comment);
+                request.done(function(data, textStatus, jqXHR) {
+                    Vue.set(vm.memberData, 'comments', data.comments);
+                });
+            });
         }
-    },
-    mounted: function() {
-        // 'this' is refer to vm instance
-        //var vm = this;
     }
 };
 
@@ -162,15 +169,6 @@ function init() {
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
 
-    $('#comment_dlg').on('shown.bs.modal', function(event) {
-        // focus on the commnet input control
-        $(this).find('textarea[name=comment]').focus();
-    });
-    $('#editComment_dlg').on('shown.bs.modal', function(event) {
-        // focus on the commnet input control
-        $(this).find('textarea[name=comment]').focus();
-    });
-
     $('#history_table').bootstrapTable({
         locale: 'zh-CN',
         columns: [{
@@ -194,46 +192,6 @@ function init() {
 
     $('#loadHistoryBtn').click(loadHistory);
     $('#loadClassesBtn').click(loadClasses);
-}
-
-function handleClickAddComment() {
-    var modal = $(this).closest('.modal');
-    var content = modal.find('textarea[name=comment]').val().trim();
-    if (content.length === 0 || content.length > 255) {
-        modal.find('textarea[name=comment]').closest(".form-group").addClass("has-error");
-        return;
-    } else {
-        modal.find('textarea[name=comment]').closest(".form-group").removeClass("has-error");
-    }
-    var comment = {
-        text: content
-    };
-    var request = memberService.addComment(viewData.memberData._id, comment);
-    request.done(function(data, textStatus, jqXHR) {
-        Vue.set(viewData.memberData, 'comments', data.comments)
-    });
-    modal.modal('hide');
-}
-
-function handleClickEditComment(event) {
-    var modal = $(this).closest('.modal');
-    var content = modal.find('textarea[name=comment]').val().trim();
-    // get the index of comment from event data
-    var commentIndex = event.data;
-    if (content.length === 0 || content.length > 255) {
-        modal.find('textarea[name=comment]').closest(".form-group").addClass("has-error");
-        return;
-    } else {
-        modal.find('textarea[name=comment]').closest(".form-group").removeClass("has-error");
-    }
-    var comment = {
-        text: content
-    };
-    var request = memberService.editComment(viewData.memberData._id, commentIndex, comment);
-    request.done(function(data, textStatus, jqXHR) {
-        Vue.set(viewData.memberData, 'comments', data.comments)
-    });
-    modal.modal('hide');
 }
 
 function loadHistory(e) {
