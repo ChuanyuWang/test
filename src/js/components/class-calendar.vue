@@ -112,8 +112,10 @@ module.exports = {
     }
   },
   watch: {
-    monday: function(value) {
-      this.updateSchedule();
+    date: function(value, oldValue) {
+      // only update the schedule when it's another day
+      if (!moment(value).isSame(oldValue, 'day'))
+        this.updateSchedule();
     },
     classroom: function(value) {
       this.updateSchedule();
@@ -122,14 +124,14 @@ module.exports = {
   methods: {
     previousWeek: function() {
       // create a new moment object to trigger the data binding
-      this.date = moment(this.monday.subtract(7, "days"));
+      this.date = moment(this.monday).subtract(7, "days");
     },
     thisWeek: function() {
       this.date = moment();
     },
     nextWeek: function() {
       // create a new moment object to trigger the data binding
-      this.date = moment(this.monday.add(7, "days"));
+      this.date = moment(this.monday).add(7, "days");
     },
     getClassess: function(dayOffset, startTime, duration) {
       var result = [];
@@ -250,7 +252,7 @@ module.exports = {
     updateSchedule: function() {
       var vm = this;
       var begin = moment(this.monday);
-      var end = moment(this.monday).add(7, "days");
+      var end = moment(begin).add(7, "days");
 
       $.ajax("/api/classes", {
         type: "GET",
