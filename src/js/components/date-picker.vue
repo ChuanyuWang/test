@@ -109,6 +109,7 @@ module.exports = {
   methods: {
     /**
      * Update v-model upon change triggered by date-picker itself
+     * Or when value property is set
      *
      * @param event
      */
