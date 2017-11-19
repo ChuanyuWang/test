@@ -1,13 +1,13 @@
 extends index
 
 append css
-  link(rel="stylesheet",href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css")
+  link(rel="stylesheet",href="#{CDN_FILES.bootstrap_table_css}")
 
 append js
   //script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")  //script(src='/components/bootbox.js/bootbox.js')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js")
-  script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src="#{CDN_FILES.bootstrap_table}")
+  script(src="#{CDN_FILES.bootstrap_table_locale_zh_CN}")
   script(src='/js/admin.js')
 
 block page

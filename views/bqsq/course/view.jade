@@ -1,15 +1,15 @@
 extends ../../index
 
 append css
-  link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css")
+  link(rel="stylesheet",href="#{CDN_FILES.bootstrap_table_css}")
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css")
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
-  script(src='//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js')
+  script(src='#{CDN_FILES.bootbox}')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
-  script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js")
-  script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
+  script(src="#{CDN_FILES.bootstrap_table}")
+  script(src="#{CDN_FILES.bootstrap_table_locale_zh_CN}")
   script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   if ENV_DEVELOPMENT
     script(src="#{CDN_FILES.i18next_dev}")
