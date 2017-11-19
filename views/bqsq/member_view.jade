@@ -13,9 +13,11 @@ append js
   script(src="//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js")
   script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   if ENV_DEVELOPMENT
-    script(src="//cdn.bootcss.com/vue/2.2.4/vue.js")
+    script(src="#{CDN_FILES.i18next_dev}")
+    script(src="#{CDN_FILES.vue_dev}")
   else
-    script(src="//cdn.bootcss.com/vue/2.2.4/vue.min.js")
+    script(src="#{CDN_FILES.i18next}")
+    script(src="#{CDN_FILES.vue}")
   script(src='/js/member_view.js')
   style.
     .container .page-header {

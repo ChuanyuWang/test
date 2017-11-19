@@ -13,6 +13,7 @@ var i18n = require('i18n');
 
 // main application
 var app = express();
+app.locals.CDN_FILES = config.cdnlibs;
 
 var env = process.env.NODE_ENV || 'development';
 app.locals.ENV = env;
