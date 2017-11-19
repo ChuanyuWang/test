@@ -4,6 +4,8 @@ var util = require('util');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 //var cookieParser = require('cookie-parser');
+const session = require('express-session');
+//const MongoStore = require('connect-mongo')(session);
 var bodyParser = require('body-parser');
 var flash = require('connect-flash');
 var passport = require('passport');
@@ -45,7 +47,7 @@ app.use(bodyParser.urlencoded({
 
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(require('express-session')({ secret: 'keyboard dog', resave: false, saveUninitialized: false }));
+app.use(session({ secret: 'keyboard dog', resave: false, saveUninitialized: false }));
 
 //i18n configuration
 i18n.configure({
