@@ -77,7 +77,7 @@ function init() {
         //e.target // newly activated tab
         //e.relatedTarget // previous active tab
     });
-    // refresh the chart when user switch to analytics tab first time
+    // refresh the chart when user switch to hint tab first time
     $('a[href="#hint"]').one('shown.bs.tab', function(e) {
         refreshPassiveChart();
     });
