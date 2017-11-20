@@ -5,41 +5,47 @@ var config = require('./config.db');
 // Store all instantiated connections.
 var connections = [];
 
-module.exports = {
-    connect : function (database) {
-        if (typeof database != "string" || database.length == 0) {
-            throw new Error("parameter databaseis not string or empty");
-        }
-        //  If a connection pool was found, return with it.
-        var db = findConnection(database, connections);
-        if (db) {
-            return db;
-        }
-        
-        //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
-        var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
-        var options = {
-            authSource : 'admin',
-            poolSize : 5
-            /* keepAlive : 120 */
-        };
-        var db = mongojs(uriString, [], options);
-        
-        // Store the connection in the connections array.
-        connections.push({
-            name : database,
-            db : db
-        });
+// export helper functions
+var helpers = {};
 
-        db.on('error', function (err) {
-            console.error('connect database "%s" with error', db.toString(), err);
-            state.db = null;
-        })
-        db.on('connect', function () {
-            console.log('database "%s" is connected', db.toString());
-        })
+helpers.connectionURI = function(database) {
+    //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
+    return util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
+};
+
+helpers.connect = function (database) {
+    if (typeof database != "string" || database.length == 0) {
+        throw new Error("parameter databaseis not string or empty");
+    }
+    //  If a connection pool was found, return with it.
+    var db = findConnection(database, connections);
+    if (db) {
         return db;
     }
+    
+    //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
+    var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
+    var options = {
+        authSource : 'admin',
+        poolSize : 5
+        /* keepAlive : 120 */
+    };
+    var db = mongojs(helpers.connectionURI(database), [], options);
+    
+    // Store the connection in the connections array.
+    connections.push({
+        name : database,
+        db : db
+    });
+
+    db.on('error', function (err) {
+        console.error('connect database "%s" with error', db.toString(), err);
+        state.db = null;
+    })
+    db.on('connect', function () {
+        console.log('database "%s" is connected', db.toString());
+    })
+    return db;
 };
 
 function findConnection(databaseName, connections) {
@@ -50,3 +56,5 @@ function findConnection(databaseName, connections) {
     }
     return null;
 };
+
+module.exports = helpers;

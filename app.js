@@ -1,11 +1,11 @@
 var express = require('express');
 var path = require('path');
-var util = require('util');
+var util = require('./util');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 //var cookieParser = require('cookie-parser');
 const session = require('express-session');
-//const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo')(session);
 var bodyParser = require('body-parser');
 var flash = require('connect-flash');
 var passport = require('passport');
@@ -42,12 +42,20 @@ app.locals.pretty = true; // output the pretty html for consistency
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-  extended: true
+    extended: true
 }));
 
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'keyboard dog', resave: false, saveUninitialized: false }));
+app.use(session({
+    secret: 'keyboard dog',
+    resave: false, //don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    store: new MongoStore({
+        url: util.connectionURI('config') + '?authSource=admin&w=1',
+        touchAfter: 24 * 3600 // time period in seconds
+    })
+}));
 
 //i18n configuration
 i18n.configure({
@@ -95,8 +103,8 @@ app.use(function(err, req, res, next) {
     if (req.xhr) {
         res.status(err.status || 500);
         res.send({
-            message : err.message,
-            code : err.code
+            message: err.message,
+            code: err.code
         });
     } else {
         next(err);
