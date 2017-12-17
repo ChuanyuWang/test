@@ -95,7 +95,11 @@ module.exports = {
      * @param newValue
      */
     value: function(newValue) {
-      this.dp && this.dp.date(newValue || null)
+      if (this.dp) {
+        // if the new value is null, clear the input text manually, because date(null) function doesn't clear previous value
+        if (newValue === null) this.dp.clear();
+        else this.dp.date(moment(newValue || null));
+      }
     },
     /**
      * Watch for any change in options and set them
