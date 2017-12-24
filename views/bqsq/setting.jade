@@ -15,18 +15,24 @@ block navlist
       
 append css
   link(rel="stylesheet",href="#{CDN_FILES.bootstrap_table_css}")
+  link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css")
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
   script(src='#{CDN_FILES.bootbox}')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
+  script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   script(src="#{CDN_FILES.bootstrap_table}")
   script(src="#{CDN_FILES.bootstrap_table_locale_zh_CN}")
   if ENV_DEVELOPMENT
     script(src="//cdn.bootcss.com/echarts/3.6.1/echarts.js")
+    script(src="#{CDN_FILES.i18next_dev}")
+    script(src="#{CDN_FILES.vue_dev}")
   else
     script(src="//cdn.bootcss.com/echarts/3.6.1/echarts.min.js")
+    script(src="#{CDN_FILES.i18next}")
+    script(src="#{CDN_FILES.vue}")
   script(src='/js/setting.js')
 
 block page
@@ -38,6 +44,8 @@ block page
         a(href="#entry",role='tab',data-toggle='tab')= __('setting_entry')
       li.active(role='presentation')
         a(href="#classroom",role='tab',data-toggle='tab') 教室
+      li(role='presentation')
+        a(href="#teacher",role='tab',data-toggle='tab') 老师
       li(role='presentation')
         a(href="#analytics",role='tab',data-toggle='tab') 统计
       li(role='presentation')
@@ -64,6 +72,8 @@ block page
           div.form-group
             div.col-sm-offset-2.col-sm-10
               button#saveBasic.btn.btn-success(type='button') 保存
+      div.tab-pane(role="tabpanel",id="teacher",style="padding:7px")
+        div#teacher-setting
       div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
         div#toolbar.btn-group(role='group')
           button.btn.btn-success(type='button',data-toggle='modal',data-target='#clsroom_dlg', data-action='add') 添加

@@ -4,6 +4,8 @@
  * --------------------------------------------------------------------------
  */
 var util = require('./services/util');
+var i18nextplugin = require('./locales/i18nextplugin');
+var teach_setting = require('./components/teach-setting.vue');
 var consumeChart = null;
 var passiveChart = null;
 var passiveChart2 = null;
@@ -17,8 +19,16 @@ $(document).ready(function() {
 // Functions =============================================================
 
 function init() {
-    //moment.locale('zh-CN');
+    moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
+
+    // load the i18next plugin to Vue
+    Vue.use(i18nextplugin);
+
+    // bootstrap the teacher setting tab
+    new Vue({el: '#teacher-setting', render : function(h){
+        return h(teach_setting);
+    }});
 
     // register vintage Theme for echarts
     var colorPalette = ['#d87c7c', '#919e8b', '#d7ab82', '#6e7074', '#61a0a8', '#efa18d', '#787464', '#cc7e63', '#724e58', '#4b565b'];
