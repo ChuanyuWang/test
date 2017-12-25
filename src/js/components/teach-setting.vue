@@ -4,7 +4,7 @@
 
 <template lang="jade">
 div.row
-  teach-list.panel.col-sm-3(:data='dummyData',style='padding-top:15px',@selectedChange='selectionChangedListener',@add='addUnsaveOne',ref='teachList')
+  teach-list.panel.col-sm-3(:data='data',style='padding-top:15px',@selectedChange='selectionChangedListener',@add='addUnsaveOne',ref='teachList')
   teach-detail.col-sm-9(:data='selectedTeacher',style='padding-top:15px',@update='saveChange',@create='addTeacher',@delete='removeTeacher')
 </template>
 
@@ -17,26 +17,17 @@ div.row
 
 var teacher_list = require("./teach-list.vue");
 var teacher_detail = require("./teach-detail.vue");
+var teacher_service = require("../services/teachers");
 
 module.exports = {
   name: "teacher-setting",
   props: {
-    data: Array // array of class object
+    //data: Array // array of teacher object
   },
   data: function() {
     return {
-      dummyData: [
-        {
-          name: "老师1",
-          _id: "1",
-          status: "active",
-          birthday: "2014-12-22T11:46:34.136Z"
-        },
-        { name: "老师2的名字比较长非常长", _id: "2", status: "inactive" },
-        { name: "Bill Gates", _id: "3", status: "active" },
-        { name: "deleted one", _id: "4", status: "deleted" }
-      ],
-      selectedIndex: -1
+      selectedIndex: -1,
+      data: [] // loaded in created event
     };
   },
   components: {
@@ -45,7 +36,7 @@ module.exports = {
   },
   computed: {
     selectedTeacher: function() {
-      return this.dummyData[this.selectedIndex];
+      return this.data[this.selectedIndex];
     }
   },
   filters: {},
@@ -54,20 +45,29 @@ module.exports = {
       this.selectedIndex = index;
     },
     saveChange: function(params) {
-      this.dummyData.splice(this.selectedIndex, 1, params);
+      this.data.splice(this.selectedIndex, 1, params);
     },
     addUnsaveOne: function() {
-      this.dummyData.push({ name: "", status: "inactive" });
-      this.$refs.teachList.setSelectedIndex(this.dummyData.length - 1);
+      this.data.push({ name: "", status: "inactive" });
+      this.$refs.teachList.setSelectedIndex(this.data.length - 1);
     },
     addTeacher: function(params) {
-      console.log(params);
-      params._id = Math.random() + '';
-      this.dummyData.splice(this.selectedIndex, 1, params);
+      var vm = this;
+      var request = teacher_service.add(params);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.data.splice(vm.selectedIndex, 1, data);
+      });
     },
     removeTeacher: function(id) {
-      this.dummyData.splice(this.selectedIndex, 1);
+      this.data.splice(this.selectedIndex, 1);
     }
+  },
+  created: function() {
+    var vm = this;
+    var request = teacher_service.getAll();
+    request.done(function(data, textStatus, jqXHR) {
+      vm.data = data;
+    });
   }
 };
 </script>
