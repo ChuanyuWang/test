@@ -60,7 +60,6 @@ router.post('/', function(req, res, next) {
 });
 
 router.patch('/:teacherID', function(req, res, next) {
-    console.log("111111111");
     var db = dbUtility.connect3(req.tenant.name);
     var teachers = db.get("teachers");
     convertDateObject(req.body);
