@@ -44,11 +44,11 @@ helpers.connect = function(database) {
     });
 
     db.on('error', function(err) {
-        console.error('connect database "%s" with error', db.toString(), err);
+        console.error('[mongojs] connect database "%s" with error', db.toString(), err);
         // TODO, remove error db from connection pool
     })
     db.on('connect', function() {
-        console.log('database "%s" is connected', db.toString());
+        console.log('[mongojs] database "%s" is connected', db.toString());
     })
     return db;
 };
@@ -66,14 +66,13 @@ helpers.connect2 = function(database) {
     if (connections2[database]) {
         return connections2[database];
     }
-
     var options = {
         useMongoClient: true,
         //keepAlive: 120,
         autoIndex: false, // Don't build indexes
         reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
         reconnectInterval: 500, // Reconnect every 500ms
-        poolSize: 5, // Maintain up to 10 socket connections
+        poolSize: 3, // Maintain up to 3 socket connections for each database
         // If not connected, return errors immediately rather than waiting for reconnect
         bufferMaxEntries: 0,
         authSource: 'admin'
@@ -82,10 +81,10 @@ helpers.connect2 = function(database) {
     //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
     var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
     var conn = mongoose.createConnection(uriString, options);
-
-    // catch error and remove failure connection
-    conn.catch(function(err) {
-        console.error('connect database "%s" with error', database, err);
+    conn.then(function(params) {
+        console.log('[mongoose] database "%s" is connected', database);
+    }, function(err) {
+        console.error('[mongoose] connect database "%s" with error', database, err);
         delete connections2[database];
     });
 
