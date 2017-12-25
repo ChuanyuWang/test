@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 var passportLocalMongoose = require('passport-local-mongoose');
 var util = require("./util");
 
-//the uri of 'config' database
+//get mongoose connection of 'config' database
 var conn = util.connect2("config");
 
 var Account = new Schema({
