@@ -45,7 +45,11 @@ module.exports = {
       this.selectedIndex = index;
     },
     saveChange: function(params) {
-      this.data.splice(this.selectedIndex, 1, params);
+      var vm = this;
+      var request = teacher_service.update(params._id, params);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.data.splice(vm.selectedIndex, 1, data);
+      });
     },
     addUnsaveOne: function() {
       this.data.push({ name: "", status: "inactive" });

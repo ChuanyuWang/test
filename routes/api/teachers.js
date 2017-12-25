@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
 var dbUtility = require('../../util');
+var monk = require('monk');
 
 var NORMAL_FIELDS = {
     name: 1,
@@ -45,6 +46,7 @@ router.post('/', function(req, res, next) {
     convertDateObject(req.body);
     if (!req.body.hasOwnProperty('status'))
         req.body.status = 'inactive';
+    delete req.body._id;
 
     var teachers = db.get("teachers");
     teachers.insert(req.body).then(function(docs) {
@@ -52,6 +54,30 @@ router.post('/', function(req, res, next) {
         return res.json(docs);
     }).catch(function(err) {
         var error = new Error("fail to add teacher");
+        error.innerError = err;
+        return next(error);
+    });
+});
+
+router.patch('/:teacherID', function(req, res, next) {
+    console.log("111111111");
+    var db = dbUtility.connect3(req.tenant.name);
+    var teachers = db.get("teachers");
+    convertDateObject(req.body);
+    delete req.body._id;
+
+    teachers.findOneAndUpdate({
+        _id: monk.id(req.params.teacherID)
+    }, {
+        $set: req.body
+    }, {
+        projection: NORMAL_FIELDS,
+        returnOriginal: false
+    }).then(function(updatedDoc) {
+        console.log("teacher %s is updated by %j", req.params.teacherID, req.body);
+        return res.json(updatedDoc);
+    }).catch(function(err) {
+        var error = new Error("Update teacher fails");
         error.innerError = err;
         return next(error);
     });
