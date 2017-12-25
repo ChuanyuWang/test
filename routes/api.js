@@ -10,6 +10,7 @@ router.use('/courses', require('./api/courses'));
 router.use('/members', require('./api/members'));
 router.use('/booking', require('./api/booking'));
 router.use('/setting', require('./api/setting'));
+router.use('/teachers', require('./api/teachers'));
 router.use('/opportunities', require('./api/opportunities'));
 router.use('/analytics', require('./api/analytics'));
 
@@ -39,7 +40,7 @@ function getTenantInfo(req, res, next) {
         next();
     }
     config_db.collection('tenants').findOne({
-        name: req.params.tenantName
+        name: tenantName
     }, function(err, tenant) {
         if (err) {
             console.error(err);
