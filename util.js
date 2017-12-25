@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 // Use native promises, more refer to http://mongoosejs.com/docs/promises.html
 mongoose.Promise = global.Promise;
 
-// Store all instantiated connections.
+// Store all connected connections.
 var connections = [];
 var connections2 = {};
 
