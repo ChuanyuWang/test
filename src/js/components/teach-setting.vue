@@ -63,7 +63,11 @@ module.exports = {
       });
     },
     removeTeacher: function(id) {
-      this.data.splice(this.selectedIndex, 1);
+      var vm = this;
+      var request = teacher_service.remove(id);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.data.splice(vm.selectedIndex, 1);
+      });
     }
   },
   created: function() {

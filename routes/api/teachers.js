@@ -73,10 +73,34 @@ router.patch('/:teacherID', function(req, res, next) {
         projection: NORMAL_FIELDS,
         returnOriginal: false
     }).then(function(updatedDoc) {
-        console.log("teacher %s is updated by %j", req.params.teacherID, req.body);
-        return res.json(updatedDoc);
+        if (updatedDoc) {
+            console.log("teacher %s is updated by %j", req.params.teacherID, req.body);
+            return res.json(updatedDoc);
+        } else {
+            var err = new Error("Teacher not found");
+            err.status = 400;
+            return next(err);
+        }
     }).catch(function(err) {
         var error = new Error("Update teacher fails");
+        error.innerError = err;
+        return next(error);
+    });
+});
+
+router.delete('/:teacherID', function(req, res, next) {
+    var db = dbUtility.connect3(req.tenant.name);
+    var teachers = db.get("teachers");
+
+    //TODO, check to be deleted teacher is not used in any class
+    teachers.remove({_id: monk.id(req.params.teacherID)}, {
+        single: true
+    }).then(function(result) {
+        // result == {"ok":1,"n":1}
+        console.log("teacher %s is deleted", req.params.teacherID);
+        return res.json(true);
+    }).catch(function(err) {
+        var error = new Error("Delete teacher fails");
         error.innerError = err;
         return next(error);
     });

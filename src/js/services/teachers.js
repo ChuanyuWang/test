@@ -43,4 +43,17 @@ service.update = function(id, fields) {
     return request;
 }
 
+service.remove = function(id, fields) {
+    var request = $.ajax("/api/teachers/" + id, {
+        type: "DELETE",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("删除老师失败", jqXHR);
+    });
+    return request;
+};
+
 module.exports = service;
