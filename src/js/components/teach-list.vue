@@ -3,12 +3,16 @@
   border-right: 2px solid #337ab7;
   color: #337ab7;
 }
+.teacher-list-item:hover {
+  background-color: aliceblue;
+  cursor: pointer;
+}
 </style>
 
 <template lang="jade">
 div
   template(v-for='(teacher, index) in data')
-    div.media(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-teacher" : ""]')
+    div.media.teacher-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-teacher" : ""]')
       div.media-left
         a(href='#')
           //img.media-object(src='/img/user.png')
