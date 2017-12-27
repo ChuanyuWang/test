@@ -82,6 +82,7 @@ module.exports = {
     $elem.on('dp.change', this.onChange);
   },
   beforeDestroy: function() {
+    $(this.$el).off();
     // Free up memory
     if (this.dp) {
       this.dp.destroy();
