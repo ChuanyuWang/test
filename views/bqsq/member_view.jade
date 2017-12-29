@@ -67,8 +67,8 @@ block page
           date-picker(v-model='memberData.birthday')
       div.form-group
         label.control-label.col-sm-2 简介:
-        div.col-sm-10
-          textarea.form-control(rows='3', name='note',v-model.trim='memberData.note')
+        div.col-sm-8
+          textarea.form-control(rows='3', name='note',v-model.trim='memberData.note',style='resize:vertical;min-height:70px')
       div.form-group
         div.col-sm-offset-2.col-sm-10
           button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
