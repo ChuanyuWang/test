@@ -45,6 +45,10 @@ block page
         select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.classroom')
           - each room in classroom
             option(value=room.id)= room.name
+      div.form-group
+        label.control-label.col-sm-2 老师:
+        select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.teacher')
+          option(v-for='t in teachers',:value='t._id') {{t.name}}
       div.form-group(v-show='cls.courseID',style='display:none')
         label.control-label.col-sm-2 所属班级:
         div.col-sm-10

@@ -7,6 +7,7 @@
 
 var i18nextplugin = require('./locales/i18nextplugin');
 var class_service = require('./services/classes');
+var teacher_service = require('./services/teachers');
 var member_select_modal = require('./components/member-select-modal.vue');
 
 var viewData = {
@@ -14,6 +15,7 @@ var viewData = {
     date: null,
     quantity: 1,
     classrooms: {},
+    teachers: [],
     reservations: []
 }
 
@@ -59,6 +61,7 @@ function initPage(cls) {
 
     // bootstrap the class view page
     new Vue({
+        name: 'class-app',
         el: '#class_app',
         data: viewData,
         components: {
@@ -126,6 +129,7 @@ function initPage(cls) {
                     name: this.cls.name,
                     date: this.date.toISOString(),
                     classroom: this.cls.classroom,
+                    teacher: this.cls.teacher,
                     capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
                     age: this.age
                 });
@@ -256,6 +260,17 @@ function initPage(cls) {
                     }
                 });
             }
+        },
+        created: function() {
+            // Load all teachers for selection
+            var vm = this;
+            var request = teacher_service.getAll();
+            request.done(function(data, textStatus, jqXHR) {
+                var all = data || [];
+                // all the unassigned option with null as id
+                all.push({name:'<未指定>',_id:null});
+                vm.teachers = all;
+            });
         },
         mounted: function() {
             // 'this' is refer to vm instance

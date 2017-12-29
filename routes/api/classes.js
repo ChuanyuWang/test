@@ -12,6 +12,7 @@ var NORMAL_FIELDS = {
     capacity: 1,
     age: 1,
     classroom: 1,
+    teacher: 1,
     booking: 1,
     books: 1
 };
@@ -35,12 +36,23 @@ router.get('/', function(req, res, next) {
             $gte: new Date(req.query.from),
             $lt: new Date(req.query.to)
         };
-    } else if (req.query.hasOwnProperty('courseID')) {
-        // query specific course
+    }
+    // query specific course
+    if (req.query.hasOwnProperty('courseID')) {
         query['courseID'] = req.query.courseID ? mongojs.ObjectId(req.query.courseID) : null;
-    } else {
-        res.status(400).send('Missing param "from", "to" or "coureID"');
-        return;
+    }
+    // query classes by specific teacher
+    if (req.query.hasOwnProperty('teacher')) {
+        query['teacher'] = req.query.teacher ? mongojs.ObjectId(req.query.teacher) : null;
+    }
+    // get all classes booked by this member
+    if (req.query.hasOwnProperty('memberid')) {
+        query['booking.member'] = mongojs.ObjectId(req.query.memberid);
+    }
+
+    // check if there is at least one filter, it's not supposed to return all classes
+    if (Object.keys(query).length === 0) {
+        return res.status(400).send('Missing param, e.g. "from", "to" or "coureID"');
     }
 
     // be defaul the sort is 'asc'
@@ -48,10 +60,6 @@ router.get('/', function(req, res, next) {
     // query specific classroom
     if (req.query.hasOwnProperty('classroom')) {
         query['classroom'] = req.query.classroom ? req.query.classroom : null;
-    }
-    // get all classes booked by this member
-    if (req.query.memberid) {
-        query['booking.member'] = mongojs.ObjectId(req.query.memberid);
     }
     // get all classes booked by this member
     if (req.query.hasOwnProperty('hasBooks')) {
@@ -100,17 +108,21 @@ router.get('/:classID', function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.post('/', helper.requireRole("admin"), function(req, res) {
-    var classes = require("../../models/classes")(req.db);
+router.post('/', helper.requireRole("admin"), function(req, res, next) {
+    var classes = req.db.collection("classes");
+    convertDateObject(req.body);
+    // save the teacher as reference object
+    if (req.body.hasOwnProperty('teacher')) {
+        req.body.teacher = req.body.teacher ? mongojs.ObjectId(req.body.teacher) : null;
+    }
     classes.insert(req.body, function(err, docs) {
         if (err) {
-            res.status(500).json({
-                'err': err
-            })
-        } else {
-            console.log("class is added %j", docs);
-            res.json(docs);
+            var error = new Error("create class fails");
+            error.innerError = err;
+            return next(error);
         }
+        console.log("class is added %j", docs);
+        return res.json(docs);
     });
 });
 
@@ -122,6 +134,10 @@ router.patch('/:classID', helper.requireRole("admin"), function(req, res, next) 
         return next(error);
     }
     convertDateObject(req.body);
+    // save the teacher as reference object
+    if (req.body.hasOwnProperty('teacher')) {
+        req.body.teacher = req.body.teacher ? mongojs.ObjectId(req.body.teacher) : null;
+    }
     var classes = req.db.collection("classes");
     classes.findAndModify({
         query: {
