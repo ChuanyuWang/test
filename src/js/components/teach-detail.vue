@@ -32,7 +32,7 @@ div.detail-teacher-border(style='min-height:300px')
     div.form-group
       div.col-sm-offset-2.col-sm-10
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError || isDeleted') {{item._id ? $t('save'): $t('create')}}
-        button.btn.btn-danger(type='button',v-on:click='deleteListener',v-show='hasData && !isDeleted',style='margin-left:5px') {{$t('delete')}}
+        button.btn.btn-danger(type='button',v-on:click='deleteListener',v-show='hasData',style='margin-left:5px') {{$t('delete')}}
 </template>
 
 <script>
