@@ -66,7 +66,13 @@ module.exports = {
       var vm = this;
       var request = teacher_service.remove(id);
       request.done(function(data, textStatus, jqXHR) {
-        vm.data.splice(vm.selectedIndex, 1);
+        if (data.n === 1 && data.ok === 1) {
+          // teacher is deleted
+          vm.data.splice(vm.selectedIndex, 1);
+        } else {
+          // teacher's status is marked as deleted
+          vm.data.splice(vm.selectedIndex, 1, data);
+        }
       });
     }
   },

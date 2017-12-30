@@ -111,7 +111,7 @@ module.exports = {
       }
       bootbox.confirm({
         title: "确定删除吗？",
-        message: '被删除的老师，会被标记成"已删除"状态，并且不能修改',
+        message: '如果该老师被一节或多节程课指定，删除后，会被标记成"已删除"状态，并且不能修改',
         buttons: {
           confirm: {
             className: "btn-danger"

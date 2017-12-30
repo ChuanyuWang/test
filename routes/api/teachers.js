@@ -90,15 +90,33 @@ router.patch('/:teacherID', function(req, res, next) {
 
 router.delete('/:teacherID', function(req, res, next) {
     var db = dbUtility.connect3(req.tenant.name);
-    var teachers = db.get("teachers");
-
-    //TODO, check to be deleted teacher is not used in any class
-    teachers.remove({_id: monk.id(req.params.teacherID)}, {
-        single: true
+    var classes = db.get('classes');
+    classes.findOne({teacher:monk.id(req.params.teacherID)},'name').then(function(doc) {
+        let teachers = db.get("teachers");
+        if (doc) {
+            // set the teacher's status as 'deleted'
+            return teachers.findOneAndUpdate({
+                _id: monk.id(req.params.teacherID)
+            }, {
+                $set: {'status': "deleted"}
+            }, {
+                projection: NORMAL_FIELDS,
+                returnOriginal: false
+            }).then(function(doc) {
+                console.log("teacher %s is marked as deleted", req.params.teacherID);
+                return doc;
+            });
+        } else {
+            return teachers.remove({_id: monk.id(req.params.teacherID)}, {
+                single: true
+            }).then(function(result) {
+                // result.result == {"ok":1,"n":1}
+                console.log("teacher %s is deleted", req.params.teacherID);
+                return result.result;
+            });
+        }
     }).then(function(result) {
-        // result == {"ok":1,"n":1}
-        console.log("teacher %s is deleted", req.params.teacherID);
-        return res.json(true);
+        return res.json(result);
     }).catch(function(err) {
         var error = new Error("Delete teacher fails");
         error.innerError = err;
