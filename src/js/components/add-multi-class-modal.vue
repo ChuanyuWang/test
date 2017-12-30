@@ -25,6 +25,10 @@ div#add-multi-class-modal.modal.fade(tabindex='-1',data-backdrop='static')
             label.control-label.col-sm-2 教室:
             select#class_room.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='room')
               option(v-for='(name, id) in classrooms',:value='id') {{name}}
+          div.form-group
+            label.control-label.col-sm-2 老师:
+            select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='teacher')
+              option(v-for='t in teachers',:value='t._id') {{t.name}}
             div.col-sm-offset-2.col-sm-10
               div.checkbox
                 label
@@ -60,6 +64,8 @@ div#add-multi-class-modal.modal.fade(tabindex='-1',data-backdrop='static')
  */
 
 var date_picker = require('./date-picker.vue');
+var teacher_service = require('../services/teachers');
+
 module.exports = {
   components: {
       'date-picker': date_picker
@@ -75,7 +81,9 @@ module.exports = {
       room: '',
       cost: 0,
       weekdays: [],
-      isRepeated: false
+      isRepeated: false,
+      teacher: null, // selected teacher
+      teachers: [] // all active teachers
     };
   },
   watch: {},
@@ -115,6 +123,17 @@ module.exports = {
   mounted: function() {
     // 'this' is refer to vm instance
     // var vm = this;
+  },
+  created: function() {
+    // Load all teachers for selection
+    var vm = this;
+    var request = teacher_service.getAll({status:'active'});
+    request.done(function(data, textStatus, jqXHR) {
+        var all = data || [];
+        // all the unassigned option with null as id
+        all.push({name:'<未指定>',_id:null});
+        vm.teachers = all;
+    });
   }
 };
 </script>

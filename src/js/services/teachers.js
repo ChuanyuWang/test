@@ -8,8 +8,8 @@ var util = require('./util');
 
 var service = {};
 
-service.getAll = function() {
-    var request = $.getJSON("/api/teachers/", '');
+service.getAll = function(fields) {
+    var request = $.getJSON("/api/teachers", fields);
     request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert("获取老师失败", jqXHR);
     });

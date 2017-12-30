@@ -264,7 +264,7 @@ function initPage(cls) {
         created: function() {
             // Load all teachers for selection
             var vm = this;
-            var request = teacher_service.getAll();
+            var request = teacher_service.getAll({status:'active'});
             request.done(function(data, textStatus, jqXHR) {
                 var all = data || [];
                 // all the unassigned option with null as id

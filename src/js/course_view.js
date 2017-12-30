@@ -245,6 +245,7 @@ var courseApp = {
             // assign classroom
             result.forEach(function(value, index, array) {
                 value.classroom = options.room;
+                value.teacher = options.teacher;
                 value.cost = options.cost;
             })
             // create classes
