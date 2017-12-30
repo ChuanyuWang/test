@@ -56,7 +56,7 @@ block page
       div.form-group
         label.control-label.col-sm-2 简介:
         div.col-sm-10
-          textarea.form-control(rows='3', v-model.trim='course.remark')
+          textarea.form-control(rows='3', v-model.trim='course.remark',style='resize:vertical;min-height:70px')
       div.form-group
         div.col-sm-offset-2.col-sm-10
           button.btn.btn-success(type='button',:disabled='!course._id || hasError',v-on:click='saveBasicInfo') 保存
@@ -89,7 +89,7 @@ block page
         div.col-sm-2
           button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',@click='showAddClassDlg')
             span.glyphicon.glyphicon-plus 添加
-        div.col-sm-5
+        div.col-sm-7.col-md-5
           ul.list-group(style='margin-bottom:0px')
             li.list-group-item(v-for="item in sortedClasses")
               h4(style='margin: 3px 0') {{item.name}}
@@ -99,7 +99,7 @@ block page
               span.small {{item.date | formatDateTime}} - {{item.classroom | formatClassroom}}
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
               a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-        div.col-sm-5
+        div.col-sm-3.col-md-5
           div
             small(style='color:#777') 共{{classesCount}}节
           div
