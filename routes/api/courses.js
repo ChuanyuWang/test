@@ -216,6 +216,10 @@ router.post('/:courseID/classes', function(req, res, next) {
             if (value.hasOwnProperty("date")) {
                 value["date"] = new Date(value["date"]);
             }
+            if (value.teacher) {
+                // save the teacher property as object reference
+                value["teacher"] = mongojs.ObjectId(value["teacher"]);
+            }
             value.cost = value.cost || 0;
             value.capacity = value.capacity || 8;
             value.booking = []; // clear the booking for new added course's classes

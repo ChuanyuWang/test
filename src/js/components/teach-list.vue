@@ -7,6 +7,10 @@
   background-color: aliceblue;
   cursor: pointer;
 }
+
+.deleted-teacher {
+  color: #777;
+}
 </style>
 
 <template lang="jade">
@@ -16,7 +20,7 @@ div
       div.media-left
         a(href='#')
           //img.media-object(src='/img/user.png')
-          span.glyphicon.glyphicon-user(:class='{"text-danger":teacher.status === "deleted"}')
+          span.glyphicon.glyphicon-user(:class='{"deleted-teacher":teacher.status === "deleted", "text-danger": teacher.status === "inactive"}')
       div.media-body
         h5.media-heading {{teacher.name}}
         p(v-if='!teacher._id') <未保存>
