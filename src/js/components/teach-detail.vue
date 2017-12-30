@@ -12,7 +12,7 @@ div.detail-teacher-border(style='min-height:300px')
       select.col-sm-5.form-control(v-model='item.status',style='margin-left:15px;width:auto',:disabled='isDeleted')
         option.text-success(value='active') {{$t('status_active')}}
         option.text-danger(value='inactive') {{$t('status_inactive')}}
-        option(value='deleted') {{$t('status_deleted')}}
+        option(v-if='isDeleted',value='deleted') {{$t('status_deleted')}}
     div.form-group(:class='{"has-error": errors.name}')
       label.col-sm-2.control-label {{$t('member_name')}}:
       div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
