@@ -67,7 +67,7 @@ block page
         div.col-sm-2
           button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',@click='showAddMemberDlg')
             span.glyphicon.glyphicon-plus 添加
-        div.col-sm-5
+        div.col-sm-7.col-md-5
           ul.list-group(style='margin-bottom:0px')
             li.list-group-item(v-for="member in course.members")
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
@@ -94,6 +94,7 @@ block page
             li.list-group-item(v-for="item in sortedClasses")
               h4(style='margin: 3px 0') {{item.name}}
               small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
+              p(style='margin: 3px 0') 绘本: {{item.books | formatBooks}}
               a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-calendar
               span.small {{item.date | formatDateTime}} - {{item.classroom | formatClassroom}}

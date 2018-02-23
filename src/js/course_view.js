@@ -129,6 +129,15 @@ var courseApp = {
         },
         formatClassroom: function(value) {
             return viewData.classrooms[value];
+        },
+        formatBooks: function(value) {
+            var result = "";
+            if (jQuery.isArray(value)) {
+                value.forEach(function(book) {
+                  if (book.title) result += "《" + book.title + "》";
+                });
+            }
+            return result || "未添加";
         }
     },
     watch: {},
