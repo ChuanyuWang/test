@@ -2,6 +2,11 @@
 .detail-teacher-border {
   border-left: 2px solid #eee;
 }
+
+.detail-separator {
+  border-top: 2px solid #eee;
+  margin: 15px 0px;
+}
 </style>
 
 <template lang="jade">
@@ -33,6 +38,19 @@ div.detail-teacher-border(style='min-height:300px')
       div.col-sm-offset-2.col-sm-10
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError || isDeleted') {{item._id ? $t('save'): $t('create')}}
         button.btn.btn-danger(type='button',v-on:click='deleteListener',v-show='hasData',style='margin-left:5px') {{$t('delete')}}
+    div.detail-separator
+    div.form-group
+      label.control-label.col-sm-2 {{$t('history_teacher')}}:
+      div.col-sm-10
+        table.history(data-striped='true',data-sort-name='date',data-sort-order='desc',data-pagination='true',data-page-size='10',data-unique-id="_id")
+          thead
+            tr
+              //th(data-field='_id',data-visible='false') ID
+              th(data-field='name') 课程名称
+              th(data-field='cost') 课时
+              th(data-field='booking') 人数
+              th(data-field='date',data-sortable='true') 课程日期
+              th(data-field='books') 绘本
 </template>
 
 <script>
@@ -43,6 +61,7 @@ div.detail-teacher-border(style='min-height:300px')
  */
 
 var date_picker = require("./date-picker.vue");
+var common = require("../common");
 
 module.exports = {
   props: {
@@ -59,6 +78,21 @@ module.exports = {
   watch: {
     data: function(value) {
       this.item = jQuery.extend(true, {}, value || {});
+      if (this.item._id) {
+        $(this.$el)
+          .find("table.history")
+          .bootstrapTable("refresh", {
+            url: "/api/classes",
+            query: {
+              teacher: this.item._id,
+              order: "desc"
+            }
+          });
+      } else {
+        $(this.$el)
+          .find("table.history")
+          .bootstrapTable("removeAll");
+      }
     }
   },
   computed: {
@@ -80,7 +114,7 @@ module.exports = {
     },
     isDeleted: function() {
       if (this.item && this.item.status) {
-        return this.item.status === 'deleted';
+        return this.item.status === "deleted";
       }
       return false;
     }
@@ -121,7 +155,54 @@ module.exports = {
           if (ok) vm.$emit("delete", vm.item._id);
         }
       });
+    },
+    linkNameFormatter: function(value, row, index) {
+      return [
+        '<a href="./class/' + row._id + '" target="_blank">',
+        ' <i class="text-primary glyphicon glyphicon-calendar"></i>' + value,
+        "</a>"
+      ].join("");
+    },
+    quantityFormatter: function(value, row, index) {
+      var result = 0;
+      if ($.isArray(value)) {
+        value.forEach(function(registration) {
+          if (registration.quantity) result += parseInt(registration.quantity);
+        });
+      }
+      return result;
+    },
+    booksFormatter: function(value, row, index) {
+      if ($.isArray(value)) {
+        var result = "";
+        value.forEach(function(book) {
+          if (book.title) result += "《" + book.title + "》";
+        });
+        return result;
+      }
     }
+  },
+  mounted: function() {
+    $(this.$el)
+      .find("table.history")
+      .bootstrapTable({
+        locale: "zh-CN",
+        columns: [
+          {
+            formatter: this.linkNameFormatter
+          },
+          {},
+          {
+            formatter: this.quantityFormatter
+          },
+          {
+            formatter: common.dateFormatter
+          },
+          {
+            formatter: this.booksFormatter
+          }
+        ]
+      });
   }
 };
 </script>
