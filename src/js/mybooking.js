@@ -138,17 +138,16 @@ function displayClass(item) {
     var list = $('.tab-content .active');
     var date = moment(item.date);
 
-    var tmp = date.format('M/D');
     // get the last class row
     var lastRow = list.find('div.class-row:last-child');
-    // check if the next class is in the same day
-    if (!lastRow || lastRow.find('.date-col p').text().indexOf(tmp) == -1) {
+    // check if it's the first row or the next class is in the same day
+    if (lastRow.length === 0 || lastRow.data('timestamp') !== date.valueOf()) {
         // add separator bar
         list.append('<div class="class-separator"></div>');
         // append a new class row
         list.append('<div class="row class-row">' +
                         '<div class="col-xs-2 date-col">' + 
-                            '<p>' + tmp + '<br><small>' + date.format('ddd') + '</small></p>' + 
+                            '<p>' + date.format('M/D') + '<br><small>' + date.format('ddd') + '</small></p>' + 
                         '</div>' + 
                         '<div class="col-xs-10 content-col"></div>' + 
                     '</div>');
@@ -180,6 +179,8 @@ function displayClass(item) {
     }
     
     lastRow = list.find('div.class-row:last-child');
+    // Add the timestamp to class-row element for later comparing
+    lastRow.data('timestamp', date.valueOf());
     lastRow.find('.content-col').append(
         '<div>' +
         '<div class="cls-col">' + 
