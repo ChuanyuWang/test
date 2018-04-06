@@ -83,7 +83,7 @@ block page
     form.form-horizontal
       div.form-group
         div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='showSelectMemberDlg')
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.memberSelectDlg.show()')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           ul.list-group(style='margin-bottom:0px')
@@ -99,7 +99,7 @@ block page
     form.form-horizontal
       div.form-group
         div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',data-toggle='modal',data-target='#newBook_dlg')
+          button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.addBookDlg.show()')
             span.glyphicon.glyphicon-plus 添加
         div.col-sm-5
           template(v-for="item in cls.books")
@@ -111,32 +111,8 @@ block page
                 p.small(style='color:#777') {{item.info}} by {{item.teacher}}
                   span.badge(style='background-color:#d9534f;cursor:pointer;float:right;margin-right:16px',@click='removeBook(item)') 删除
           small(style='color:#777') 共{{booksCount}}本
+    add-book-modal(ref='addBookDlg',@ok='addNewBook')
     member-select-modal(ref='memberSelectDlg',@ok='addReservation')
       div.btn-group(slot='toolbar',style='display:inline-flex;position:absolute;top:25px;left:20px')
         label(style='margin-right:4px;line-height:34px') 人数:
         input.form-control(type='number',min='1',step='1',style='width:90px',v-model.number='quantity')
-  div#newBook_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 添加绘本
-        div.modal-body
-          form.form-horizontal
-            div.form-group
-              label.control-label.col-sm-2 绘本名称:
-              div.col-sm-10
-                input.form-control(type='text',name='book_name',placeholder='绘本名称')
-            div.form-group
-              label.control-label.col-sm-2 上课老师:
-              div.col-sm-10
-                input.form-control(type='text',name='book_teacher',placeholder='请输入')
-                span.help-block.bg-danger 请在课程中设置相同老师
-            div.form-group
-              label.control-label.col-sm-2 内容:
-              div.col-sm-10
-                input.form-control(type='text',name='book_info',placeholder='请输入')
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_pictureBook.btn.btn-success(type="button") 添加

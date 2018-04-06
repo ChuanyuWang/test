@@ -9,6 +9,7 @@ var i18nextplugin = require('./locales/i18nextplugin');
 var class_service = require('./services/classes');
 var teacher_service = require('./services/teachers');
 var member_select_modal = require('./components/member-select-modal.vue');
+var add_book_modal = require('./components/add-book-modal.vue');
 
 var viewData = {
     cls: {},
@@ -39,19 +40,12 @@ $(document).ready(function() {
 // Functions =============================================================
 
 function init() {
-    console.log("course_view moudle init...");
+    console.log("class_view moudle init...");
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
-
-    // event listener of adding new book
-    $('#newBook_dlg #add_pictureBook').click(handleAddNewBook);
-    $('#newBook_dlg').on('show.bs.modal', function(event) {
-        $(this).find('.form-group').removeClass('has-error');
-        $(this).find('input[type=text]').val(null);
-    });
 }
 
 function initPage(cls) {
@@ -65,7 +59,8 @@ function initPage(cls) {
         el: '#class_app',
         data: viewData,
         components: {
-            'member-select-modal': member_select_modal
+            'member-select-modal': member_select_modal,
+            'add-book-modal': add_book_modal
         },
         computed: {
             membersCount: function() {
@@ -196,9 +191,6 @@ function initPage(cls) {
                     }
                 });
             },
-            showSelectMemberDlg: function(params) {
-                this.$refs.memberSelectDlg.show();
-            },
             addReservation: function(selectedItems) {
                 // reset the quantity of reservation
                 if (this.quantity === '') this.quantity = 1;
@@ -227,13 +219,25 @@ function initPage(cls) {
                     // add one member's reservation
                     var request = class_service.addReservation(result[0]);
                     request.done(function(data, textStatus, jqXHR) {
-                        var newAdded = findReservation(data['class'], data['member']);
+                        var newAdded = vm.findReservation(data['class'], data['member']);
                         if (newAdded) vm.reservations.push(newAdded);
                         bootbox.alert('预约成功');
                     });
                 } else {
                     bootbox.alert('所选会员已经预约');
                 }
+            },
+            findReservation: function(cls, member) {
+                if (!cls || !member) return null;
+                var booking = cls.booking || [];
+                var found = booking.filter(function(value, index, array) {
+                    return value.member == member._id;
+                });
+                if (found.length != 1) return null;
+                var item = found[0];
+                item.userName = member.name;
+                item.contact = member.contact;
+                return item;
             },
             cancelReservation: function(item) {
                 var vm = this;
@@ -258,6 +262,12 @@ function initPage(cls) {
                             }
                         });
                     }
+                });
+            },
+            addNewBook: function(newBook) {
+                var request = class_service.addBooks(viewData.cls._id, newBook);
+                request.done(function(data, textStatus, jqXHR) {
+                    viewData.cls.books = data.books;
                 });
             }
         },
@@ -289,48 +299,4 @@ function initPage(cls) {
             });
         }
     });
-}
-
-function handleAddNewBook(e) {
-    var modal = $(this).closest('.modal');
-    var book = {};
-    book.title = modal.find('input[name=book_name]').val().trim();
-    if (!book.title) {
-        return markError(modal, 'input[name=book_name]', true);
-    } else {
-        markError(modal, 'input[name=book_name]', false);
-    }
-    book.teacher = modal.find('input[name=book_teacher]').val().trim();
-    if (!book.teacher) {
-        return markError(modal, 'input[name=book_teacher]', true);
-    } else {
-        markError(modal, 'input[name=book_teacher]', false);
-    }
-    book.info = modal.find('input[name=book_info]').val().trim();
-    var request = class_service.addBooks(viewData.cls._id, book);
-    request.done(function(data, textStatus, jqXHR) {
-        viewData.cls.books = data.books;
-    });
-    modal.modal('hide');
-}
-
-function markError(container, selector, hasError) {
-    if (hasError) {
-        container.find(selector).closest(".form-group").addClass("has-error");
-    } else {
-        container.find(selector).closest(".form-group").removeClass("has-error");
-    }
-}
-
-function findReservation(cls, member) {
-    if (!cls || !member) return null;
-    var booking = cls.booking || [];
-    var found = booking.filter(function(value, index, array) {
-        return value.member == member._id;
-    });
-    if (found.length != 1) return null;
-    var item = found[0];
-    item.userName = member.name;
-    item.contact = member.contact;
-    return item;
 }
