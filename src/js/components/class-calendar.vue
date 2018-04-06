@@ -2,7 +2,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div
   div.row(style='margin-top:15px;margin-bottom:15px')
     div.col-sm-4.btn-group

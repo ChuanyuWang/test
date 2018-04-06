@@ -2,7 +2,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div.input-group.date(:id="id",:class="inputClass")
   input.form-control(type="text",
         :name="name",

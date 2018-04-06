@@ -8,7 +8,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div.modal.fade(tabindex='-1',data-backdrop='static')
   div.modal-dialog
     div.modal-content

@@ -2,7 +2,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div
   template(v-for='classItem in data')
     div.class-item-div(v-bind:class="[reservation(classItem) > 0 ? 'bg-success' : 'bg-info']")

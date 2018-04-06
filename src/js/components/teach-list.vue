@@ -13,7 +13,7 @@
 }
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div
   template(v-for='(teacher, index) in data')
     div.media.teacher-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-teacher" : ""]')

@@ -2,8 +2,8 @@
 
 </style>
 
-<template lang="jade">
-div#add-multi-class-modal.modal.fade(tabindex='-1',data-backdrop='static')
+<template lang="pug">
+div.modal.fade(tabindex='-1',data-backdrop='static')
   div.modal-dialog
     div.modal-content
       div.modal-header
@@ -38,7 +38,7 @@ div#add-multi-class-modal.modal.fade(tabindex='-1',data-backdrop='static')
             div.form-group(:class='{"has-error": !validation.weekdays}')
               label.control-label.col-sm-2 每周:
               div.weekdays.col-sm-10(style='display:flex;flex-wrap:wrap')
-                - each day,index in ['星期日','星期一','星期二','星期三','星期四','星期五','星期六']
+                each day,index in ['星期日','星期一','星期二','星期三','星期四','星期五','星期六']
                   div.checkbox(style='margin:0 30px 0 0')
                     label
                       input(type="checkbox", name="weekday", value="#{index}",v-model='weekdays')

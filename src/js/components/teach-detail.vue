@@ -9,7 +9,7 @@
 }
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div.detail-teacher-border(style='min-height:300px')
   form.form-horizontal(v-show='hasData')
     div.form-group

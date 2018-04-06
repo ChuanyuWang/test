@@ -12,7 +12,7 @@
 }
 </style>
 
-<template lang="jade">
+<template lang="pug">
 div.bb-alert.alert(style='display:none',:class='[isError?"alert-danger":"alert-success"]')
   span {{message}}
 </template>

@@ -2,7 +2,7 @@
 
 </style>
 
-<template lang="jade">
+<template lang="pug">
 form.form-horizontal
   div.form-group
     label.control-label.col-sm-2 课时:
