@@ -60,10 +60,7 @@ block page
       div.form-group(:class='{"has-error": errors.date}')
         label.control-label.col-sm-2 日期/时间:
         div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.date")
-          div#class_date.input-group.date
-            input.form-control(type='text')
-            span.input-group-addon
-              span.glyphicon.glyphicon-calendar
+          date-picker(v-model='cls.date',:config="{format:'lll',locale:'zh-CN',sideBySide: true}")
       div.form-group(:class='{"has-error": errors.age}')
         label.control-label.col-sm-2 年龄:
         div.col-sm-10(style="display:inline-flex",data-toggle="tooltip",data-placement="right",:title="errors.age")

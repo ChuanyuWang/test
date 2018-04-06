@@ -7,13 +7,13 @@
 
 var i18nextplugin = require('./locales/i18nextplugin');
 var class_service = require('./services/classes');
+var date_picker = require('./components/date-picker.vue');
 var teacher_service = require('./services/teachers');
 var member_select_modal = require('./components/member-select-modal.vue');
 var add_book_modal = require('./components/add-book-modal.vue');
 
 var viewData = {
     cls: {},
-    date: null,
     quantity: 1,
     classrooms: {},
     teachers: [],
@@ -59,6 +59,7 @@ function initPage(cls) {
         el: '#class_app',
         data: viewData,
         components: {
+            'date-picker': date_picker,
             'member-select-modal': member_select_modal,
             'add-book-modal': add_book_modal
         },
@@ -83,7 +84,8 @@ function initPage(cls) {
             errors: function() {
                 var errors = {};
                 if (this.cls.name.length == 0) errors.name = '名称不能为空';
-                if (!this.date || !this.date.isValid()) errors.date = '日期/时间格式不正确';
+                if (!this.cls.date) errors.date = '日期/时间未指定';
+                if (this.cls.date && !moment(this.cls.date).isValid()) errors.date = '日期/时间格式不正确';
                 if (this.cls.capacity < 0) errors.capacity = '最大人数不能小于零';
                 if (this.age.min < 0) errors.age = '最小年龄不能小于零';
                 if (this.age.max < 0) errors.age = '最大年龄不能小于零';
@@ -108,13 +110,7 @@ function initPage(cls) {
                 return moment(value).format('lll');
             }
         },
-        watch: {
-            'cls.date': function() {
-                $('#class_date').data('DateTimePicker').date(this.cls.date ? moment(this.cls.date) : null);
-                // only update the birth in dp.change event
-                //this.birth = this.memberData.birthday ? moment(this.memberData.birthday) : null;
-            }
-        },
+        watch: {},
         methods: {
             saveBasicInfo: function() {
                 if (this.hasError) return false;
@@ -122,7 +118,7 @@ function initPage(cls) {
                 var vm = this;
                 var request = class_service.updateClass(this.cls._id, {
                     name: this.cls.name,
-                    date: this.date.toISOString(),
+                    date: this.cls.date && moment(this.cls.date).toISOString(),
                     classroom: this.cls.classroom,
                     teacher: this.cls.teacher,
                     capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
@@ -130,9 +126,9 @@ function initPage(cls) {
                 });
                 request.done(function(data, textStatus, jqXHR) {
                     bootbox.alert('课程基本资料更新成功');
-                    // update according to result
-                    vm.cls.age = data.age;
-                    vm.cls.capacity = data.capacity;
+                    vm.cls = data;
+                    vm.cls.age = data.age || {};
+                    vm.cls.books = data.books || [];
                 });
             },
             deleteClass: function() {
@@ -210,7 +206,7 @@ function initPage(cls) {
                 if (addedOnes.length > 0) {
                     var result = addedOnes.map(function(value, index, array) {
                         return {
-                            classid: viewData.cls._id,
+                            classid: vm.cls._id,
                             contact: value.contact,
                             name: value.name,
                             quantity: vm.quantity
@@ -265,9 +261,10 @@ function initPage(cls) {
                 });
             },
             addNewBook: function(newBook) {
-                var request = class_service.addBooks(viewData.cls._id, newBook);
+                var vm = this;
+                var request = class_service.addBooks(vm.cls._id, newBook);
                 request.done(function(data, textStatus, jqXHR) {
-                    viewData.cls.books = data.books;
+                    vm.cls.books = data.books;
                 });
             }
         },
@@ -284,19 +281,7 @@ function initPage(cls) {
         },
         mounted: function() {
             // 'this' is refer to vm instance
-            var vm = this, datepicker = $(this.$el).find('#class_date');
-            datepicker.datetimepicker({
-                format: 'lll',
-                locale: 'zh-CN',
-                sideBySide: true
-            });
-            datepicker.data('DateTimePicker').date(this.cls.date ? moment(this.cls.date) : null);
-            vm.date = datepicker.data('DateTimePicker').date();
-
-            datepicker.on('dp.change', function(e) {
-                // when user clears the input box, the 'e.date' is false value
-                vm.date = e.date === false ? null : e.date;
-            });
+            //var vm = this;
         }
     });
 }
