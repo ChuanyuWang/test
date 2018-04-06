@@ -8,8 +8,8 @@ module.exports = {
         replaceConsole : true
     },
     cdnlibs : {
-        vue     : '//cdn.bootcss.com/vue/2.5.9/vue.min.js',
-        vue_dev : '//cdn.bootcss.com/vue/2.5.9/vue.js',
+        vue     : '//cdn.bootcss.com/vue/2.5.16/vue.min.js',
+        vue_dev : '//cdn.bootcss.com/vue/2.5.16/vue.js',
         i18next : '//cdn.bootcss.com/i18next/8.2.1/i18next.min.js',
         i18next_dev : '//cdn.bootcss.com/i18next/8.2.1/i18next.js',
         bootstrap_table_css : '//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css',
