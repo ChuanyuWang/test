@@ -6,7 +6,6 @@ var logger = require('morgan');
 //var cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-var bodyParser = require('body-parser');
 var flash = require('connect-flash');
 var passport = require('passport');
 var config = require('./config');
@@ -40,8 +39,9 @@ app.locals.pretty = true; // output the pretty html for consistency
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
+
+app.use(express.json());
+app.use(express.urlencoded({
     extended: true
 }));
 
