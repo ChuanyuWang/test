@@ -33,6 +33,6 @@ module.exports = {
         }
     },
     views: {
-        files: ['views/*.jade', 'views/**/*.jade']
+        files: ['views/*.pug', 'views/**/*.pug']
     }
 };

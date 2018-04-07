@@ -7,7 +7,7 @@ block append js
 block content
   div#main.container
     div.row
-      img.center-block(src='#{logoPath}',style="width:200px")
+      img.center-block(src=logoPath,style="width:200px")
     form#opportunity
       div.form-group(style='margin-bottom:auto')
         p.form-control-static(style='color:#808080;text-align:center')
@@ -55,9 +55,9 @@ block content
           p#message 您的信息已经成功提交，我们的客服人员会在第一时间联系您
           p(style='color:#808080')
             small 客服电话: 
-              a(href='tel:#{tel}')= contact
+              a(href='tel:' + tel)= contact
             br
             small 门店地址: 
-              a(href='#{addressLink}')= address
+              a(href=addressLink)= address
         div.modal-footer
           button#success_ok.btn.btn-success(type="button",data-dismiss="modal") 确定

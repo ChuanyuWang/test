@@ -1,23 +1,23 @@
 extends ../index
 
 append css
-  link(rel="stylesheet",href="#{CDN_FILES.bootstrap_table_css}")
+  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css")
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
-  script(src='#{CDN_FILES.bootbox}')
+  script(src=CDN_FILES.bootbox)
   //script(src='/components/requirejs/require.js',data-main="/js/main")
-  script(src="#{CDN_FILES.bootstrap_table}")
-  script(src="#{CDN_FILES.bootstrap_table_locale_zh_CN}")
+  script(src=CDN_FILES.bootstrap_table)
+  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   if ENV_DEVELOPMENT
-    script(src="#{CDN_FILES.i18next_dev}")
-    script(src="#{CDN_FILES.vue_dev}")
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
   else
-    script(src="#{CDN_FILES.i18next}")
-    script(src="#{CDN_FILES.vue}")
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
   script(src='/js/class_view.js')
   style.
     .container .page-header {
@@ -25,7 +25,7 @@ append js
       padding-bottom: 3px;
     }
 block page
-  div#class_app.container(style='padding-top:69px',data-class-id='#{classID}')
+  div#class_app.container(style='padding-top:69px',data-class-id=classID)
     ol.breadcrumb
       li
         a(href="../home") 主页
@@ -43,7 +43,7 @@ block page
       div.form-group
         label.control-label.col-sm-2 教室:
         select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.classroom')
-          - each room in classroom
+          each room in classroom
             option(value=room.id)= room.name
       div.form-group
         label.control-label.col-sm-2 老师:

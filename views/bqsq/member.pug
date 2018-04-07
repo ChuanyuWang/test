@@ -14,16 +14,16 @@ block navlist
       a(href='setting') 设置
 
 append css
-  link(rel="stylesheet",href="#{CDN_FILES.bootstrap_table_css}")
+  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css")
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
-  script(src='#{CDN_FILES.bootbox}')
+  script(src=CDN_FILES.bootbox)
   //script(src='/components/requirejs/require.js',data-main="/js/main")
-  script(src="#{CDN_FILES.bootstrap_table}")
-  script(src="#{CDN_FILES.bootstrap_table_locale_zh_CN}")
+  script(src=CDN_FILES.bootstrap_table)
+  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   script(src="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js")
   script(src='/js/member.js')
 
@@ -106,7 +106,7 @@ block page
                   label
                     input(type="radio", name="filter", value="null", checked)
                     | 显示全部会员
-                - each room in classroom
+                each room in classroom
                   div.radio
                     label
                       input(type="radio", name="filter", value=room.id)

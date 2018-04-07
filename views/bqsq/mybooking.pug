@@ -18,7 +18,7 @@ block content
     };
   div#main.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
-      img.center-block(src='#{logoPath}',style="padding:0px;width:200px")
+      img.center-block(src=logoPath,style="padding:0px;width:200px")
     form#login.form-horizontal(style='margin-top:15px;display:none;padding-left:8px;padding-right:8px',role='form')
         div.form-group.form-group-sm
           div.col-xs-12(style='color:#808080;text-align:center') 请输入宝宝姓名和联系方式查看已预约课程
@@ -34,8 +34,7 @@ block content
           div.col-xs-offset-3.col-xs-9
             button.btn.btn-primary 查看预约
     div#user_info.row(style='display:none;margin:7px -7px 3px -7px')
-      p.pull-left.col-xs-10
-        你好，小朋友
+      p.pull-left.col-xs-10 你好，小朋友
       div.col-xs-2(style='padding-right:9px')
         button.btn.btn-danger.btn-xs.pull-right 注销
 
@@ -59,10 +58,10 @@ block content
           p#message
           p
             small 客服电话: 
-              a(href='tel:#{tel}')= contact
+              a(href='tel:' + tel)= contact
             br
             small 门店地址: 
-              a(href='#{addressLink}')= address
+              a(href=addressLink)= address
         div.modal-footer
           button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
 

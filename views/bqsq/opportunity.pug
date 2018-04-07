@@ -14,15 +14,15 @@ block navlist
       a(href='setting') 设置
       
 append css
-  link(rel="stylesheet",href="#{CDN_FILES.bootstrap_table_css}")
+  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   //script(src='/components/bootbox.js/bootbox.js')
   //script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js')
   //script(src='/components/requirejs/require.js',data-main="/js/main")
-  script(src="#{CDN_FILES.bootstrap_table}")
-  script(src="#{CDN_FILES.bootstrap_table_locale_zh_CN}")
+  script(src=CDN_FILES.bootstrap_table)
+  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   script(src='/js/opportunity.js')
 
 block page

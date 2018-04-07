@@ -16,13 +16,13 @@ block content
   div#topbar.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
       if classroom.length > 1
-        img.col-xs-9.center-block(src='#{logoPath}',style="padding:0px;width:200px")
+        img.col-xs-9.center-block(src=logoPath,style="padding:0px;width:200px")
         div.col-xs-3.pull-right(style="padding:9px")
           select#chooseRoom.form-control.text-primary.input-sm(style='float:right;width:90px;padding:0 0 0 5px;border-color:#2e6da4')
-            - each room in classroom
+            each room in classroom
               option(value=room.id)= room.name
       else
-        img.center-block(src='#{logoPath}',style="padding:0px;width:200px")
+        img.center-block(src=logoPath,style="padding:0px;width:200px")
     div#weekbtns.row(style='margin:7px -7px 3px -7px')
       div.btn-group(style='float:left;padding-left:9px')
         button#previous_week.btn.btn-default.btn-xs 上一周
@@ -47,7 +47,7 @@ block content
   div#main.container(style='padding-left:7px;padding-right:7px;overflow-y:auto')
   div#obj(style='display:none')
     select#rooms
-      - each room in classroom
+      each room in classroom
         option(value=room.id)= room.name
       
   div#book_dlg.modal(tabindex='-1',data-backdrop='static')
@@ -94,10 +94,10 @@ block content
           p#message
           p
             small 客服电话: 
-              a(href='tel:#{tel}')= contact
+              a(href='tel:' + tel)= contact
             br
             small 门店地址: 
-              a(href='#{addressLink}')= address
+              a(href=addressLink)= address
         div.modal-footer
           button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
 
