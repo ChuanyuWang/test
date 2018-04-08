@@ -119,6 +119,8 @@ function getTenantInfo(req, res, next) {
         }
 
         req.tenant = tenant || {};
+        // navTitle is the title on the navigation bar
+        res.locals.navTitle = tenant.displayName;
         next();
     });
 }

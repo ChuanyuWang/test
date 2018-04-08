@@ -7,7 +7,6 @@ router.get('/home', helper.checkTenantUser, function (req, res) {
         title: '课程表',
         currentUrl: 'home',
         user: req.user,
-        navTitle: req.tenant.displayName,
         classrooms: req.tenant.classroom || []
     });
 });
@@ -17,7 +16,6 @@ router.get('/class/:classID', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/class_view', {
         title: '查看课程',
         user: req.user,
-        navTitle: req.tenant.displayName,
         classroom: req.tenant.classroom || []
     });
 });
@@ -61,7 +59,6 @@ router.get('/member', helper.checkTenantUser, function (req, res) {
             title: '会员',
             user: req.user,
             currentUrl: 'member',
-            navTitle: req.tenant.displayName,
             classroom: req.tenant.classroom || [],
             statistics: {
                 count: doc.count,
@@ -76,7 +73,6 @@ router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next
     res.render('bqsq/member_view', {
         title: '查看会员',
         user: req.user,
-        navTitle: req.tenant.displayName,
         classrooms: req.tenant.classroom || []
     });
 });
@@ -85,8 +81,7 @@ router.get('/opportunity', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/opportunity', {
         title: '试听',
         currentUrl: 'opportunity',
-        user: req.user,
-        navTitle: req.tenant.displayName
+        user: req.user
     });
 });
 
@@ -95,7 +90,6 @@ router.get('/setting', helper.checkTenantUser, function (req, res) {
         title: '设置',
         currentUrl: 'setting',
         user: req.user,
-        navTitle: req.tenant.displayName,
         tenantContact: req.tenant.contact || '',
         tenantAddress: req.tenant.address || '',
         baseUrl: req.protocol + '://' + req.hostname + req.baseUrl,
