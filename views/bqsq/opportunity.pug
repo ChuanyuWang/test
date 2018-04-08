@@ -1,17 +1,7 @@
 extends ../index
 
 block navlist
-  ul.nav.navbar-nav
-    li
-      a(href='home') 课程表
-    li
-      a(href='member') 会员
-    li
-      a(href='course') 班级
-    li.active
-      a(href='#') 试听
-    li
-      a(href='setting') 设置
+  include navigation.pug
       
 append css
   link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)

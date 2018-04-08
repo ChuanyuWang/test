@@ -1,18 +1,8 @@
 extends ../index
 
 block navlist
-  ul.nav.navbar-nav
-    li
-      a(href='home') 课程表
-    li
-      a(href='member') 会员
-    li
-      a(href='course') 班级
-    li
-      a(href='opportunity') 试听
-    li.active
-      a(href='#') 设置
-      
+  include navigation.pug
+
 append css
   link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
   link(rel="stylesheet",href="//cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css")

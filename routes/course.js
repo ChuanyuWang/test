@@ -5,6 +5,7 @@ var helper = require('../helper');
 router.get('/', helper.checkTenantUser, function (req, res, next) {
     res.render('bqsq/course', {
         title: '班级',
+        currentUrl: 'course',
         user: req.user,
         navTitle: req.tenant.displayName,
         classroom: req.tenant.classroom ? req.tenant.classroom : []

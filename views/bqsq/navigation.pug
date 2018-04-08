@@ -1,0 +1,7 @@
+ul.nav.navbar-nav
+  each val, index in {home:'课程表',member:'会员',course:'班级',opportunity:'试听',setting:'设置'}
+    li(class={active: currentUrl === index})
+      if currentUrl === index
+        a(href='#') #{val}
+      else
+        a(href=index) #{val}

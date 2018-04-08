@@ -5,6 +5,7 @@ var helper = require('../helper');
 router.get('/home', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/home', {
         title: '课程表',
+        currentUrl: 'home',
         user: req.user,
         navTitle: req.tenant.displayName,
         classrooms: req.tenant.classroom || []
@@ -59,6 +60,7 @@ router.get('/member', helper.checkTenantUser, function (req, res) {
         res.render('bqsq/member', {
             title: '会员',
             user: req.user,
+            currentUrl: 'member',
             navTitle: req.tenant.displayName,
             classroom: req.tenant.classroom || [],
             statistics: {
@@ -82,6 +84,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next
 router.get('/opportunity', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/opportunity', {
         title: '试听',
+        currentUrl: 'opportunity',
         user: req.user,
         navTitle: req.tenant.displayName
     });
@@ -90,6 +93,7 @@ router.get('/opportunity', helper.checkTenantUser, function (req, res) {
 router.get('/setting', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/setting', {
         title: '设置',
+        currentUrl: 'setting',
         user: req.user,
         navTitle: req.tenant.displayName,
         tenantContact: req.tenant.contact || '',
