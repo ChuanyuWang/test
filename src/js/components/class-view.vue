@@ -57,9 +57,9 @@ div.container
   form.form-horizontal
     div.form-group
       div.col-sm-2
-        button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.memberSelectDlg.show()')
+        button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.memberSelectDlg.show()',style='margin-bottom:7px')
           span.glyphicon.glyphicon-plus 添加
-      div.col-sm-5
+      div.col-sm-6
         ul.list-group(style='margin-bottom:0px')
           li.list-group-item(v-for="booking in reservations")
             span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
@@ -73,9 +73,9 @@ div.container
   form.form-horizontal
     div.form-group
       div.col-sm-2
-        button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.addBookDlg.show()')
+        button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.addBookDlg.show()',style='margin-bottom:7px')
           span.glyphicon.glyphicon-plus 添加
-      div.col-sm-5
+      div.col-sm-6
         template(v-for="item in cls.books")
           div.media
             div.media-left
