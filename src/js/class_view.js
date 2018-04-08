@@ -22,8 +22,8 @@ $(document).ready(function() {
             el: '#class_app',
             //template: '<class-view :data="cls"/>',
             data: {cls:data},
-            components: { classView }
-        })
+            components: { 'class-view' : classView }
+        });
     });
 });
 
@@ -36,4 +36,4 @@ function init() {
     //TODO, localization 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
-};
+}
