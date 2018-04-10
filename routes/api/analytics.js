@@ -34,6 +34,7 @@ router.get('/consumption', function(req, res, next) {
         $unwind: "$booking"
     }, {
         $project: {
+            courseID: 1,
             week: {
                 $week: "$date"
             },
@@ -46,7 +47,16 @@ router.get('/consumption', function(req, res, next) {
         }
     }, {
         $group: {
-            _id: "$" + unit, // group the data according to unit (month or week)
+            //_id: "$" + unit, // group the data according to unit (month or week)
+            
+            // The only working solution is from below link, it looks like a hack
+            // https://stackoverflow.com/questions/25497150/mongodb-aggregate-by-field-exists
+            _id: {unit: "$" + unit, isCourse: {$gt:["$courseID", null]}}, 
+            // below methods are all failure
+            //_id: {unit: "$" + unit, isCourse: { $ne: [ "$courseID", null ] }},
+            //_id: {unit: "$" + unit, isCourse: { $eq: [ "$courseID", null]}}, 
+            //_id: {unit: "$" + unit, isCourse: {$ifNull: ["$courseID", 1]}}, 
+            //_id: {unit: "$" + unit, isCourse: {$ne : ["$courseID", undefined]}}, 
             total: {
                 $sum: "$totalCost"
             }
@@ -125,7 +135,7 @@ router.get('/deposit', function(req, res, next) {
 });
 
 router.get('/deposit', function(req, res, next) {
-    //[Default] get the current year consumption by month
+    //[Default] get the current year deposit by month
     var year = (new Date()).getFullYear();
     var unit = 'month';
     if (req.query.hasOwnProperty("year")) {

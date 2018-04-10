@@ -227,9 +227,9 @@ function refreshChart() {
 
     var drawChartFunc = function(consumptionQueryResult, depositQueryResult) {
         if (filter.unit == "month") {
-            drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0]), filter.year, '月');
+            drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0], '月'), filter.year, '月');
         } else if (filter.unit == "week") {
-            drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0]), filter.year, '周');
+            drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0], '周'), filter.year, '周');
         }
     };
 
@@ -244,53 +244,49 @@ function refreshChart() {
     $.when(consumptionQuery, depositQuery).then(drawChartFunc, errorFunc);
 }
 
-function preChartData(consumptionData, depositData) {
+function preChartData(consumptionData, depositData, unitName) {
     var chartData = {
         xAxis: [],
-        series0: [], // consumption value list
-        series1: []  // deposit value list
+        series0: [], // consumption by non-course
+        series1: [],  // deposit value list
+        series2: [] // consumption by course
     };
 
     if (!consumptionData && !depositData) {
         return chartData;
     }
 
-    var i = 0, j = 0;
-    while (i < consumptionData.length || j < depositData.length) {
-        var c = i < consumptionData.length ? consumptionData[i] : null;
-        var d = j < depositData.length ? depositData[j] : null;
+    var data = [];
+    // parse the comsumption data
+    consumptionData.forEach(function(value, index, array) {
+        if (!value) return;
+        var i = value._id && value._id.unit;
+        if (typeof(i) !== 'number') return;
 
-        if (c && d) {
-            if (c._id == d._id) {
-                chartData.xAxis.push(c._id);
-                chartData.series0.push(Math.round(c.total * 10) / 10);
-                chartData.series1.push(Math.round(d.total * 10) / 10);
-                i++;
-                j++;
-            } else if (c._id < d._id) {
-                chartData.xAxis.push(c._id);
-                chartData.series0.push(Math.round(c.total * 10) / 10);
-                chartData.series1.push(0);
-                i++;
-            } else if (c._id > d._id) {
-                chartData.xAxis.push(d._id);
-                chartData.series0.push(0);
-                chartData.series1.push(Math.round(d.total * 10) / 10);
-                j++;
-            }
-        } else if (c) {
-            chartData.xAxis.push(c._id);
-            chartData.series0.push(Math.round(c.total * 10) / 10);
-            chartData.series1.push(0);
-            i++;
-        } else if (d) {
-            chartData.xAxis.push(d._id);
-            chartData.series0.push(0);
-            chartData.series1.push(Math.round(d.total * 10) / 10);
-            j++;
+        data[i] = data[i] || {};
+        if (value._id.isCourse === true) {
+            data[i].courseConsumption = value.total;
+        } else {
+            data[i].storyConsumption = value.total;
         }
-    }
+    });
+    // parse the deposit data
+    depositData.forEach(function(value, index, array) {
+        if (!value) return;
+        var i = value._id;
+        if (typeof(i) !== 'number') return;
 
+        data[i] = data[i] || {};
+        data[i].deposit = value.total;
+    });
+
+    data.forEach(function(value, index, array) {
+       if (!value) return;
+       chartData.xAxis.push(index + unitName);
+       chartData.series0.push(Math.round((value.storyConsumption || 0) * 10)/10);
+       chartData.series1.push(Math.round((value.deposit||0) * 10)/10);
+       chartData.series2.push(Math.round((value.courseConsumption||0) * 10)/10);
+    });
     return chartData;
 }
 
@@ -313,7 +309,7 @@ function drawChart(data, year, unitName) {
             }
         },
         legend: {
-            data: ['消费课时', "充值课时"],
+            data: ['课程课时消费', "充值课时", "班级课时消费"],
             top: 'bottom'
         },
         xAxis: {
@@ -324,14 +320,22 @@ function drawChart(data, year, unitName) {
             name: "课时"
         },
         series: [{
-            name: '消费课时',
+            name: '课程课时消费',
             type: 'bar',
+            stack: 'one',
             barGap: 0,
             data: data.series0
         }, {
             name: '充值课时',
             type: 'bar',
+            stack: 'two',
             data: data.series1
+        }, {
+            name: '班级课时消费',
+            type: 'bar',
+            stack: 'one',
+            barGap: 0,
+            data: data.series2
         }]
     };
 
@@ -651,3 +655,10 @@ var handleActions = {
         modal.modal('show');
     }
 };
+/*
+function getParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var param = window.location.search.substr(1).match(reg);
+    return param ? decodeURI(param[2]) : null;
+}
+*/
