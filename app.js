@@ -1,4 +1,5 @@
 var express = require('express');
+var compression = require('compression')
 var path = require('path');
 var util = require('./util');
 var favicon = require('serve-favicon');
@@ -39,6 +40,9 @@ app.locals.pretty = true; // output the pretty html for consistency
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));
 app.use(logger('dev'));
+
+// Use gzip compression
+app.use(compression())
 
 app.use(express.json());
 app.use(express.urlencoded({
