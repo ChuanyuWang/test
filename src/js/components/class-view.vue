@@ -112,8 +112,11 @@ module.exports = {
     classrooms: Array // Array of available classroom
   },
   data: function() {
+    var tmp = this.data;
+    tmp.age = tmp.age || {};
+    tmp.books = tmp.books || [];
     return {
-      cls: this.data,
+      cls: tmp,
       quantity: 1,
       teachers: [],
       reservations: []
@@ -137,9 +140,10 @@ module.exports = {
       return this.cls.books ? this.cls.books.length : 0;
     },
     age: function() {
+      var age = this.cls.age || {}; // age field could be null
       return {
-        min: this.cls.age.min ? parseInt(this.cls.age.min) : null,
-        max: this.cls.age.max ? parseInt(this.cls.age.max) : null
+        min: age.min ? parseInt(age.min) : null,
+        max: age.max ? parseInt(age.max) : null
       };
     },
     errors: function() {
