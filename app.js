@@ -39,7 +39,11 @@ app.set('view engine', 'pug');
 app.locals.pretty = true; // output the pretty html for consistency 
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));
-app.use(logger('dev'));
+if (app.locals.ENV_DEVELOPMENT) {
+    app.use(logger('dev'));
+} else {
+    app.use(logger('common'));
+}
 
 // Use gzip compression
 app.use(compression())
