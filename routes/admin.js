@@ -139,8 +139,22 @@ router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
                 //TODO, send the complete message when all data update
                 res.send("Tenant update to 4.0");
             });
-        } else {
+        } else if (doc.version == 4) {
+            upgradeFromFour(req, res, next, doc.name);
+            doc.version = 5;
+            config_db.collection("tenants").save(doc, function(err, doc) {
+                if (err) {
+                    return next(new Error("save tenant version fails"));
+                }
+                //TODO, send the complete message when all data update
+                res.send("Tenant update to 5.0");
+            });
+        } else if (doc.version == VERSION) {
             res.send("Tenant is already update to date");
+        } else {
+            var error = new Error("tenant version is not valid");
+            error.status = 400;
+            return next(error);
         }
     });
 });
@@ -267,7 +281,7 @@ function upgradeFromThree(req, res, next, tenant_name) {
         ]
     }, { courseID: 1, booking: 1 }, function(err, docs) {
         if (err) return console.error(err); // TODO, handle error
-        for (var i = 999;i<docs.length;i++) {
+        for (var i = 0;i<docs.length;i++) {
             var doc = docs[i];
         //docs.forEach(function(doc) {
             var query = { $set: {} };
@@ -311,6 +325,39 @@ function upgradeFromThree(req, res, next, tenant_name) {
             //TODO, handle error
             if (err) console.error(err);
             else console.log("update members.id in all courses %j", result);
+        });
+    });
+}
+
+function upgradeFromFour(req, res, next, tenant_name) {
+    var tenant_db = util.connect(tenant_name);
+
+    // Set all the classes in history with booking status as 'checkin'
+    var classes = tenant_db.collection('classes');
+    var bulk = classes.initializeUnorderedBulkOp();
+    // query class documents that has booking and be in the past
+    classes.find({
+        date: { $lt: new Date() },
+        'booking.status': null,
+        'booking.0': { $exists: true }
+    }, { booking: 1 }, function(err, docs) {
+        if (err) return console.error(err); // TODO, handle error
+
+        for (var i = 0;i<docs.length;i++) {
+            var doc = docs[i];
+            var query = { $set: {} };
+            if (doc.booking && doc.booking.length > 0) {
+                // add the status field
+                doc.booking.forEach(function(value, index, array) {
+                    query.$set[`booking.${index}.status`] = 'checkin';
+                })
+            }
+            bulk.find({ _id: doc._id }).updateOne(query);
+        }
+        bulk.execute(function(err, result) {
+            //TODO, handle error
+            if (err) console.error(err);
+            else console.log("add status field in all classes %j", result);
         });
     });
 }

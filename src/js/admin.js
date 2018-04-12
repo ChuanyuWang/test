@@ -108,9 +108,6 @@ function handleAddNewTenant(event) {
 
 var handleUpgradeTenant = {
     'click .upgrade': function(e, value, row, index) {
-        //alert("暂不支持");
-        console.log(value);
-        console.log(row);
         var body = {
             tenant: row.name
         }
