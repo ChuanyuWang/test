@@ -31,7 +31,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
               input.form-control(type='number',min='0',style={'width':'60px'},v-model.number='age.min')
               p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
               input.form-control(type='number',min='0',style={'width':'60px','margin-left':'3px'},v-model.number='age.max')
-              p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
+              p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 岁
           div.form-group(:class='{"has-error": errors.capacity}',:title='errors.capacity')
             label.control-label.col-sm-2(for='cls_capacity') 最大人数:
             div.col-sm-2
@@ -63,20 +63,14 @@ module.exports = {
       name: '',
       cost: 1,
       capacity: 8,
-      age: {
-        min: 24,
-        max: 48
+      age: { // by year
+        min: 2,
+        max: 4
       },
       classroom: null
     };
   },
   watch: {
-    "age.min": function(value) {
-      this.age.min = parseInt(value);
-    },
-    "age.max": function(value) {
-      this.age.max = parseInt(value);
-    },
     capacity: function(value) {
       this.capacity = parseInt(value);
     }
@@ -97,7 +91,9 @@ module.exports = {
         errors.age = '最小年龄不能为负';
       if (this.age.max < 0)
         errors.age = '最大年龄不能为负';
-      if (this.age.max < this.age.min)
+      if (typeof this.age.max === "number" &&
+        typeof this.age.min === "number" &&
+        this.age.max < this.age.min)
         errors.age = '最大年龄不能小于最小年龄';
       return errors;
     },
@@ -127,7 +123,10 @@ module.exports = {
         cost: this.cost,
         capacity: this.capacity,
         classroom: this.classroom,
-        age: this.age
+        age: { // age is stored as months
+          min: this.age.min ? parseInt(this.age.min*12) : null,
+          max: this.age.max ? parseInt(this.age.max*12) : null
+        }
       };
       this.$emit("ok", createdClass);
       $(this.$el).modal('hide');

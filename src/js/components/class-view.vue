@@ -41,10 +41,10 @@ div.container
     div.form-group(:class='{"has-error": errors.age}')
       label.control-label.col-sm-2 年龄:
       div.col-sm-10(style="display:inline-flex",data-toggle="tooltip",data-placement="right",:title="errors.age")
-        input.form-control(type='number',v-model.number='cls.age.min',min='0',style={'width':'70px'})
+        input.form-control(type='number',v-model.number='age.min',min='0',style={'width':'70px'})
         p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
-        input.form-control(type='number',v-model.number='cls.age.max',min='0',style={'width':'70px','margin-left':'3px'})
-        p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 月
+        input.form-control(type='number',v-model.number='age.max',min='0',style={'width':'70px','margin-left':'3px'})
+        p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 岁
     div.form-group(:class='{"has-error": errors.capacity}')
       label.control-label.col-sm-2 最大人数:
       div.col-sm-2(data-toggle="tooltip" data-placement="right",:title="errors.capacity")
@@ -113,7 +113,6 @@ module.exports = {
   },
   data: function() {
     var tmp = this.data;
-    tmp.age = tmp.age || {};
     tmp.books = tmp.books || [];
     return {
       cls: tmp,
@@ -139,11 +138,12 @@ module.exports = {
     booksCount: function() {
       return this.cls.books ? this.cls.books.length : 0;
     },
+    // age is displayed as year
     age: function() {
       var age = this.cls.age || {}; // age field could be null
       return {
-        min: age.min ? parseInt(age.min) : null,
-        max: age.max ? parseInt(age.max) : null
+        min: age.min ? Math.round(age.min/12 * 10) / 10 : null,
+        max: age.max ? Math.round(age.max/12 * 10) / 10 : null
       };
     },
     errors: function() {
@@ -193,12 +193,14 @@ module.exports = {
         classroom: this.cls.classroom,
         teacher: this.cls.teacher,
         capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
-        age: this.age
+        age: { // age is stored as months
+          min: this.age.min ? parseInt(this.age.min*12) : null,
+          max: this.age.max ? parseInt(this.age.max*12) : null
+        }
       });
       request.done(function(data, textStatus, jqXHR) {
         bootbox.alert("课程基本资料更新成功");
         vm.cls = data;
-        vm.cls.age = data.age || {};
         vm.cls.books = data.books || [];
       });
     },
