@@ -41,7 +41,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
                 each day,index in ['星期日','星期一','星期二','星期三','星期四','星期五','星期六']
                   div.checkbox(style='margin:0 30px 0 0')
                     label
-                      input(type="checkbox", name="weekday", value="#{index}",v-model='weekdays')
+                      input(type="checkbox", name="weekday", value=index,v-model='weekdays')
                       | #{day}
             div.form-group(:class='{"has-error": !validation.begin}')
               label.control-label.col-sm-2 开始日期:
