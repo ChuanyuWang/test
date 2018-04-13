@@ -429,12 +429,15 @@ function clearSchedule() {
 }
 
 function getAgeLimit(cls) {
-    if (cls.age && cls.age.min && cls.age.max) {
-        return "年龄" + cls.age.min + "至" + cls.age.max + "月";
-    } else if (cls.age && cls.age.min) {
-        return "年龄大于" + cls.age.min + "月";
-    } else if (cls.age && cls.age.max) {
-        return "年龄小于" + cls.age.max + "月";
+    var age = cls.age || {};
+    age.min = age.min ? Math.round(age.min/12*10)/10 : null;
+    age.max = age.max ? Math.round(age.max/12*10)/10 : null;
+    if (age.min && age.max) {
+        return "年龄" + age.min + "至" + age.max + "岁";
+    } else if (age.min) {
+        return "年龄大于" + age.min + "岁";
+    } else if (age.max) {
+        return "年龄小于" + age.max + "岁";
     }
     return "";
 }
