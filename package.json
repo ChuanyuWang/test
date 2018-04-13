@@ -22,7 +22,7 @@
     "express-session": "~1.15.6",
     "i18n": "^0.8.3",
     "log4js": "^0.6.35",
-    "mongojs": "~2.4.1",
+    "mongojs": "~2.5.0",
     "mongoose": "^4.13.7",
     "monk": "^6.0.5",
     "morgan": "^1.9.0",
@@ -35,9 +35,9 @@
     "wechat-api": "^1.27.1"
   },
   "devDependencies": {
-    "browserify-hmr": "^0.3.5",
+    "browserify-hmr": "^0.3.6",
     "browserify-shim": "^3.8.14",
-    "grunt": "~1.0.1",
+    "grunt": "~1.0.2",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-less": "~1.4.0",
     "grunt-contrib-uglify": "^2.2.0",
