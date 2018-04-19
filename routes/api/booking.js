@@ -3,11 +3,12 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var util = require('../../util');
 var reservation = require('./lib/reservation');
+var helper = require('../../helper');
 
 /**
  * Get the member list who booked the class
  */
-router.get('/', function (req, res, next) {
+router.get('/', helper.isAuthenticated, function (req, res, next) {
     var tenantDB = null;
     if (req.query.hasOwnProperty('tenant')) {
         tenantDB = util.connect(req.query.tenant);
