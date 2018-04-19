@@ -236,6 +236,53 @@ router.delete('/:classID/books', function(req, res, next) {
 });
 
 /**
+ * booking:[{
+ *     "member":"598dd2cf6c6da92830760a90",
+ *     "quantity":1,
+ *     "bookDate":"2018-04-08T13:40:20.279Z",
+ *     "status": null (absent) || "checkin" || "absent"
+ * }]
+ */
+router.put('/:classID/checkin', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    var memberToCheckin = req.body || {};
+
+    if (!memberToCheckin.memberid) {
+        var error = new Error('Check in fails due to memberid is missing');
+        error.status = 400;
+        return next(error);
+    }
+
+    classes.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.classID),
+            'booking.member': mongojs.ObjectId(memberToCheckin.memberid)
+        },
+        update: {
+            $set: {
+                'booking.$.status': memberToCheckin.status || 'checkin'
+            }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("class check-in fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (doc) {
+            console.log("class %s check-in by member %s", req.params.classID, memberToCheckin.memberid);
+            res.json(doc);
+        } else {
+            var error = new Error('签到失败，会员未参加此课程');
+            error.status = 400;
+            return next(error);
+        }
+    });
+});
+
+/**
  * make sure the datetime object is stored as ISODate
  * @param {Object} doc 
  */

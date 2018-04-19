@@ -119,4 +119,25 @@ service.getReservations = function(classID) {
     return request;
 };
 
+function putCheckinStatus(classID, memberID, status) {
+    var request = $.ajax("/api/classes/" + classID + "/checkin", {
+        type: "PUT",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({"memberid": memberID, "status": status || "checkin"}),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("会员签到失败", jqXHR);
+    });
+    return request;
+}
+
+service.checkin = function(classID, memberID) {
+    return putCheckinStatus(classID, memberID, 'checkin');
+};
+
+service.absent = function(classID, memberID) {
+    return putCheckinStatus(classID, memberID, 'absent');
+};
+
 module.exports = service;
