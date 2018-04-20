@@ -26,10 +26,11 @@ router.get('/', helper.isAuthenticated, function (req, res, next) {
         return;
     }
 
+    //TODO, use aggregate to query
     var classes = tenantDB.collection("classes");
     classes.findOne({
         _id : mongojs.ObjectId(req.query.classid)
-    }, function(err, doc){
+    }, {booking:1}, function(err, doc){
         if (err) {
             res.status(500).json({
                 'err' : err
@@ -67,7 +68,7 @@ router.get('/', helper.isAuthenticated, function (req, res, next) {
             _id : {
                 "$in" : query_member
             }
-        }, function (err, users) {
+        }, {name:1, contact:1}, function (err, users) {
             if (err) {
                 return res.status(500).json({
                     'err' : err

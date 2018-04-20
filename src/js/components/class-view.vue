@@ -61,12 +61,17 @@ div.container
           span.glyphicon.glyphicon-plus 添加
       div.col-sm-6
         ul.list-group(style='margin-bottom:0px')
-          li.list-group-item(v-for="booking in reservations")
-            span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
-            span.badge(style='background-color:#d9534f;cursor:pointer',@click='cancelReservation(booking)') 取消
-            a.badge(:href='"../member/" + booking.member',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-            | {{booking.userName}} <small>({{booking.quantity}}人)</small>
-            div.small(style='color:#777;text-align:right') 于{{booking.bookDate | formatDate}}预约
+          li.list-group-item(v-for="booking in bookings")
+            div(style='display:flex')
+              span.glyphicon.glyphicon-ok.text-success(v-if='booking.status=="checkin"',style='margin-right:3px;font-size:large')
+              span.glyphicon.glyphicon-remove.text-danger(v-else-if='booking.status=="absent"',style='margin-right:3px;font-size:large')
+              span.glyphicon.glyphicon-question-sign.text-default(v-else,style='margin-right:3px;font-size:large')
+              div(style='flex-grow:2') {{booking.userName}} <small>({{booking.quantity}}人)</small>
+              button.btn.btn-danger.btn-xs(v-show='booking.status!=="absent"',type='button',style='margin-right:3px',@click='absent(booking.member)') 缺席
+              button.btn.btn-success.btn-xs(v-show='booking.status!=="checkin"',type='button',style='margin-right:3px',@click='checkin(booking.member)') 签到
+              a.btn.btn-xs.btn-primary(:href='"../member/" + booking.member',style='margin-right:3px',target='_blank') 查看
+              button.btn.btn-default.btn-xs(type='button',style='',@click='cancelReservation(booking)') 取消
+            p.small(style='color:#777;margin:5px 3px 0px;text-align:right') 于{{booking.bookDate | formatDate}}预约
         small(style='color:#777') 共{{membersCount}}人
   div.page-header
     h3 绘本
@@ -118,7 +123,7 @@ module.exports = {
       cls: tmp,
       quantity: 1,
       teachers: [],
-      reservations: []
+      bookedMembers: []
     };
   },
   components: {
@@ -127,9 +132,25 @@ module.exports = {
     "add-book-modal": add_book_modal
   },
   computed: {
+    bookings: function() {
+      var vm = this;
+      var result = vm.cls.booking || [];
+      result.forEach(function(value, index, array) {
+        var name = '已删除';
+        vm.bookedMembers.some(function(member) {
+          if (member.member == value.member){
+            name = member.userName;
+            return true;
+          }
+          return false;
+        });
+        value.userName = name;
+      });
+      return result;
+    },
     membersCount: function() {
       var count = 0;
-      var all = this.reservations || [];
+      var all = this.bookings || [];
       all.forEach(function(value, index, array) {
         count += value.quantity || 0;
       });
@@ -269,7 +290,7 @@ module.exports = {
       var vm = this;
       if (selectedItems.length == 0) return bootbox.alert("请选择会员");
 
-      var members = vm.reservations || [];
+      var members = vm.bookings || [];
       var addedOnes = selectedItems.filter(function(element, index, array) {
         // filter the new added member
         return !members.some(function(value, index, array) {
@@ -290,25 +311,16 @@ module.exports = {
         // add one member's reservation
         var request = class_service.addReservation(result[0]);
         request.done(function(data, textStatus, jqXHR) {
-          var newAdded = vm.findReservation(data["class"], data["member"]);
-          if (newAdded) vm.reservations.push(newAdded);
+          vm.bookedMembers.push({
+            member: data['member']._id,
+            userName: data['member'].name
+          });
+          vm.cls.booking = data['class'].booking || [];
           bootbox.alert("预约成功");
         });
       } else {
         bootbox.alert("所选会员已经预约");
       }
-    },
-    findReservation: function(cls, member) {
-      if (!cls || !member) return null;
-      var booking = cls.booking || [];
-      var found = booking.filter(function(value, index, array) {
-        return value.member == member._id;
-      });
-      if (found.length != 1) return null;
-      var item = found[0];
-      item.userName = member.name;
-      item.contact = member.contact;
-      return item;
     },
     cancelReservation: function(item) {
       var vm = this;
@@ -326,13 +338,7 @@ module.exports = {
             memberid: item.member
           });
           request.done(function(data, textStatus, jqXHR) {
-            var reservations = vm.reservations;
-            for (var i = 0; i < reservations.length; i++) {
-              if (reservations[i].member == item.member) {
-                reservations.splice(i, 1);
-                break;
-              }
-            }
+            vm.cls.booking = data.booking || [];
           });
         }
       });
@@ -342,6 +348,20 @@ module.exports = {
       var request = class_service.addBooks(vm.cls._id, newBook);
       request.done(function(data, textStatus, jqXHR) {
         vm.cls.books = data.books;
+      });
+    },
+    checkin: function(memberid) {
+      var vm = this;
+      var request = class_service.checkin(vm.cls._id, memberid);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.cls.booking = data.booking || [];
+      });
+    },
+    absent: function(memberid) {
+      var vm = this;
+      var request = class_service.absent(vm.cls._id, memberid);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.cls.booking = data.booking || [];
       });
     }
   },
@@ -362,9 +382,7 @@ module.exports = {
     // load class reservations
     var request = class_service.getReservations(this.cls._id);
     request.done(function(data, textStatus, jqXHR) {
-      data.forEach(function(value, index, array) {
-        vm.reservations.push(value);
-      });
+      vm.bookedMembers = data || [];
     });
   }
 };
