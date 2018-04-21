@@ -23,6 +23,7 @@ module.exports = {
             'public/js/course.js': 'src/js/course.js',
             'public/js/course_view.js': 'src/js/course_view.js',
             'public/js/setting.js': 'src/js/setting.js',
+            'public/js/statistics.js': 'src/js/statistics.js',
             'public/js/opportunity.js': 'src/js/opportunity.js',
             'public/js/admin.js': 'src/js/admin.js'
         }

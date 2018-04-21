@@ -85,6 +85,14 @@ router.get('/opportunity', helper.checkTenantUser, function (req, res) {
     });
 });
 
+router.get('/statistics', helper.checkTenantUser, function (req, res) {
+    res.render('bqsq/statistics', {
+        title: '统计',
+        currentUrl: 'statistics',
+        user: req.user
+    });
+});
+
 router.get('/setting', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/setting', {
         title: '设置',
