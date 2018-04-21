@@ -5,7 +5,7 @@
 <template lang="pug">
 div
   div.row(style='margin-top:15px;margin-bottom:15px')
-    div.col-sm-4.btn-group
+    div.col-lg-4.col-md-5.col-sm-6.col-xs-6.btn-group
       button.btn.btn-primary.btn-sm(@click='previousWeek') 上一周
       button.btn.btn-primary.btn-sm(@click='thisWeek') 本周
       button.btn.btn-primary.btn-sm(@click='nextWeek') 下一周
