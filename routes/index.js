@@ -3,6 +3,15 @@ var passport = require('passport');
 var router = express.Router();
 var logger = require('log4js').getLogger();
 var util = require('../util');
+var RateLimit = require('express-rate-limit');
+
+var loginLimiter = new RateLimit({
+    windowMs: 1000*60, // 1 minutes
+    max: 5, // limit each IP to 10 requests per windowMs
+    delayMs: 0, // disable delaying - full speed until the max limit is reached
+    // Error message returned when max is exceeded.
+    message: "Too many login requests, please try again later."
+  });
 
 /* GET home page. */
 router.get('/', function (req, res) {
@@ -22,7 +31,7 @@ router.get('/login', function (req, res) {
     res.redirect('/');
 });
 
-router.post('/login', passport.authenticate('local', {
+router.post('/login', loginLimiter, passport.authenticate('local', {
         failureRedirect : '/',
         failureFlash : '用户名或密码不正确'
     }), function (req, res) {
