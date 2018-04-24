@@ -65,7 +65,15 @@ app.use(session({
     store: new MongoStore({
         url: util.connectionURI('config') + '?authSource=admin&w=1',
         touchAfter: 24 * 3600 // time period in seconds
-    })
+    }),
+    cookie: { 
+        //this attribute tells the browser to only send the cookie 
+        // if the request is being sent over HTTPS.
+        secure: !app.locals.ENV_DEVELOPMENT,
+        //this attribute is used to help prevent attacks such as cross-site scripting, 
+        // since it does not allow the cookie to be accessed via JavaScript.
+        httpOnly: true 
+    }
 }));
 
 //i18n configuration
