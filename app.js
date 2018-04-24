@@ -26,6 +26,9 @@ var log4js = require('log4js');
 log4js.configure(config.log4js);
 log4js.getLogger().setLevel("TRACE");
 
+//setting various HTTP headers.
+app.use(require('helmet')());
+
 // passport config
 var Account = require('./account');
 var LocalStrategy = require('passport-local').Strategy;
