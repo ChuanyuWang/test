@@ -24,11 +24,11 @@ block page
         button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
         button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
           span.glyphicon.glyphicon-filter
-      label(style='margin-right:7px') 状态:
-      label.checkbox-inline
+      label(style='margin-left:7px;margin-right:7px') 状态:
+      label.text-success.checkbox-inline
         input(type="checkbox",value='active',checked)
         | 正常
-      label.checkbox-inline
+      label.text-danger.checkbox-inline
         input(type="checkbox" value='inactive')
         | 停用
     table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,All]',data-search='true',data-striped='true',data-url='/api/members',data-row-style='highlightExpire',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
