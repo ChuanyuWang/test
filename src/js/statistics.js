@@ -4,11 +4,18 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('./locales/i18nextplugin');
-//var calendar = require('./components/class-calendar.vue');
+var statisticsPage = require('./components/statistics-page.vue');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
+
+    // bootstrap the statistics page
+    new Vue({
+        el: '#statistics-app',
+        //data: {cls:data},
+        components: { 'statistics-page' : statisticsPage }
+    });
 });
 
 // Functions =============================================================

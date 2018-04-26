@@ -90,6 +90,125 @@ router.get('/', function(req, res, next) {
     });
 });
 
+/**
+ * Get the checkin status of all classes, pagination is supported.
+ * Query string contains RESTFul type pagination params, "limit", "offset", "search", "sort" and "order"
+ * "order" can only be 'asc' or 'desc'.
+ * Return format is 
+ * {
+ *   "total": Number,
+ *   "rows": []
+ * }
+ */
+router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
+    var query = {
+        "booking.0": { // array size >= 1
+            $exists: true
+        },
+    };
+    var query2 = {};
+    if (req.query.hasOwnProperty('from') && req.query.hasOwnProperty('to')) {
+        query.date = {
+            $gte: new Date(req.query.from),
+            $lt: new Date(req.query.to)
+        };
+    }
+    // query checkin status
+    if (req.query.hasOwnProperty('status')) {
+        //query2['booking.status'] = req.query.status ? {$in: req.query.status.split(',')} : null;
+        query2['booking.status'] = {$in: req.query.status.split(',').map(function(value) {
+            return value ? value : null;
+        })};
+    }
+    // get all checkin status of this member
+    if (req.query.hasOwnProperty('memberid')) {
+        query2['booking.member'] = mongojs.ObjectId(req.query.memberid);
+    }
+
+    // be defaul the sort is 'desc'
+    var sort = req.query.order == 'asc' ? 1 : -1;
+    // query specific classroom
+    if (req.query.hasOwnProperty('classroom')) {
+        query['classroom'] = req.query.classroom ? req.query.classroom : null;
+    }
+    // get all classes booked by this member
+    if (req.query.hasOwnProperty('hasBooks')) {
+        query['books.0'] = { // array size >= 1
+            $exists: true
+        };
+    }
+
+    var classes = req.db.collection("classes");
+    classes.aggregate([
+        {
+            $match: query
+        }, {
+            $unwind: "$booking"
+        }, {
+            $match: query2
+        }, {
+            $group: {
+                _id: null,
+                total: {$sum: 1}
+            }
+        }
+    ], function(err, totalDoc) {
+        if (err) {
+            var error = new Error("Get class checkin status total fails");
+            error.innerError = err;
+            next(error);
+            return;
+        }
+        var total = totalDoc && totalDoc.length ? totalDoc[0].total : 0;
+        console.log(`get classes checkin total: ${total}`);
+
+        classes.aggregate([
+            {
+                $match: query
+            }, { 
+                $sort : { date : sort }
+            }, {
+                $unwind: "$booking"
+            }, {
+                $match: query2
+            }, {
+                $skip : parseInt(req.query.offset) || 0
+            }, {
+                $limit : parseInt(req.query.limit) || 10
+            }, {
+                $lookup: {
+                    from: "members",
+                    localField: "booking.member",
+                    foreignField: "_id",
+                    as: "member"
+                }
+            }, {
+                $project: { // only return necessary value
+                    name: 1,
+                    date: 1,
+                    booking: 1,
+                    books: 1,
+                    'member._id': 1,
+                    'member.name': 1,
+                    'member.contact': 1
+                }
+            }
+        ], function(err, docs) {
+            if (err) {
+                var error = new Error("Get class checkin status fails");
+                error.innerError = err;
+                next(error);
+                return;
+            }
+            console.log("get classes checkin status: %s", docs ? docs.length : 0);
+            res.json({
+                total: total,
+                rows: docs
+            });
+        });
+    });
+});
+
 router.get('/:classID', function(req, res, next) {
     var classes = req.db.collection("classes");
     classes.findOne({
@@ -240,7 +359,8 @@ router.delete('/:classID/books', function(req, res, next) {
  *     "member":"598dd2cf6c6da92830760a90",
  *     "quantity":1,
  *     "bookDate":"2018-04-08T13:40:20.279Z",
- *     "status": null (absent) || "checkin" || "absent"
+ *     "status": null (absent) || "checkin" || "absent",
+ *     "flag": null || red || yellow || green
  * }]
  */
 router.put('/:classID/checkin', function(req, res, next) {
@@ -276,6 +396,45 @@ router.put('/:classID/checkin', function(req, res, next) {
             res.json(doc);
         } else {
             var error = new Error('签到失败，会员未参加此课程');
+            error.status = 400;
+            return next(error);
+        }
+    });
+});
+
+router.put('/:classID/flag', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    var memberToFlag = req.body || {};
+
+    if (!memberToFlag.memberid) {
+        var error = new Error('Flag fails due to memberid is missing');
+        error.status = 400;
+        return next(error);
+    }
+
+    classes.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.classID),
+            'booking.member': mongojs.ObjectId(memberToFlag.memberid)
+        },
+        update: {
+            $set: {
+                'booking.$.flag': memberToFlag.flag || null
+            }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Add flag to booking fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (doc) {
+            console.log("class %s flagged by member %s", req.params.classID, memberToFlag.memberid);
+            res.json(doc);
+        } else {
+            var error = new Error('标旗失败，会员未参加此课程');
             error.status = 400;
             return next(error);
         }

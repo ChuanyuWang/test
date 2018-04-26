@@ -119,6 +119,19 @@ service.getReservations = function(classID) {
     return request;
 };
 
+service.flag = function(classID, memberID, flag) {
+    var request = $.ajax("/api/classes/" + classID + "/flag", {
+        type: "PUT",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({"memberid": memberID, "flag": flag}),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("标旗失败", jqXHR);
+    });
+    return request;
+}
+
 function putCheckinStatus(classID, memberID, status) {
     var request = $.ajax("/api/classes/" + classID + "/checkin", {
         type: "PUT",

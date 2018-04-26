@@ -9,8 +9,6 @@ append css
 
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
-  //script(src="//cdn.bootcss.com/i18next-browser-languagedetector/1.0.1/i18nextBrowserLanguageDetector.min.js")
-  //script(src='/components/bootbox.js/bootbox.js')
   if ENV_DEVELOPMENT
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
@@ -30,5 +28,5 @@ append js
     };
 
 block page
-  div.container(style={'padding-top': '50px'})
-    div#app
+  div#statistics-app.container(style={'padding-top': '51px'})
+    statistics-page

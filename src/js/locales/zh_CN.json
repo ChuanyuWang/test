@@ -22,5 +22,6 @@
   "status_deleted": "已删除",
   "msg_name_cannot_empty": "姓名不能为空",
   "msg_note_too_long": "简介不能超过256个字",
-  "history_teacher": "上课记录"
+  "history_teacher": "上课记录",
+  "checkin_title": "出勤"
 }
