@@ -30,11 +30,12 @@ block page
       thead
         tr
           //th(data-field='_id',data-visible='false') ID
+          th(data-align='center')
           th(data-field='name',data-sortable='true') 班级名称
           th(data-field='createDate',data-sortable='true') 创建时间
           th(data-field='status',data-sortable='true') 状态
           th(data-field='members',data-sortable='true') 人数
-          th(data-width='180px',data-align='center') 操作
+          th(data-align='center') 操作
   div#course_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content

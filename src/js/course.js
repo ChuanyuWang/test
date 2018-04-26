@@ -33,7 +33,9 @@ function init() {
     $('#course_table').bootstrapTable({
         locale: 'zh-CN',
         queryParams: customQuery,
-        columns: [{}, {
+        columns: [{
+            formatter: viewFormatter
+        }, {}, {
             formatter: common.dateFormatter
         }, {
             formatter: statusFormatter
@@ -41,7 +43,9 @@ function init() {
             formatter: membersFormatter
         }, {
             formatter: actionFormatter,
-            events: handleActionClicks
+            events: {
+                'click .end': handleEndCourse
+            }
         }]
     });
 }
@@ -59,27 +63,17 @@ function handleEndCourse(e, value, row, index) {
     //TODO
 }
 
-/**
- * event handler of clicking end course button 
- * 
- * @param {Object} e the jQuery event
- * @param {Object} value the field value
- * @param {Object} row the row record data
- * @param {Number} index the row index
- * @public
- */
-function handleViewCourse(e, value, row, index) {
-    window.location.href = window.location.pathname + '/' + row._id;
-}
-
-// global event handler for table inline action
-var handleActionClicks = {
-    'click .end': handleEndCourse,
-    'click .view': handleViewCourse,
-};
-
 function membersFormatter(value, row, index) {
     return value && value.length ? value.length : 0;
+}
+
+function viewFormatter(value, row, index) {
+    var url = window.location.pathname + '/' + row._id;
+    return [
+        '<a href="' + url + '" title="查看班级详情">',
+        '<i class="glyphicon glyphicon-edit"></i>',
+        '</a>'
+    ].join('');
 }
 
 function statusFormatter(value, row, index) {
@@ -92,9 +86,6 @@ function actionFormatter(value, row, index) {
     return [
         '<button type="button" class="end btn btn-danger btn-xs">',
         '  <span class="glyphicon glyphicon-ban-circle"></span> 结束',
-        '</button>',
-        '<button type="button" style="margin-left:6px" class="view btn btn-primary btn-xs">',
-        '  <span class="glyphicon glyphicon-expand"></span> 查看',
         '</button>'
     ].join('');
 }
