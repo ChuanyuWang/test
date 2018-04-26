@@ -28,7 +28,6 @@ $(document).ready(function() {
         $(this).find('input[name=name]').focus(); // focus on the member name input control
     });
 
-    $('#viewMember').click(viewMember);
     $('#add_member').click(handleAddNewMember);
     $('div.statusFilter button').click(handleFilterStatus);
 });
@@ -49,14 +48,14 @@ function init() {
         maintainSelected: true,
         rowStyle: highlightExpire,
         queryParams: customQuery,
-        columns: [{}, {}, {}, {
+        columns: [{
+            formatter: viewFormatter
+        }, {}, {}, {
             formatter: common.dateFormatter
         }, {
             formatter: remainingFormatter
         }, {
             formatter: expireFormatter
-        }, {
-            formatter: viewFormatter
         }, {
             formatter: creditFormatter
         }, {}, {}
@@ -202,16 +201,6 @@ function expireFormatter(value, row, index) {
     }
 }
 
-function viewMember(membership) {
-    console.log('abc');
-    var items = $('#member_table').bootstrapTable('getSelections');
-    if (items.length != 1) {
-        bootbox.alert('请选择一个会员');
-        return;
-    }
-    window.location.href = window.location.pathname + '/' + items[0]._id;
-}
-
 function highlightExpire(row, index) {
     var card = row.membership && row.membership[0];
     if (card) {
@@ -237,8 +226,8 @@ function highlightExpire(row, index) {
 function viewFormatter(value, row, index) {
     var url = window.location.pathname + '/' + row._id;
     return [
-        '<a href="' + url + '" title="查看会员详情" class="btn btn-primary btn-xs">',
-        '<i class="glyphicon glyphicon-expand"></i> 查看',
+        '<a href="' + url + '" title="查看会员详情">',
+        '<i class="glyphicon glyphicon-edit"></i>',
         '</a>'
     ].join('');
 }
