@@ -41,7 +41,9 @@ router.get('/', function(req, res, next) {
     }
     // query courses by status only if status query is defined and not null
     if (req.query.status) {
-        query["status"] = req.query.status;
+        query['status'] = {$in: req.query.status.split(',').map(function(value) {
+            return value ? value : null;
+        })};
     }
     courses.find(query, NORMAL_FIELDS, function(err, docs) {
         if (err) {

@@ -7,9 +7,6 @@
 var common = require('./common');
 var util = require('./services/util');
 
-// only display the active course by default
-var courseStatus = 'active';
-
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
@@ -29,11 +26,7 @@ function init() {
     });
     $('#add_course').click(handleAddNewCourse);
 
-    $('div.status-filter li>a').click(function(event) {
-        var label = this.innerText;
-        $('div.status-filter button').html(label + '<span class="caret"/>');
-        courseStatus = $(this).data('status') || null;
-        //updateSchedule($("this"));
+    $('div.status-filter input[type=checkbox]').click(function(event) {
         $('#course_table').bootstrapTable('refresh');
     });
 
@@ -108,7 +101,15 @@ function actionFormatter(value, row, index) {
 
 function customQuery(params) {
     // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
-    params.status = courseStatus;
+    var statusEl = $('.status-filter input[type=checkbox]:checked');
+    if (statusEl.length > 0) {
+        var statusQuery = '';
+        for (var i=0;i<statusEl.length;i++) {
+            statusQuery += statusEl[i].value + ',';
+        }
+        params.status = statusQuery.substring(0, statusQuery.length-1);
+    }
+
     return params;
 }
 
