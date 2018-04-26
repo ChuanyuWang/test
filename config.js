@@ -12,9 +12,9 @@ module.exports = {
         vue_dev : '//cdn.bootcss.com/vue/2.5.16/vue.js',
         i18next : '//cdn.bootcss.com/i18next/8.2.1/i18next.min.js',
         i18next_dev : '//cdn.bootcss.com/i18next/8.2.1/i18next.js',
-        bootstrap_table_css : '//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css',
-        bootstrap_table : '//cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js',
-        bootstrap_table_locale_zh_CN : '//cdn.bootcss.com/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js',
+        bootstrap_table_css : '//cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.css',
+        bootstrap_table : '//cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js',
+        bootstrap_table_locale_zh_CN : '//cdn.bootcss.com/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js',
         bootbox : '//cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js'
     }
 };
