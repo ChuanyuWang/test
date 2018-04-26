@@ -11,13 +11,13 @@ div(style='margin-top:7px')
     div.tab-pane.active(role="tabpanel",id="checkin",style="padding:7px")
       div#toolbar(style='line-height:1.5;display:inline-block')
         label.text-success.checkbox-inline
-          input(type="checkbox",v-model='filter.checkin')
+          input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
           | 已签到
         label.text-danger.checkbox-inline
-          input(type="checkbox" v-model='filter.absent')
+          input(type="checkbox",value='absent',@click='refreshCheckinStatus')
           | 缺席
         label.checkbox-inline
-          input(type="checkbox" v-model='filter.unknown')
+          input(type="checkbox",value='',@click='refreshCheckinStatus')
           | 未签到
       table#checkin_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-striped='true',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
         thead
@@ -47,25 +47,9 @@ module.exports = {
     //data: Array // array of teacher object
   },
   data: function() {
-    return {
-      filter: {
-        checkin: false,
-        absent: true,
-        unknown: true
-      }
-    };
+    return {};
   },
-  watch: {
-    'filter.checkin': function(value) {
-      this.refreshCheckinStatus();
-    },
-    'filter.absent': function(value) {
-      this.refreshCheckinStatus();
-    },
-    'filter.unknown': function(value) {
-      this.refreshCheckinStatus();
-    }
-  },
+  watch: {},
   components: {},
   computed: {},
   filters: {},
@@ -146,17 +130,14 @@ module.exports = {
     },
     statusQuery: function(params) {
         // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
-        var statusFilter = null;
-        if (this.filter.checkin && this.filter.absent) {
-          statusFilter = 'checkin,absent';
-        } else if (this.filter.checkin) {
-          statusFilter = 'checkin';
-        } else if (this.filter.absent) {
-          statusFilter = 'absent';
+        var statusEl = $('#toolbar input[type=checkbox]:checked');
+        if (statusEl.length > 0) {
+            var statusQuery = '';
+            for (var i=0;i<statusEl.length;i++) {
+                statusQuery += statusEl[i].value + ',';
+            }
+            params.status = statusQuery.substring(0, statusQuery.length-1);
         }
-        if (this.filter.unknown) statusFilter += ',';
-        if (statusFilter !== null)
-          params.status = statusFilter;
         return params;
     }
   },
