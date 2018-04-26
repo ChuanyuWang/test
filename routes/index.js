@@ -93,6 +93,7 @@ function getTenantInfo2(req, res, next) {
         }
 
         req.tenant = tenant || {};
+        res.locals.navTitle = req.tenant.displayName;
         next();
     });
 }
@@ -129,7 +130,7 @@ function getTenantInfo(req, res, next) {
 
         req.tenant = tenant || {};
         // navTitle is the title on the navigation bar
-        res.locals.navTitle = tenant.displayName;
+        res.locals.navTitle = req.tenant.displayName;
         next();
     });
 }
