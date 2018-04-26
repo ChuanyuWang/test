@@ -174,7 +174,7 @@ router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
             }, {
                 $skip : parseInt(req.query.offset) || 0
             }, {
-                $limit : parseInt(req.query.limit) || 10
+                $limit : parseInt(req.query.limit) || 100 // return 100 checkin status if limit is not defined
             }, {
                 $lookup: {
                     from: "members",
