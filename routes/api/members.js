@@ -72,7 +72,9 @@ router.get('/', getMemberLeftClasses, function(req, res, next) {
     }
     // query members by status
     if (req.query.hasOwnProperty('status')) {
-        query["status"] = req.query.status;
+        query['status'] = {$in: req.query.status.split(',').map(function(value) {
+            return value ? value : null;
+        })};
     }
     members.find(query, NORMAL_FIELDS).sort({
         since: -1

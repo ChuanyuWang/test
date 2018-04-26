@@ -29,7 +29,7 @@ $(document).ready(function() {
     });
 
     $('#add_member').click(handleAddNewMember);
-    $('div.statusFilter button').click(handleFilterStatus);
+    $('#toolbar input[type=checkbox]').click(handleFilterStatus);
 });
 
 // Functions =============================================================
@@ -136,25 +136,23 @@ function customQuery(params) {
     // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
     var filter = $("#filter_dlg input:checked").val();
     params.filter = filter;
-    var status = $('div.statusFilter button.btn-info').data('filter');
-    params.status = status;
+
+    var statusEl = $('#toolbar input[type=checkbox]:checked');
+    if (statusEl.length > 0) {
+        var statusQuery = '';
+        for (var i=0;i<statusEl.length;i++) {
+            statusQuery += statusEl[i].value + ',';
+        }
+        params.status = statusQuery.substring(0, statusQuery.length-1);
+    }
     // Append the field 'unStartedClassCount' to returned members
     params.appendLeft = true;
     return params;
 }
 
 function handleFilterStatus(event) {
-    var btn = $(this);
-    btn.removeClass('btn-default').addClass('btn-info');
-    btn.siblings('button').removeClass('btn-info').addClass('btn-default');
     // refresh the table when user changes the status filter
     $('#member_table').bootstrapTable('refresh');
-    // show/hide add new member button
-    if (btn.data('filter') == 'active') {
-        $('#toolbar button[data-action=add]').show();
-    } else {
-        $('#toolbar button[data-action=add]').hide();
-    }
 }
 
 function getCredit(member) {
