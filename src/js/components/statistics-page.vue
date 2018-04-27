@@ -14,10 +14,10 @@ div(style='margin-top:7px')
           input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
           | 已签到
         label.text-danger.checkbox-inline
-          input(type="checkbox",value='absent',@click='refreshCheckinStatus')
+          input(type="checkbox",value='absent',@click='refreshCheckinStatus',checked)
           | 缺席
         label.checkbox-inline
-          input(type="checkbox",value='',@click='refreshCheckinStatus')
+          input(type="checkbox",value='',@click='refreshCheckinStatus',checked)
           | 未签到
       table#checkin_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-striped='true',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
         thead
