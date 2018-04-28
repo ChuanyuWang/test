@@ -198,11 +198,10 @@ module.exports = {
         // five status: 'nonparticipant' || 'absent' || 'checkin' || 'unchecked' || 'tobechecked'
         var allClassesStatus = [];
         vm.sortedClasses.forEach(function(cls, index, array) {
-          var date = moment(cls.date).format("ll");
           var status = vm.getParticipationStatus(cls, member);
           if (moment(cls.date).isSameOrAfter(now)) {
             // consider all unchecked classes as tobechecked in the future
-            date = status === 'unchecked' ? 'tobechecked' : status;
+            status = status === 'unchecked' ? 'tobechecked' : status;
           }
           allClassesStatus.push({
             date: moment(cls.date).format("ll"),
