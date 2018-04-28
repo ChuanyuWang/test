@@ -3,6 +3,17 @@
   margin: 15px 0;
   padding-bottom: 3px;
 }
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-enter-active, .list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateX(30px);
+}
 </style>
 
 <template lang="pug">
@@ -49,18 +60,19 @@ div.container
           span.glyphicon.glyphicon-plus 添加
       div.col-sm-7.col-md-5
         ul.list-group(style='margin-bottom:0px')
-          li.list-group-item(v-for="member in course.members")
-            span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
-            span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
-            a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-            //span.badge(style='margin-right:3px;background-color:#337ab7;cursor:pointer',@click='showMemberCourse(member)') 分配
-            | {{member.name}}
-            div.small(style='color:#777') 学习进度
-            div.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
-              div.progress-bar.progress-bar-danger(:style='{width: Math.round(progressStatus[member.id].absent*100/progressStatus[member.id].total) + "%"}',:title='"缺席" + progressStatus[member.id].absent + "节"') {{progressStatus[member.id].absent}}
-              div.progress-bar.progress-bar-success(:style='{width: Math.round(progressStatus[member.id].done*100/progressStatus[member.id].total) + "%"}',:title='"已上" + progressStatus[member.id].done + "节"') {{progressStatus[member.id].done}}
-              div.progress-bar.progress-bar-info.progress-bar-striped.active(:style='{width: Math.floor(progressStatus[member.id].left*100/progressStatus[member.id].total) + "%"}',:title='"待上" + progressStatus[member.id].left + "节"') {{progressStatus[member.id].left}}
-              div(style='float:left;text-align:center',:style='{width: Math.floor(progressStatus[member.id].uninvolved*100/progressStatus[member.id].total) + "%"}',:title='"未预约" + progressStatus[member.id].uninvolved + "节"') {{progressStatus[member.id].uninvolved}}
+          transition-group(name="list")
+            li.list-group-item(v-for="member in course.members",:key='member.id')
+              span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
+              a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+              //span.badge(style='margin-right:3px;background-color:#337ab7;cursor:pointer',@click='showMemberCourse(member)') 分配
+              | {{member.name}}
+              div.small(style='color:#777') 学习进度
+              div.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
+                div.progress-bar.progress-bar-danger(:style='{width: Math.round(progressStatus[member.id].absent*100/progressStatus[member.id].total) + "%"}',:title='"缺席" + progressStatus[member.id].absent + "节"') {{progressStatus[member.id].absent}}
+                div.progress-bar.progress-bar-success(:style='{width: Math.round(progressStatus[member.id].done*100/progressStatus[member.id].total) + "%"}',:title='"已上" + progressStatus[member.id].done + "节"') {{progressStatus[member.id].done}}
+                div.progress-bar.progress-bar-info.progress-bar-striped.active(:style='{width: Math.floor(progressStatus[member.id].left*100/progressStatus[member.id].total) + "%"}',:title='"待上" + progressStatus[member.id].left + "节"') {{progressStatus[member.id].left}}
+                div(style='float:left;text-align:center',:style='{width: Math.floor(progressStatus[member.id].uninvolved*100/progressStatus[member.id].total) + "%"}',:title='"未预约" + progressStatus[member.id].uninvolved + "节"') {{progressStatus[member.id].uninvolved}}
         small(style='color:#777') 共{{membersCount}}人
   div.page-header
     h3 课程
@@ -71,15 +83,16 @@ div.container
           span.glyphicon.glyphicon-plus 添加
       div.col-sm-7.col-md-5
         ul.list-group(style='margin-bottom:0px')
-          li.list-group-item(v-for="item in sortedClasses")
-            h4(style='margin: 3px 0') {{item.name}}
-            small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
-            p(style='margin: 3px 0') 绘本: {{item.books | formatBooks}}
-            a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
-              i.glyphicon.glyphicon-calendar
-            span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
-            span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
-            a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+          transition-group(name="list")
+            li.list-group-item(v-for="item in sortedClasses",:key='item._id')
+              h4(style='margin: 3px 0') {{item.name}}
+              small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
+              p(style='margin: 3px 0') 绘本: {{item.books | formatBooks}}
+              a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
+                i.glyphicon.glyphicon-calendar
+              span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
+              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
+              a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
       div.col-sm-3.col-md-5
         div
           small(style='color:#777') 共{{classesCount}}节
