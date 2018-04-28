@@ -24,7 +24,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
           div.form-group(:class='{"has-error": !validation.room}')
             label.control-label.col-sm-2 教室:
             select#class_room.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='room')
-              option(v-for='(name, id) in classrooms',:value='id') {{name}}
+              option(v-for='r in classrooms',:value='r.id') {{r.name}}
           div.form-group
             label.control-label.col-sm-2 老师:
             select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='teacher')
@@ -71,7 +71,7 @@ module.exports = {
       'date-picker': date_picker
   },
   props: {
-    classrooms: Object // list of available classrooms
+    classrooms: Array // list of available classrooms
   },
   data: function() {
     return {
