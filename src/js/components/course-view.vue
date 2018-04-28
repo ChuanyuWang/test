@@ -3,6 +3,18 @@
   margin: 15px 0;
   padding-bottom: 3px;
 }
+.participation-status div:hover{
+  border-color: black;
+  border-width: 1px;
+  border-style: solid;
+}
+.participation-status-legend .progress {
+  margin-bottom: 5px;
+  width:70px;
+}
+.participation-status-legend .progress .progress-bar {
+  width:100%;
+}
 .list-item {
   display: inline-block;
   margin-right: 10px;
@@ -61,19 +73,32 @@ div.container
       div.col-sm-7.col-md-5
         ul.list-group(style='margin-bottom:0px')
           transition-group(name="list")
-            li.list-group-item(v-for="member in members",:key='member.id')
+            li.list-group-item(v-for="member in memberList",:key='member.id')
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
               a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
               //span.badge(style='margin-right:3px;background-color:#337ab7;cursor:pointer',@click='showMemberCourse(member)') 分配
               | {{member.name}}
               div.small(style='color:#777') 学习进度
-              div.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
-                div.progress-bar.progress-bar-danger(:style='{width: Math.round(progressStatus[member.id].absent*100/progressStatus[member.id].total) + "%"}',:title='"缺席" + progressStatus[member.id].absent + "节"') {{progressStatus[member.id].absent}}
-                div.progress-bar.progress-bar-success(:style='{width: Math.round(progressStatus[member.id].done*100/progressStatus[member.id].total) + "%"}',:title='"已上" + progressStatus[member.id].done + "节"') {{progressStatus[member.id].done}}
-                div.progress-bar.progress-bar-info.progress-bar-striped.active(:style='{width: Math.floor(progressStatus[member.id].left*100/progressStatus[member.id].total) + "%"}',:title='"待上" + progressStatus[member.id].left + "节"') {{progressStatus[member.id].left}}
-                div(style='float:left;text-align:center',:style='{width: Math.floor(progressStatus[member.id].uninvolved*100/progressStatus[member.id].total) + "%"}',:title='"未预约" + progressStatus[member.id].uninvolved + "节"') {{progressStatus[member.id].uninvolved}}
+              div.participation-status.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
+                template(v-for='item in member.participationStatus')
+                  div(v-if='item.status=="nonparticipant"',style='flex-grow:1',:title='item.date')
+                  div.progress-bar-danger(v-if='item.status=="absent"',style='flex-grow:1',:title='item.date')
+                  div.progress-bar-warning(v-if='item.status=="unchecked"',style='flex-grow:1',:title='item.date')
+                  div.progress-bar-success(v-if='item.status=="checkin"',style='flex-grow:1',:title='item.date')
+                  div.progress-bar.progress-bar-info.progress-bar-striped.active(v-if='item.status=="tobechecked"',style='flex-grow:1',:title='item.date')
         small(style='color:#777') 共{{membersCount}}人
+      div.col-sm-3.col-md-5.participation-status-legend        
+        div.progress
+          div.progress-bar(style='background-color:darkgrey') 未预约
+        div.progress
+          div.progress-bar.progress-bar-danger 缺席
+        div.progress
+          div.progress-bar.progress-bar-warning 未签到
+        div.progress
+          div.progress-bar.progress-bar-success 签到
+        div.progress
+          div.progress-bar.progress-bar-info.progress-bar-striped.active 剩余课程
   div.page-header
     h3 课程
   form.form-horizontal
@@ -164,6 +189,34 @@ module.exports = {
         else return 1;
       });
     },
+    memberList: function() {
+      var vm = this;
+      var members = this.members || [];
+      var now = moment();
+
+      var result = members.map(function(member, index, array) {
+        // five status: 'nonparticipant' || 'absent' || 'checkin' || 'unchecked' || 'tobechecked'
+        var allClassesStatus = [];
+        vm.sortedClasses.forEach(function(cls, index, array) {
+          var date = moment(cls.date).format("ll");
+          var status = vm.getParticipationStatus(cls, member);
+          if (moment(cls.date).isSameOrAfter(now)) {
+            // consider all unchecked classes as tobechecked in the future
+            date = status === 'unchecked' ? 'tobechecked' : status;
+          }
+          allClassesStatus.push({
+            date: moment(cls.date).format("ll"),
+            status: status
+          });
+        });
+        return {
+          id: member.id,
+          name: member.name,
+          participationStatus: allClassesStatus
+        };
+      });
+      return result;
+    },
     progressStatus: function() {
       var progress = {},
         vm = this;
@@ -239,6 +292,22 @@ module.exports = {
         return value.member === member.id;
       };
       return !booking.some(hasReservation);
+    },
+    getParticipationStatus: function(cls, member) {
+      var booking = cls.booking || [];
+      var checkinStatus = null;
+      var hasReservation = function(value, index, array) {
+        if (value.member === member.id) {
+          checkinStatus = value.status || 'unchecked';
+          return true;
+        }
+        return false;
+      };
+      if (booking.some(hasReservation)){
+        return checkinStatus;
+      } else {
+        return 'nonparticipant'
+      }
     },
     saveBasicInfo: function() {
       if (this.hasError) return false;
