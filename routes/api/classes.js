@@ -373,32 +373,55 @@ router.put('/:classID/checkin', function(req, res, next) {
         return next(error);
     }
 
-    classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.classID),
-            'booking.member': mongojs.ObjectId(memberToCheckin.memberid)
-        },
-        update: {
-            $set: {
-                'booking.$.status': memberToCheckin.status || 'checkin'
-            }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
+    classes.findOne({
+        _id: mongojs.ObjectId(req.params.classID)
+    }, {date:1}, function(err, doc) {
         if (err) {
-            var error = new Error("class check-in fails");
+            var error = new Error("Get class fails");
             error.innerError = err;
             return next(error);
         }
-        if (doc) {
-            console.log("class %s check-in by member %s", req.params.classID, memberToCheckin.memberid);
-            res.json(doc);
-        } else {
-            var error = new Error('签到失败，会员未参加此课程');
+
+        var now = new Date();
+        if (doc.date > now && req.user.role !== "admin") {
+            var error = new Error("不能在课程开始前签到");
             error.status = 400;
             return next(error);
         }
+
+        now.setHours(now.getHours() - 8 - 1); // one class takes 1 hour to finish
+        if (doc.date < now && req.user.role !== "admin") {
+            var error = new Error("不能在课程结束8小时后签到");
+            error.status = 400;
+            return next(error);
+        }
+
+        classes.findAndModify({
+            query: {
+                _id: doc._id,
+                'booking.member': mongojs.ObjectId(memberToCheckin.memberid)
+            },
+            update: {
+                $set: {
+                    'booking.$.status': memberToCheckin.status || 'checkin'
+                }
+            },
+            fields: NORMAL_FIELDS,
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if (err) {
+                var error = new Error("class check-in fails");
+                error.innerError = err;
+                return next(error);
+            }
+            if (!doc) {
+                var error = new Error('签到失败，会员未参加此课程');
+                error.status = 400;
+                return next(error);
+            }
+            console.log("class %s check-in by member %s", req.params.classID, memberToCheckin.memberid);
+            res.json(doc);
+        });
     });
 });
 
