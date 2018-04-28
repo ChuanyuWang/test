@@ -34,6 +34,19 @@ service.updateCourse = function(courseID, fields) {
     return request;
 };
 
+service.getCourseMembers = function(courseID, fields) {
+    var request = $.ajax("/api/courses/" + courseID + '/members', {
+        type: "GET",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("获取班级成员失败", jqXHR);
+    })
+    return request;
+};
+
 service.addCourseMembers = function(courseID, fields) {
     var request = $.ajax("/api/courses/" + courseID + '/members', {
         type: "POST",

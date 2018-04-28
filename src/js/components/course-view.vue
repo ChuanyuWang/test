@@ -61,7 +61,7 @@ div.container
       div.col-sm-7.col-md-5
         ul.list-group(style='margin-bottom:0px')
           transition-group(name="list")
-            li.list-group-item(v-for="member in course.members",:key='member.id')
+            li.list-group-item(v-for="member in members",:key='member.id')
               span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
               span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
               a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
@@ -131,6 +131,7 @@ module.exports = {
   data: function() {
     return {
       course: this.data || {},
+      members: [],
       classes: []
     };
   },
@@ -142,7 +143,7 @@ module.exports = {
   },
   computed: {
     membersCount: function() {
-      return this.course.members ? this.course.members.length : 0;
+      return this.members ? this.members.length : 0;
     },
     classesCount: function() {
       return this.classes ? this.classes.length : 0;
@@ -166,7 +167,7 @@ module.exports = {
     progressStatus: function() {
       var progress = {},
         vm = this;
-      var members = this.course.members || [];
+      var members = this.members || [];
       if (members.length == 0) return progress;
       var now = moment();
 
@@ -276,7 +277,7 @@ module.exports = {
       this.$refs.modal.show();
     },
     showAddMemberDlg: function(params) {
-      var checkedItems = (this.course.members || []).map(function(
+      var checkedItems = (this.members || []).map(function(
         value,
         index,
         array
@@ -400,7 +401,7 @@ module.exports = {
     },
     addMembers: function(selectedMembers) {
       var vm = this;
-      var members = this.course.members || [];
+      var members = this.members || [];
       var addedOnes = selectedMembers.filter(function(element, index, array) {
         // filter the new added member
         return !members.some(function(value, index, array) {
@@ -410,10 +411,6 @@ module.exports = {
       });
 
       if (addedOnes.length > 0) {
-        // initialize members property
-        if (!this.course.hasOwnProperty("members")) {
-          Vue.set(this.course, "members", []);
-        }
         var result = addedOnes.map(function(value, index, array) {
           return {
             id: value._id,
@@ -427,7 +424,7 @@ module.exports = {
         );
         request.done(function(data, textStatus, jqXHR) {
           result.forEach(function(value, index, array) {
-            vm.course.members.push(value);
+            vm.members.push(value);
           });
           vm.classes = data.updateClasses || [];
           vm.$refs.summaryDlg.show(data.result || {});
@@ -454,7 +451,7 @@ module.exports = {
             id: item.id
           });
           request.done(function(data, textStatus, jqXHR) {
-            var members = vm.course.members;
+            var members = vm.members || [];
             for (var i = 0; i < members.length; i++) {
               if (members[i].id == item.id) {
                 members.splice(i, 1);
@@ -492,8 +489,14 @@ module.exports = {
     var vm = this;
     var request = course_service.getCourseClasses(vm.course._id);
     request.done(function(data, textStatus, jqXHR) {
-        // initialize classes property
+        // set classes property
         vm.classes = data || [];
+    });
+
+    var request2 = course_service.getCourseMembers(vm.course._id);
+    request2.done(function(data, textStatus, jqXHR) {
+        // set members property
+        vm.members = data && data.members || [];
     });
   }
 };

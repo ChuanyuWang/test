@@ -71,6 +71,53 @@ router.get('/:courseID', function(req, res, next) {
     });
 });
 
+// get the course members with name
+router.get('/:courseID/members', function(req, res, next) {
+    var courses = req.db.collection("courses");
+    courses.aggregate([
+        {
+            $match: {_id: mongojs.ObjectId(req.params.courseID)}
+        }, {
+            $unwind: "$members"
+        }, {
+            $lookup: {
+                from: "members",
+                localField: "members.id",
+                foreignField: "_id",
+                as: "member"
+            }
+        }, {
+            $project: {
+                "member.name": 1,
+                "members": 1
+            }
+        }
+    ], function(err, docs) {
+        if (err) {
+            var error = new Error("Get course members fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("get course members: %j", docs ? docs.length:0);
+        if (!docs || docs.length === 0) {
+            var error = new Error("Course doesn't exist");
+            error.status = 400;
+            return next(error);
+        }
+        var members = docs.map(function name(value, index, array) {
+            return {
+                id: value.members.id,
+                // display the cached member name if member is deleted
+                name: value.member.length > 0 ? value.member[0].name : value.members.name
+            }
+        });
+        res.json({
+            _id: docs[0]._id,
+            members: members
+        });
+    });
+});
+
 /// Below APIs are only visible to authenticated users with 'admin' role
 router.use(helper.requireRole("admin"));
 
