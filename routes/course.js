@@ -13,7 +13,7 @@ router.get('/', helper.checkTenantUser, function (req, res, next) {
 
 router.get('/:courseID', helper.checkTenantUser, function (req, res, next) {
     res.locals.courseID = req.params.courseID;
-    res.render('bqsq/course/view', {
+    res.render('bqsq/pages/course_view', {
         title: '查看班级',
         user: req.user,
         classroom: req.tenant.classroom ? req.tenant.classroom : []

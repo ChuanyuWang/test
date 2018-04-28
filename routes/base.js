@@ -13,7 +13,7 @@ router.get('/home', helper.checkTenantUser, function (req, res) {
 
 router.get('/class/:classID', helper.checkTenantUser, function (req, res) {
     res.locals.classID = req.params.classID;
-    res.render('bqsq/class_view', {
+    res.render('bqsq/pages/class_view', {
         title: '查看课程',
         user: req.user,
         classroom: req.tenant.classroom || []
@@ -70,7 +70,7 @@ router.get('/member', helper.checkTenantUser, function (req, res) {
 
 router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next) {
     res.locals.memberID = req.params.memberID;
-    res.render('bqsq/member_view', {
+    res.render('bqsq/pages/member_view', {
         title: '查看会员',
         user: req.user,
         classrooms: req.tenant.classroom || []
