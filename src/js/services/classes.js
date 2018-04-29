@@ -27,6 +27,19 @@ service.getClass = function(classID) {
     return request;
 };
 
+service.getClasses = function(fields) {
+    var request = $.ajax('/api/classes', {
+        type: "GET",
+        //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+        dataType: "json",
+        data: fields
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert('获取课程失败', jqXHR);
+    });
+    return request;
+};
+
 service.updateClass = function(coureID, fields) {
     var request = $.ajax("/api/classes/" + coureID, {
         type: "PATCH",

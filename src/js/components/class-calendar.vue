@@ -254,27 +254,18 @@ module.exports = {
       var begin = moment(this.monday);
       var end = moment(begin).add(7, "days");
 
-      $.ajax("/api/classes", {
-        type: "GET",
-        //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-        data: {
-          from: begin.toISOString(),
-          to: end.toISOString(),
-          classroom: vm.classroom,
-          tenant: common.getTenantName()
-        },
-        success: function(data) {
-          vm.classes = data || [];
-        },
-        error: function(jqXHR, status, err) {
-          console.error(
-            jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText
-          );
-        },
-        complete: function(jqXHR, status) {
-          // TODO, finish loading
-        },
-        dataType: "json"
+      var request = class_service.getClasses({
+        from: begin.toISOString(),
+        to: end.toISOString(),
+        classroom: vm.classroom,
+        tenant: common.getTenantName()
+      });
+
+      request.done(function(data, textStatus, jqXHR) {
+        vm.classes = data || [];
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
     }
   }
