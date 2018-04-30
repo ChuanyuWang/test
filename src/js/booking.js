@@ -130,7 +130,7 @@ function init() {
     }
     document.title = '会员约课-' + roomName;
     // select the classroom in droplist if there is filter control
-    var option_ele = $('#chooseRoom option[value=' + classroomID.trim() + ']');
+    var option_ele = $('#chooseRoom option[value=' + classroomID + ']');
     if (option_ele.length == 1) {
         option_ele.prop('selected', true);
     }
