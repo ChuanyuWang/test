@@ -12,26 +12,26 @@ div(style='margin-top:7px')
       div#toolbar(style='line-height:1.5;display:inline-block')
         label.text-success.checkbox-inline
           input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
-          | 已签到
+          | {{$t('checked-in')}}
           span.glyphicon.glyphicon-ok(style='margin-left:3px')
         label.text-danger.checkbox-inline
           input(type="checkbox",value='absent',@click='refreshCheckinStatus',checked)
-          | 缺席
+          | {{$t('absent')}}
           span.glyphicon.glyphicon-remove(style='margin-left:3px')
         label.checkbox-inline
           input(type="checkbox",value='',@click='refreshCheckinStatus',checked)
-          | 未签到
+          | {{$t('uncheckin')}}
           span.glyphicon.glyphicon-question-sign(style='margin-left:3px;color:#777')
       table#checkin_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-striped='true',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
         thead
           tr
-            th(data-field='date',data-sortable='false') 日期/时间
-            th(data-field='name',data-sortable='false') 课程名称
-            th(data-field='books',data-sortable='false') 绘本
-            th(data-field='member.0.name',data-sortable='false') 姓名
+            th(data-field='date',data-sortable='false') {{$t('datetime')}}
+            th(data-field='name',data-sortable='false') {{$t('class')}}
+            th(data-field='books',data-sortable='false') {{$t('book')}}
+            th(data-field='member.0.name',data-sortable='false') {{$t('member_name')}}
             //th(data-field='member.contact') 联系方式
-            th(data-field='booking.status',data-sortable='false') 签到
-            th(data-field='flag',data-align='center') 旗标
+            th(data-field='booking.status',data-sortable='false') {{$t('checkin')}}
+            th(data-field='flag',data-align='center') {{$t('flag')}}
 </template>
 
 <script>
@@ -68,7 +68,7 @@ module.exports = {
           if (book.title) result += "《" + book.title + "》";
         });
       }
-      return result || "<i>未添加</i>";
+      return result || "<i>" + this.$t('book_not_added') + "</i>";
     },
     getFlag: function(booking) {
       if (!booking) return null;

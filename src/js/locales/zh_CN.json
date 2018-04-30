@@ -23,5 +23,14 @@
   "msg_name_cannot_empty": "姓名不能为空",
   "msg_note_too_long": "简介不能超过256个字",
   "history_teacher": "上课记录",
-  "checkin_title": "出勤"
+  "checkin_title": "出勤",
+  "flag": "旗标",
+  "checkin": "签到",
+  "book": "绘本",
+  "class": "课程",
+  "datetime": "日期/时间",
+  "checked-in": "已签到",
+  "absent": "缺席",
+  "uncheckin": "未签到",
+  "book_not_added": "未添加"
 }
