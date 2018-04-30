@@ -12,7 +12,7 @@ div(style='margin-top:7px')
       div#toolbar(style='line-height:1.5;display:inline-block')
         label.text-success.checkbox-inline
           input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
-          | {{$t('checked-in')}}
+          | {{$t('checked_in')}}
           span.glyphicon.glyphicon-ok(style='margin-left:3px')
         label.text-danger.checkbox-inline
           input(type="checkbox",value='absent',@click='refreshCheckinStatus',checked)

@@ -9,6 +9,7 @@
   "completed": "已结束",
   "save": "保存",
   "create": "创建",
+  "create_classroom": "创建教室",
   "delete": "删除",
   "not_started": "未开始",
   "view_member_course_title": "分配会员在此班级的课程",
@@ -29,8 +30,12 @@
   "book": "绘本",
   "class": "课程",
   "datetime": "日期/时间",
-  "checked-in": "已签到",
+  "time": "时间",
+  "checked_in": "已签到",
   "absent": "缺席",
   "uncheckin": "未签到",
-  "book_not_added": "未添加"
+  "book_not_added": "未添加",
+  "previous_week": "上一周",
+  "this_week": "本周",
+  "next_week": "下一周"
 }

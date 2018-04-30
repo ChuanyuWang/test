@@ -6,9 +6,9 @@
 div
   div.row(style='margin-top:15px;margin-bottom:15px')
     div.col-lg-4.col-md-5.col-sm-6.col-xs-6.btn-group
-      button.btn.btn-primary.btn-sm(@click='previousWeek') 上一周
-      button.btn.btn-primary.btn-sm(@click='thisWeek') 本周
-      button.btn.btn-primary.btn-sm(@click='nextWeek') 下一周
+      button.btn.btn-primary.btn-sm(@click='previousWeek') {{$t('previous_week')}}
+      button.btn.btn-primary.btn-sm(@click='thisWeek') {{$t('this_week')}}
+      button.btn.btn-primary.btn-sm(@click='nextWeek') {{$t('next_week')}}
       date-picker(v-model='date',inputClass='input-group-sm')
     div.col-sm-2.pull-right
       select.form-control.input-sm(style='float:right',v-model='classroom')
@@ -17,7 +17,7 @@ div
   table.class-table.table.table-bordered(v-if='hasClassroom')
     thead
       tr
-        th(style='width:60px;text-align:center') 时间
+        th(style='width:60px;text-align:center') {{$t('time')}}
         th(v-for='(col, index) in columns') {{col}}
           div {{index | displayWeekDay(monday)}}
     tbody
@@ -27,7 +27,7 @@ div
           class-list(:data='getClassess(j, section.startTime, section.duration)',v-on:view="viewClass",v-on:delete="deleteClass",v-on:add="addClass(j,section.startTime)")
   div.row(v-else)
     div.col-sm-12(style='height:200px;background-color:#eee')
-      a.btn.btn-success(style='margin:83px auto;display:table',href='setting') 创建教室
+      a.btn.btn-success(style='margin:83px auto;display:table',href='setting') {{$t('create_classroom')}}
   create-class-modal(ref='createClsDlg',@ok='createClass')
   notification(ref='alertbar')
 </template>
@@ -77,7 +77,8 @@ module.exports = {
     return {
       date: moment(), // moment date object
       //monday: getMonday(moment()), // moment date object
-      columns: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"],
+      // [ "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ]
+      columns: moment.weekdays(true),
       sections: [
         { name: "上午", startTime: 0, duration: 12 },
         { name: "下午", startTime: 12, duration: 6 },
