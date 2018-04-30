@@ -10,7 +10,7 @@ mongoose.Promise = global.Promise;
 // Store all connected connections.
 var connections = [];
 var connections2 = {};
-var connections3 = {};
+var monkConnections = {};
 
 // export helper functions
 var helpers = {};
@@ -105,8 +105,8 @@ helpers.connect3 = function(database) {
         throw new Error("parameter database is not string or empty");
     }
     //  If a connection was found, return with it.
-    if (connections3[database]) {
-        return connections3[database];
+    if (monkConnections[database]) {
+        return monkConnections[database];
     }
     var options = {
         //keepAlive: 120,
@@ -125,11 +125,11 @@ helpers.connect3 = function(database) {
         console.log('[monk] database "%s" is connected', database);
     }, function(err) {
         console.error('[monk] connect database "%s" with error', database, err);
-        delete connections3[database];
+        delete monkConnections[database];
     });
 
     // Store the connection in the connections pool.
-    connections3[database] = conn;
+    monkConnections[database] = conn;
     return conn;
 };
 
