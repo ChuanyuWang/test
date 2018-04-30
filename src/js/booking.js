@@ -114,7 +114,7 @@ function init() {
 
     // check the classroom id from URL param
     var _ALL_CLASSROOM_ = getAllClassroom();
-    var room = getParam('classroom');
+    var room = common.getParam('classroom');
     var roomName = '';
     if (room && _ALL_CLASSROOM_[room]) {
         classroomID = room;
@@ -440,10 +440,4 @@ function getAgeLimit(cls) {
         return "年龄小于" + age.max + "岁";
     }
     return "";
-}
-
-function getParam(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-    var param = window.location.search.substr(1).match(reg);
-    return param ? decodeURI(param[2]) : null;
 }

@@ -655,10 +655,3 @@ var handleActions = {
         modal.modal('show');
     }
 };
-/*
-function getParam(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-    var param = window.location.search.substr(1).match(reg);
-    return param ? decodeURI(param[2]) : null;
-}
-*/

@@ -50,5 +50,13 @@ module.exports = {
         } else {
             return undefined;
         }
+    },
+    /**
+     * Get the parameter from url
+     */
+    getParam: function(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var param = window.location.search.substr(1).match(reg);
+        return param ? decodeURI(param[2]) : null;
     }
 };

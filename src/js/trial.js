@@ -57,7 +57,7 @@ function handleSubmit(event) {
     user_info.remark = form.find('textarea[name=remark]').val().trim();
     
     if (!hasError) {
-        user_info.source = getParam('source');
+        user_info.source = common.getParam('source');
         addOpportunity(user_info);
     }
 }
@@ -79,10 +79,4 @@ function addOpportunity(opportunity) {
         },
         dataType : "json"
     });
-}
-
-function getParam(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-    var param = window.location.search.substr(1).match(reg);
-    return param ? decodeURI(param[2]) : null;
 }
