@@ -22,7 +22,11 @@ router.get('/api/currentuser', function (req, res) {
     res.json(user || {});
 });
 
-router.get('/booking', function (req, res) {
+router.get('/booking', function (req, res, next) {
+    if (!req.tenant || !req.tenant.name) {
+        //tenant not found
+        return next();
+    }
     var timeKey = parseInt(Date.now()/1000);
 
     function findUserOpenID(user) {
