@@ -4,7 +4,7 @@ var Account = require('../account');
 var util = require('../util');
 var mongojs = require('mongojs');
 
-var VERSION = 4;
+var VERSION = 5;
 var config_db = null;
 // initialize the 'config' database for setting router
 router.use(function(req, res, next) {
