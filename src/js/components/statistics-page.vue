@@ -151,7 +151,7 @@ module.exports = {
       .bootstrapTable({
         locale: "zh-CN",
         //sortName: 'date',
-        sortOrder: "desc",
+        sortOrder: "asc",
         maintainSelected: true,
         //rowStyle: highlightExpire,
         queryParams: this.statusQuery,
