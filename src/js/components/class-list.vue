@@ -7,16 +7,17 @@ div
   template(v-for='classItem in data')
     div.class-item-div(v-bind:class="[reservation(classItem) > 0 ? 'bg-success' : 'bg-info']")
       div.small(style='color:#777;display:flex;justify-content:space-between')
-        div(style='display:inline-flex')
+        div
           span.glyphicon.glyphicon-time(style='color:#999;margin-right:1px')
           |{{classItem.date | displayTime}}
-        div(style='display:inline-flex')
+        div
           span.glyphicon.glyphicon-user(style='margin:0 2px',:title='reservation(classItem) + "人预约"')
           |{{reservation(classItem)}}
           span.glyphicon.glyphicon-book(style='margin:0 2px',:title='books(classItem) + "本绘本"')
           |{{books(classItem)}}
-      p(style='padding-bottom:7px;cursor:pointer',v-on:click='$emit("view", classItem)',title='点击查看课程详情') {{classItem.name}}
-      div.btn-group.btn-group-xs(style='align-self:flex-end;display:inline-flex')
+      div
+        p(style='padding-bottom:7px;cursor:pointer',v-on:click='$emit("view", classItem)',title='点击查看课程详情') {{classItem.name}}
+      div.btn-group.btn-group-xs(style='align-self:flex-end')
         a.btn.btn-primary(:href='"./class/" + classItem._id')
           |查看
           //span.badge(style='margin-left:3px') {{reservation(classItem)}}
