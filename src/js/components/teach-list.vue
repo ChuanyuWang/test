@@ -8,6 +8,11 @@
   cursor: pointer;
 }
 
+.teacher-list-item {
+  margin-top: 0px;
+  padding: 7px 0px;
+}
+
 .deleted-teacher {
   color: #777;
 }
