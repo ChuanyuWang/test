@@ -82,11 +82,11 @@ div.container
               div.small(style='color:#777') 学习进度
               div.participation-status.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
                 template(v-for='item in member.participationStatus')
-                  div(v-if='item.status=="nonparticipant"',style='flex-grow:1',:title='item.date')
-                  div.progress-bar-danger(v-if='item.status=="absent"',style='flex-grow:1',:title='item.date')
-                  div.progress-bar-warning(v-if='item.status=="unchecked"',style='flex-grow:1',:title='item.date')
-                  div.progress-bar-success(v-if='item.status=="checkin"',style='flex-grow:1',:title='item.date')
-                  div.progress-bar.progress-bar-info.progress-bar-striped.active(v-if='item.status=="tobechecked"',style='flex-grow:1',:title='item.date')
+                  div(v-if='item.status=="nonparticipant"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                  div.progress-bar-danger(v-if='item.status=="absent"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                  div.progress-bar-warning(v-if='item.status=="unchecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                  div.progress-bar-success(v-if='item.status=="checkin"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                  div.progress-bar.progress-bar-info.progress-bar-striped.active(v-if='item.status=="tobechecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
         small(style='color:#777') 共{{membersCount}}人
       div.col-sm-3.col-md-5.participation-status-legend        
         div.progress
@@ -278,6 +278,17 @@ module.exports = {
   },
   watch: {},
   methods: {
+    showTooltip: function(e) {
+      // must listen to 'touchstart' event
+      $(document).one("touchstart", function() {
+        // hide tooltip when user touch screen again
+        $(e.target).tooltip('destroy');
+      });
+      // show tooltip
+      $(e.target).tooltip({
+        container: "body"
+      }).tooltip('show');
+    },
     getClassroomName: function(value) {
       for (var i=0;i<this.classrooms.length;i++) {
         if (this.classrooms[i].id == value)
