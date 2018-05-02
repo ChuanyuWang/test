@@ -1,5 +1,13 @@
-<style>
-
+<style lang='less'>
+.class-item-div {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  p:hover {
+    text-decoration: underline;
+  }
+}
 </style>
 
 <template lang="pug">

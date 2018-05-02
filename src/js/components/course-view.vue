@@ -11,9 +11,9 @@
 .participation-status-legend .progress {
   margin-bottom: 5px;
   width:70px;
-}
-.participation-status-legend .progress .progress-bar {
-  width:100%;
+  .progress-bar {
+    width:100%;  
+  }
 }
 .list-item {
   display: inline-block;
