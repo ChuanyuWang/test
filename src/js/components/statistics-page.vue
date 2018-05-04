@@ -10,6 +10,13 @@ div(style='margin-top:7px')
   div.tab-content
     div.tab-pane.active(role="tabpanel",id="checkin",style="padding:7px")
       div#toolbar(style='line-height:1.5;display:inline-block')
+        label(style='margin:0 3px') {{$t('time')}}:
+        select.input-sm(v-model='timeFilter',style='margin-right:7px',@change='refreshCheckinStatus')
+          option(value='today') {{$t('today')}}
+          option(value='yesterday') {{$t('yesterday')}}
+          option(value='past_week') {{$t('past_week')}}
+          option(value='past_month') {{$t('past_month')}}
+          option(value='') {{$t('all')}}
         label.text-success.checkbox-inline
           input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
           | {{$t('checked_in')}}
@@ -50,7 +57,9 @@ module.exports = {
     //data: Array // array of teacher object
   },
   data: function() {
-    return {};
+    return {
+      timeFilter: 'today'
+    };
   },
   watch: {},
   components: {},
@@ -140,6 +149,26 @@ module.exports = {
                 statusQuery += statusEl[i].value + ',';
             }
             params.status = statusQuery.substring(0, statusQuery.length-1);
+        }
+        switch (this.timeFilter) {
+          case 'today':
+            params.from = moment().startOf('day').toISOString();
+            params.to = moment().endOf('day').toISOString();
+            break;
+          case 'yesterday':
+            params.from = moment().startOf('day').subtract(24, 'hours').toISOString();
+            params.to = moment().startOf('day').toISOString();
+            break;
+          case 'past_week':
+            params.from = moment().startOf('day').subtract(7, 'days').toISOString();
+            params.to = moment().endOf('day').toISOString();
+            break;
+          case 'past_month':
+            params.from = moment().startOf('day').subtract(30, 'days').toISOString();
+            params.to = moment().endOf('day').toISOString();
+            break;
+          default:
+            break;
         }
         return params;
     }
