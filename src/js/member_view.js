@@ -187,8 +187,10 @@ function init() {
             formatter: linkNameFormatter
         }, {}, {
             formatter: common.dateFormatter
-        },{
+        }, {
             formatter: booksFormatter
+        }, {
+            formatter: checkinFormatter
         }]
     });
 
@@ -250,6 +252,27 @@ function booksFormatter(value, row, index) {
             if (book.title) result += "《" + book.title + "》";
         });
         return result;
+    }
+}
+
+function checkinFormatter(value, row, index) {
+    var result = '';
+    if ($.isArray(value)) {
+        value.some(function(booking){
+            if (booking.member === viewData.memberData._id) {
+                result = booking.status;
+                return true;
+            }
+            return false;
+        });
+    }
+
+    if (result == "absent") {
+        return '<span style="display:table-cell" class="text-danger glyphicon glyphicon-remove"></span>';
+    } else if (result == "checkin") {
+        return '<span style="display:table-cell" class="text-success glyphicon glyphicon-ok"></span>';
+    } else {
+        return '<span style="display:table-cell" class="text-muted glyphicon glyphicon-question-sign"></span>';
     }
 }
 
