@@ -11,6 +11,8 @@ div
       a(href="#opportunity",role='tab',data-toggle='tab') {{$t('opportunity')}}
     li(role='presentation')
       a(href="#analytics",role='tab',data-toggle='tab') {{$t('consume')}}
+    li(role='presentation')
+      a(href="#hint",role='tab',data-toggle='tab') {{$t('passive_title')}}
   div.tab-content
     div.tab-pane.active(role="tabpanel",id="checkin")
       checkin-tab
@@ -18,6 +20,8 @@ div
       opportunity-tab
     div.tab-pane(role="tabpanel",id="analytics")
       consume-tab(ref='consumeChart')
+    div.tab-pane(role="tabpanel",id="hint")
+      passive-tab(ref='passiveChart')
 </template>
 
 <script>
@@ -31,6 +35,7 @@ var common = require("../common");
 var checkinTab = require("./checkin-tab.vue");
 var opportunityTab = require("./opportunity-tab.vue");
 var consumeTab = require("./consume-tab.vue");
+var passiveTab = require("./passive-tab.vue");
 var class_service = require("../services/classes");
 
 module.exports = {
@@ -43,7 +48,8 @@ module.exports = {
   components: {
     "checkin-tab": checkinTab,
     "opportunity-tab": opportunityTab,
-    "consume-tab": consumeTab
+    "consume-tab": consumeTab,
+    "passive-tab": passiveTab,
   },
   computed: {},
   filters: {},
@@ -52,9 +58,14 @@ module.exports = {
   mounted: function() {
     var vm = this;
 
+    // refresh the chart when user switch to consume tab first time, otherwise width is 0
     $(this.$el).find('a[href="#analytics"]').one('shown.bs.tab', function(e) {
-      // refresh the chart when user switch to consume tab first time, otherwise width is 0
       vm.$refs.consumeChart.refreshChart();
+    });
+
+    // refresh the chart when user switch to hint tab first time
+    $(this.$el).find('a[href="#hint"]').one('shown.bs.tab', function(e) {
+        vm.$refs.passiveChart.refreshPassiveChart();
     });
   }
 };

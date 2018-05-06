@@ -16,11 +16,9 @@ append js
   script(src=CDN_FILES.bootstrap_table)
   script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   if ENV_DEVELOPMENT
-    script(src="//cdn.bootcss.com/echarts/3.8.5/echarts.js")
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
   else
-    script(src="//cdn.bootcss.com/echarts/3.8.5/echarts.min.js")
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
   script(src='/js/setting.js')
@@ -36,8 +34,6 @@ block page
         a(href="#classroom",role='tab',data-toggle='tab') 教室
       li(role='presentation')
         a(href="#teacher",role='tab',data-toggle='tab') 老师
-      li(role='presentation')
-        a(href="#hint",role='tab',data-toggle='tab') 分析
     div.tab-content
       div.tab-pane(role="tabpanel",id="general",style="padding:7px")
         form.form-horizontal
@@ -99,12 +95,6 @@ block page
             div.col-sm-10
               p.form-control-static= baseUrl + '/myReadBooks'
               span.help-block 我的阅读入口，访问用户可以根据注册信息查看所有历史课程中使用的绘本，包括书名和授课老师。
-      div.tab-pane(role="tabpanel",id="hint",style="padding:7px")
-        div.row(style="margin-top:15px")
-          div#chart2.col-md-6(style="height:450px")
-          div#chart3.col-md-6(style="height:450px")
-        div.row(style="margin-top:15px")
-          div#chart4.col-md-12(style="height:400px")
   div#clsroom_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
     div.modal-dialog(role="document")
       div.modal-content
