@@ -6,6 +6,7 @@
 var util = require('./services/util');
 var i18nextplugin = require('./locales/i18nextplugin');
 var teach_setting = require('./components/teach-setting.vue');
+var users_setting = require('./components/users-setting.vue');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -24,6 +25,11 @@ function init() {
     // bootstrap the teacher setting tab
     new Vue({el: '#teacher-setting', render : function(h){
         return h(teach_setting);
+    }});
+
+    // bootstrap the users setting tab
+    new Vue({el: '#users-setting', render : function(h){
+        return h(users_setting);
     }});
 
     // initialize the classroom table

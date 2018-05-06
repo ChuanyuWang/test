@@ -33,9 +33,13 @@ block page
       li.active(role='presentation')
         a(href="#classroom",role='tab',data-toggle='tab') 教室
       li(role='presentation')
+        a(href="#users",role='tab',data-toggle='tab') 用户
+      li(role='presentation')
         a(href="#teacher",role='tab',data-toggle='tab') 老师
     div.tab-content
-      div.tab-pane(role="tabpanel",id="general",style="padding:7px")
+      div.tab-pane(role="tabpanel",id="users")
+        div#users-setting
+      div.tab-pane(role="tabpanel",id="general")
         form.form-horizontal
           span.help-block 请设置客服电话和门店地址，方便会员在约课遇到问题时联系
           div.form-group
@@ -56,9 +60,9 @@ block page
           div.form-group
             div.col-sm-offset-2.col-sm-10
               button#saveBasic.btn.btn-success(type='button') 保存
-      div.tab-pane(role="tabpanel",id="teacher",style="padding:7px")
+      div.tab-pane(role="tabpanel",id="teacher")
         div#teacher-setting
-      div.tab-pane.active(role="tabpanel",id="classroom",style="padding:7px")
+      div.tab-pane.active(role="tabpanel",id="classroom")
         div#toolbar.btn-group(role='group')
           button.btn.btn-success(type='button',data-toggle='modal',data-target='#clsroom_dlg', data-action='add') 添加
         table#classroom_table(data-checkbox-header='false',data-striped='true',data-unique-id="id",data-show-refresh='true',data-toolbar='#toolbar')
@@ -68,7 +72,7 @@ block page
               th(data-field='name') 教室名字
               th(data-field='visibility') 内部预约
               th(data-title='操作',data-align='center')
-      div.tab-pane(role="tabpanel",id="entry",style="padding:7px")
+      div.tab-pane(role="tabpanel",id="entry")
         div.page-header(style='margin-top:0')
           h3 微信入口Url
         form.form-horizontal
