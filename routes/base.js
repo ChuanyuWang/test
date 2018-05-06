@@ -77,14 +77,6 @@ router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next
     });
 });
 
-router.get('/opportunity', helper.checkTenantUser, function (req, res) {
-    res.render('bqsq/opportunity', {
-        title: '试听',
-        currentUrl: 'opportunity',
-        user: req.user
-    });
-});
-
 router.get('/statistics', helper.checkTenantUser, function (req, res) {
     res.render('bqsq/statistics', {
         title: '统计',

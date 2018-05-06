@@ -10,6 +10,16 @@ module.exports = {
             //['browserify-hmr',{ noServe : false }]
         ]
     },
+    app2: {
+        files: {
+            //'public/js/course_view.js': 'src/js/course_view.js'
+        },
+        options: {
+            plugin: [
+                ['browserify-hmr', { noServe : false }]
+            ]
+        }
+    },
     app: {
         files: {
             'public/js/main.js': 'src/js/main.js',
@@ -24,7 +34,6 @@ module.exports = {
             'public/js/course_view.js': 'src/js/course_view.js',
             'public/js/setting.js': 'src/js/setting.js',
             'public/js/statistics.js': 'src/js/statistics.js',
-            'public/js/opportunity.js': 'src/js/opportunity.js',
             'public/js/admin.js': 'src/js/admin.js'
         }
     }

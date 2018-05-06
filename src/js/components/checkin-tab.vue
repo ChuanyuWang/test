@@ -4,7 +4,7 @@
 
 <template lang="pug">
 div
-  div#toolbar(style='line-height:1.5;display:inline-block')
+  div#checkin_toolbar(style='line-height:1.5;display:inline-block')
     label(style='margin:0 3px') {{$t('time')}}:
     select.input-sm(v-model='timeFilter',style='margin-right:7px',@change='refreshCheckinStatus')
       option(value='today') {{$t('today')}}
@@ -24,7 +24,7 @@ div
       input(type="checkbox",value='',@click='refreshCheckinStatus',checked)
       | {{$t('uncheckin')}}
       span.glyphicon.glyphicon-question-sign(style='margin-left:3px;color:#777')
-  table#checkin_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-striped='true',data-show-columns='true',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
+  table#checkin_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-striped='true',data-show-columns='true',data-unique-id="_id",data-click-to-select="true")
     thead
       tr
         th(data-field='date',data-sortable='false') {{$t('datetime')}}
@@ -39,7 +39,7 @@ div
 <script>
 /**
  * --------------------------------------------------------------------------
- * teach-setting display a panel for teacher settings
+ * checkin-tab display a panel for checkin status statistics
  * --------------------------------------------------------------------------
  */
 
@@ -135,7 +135,7 @@ module.exports = {
     },
     statusQuery: function(params) {
         // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
-        var statusEl = $('#toolbar input[type=checkbox]:checked');
+        var statusEl = $('#checkin_toolbar input[type=checkbox]:checked');
         if (statusEl.length > 0) {
             var statusQuery = '';
             for (var i=0;i<statusEl.length;i++) {
@@ -175,6 +175,7 @@ module.exports = {
         //sortName: 'date',
         sortOrder: "asc",
         maintainSelected: true,
+        toolbar: '#checkin_toolbar',
         //rowStyle: highlightExpire,
         queryParams: this.statusQuery,
         url: "/api/classes/checkin",
