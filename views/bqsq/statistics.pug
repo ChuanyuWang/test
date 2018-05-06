@@ -10,9 +10,11 @@ append css
 append js
   script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
   if ENV_DEVELOPMENT
+    script(src="//cdn.bootcss.com/echarts/3.8.5/echarts.js")
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
   else
+    script(src="//cdn.bootcss.com/echarts/3.8.5/echarts.min.js")
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
   script(src=CDN_FILES.bootbox)

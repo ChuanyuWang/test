@@ -37,8 +37,6 @@ block page
       li(role='presentation')
         a(href="#teacher",role='tab',data-toggle='tab') 老师
       li(role='presentation')
-        a(href="#analytics",role='tab',data-toggle='tab') 统计
-      li(role='presentation')
         a(href="#hint",role='tab',data-toggle='tab') 分析
     div.tab-content
       div.tab-pane(role="tabpanel",id="general",style="padding:7px")
@@ -101,23 +99,6 @@ block page
             div.col-sm-10
               p.form-control-static= baseUrl + '/myReadBooks'
               span.help-block 我的阅读入口，访问用户可以根据注册信息查看所有历史课程中使用的绘本，包括书名和授课老师。
-      div.tab-pane(role="tabpanel",id="analytics",style="padding:7px")
-        div.row
-          div.col-md-1.pull-right(style="display:inline-flex")
-            button.btn.btn-default#refresh(type="button") 刷新
-          div.col-md-3.pull-right(style="display:inline-flex")
-            p.form-control-static.text-nowrap(style="display:inline-table") 单位：
-            select#unit.form-control
-              option(value='month') 月
-              option(value='week') 周
-          div.col-md-3.pull-right(style="display:inline-flex")
-            p.form-control-static.text-nowrap(style="display:inline-table") 年份： 
-            select#year.form-control
-              option(value=2018) 2018
-              option(value=2017) 2017
-              option(value=2016) 2016
-        div.row(style="margin-top:15px")
-          div#consume_chart(style="height:400px")
       div.tab-pane(role="tabpanel",id="hint",style="padding:7px")
         div.row(style="margin-top:15px")
           div#chart2.col-md-6(style="height:450px")

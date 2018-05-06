@@ -6,7 +6,6 @@
 var util = require('./services/util');
 var i18nextplugin = require('./locales/i18nextplugin');
 var teach_setting = require('./components/teach-setting.vue');
-var consumeChart = null;
 var passiveChart = null;
 var passiveChart2 = null;
 var passiveChart3 = null;
@@ -41,7 +40,6 @@ function init() {
     });
 
     // initialize chart instance
-    consumeChart = echarts.init(document.getElementById('consume_chart'), 'vintage');
     passiveChart = echarts.init(document.getElementById('chart2'), 'vintage');
     passiveChart2 = echarts.init(document.getElementById('chart3'), 'vintage');
     passiveChart3 = echarts.init(document.getElementById('chart4'), 'vintage');
@@ -75,18 +73,6 @@ function init() {
     $('#add_room').click(handleAddNewClassRoom);
     $('#edit_room').click(handleEditClassRoom);
     $('#saveBasic').click(handleSaveBasic);
-    // handle user refresh the chart
-    $('div.tab-pane#analytics #refresh').click(refreshChart);
-    // handle user change the chart filters
-    $('div.tab-pane#analytics select').change(function(event) {
-        refreshChart();
-    });
-    // refresh the chart when user switch to analytics tab first time
-    $('a[href="#analytics"]').one('shown.bs.tab', function(e) {
-        refreshChart();
-        //e.target // newly activated tab
-        //e.relatedTarget // previous active tab
-    });
     // refresh the chart when user switch to hint tab first time
     $('a[href="#hint"]').one('shown.bs.tab', function(e) {
         refreshPassiveChart();
@@ -217,130 +203,6 @@ function editClassroom(room) {
         util.showAlert("修改教室失败", jqXHR);
     });
     return request;
-}
-
-function refreshChart() {
-    var filter = {
-        "unit": $("div#analytics select#unit").val(),
-        "year": parseInt($("div#analytics select#year").val())
-    };
-
-    var drawChartFunc = function(consumptionQueryResult, depositQueryResult) {
-        if (filter.unit == "month") {
-            drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0], '月'), filter.year, '月');
-        } else if (filter.unit == "week") {
-            drawChart(preChartData(consumptionQueryResult[0], depositQueryResult[0], '周'), filter.year, '周');
-        }
-    };
-
-    var errorFunc = function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("刷新图表失败", jqXHR);
-    };
-
-    //Execute the function drawChartFunc when both ajax requests are successful, or errorFunc if either one has an error.
-    // errorFunc is called only once even if both ajax requests have error
-    var consumptionQuery = $.get("/api/analytics/consumption", filter, "json");
-    var depositQuery = $.get("/api/analytics/deposit", filter, "json");
-    $.when(consumptionQuery, depositQuery).then(drawChartFunc, errorFunc);
-}
-
-function preChartData(consumptionData, depositData, unitName) {
-    var chartData = {
-        xAxis: [],
-        series0: [], // consumption by non-course
-        series1: [],  // deposit value list
-        series2: [] // consumption by course
-    };
-
-    if (!consumptionData && !depositData) {
-        return chartData;
-    }
-
-    var data = [];
-    // parse the comsumption data
-    consumptionData.forEach(function(value, index, array) {
-        if (!value) return;
-        var i = value._id && value._id.unit;
-        if (typeof(i) !== 'number') return;
-
-        data[i] = data[i] || {};
-        if (value._id.isCourse === true) {
-            data[i].courseConsumption = value.total;
-        } else {
-            data[i].storyConsumption = value.total;
-        }
-    });
-    // parse the deposit data
-    depositData.forEach(function(value, index, array) {
-        if (!value) return;
-        var i = value._id;
-        if (typeof(i) !== 'number') return;
-
-        data[i] = data[i] || {};
-        data[i].deposit = value.total;
-    });
-
-    data.forEach(function(value, index, array) {
-       if (!value) return;
-       chartData.xAxis.push(index + unitName);
-       chartData.series0.push(Math.round((value.storyConsumption || 0) * 10)/10);
-       chartData.series1.push(Math.round((value.deposit||0) * 10)/10);
-       chartData.series2.push(Math.round((value.courseConsumption||0) * 10)/10);
-    });
-    return chartData;
-}
-
-function drawChart(data, year, unitName) {
-    // resize the chart according to its parent dom size
-    consumeChart.resize();
-    // define the options of charts
-    var option = {
-        title: {
-            text: year + '年课时消费明细',
-            top: 'top',
-            left: 'center'
-        },
-        tooltip: {
-            trigger: 'axis'
-        },
-        toolbox: {
-            feature: {
-                dataView: { readOnly: true }
-            }
-        },
-        legend: {
-            data: ['课程课时消费', "充值课时", "班级课时消费"],
-            top: 'bottom'
-        },
-        xAxis: {
-            name: unitName,
-            data: data.xAxis
-        },
-        yAxis: {
-            name: "课时"
-        },
-        series: [{
-            name: '课程课时消费',
-            type: 'bar',
-            stack: 'one',
-            barGap: 0,
-            data: data.series0
-        }, {
-            name: '充值课时',
-            type: 'bar',
-            stack: 'two',
-            data: data.series1
-        }, {
-            name: '班级课时消费',
-            type: 'bar',
-            stack: 'one',
-            barGap: 0,
-            data: data.series2
-        }]
-    };
-
-    // Apply the chart options to create/update chart instance
-    consumeChart.setOption(option);
 }
 
 function refreshPassiveChart() {
