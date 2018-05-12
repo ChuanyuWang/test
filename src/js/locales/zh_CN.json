@@ -45,5 +45,7 @@
   "all": "全部",
   "opportunity": "试听",
   "consume": "消费",
-  "passive_title": "排名"
+  "passive_title": "排名",
+  "red_flag": "红旗",
+  "green_flag": "绿旗"
 }

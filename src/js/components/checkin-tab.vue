@@ -12,6 +12,11 @@ div
       option(value='past_week') {{$t('past_week')}}
       option(value='past_month') {{$t('past_month')}}
       option(value='') {{$t('all')}}
+    label(style='margin:0 3px') {{$t('flag')}}:
+    select.input-sm(v-model='flagFilter',style='margin-right:7px',@change='refreshCheckinStatus')
+      option(value='red') {{$t('red_flag')}}
+      option(value='green') {{$t('green_flag')}}
+      option(value='') {{$t('all')}}
     label.text-success.checkbox-inline
       input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
       | {{$t('checked_in')}}
@@ -51,7 +56,8 @@ module.exports = {
   props: {},
   data: function() {
     return {
-      timeFilter: 'today'
+      timeFilter: 'today',
+      flagFilter: 'red'
     };
   },
   watch: {},
@@ -142,6 +148,16 @@ module.exports = {
                 statusQuery += statusEl[i].value + ',';
             }
             params.status = statusQuery.substring(0, statusQuery.length-1);
+        }
+        switch (this.flagFilter) {
+          case 'red':
+            params.flag = 'red,'; // include red flag and 'null' flag
+            break;
+          case 'green':
+            params.flag = 'green';
+            break;
+          default:
+            break;
         }
         switch (this.timeFilter) {
           case 'today':

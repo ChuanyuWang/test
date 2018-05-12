@@ -121,6 +121,13 @@ router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
             return value ? value : null;
         })};
     }
+    // query flag status
+    if (req.query.hasOwnProperty('flag')) {
+        //query2['booking.status'] = req.query.status ? {$in: req.query.status.split(',')} : null;
+        query2['booking.flag'] = {$in: req.query.flag.split(',').map(function(value) {
+            return value ? value : null;
+        })};
+    }
     // get all checkin status of this member
     if (req.query.hasOwnProperty('memberid')) {
         query2['booking.member'] = mongojs.ObjectId(req.query.memberid);
