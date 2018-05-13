@@ -100,9 +100,10 @@ router.get('/:courseID/members', function(req, res, next) {
         }
         console.log("get course members: %j", docs ? docs.length:0);
         if (!docs || docs.length === 0) {
-            var error = new Error("Course doesn't exist");
-            error.status = 400;
-            return next(error);
+            return res.json({
+                _id: req.params.courseID,
+                members: []
+            });
         }
         var members = docs.map(function name(value, index, array) {
             return {
@@ -112,7 +113,7 @@ router.get('/:courseID/members', function(req, res, next) {
             }
         });
         res.json({
-            _id: docs[0]._id,
+            _id: req.params.courseID,
             members: members
         });
     });
