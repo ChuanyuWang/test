@@ -2,13 +2,13 @@ extends layout
 
 block prepend css
   if ENV_DEVELOPMENT
-    link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css")
+    link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
   else
-    link(rel="stylesheet", href="//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css")
+    link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
 block append js
   if ENV_DEVELOPMENT
-    script(src="//cdn.bootcss.com/jquery/3.2.1/jquery.js")
-    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js")
+    script(src=CDN_FILES.jquery_dev)
+    script(src=CDN_FILES.bootstrap_dev)
   else
-    script(src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js")
-    script(src="//cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js")
+    script(src=CDN_FILES.jquery)
+    script(src=CDN_FILES.bootstrap)

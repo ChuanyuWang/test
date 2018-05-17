@@ -1,8 +1,7 @@
 extends ../mlayout
 
 block append js
-  //script(src='/components/requirejs/require.js',data-main="/js/booking")
-  script(src="//cdn.bootcss.com/moment.js/2.13.0/moment-with-locales.min.js")
+  script(src=CDN_FILES.momentjs)
   script(src='/js/mybooking.js')
 
 block content
