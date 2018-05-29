@@ -34,7 +34,7 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.post('/', function(req, res, next) {
+router.post('/', helper.requireRole("admin"), function(req, res, next) {
     if (!req.body.hasOwnProperty('name')) {
         var error = new Error("Missing param 'name'");
         error.status = 400;
@@ -59,7 +59,7 @@ router.post('/', function(req, res, next) {
     });
 });
 
-router.patch('/:teacherID', function(req, res, next) {
+router.patch('/:teacherID', helper.requireRole("admin"), function(req, res, next) {
     var db = dbUtility.connect3(req.tenant.name);
     var teachers = db.get("teachers");
     convertDateObject(req.body);
@@ -88,7 +88,7 @@ router.patch('/:teacherID', function(req, res, next) {
     });
 });
 
-router.delete('/:teacherID', function(req, res, next) {
+router.delete('/:teacherID', helper.requireRole("admin"), function(req, res, next) {
     var db = dbUtility.connect3(req.tenant.name);
     var classes = db.get('classes');
     classes.findOne({teacher:monk.id(req.params.teacherID)},'name').then(function(doc) {

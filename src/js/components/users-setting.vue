@@ -46,9 +46,9 @@ module.exports = {
         {name:'修改教室', role: 'admin'},
 
         {name:'查看老师', role: 'user'},
-        {name:'添加老师', role: 'user'},
-        {name:'删除老师', role: 'user'},
-        {name:'修改老师', role: 'user'},
+        {name:'添加老师', role: 'admin'},
+        {name:'删除老师', role: 'admin'},
+        {name:'修改老师', role: 'admin'},
 
         {name:'综合设置', role: 'admin'},
 
