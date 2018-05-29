@@ -191,6 +191,8 @@ function init() {
             formatter: booksFormatter
         }, {
             formatter: checkinFormatter
+        }, {
+            formatter: flagFormatter
         }]
     });
 
@@ -273,6 +275,29 @@ function checkinFormatter(value, row, index) {
         return '<span style="display:table-cell" class="text-success glyphicon glyphicon-ok"></span>';
     } else {
         return '<span style="display:table-cell" class="text-muted glyphicon glyphicon-question-sign"></span>';
+    }
+}
+
+function flagFormatter(value, row, index) {
+    var flag = '';
+    if ($.isArray(value)) {
+        value.some(function(booking){
+            if (booking.member === viewData.memberData._id) {
+                flag = booking.flag;
+                return true;
+            }
+            return false;
+        });
+    }
+
+    if (flag == "red") {
+        return '<span class="glyphicon glyphicon-flag text-danger"></span>';
+    } else if (flag == "green") {
+        return '<span class="glyphicon glyphicon-flag text-success"></span>';
+    } else if (flag == "yellow") {
+        return '<span class="glyphicon glyphicon-flag text-warning"></span>';
+    } else {
+        return '<span class="glyphicon glyphicon-flag text-muted"></span>';
     }
 }
 
