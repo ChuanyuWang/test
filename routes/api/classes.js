@@ -235,7 +235,7 @@ router.get('/:classID', function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.post('/', helper.requireRole("admin"), function(req, res, next) {
+router.post('/', function(req, res, next) {
     var classes = req.db.collection("classes");
     convertDateObject(req.body);
     // save the teacher as reference object
@@ -253,7 +253,7 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
     });
 });
 
-router.patch('/:classID', helper.requireRole("admin"), function(req, res, next) {
+router.patch('/:classID', function(req, res, next) {
     // booking can only added by post/delete 'api/booking?classID=xxx' 
     if (req.body.hasOwnProperty('booking')) {
         var error = new Error('booking can only added by API "api/booking?classID=xxx"');
@@ -265,11 +265,19 @@ router.patch('/:classID', helper.requireRole("admin"), function(req, res, next) 
     if (req.body.hasOwnProperty('teacher')) {
         req.body.teacher = req.body.teacher ? mongojs.ObjectId(req.body.teacher) : null;
     }
+    var query = {
+        _id: mongojs.ObjectId(req.params.classID)
+    };
+
+    if (req.user.role !== "admin") {
+        // non-admin could only edit the classes not startted
+        query.date = {
+            $gt: new Date()
+        };
+    }
     var classes = req.db.collection("classes");
     classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.classID)
-        },
+        query: query,
         update: {
             $set: req.body
         },
@@ -279,6 +287,11 @@ router.patch('/:classID', helper.requireRole("admin"), function(req, res, next) 
         if (err) {
             var error = new Error("Update class fails");
             error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var error = new Error('课程不存在，或没有权限执行此操作(修改已结束的课程)');
+            error.status = 403;
             return next(error);
         }
         console.log("class %s is updated by %j", req.params.classID, req.body);

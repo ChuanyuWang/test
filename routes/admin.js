@@ -55,6 +55,12 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         return next(error);
     }
 
+    if (['config', 'test', 'chuanyu', 'admin', 'setting', 'settings'].indexOf(req.body.name) > -1) {
+        var error = new Error("tenant name is duplicated");
+        error.status = 400;
+        return next(error);
+    }
+
     var namePattern = /^[a-z]+$/; // only letter or number
     if (!namePattern.test(req.body.name)) {
         var error = new Error("tenant name only supports letter");

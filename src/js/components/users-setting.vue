@@ -23,6 +23,7 @@ div(style='padding:7px')
         td
           span.glyphicon.glyphicon-ok.text-success
   p.small 
+    |*修改课程 - 店长可以在课程开始前修改;管理员不受限制<br/>
     |*取消预约 - 会员可以在课程开始前24小时取消预约;店长可以在课程开始前2小时取消预约;管理员不受限制<br/>
     |*签到 - 店长可以在课程结束8小时内签到;管理员不受限制
 </template>
@@ -53,9 +54,9 @@ module.exports = {
         {name:'综合设置', role: 'admin'},
 
         {name:'查看课程', role: 'guest'},
-        {name:'添加课程', role: 'admin'},
+        {name:'添加课程', role: 'user'},
         {name:'删除课程', role: 'admin'},
-        {name:'修改课程', role: 'admin'},
+        {name:'修改课程*', role: 'user'},
         {name:'添加绘本', role: 'user'},
         {name:'删除绘本', role: 'user'},
         {name:'预约课程', role: 'guest'},
@@ -73,9 +74,9 @@ module.exports = {
         {name:'添加班级', role: 'admin'},
         {name:'删除班级', role: 'admin'},
         {name:'修改班级', role: 'admin'},
-        {name:'添加班级成员', role: 'admin'},
-        {name:'删除班级成员', role: 'admin'},
-        {name:'添加班级课程', role: 'admin'},
+        {name:'添加班级成员', role: 'user'},
+        {name:'删除班级成员', role: 'user'},
+        {name:'添加班级课程', role: 'user'},
         {name:'删除班级课程', role: 'admin'},
 
         {name:'签到*', role: 'user'},

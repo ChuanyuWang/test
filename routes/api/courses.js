@@ -119,62 +119,6 @@ router.get('/:courseID/members', function(req, res, next) {
     });
 });
 
-/// Below APIs are only visible to authenticated users with 'admin' role
-router.use(helper.requireRole("admin"));
-
-router.post('/', function(req, res, next) {
-    if (!req.body.hasOwnProperty('name')) {
-        var error = new Error("Missing param 'name'");
-        error.status = 400;
-        return next(error);
-    }
-    convertDateObject(req.body);
-    req.body.status = 'active';
-
-    var courses = req.db.collection("courses");
-    courses.insert(req.body, function(err, docs) {
-        if (err) {
-            var error = new Error("fail to add course");
-            error.innerError = err;
-            next(error);
-        } else {
-            console.log("course is added %j", docs);
-            res.json(docs);
-        }
-    });
-});
-
-router.patch('/:courseID', function(req, res, next) {
-    var courses = req.db.collection("courses");
-    convertDateObject(req.body);
-
-    // members can only added by post 'courses/:id/members' 
-    if (req.body.hasOwnProperty('members')) {
-        var error = new Error('members can only added by API "courses/:id/members"');
-        error.status = 400;
-        return next(error);
-    }
-
-    courses.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.courseID)
-        },
-        update: {
-            $set: req.body
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update course fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("course %s is updated by %j", req.params.courseID, req.body);
-        res.json(doc);
-    });
-});
-
 router.post('/:courseID/members', function(req, res, next) {
     var courses = req.db.collection("courses");
     var added_members = Array.isArray(req.body) ? req.body : [req.body];
@@ -292,6 +236,62 @@ router.post('/:courseID/classes', function(req, res, next) {
                 });
             });
         });
+    });
+});
+
+/// Below APIs are only visible to authenticated users with 'admin' role
+router.use(helper.requireRole("admin"));
+
+router.post('/', function(req, res, next) {
+    if (!req.body.hasOwnProperty('name')) {
+        var error = new Error("Missing param 'name'");
+        error.status = 400;
+        return next(error);
+    }
+    convertDateObject(req.body);
+    req.body.status = 'active';
+
+    var courses = req.db.collection("courses");
+    courses.insert(req.body, function(err, docs) {
+        if (err) {
+            var error = new Error("fail to add course");
+            error.innerError = err;
+            next(error);
+        } else {
+            console.log("course is added %j", docs);
+            res.json(docs);
+        }
+    });
+});
+
+router.patch('/:courseID', function(req, res, next) {
+    var courses = req.db.collection("courses");
+    convertDateObject(req.body);
+
+    // members can only added by post 'courses/:id/members' 
+    if (req.body.hasOwnProperty('members')) {
+        var error = new Error('members can only added by API "courses/:id/members"');
+        error.status = 400;
+        return next(error);
+    }
+
+    courses.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.courseID)
+        },
+        update: {
+            $set: req.body
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Update course fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("course %s is updated by %j", req.params.courseID, req.body);
+        res.json(doc);
     });
 });
 
