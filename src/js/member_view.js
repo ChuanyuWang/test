@@ -251,7 +251,12 @@ function booksFormatter(value, row, index) {
     if ($.isArray(value)) {
         var result = '';
         value.forEach(function(book){
-            if (book.title) result += "《" + book.title + "》";
+            if (book.title) {
+                if (book.title.substr(0, 1) !== "《")
+                    result += "《" + book.title + "》";
+                else
+                    result += book.title;
+            }
         });
         return result;
     }
