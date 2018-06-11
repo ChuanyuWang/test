@@ -21,16 +21,37 @@ router.get('/home', checkTenantUser, function(req, res) {
     });
 });
 
-router.post('/createUser', isAuthenticated, function(req, res) {
+router.get('/api/users', isAuthenticated, function(req, res, next) {
+    var tenant = req.query.tenant || null;
+    Account.find({
+        tenant: tenant
+    }, 'username displayName role', function(err, users) {
+        if (err) {
+            var error = new Error("get tenant users fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log(`Get the users of tenant ${tenant}`);
+        res.json(users);
+    });
+});
+
+router.post('/api/users', isAuthenticated, function(req, res, next) {
     //TODO, check the tenant name existed
     Account.register(new Account({
         username: req.body.user, tenant: req.body.tenant, displayName: req.body.display, role: req.body.role
     }), req.body.password, function(err, account) {
         if (err) {
-            return res.status(500).send(err);
+            var error = new Error("create tenant user fails");
+            error.innerError = err;
+            return next(error);
         }
         console.log("Account %j is created successfully", account);
-        res.send("success");
+        res.json({
+            username: account.username,
+            displayName: account.displayName,
+            role: account.role
+        });
     });
 });
 

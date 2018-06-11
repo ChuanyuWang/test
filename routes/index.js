@@ -38,7 +38,7 @@ router.post('/login', loginLimiter, passport.authenticate('local', {
     // If this function gets called, authentication was successful.
     // 'req.user' contains the authenticated user.
 
-    logger.info("User >>%s<< login", req.user.username);
+    logger.info(`User >>${req.user.username}<< login ${req.user.tenant}`);
     navigateToUserHome(req, res);
 });
 
@@ -66,7 +66,6 @@ router.use('/t/:tenantName/', getTenantInfo, require("./tenant"));
 
 // remove bqsq tenant path later
 function getTenantInfo2(req, res, next) {
-    req.db = util.connect('bqsq');
     // cache the tenant object in request, e.g.
     /* tenant object
     {
@@ -82,8 +81,7 @@ function getTenantInfo2(req, res, next) {
     */
     var config_db = util.connect('config');
     if (!config_db) {
-        console.error("database config is not existed");
-        next();
+        return next(new Error("database config is not existed"));
     }
     config_db.collection('tenants').findOne({
         name: 'bqsq'
@@ -91,7 +89,8 @@ function getTenantInfo2(req, res, next) {
         if (err) {
             console.error(err);
         }
-
+        
+        req.db = util.connect('bqsq');
         req.tenant = tenant || {};
         res.locals.navTitle = req.tenant.displayName;
         next();
@@ -99,7 +98,6 @@ function getTenantInfo2(req, res, next) {
 }
 
 function getTenantInfo(req, res, next) {
-    req.db = util.connect(req.params.tenantName);
     // cache the tenant object in request, e.g.
     /* tenant object
     {
@@ -118,19 +116,26 @@ function getTenantInfo(req, res, next) {
     */
     var config_db = util.connect('config');
     if (!config_db) {
-        console.error("database config is not existed");
-        next();
+        return next(new Error("database config is not existed"));
     }
     config_db.collection('tenants').findOne({
         name: req.params.tenantName
     }, function (err, tenant) {
         if (err) {
-            console.error(err);
+            var error = new Error("get tenant fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (!tenant) {
+            var error = new Error(`tenant ${req.params.tenantName} doesn't exist`);
+            error.innerError = err;
+            return next(error);
         }
 
-        req.tenant = tenant || {};
+        req.tenant = tenant;
+        req.db = util.connect(tenant.name);
         // navTitle is the title on the navigation bar
-        res.locals.navTitle = req.tenant.displayName;
+        res.locals.navTitle = tenant.displayName;
         next();
     });
 }
