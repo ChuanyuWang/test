@@ -4,73 +4,17 @@ append css
   link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
 
 append js
-  script(src=CDN_FILES.bootstrap_table)
-  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
+  if ENV_DEVELOPMENT
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
+  else
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
+  script(src=CDN_FILES.bootbox)
+  //script(src=CDN_FILES.bootstrap_table)
+  //script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   script(src='/js/admin.js')
 
 block page
-  div.container(style={'padding-top': '69px'})
-    ul.nav.nav-tabs(role='tablist')
-      li.active(role='presentation')
-        a(href="#users",role='tab',data-toggle='tab') Users
-      li(role='presentation')
-        a(href="#tenants",role='tab',data-toggle='tab') Tenants
-    div.tab-content
-      div.tab-pane.active(role="tabpanel",id="users")
-          form.form-horizontal(style={'padding':'11px'},role='form',action="createUser",method="post")
-            div.form-group
-              label.control-label.col-sm-2 User Name:
-              div.col-sm-10
-                input.form-control(type='text',placeholder='',name='user')
-            div.form-group
-              label.control-label.col-sm-2 Password:
-              div.col-sm-10
-                input.form-control(type='password',placeholder='',name='password')
-            div.form-group
-              label.control-label.col-sm-2 Tenant:
-              div.col-sm-10
-                input.form-control(type='text',placeholder='',name='tenant')
-            div.form-group
-              label.control-label.col-sm-2 Display Name:
-              div.col-sm-10
-                input.form-control(type='text',placeholder='',name='display')
-            div.form-group
-              label.control-label.col-sm-2 Role:
-              div.col-sm-10
-                input.form-control(type='text',placeholder='admin',name='role')
-            div.form-group
-              div.col-sm-offset-2.col-sm-10
-                button.btn.btn-default(type='submit') Create User
-      div.tab-pane(role="tabpanel",id="tenants")
-        div#toolbar.btn-group(role='group')
-          button.btn.btn-success(type='button',data-toggle='modal',data-target='#tenant_dlg', data-action='add') Add
-        table#tenant_table(data-checkbox-header='false',data-striped='true',data-unique-id="name",data-show-refresh='true',data-toolbar='#toolbar',data-url='api/tenants')
-          thead
-            tr
-              th(data-field='name',data-sortable='true') name
-              th(data-field='displayName') Display Name
-              th(data-field='version') Version
-              th(data-field='classroom') Classroom
-              th(data-title='Uprade',data-align='center')
-              th(data-title='Delete',data-align='center')
-  div#tenant_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
-    div.modal-dialog(role="document")
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title Create Tenant
-        div.modal-body
-          form.form-horizontal
-            div.form-group
-              label.control-label.col-sm-3(for='name') Name:
-              div.col-sm-9
-                input#name.form-control(type='text',name='name',placeholder='only letters')
-            div.form-group
-              label.control-label.col-sm-3(for='displayName') Display name:
-              div.col-sm-9
-                input#displayName.form-control(type='text',name='displayName',placeholder='display name')
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") Cancel
-          button#add_tenant.btn.btn-success(type="button") Create
-          //button#edit_member.btn.btn-success(type="button") 修改
+  div#admin-app.container(style={'padding-top': '58px'})
+    admin-console
