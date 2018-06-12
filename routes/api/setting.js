@@ -54,6 +54,21 @@ router.get('/classrooms', function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
+router.get('/', function(req, res, next) {
+    var tenants = config_db.collection('tenants');
+    tenants.findOne({
+        name: req.user.tenant
+    }, TENANT_FIELDS, function(err, doc) {
+        if (err) {
+            var error = new Error("Get tenant basic setting fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log(`Get tenant ${req.user.tenant} basic settings`);
+        res.json(doc);
+    });
+});
+
 router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
     var body = req.body || {};
     // tenant 'name' field is reserved and unique when created

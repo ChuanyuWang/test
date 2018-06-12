@@ -7,6 +7,7 @@ var util = require('./services/util');
 var i18nextplugin = require('./locales/i18nextplugin');
 var teach_setting = require('./components/teach-setting.vue');
 var users_setting = require('./components/users-setting.vue');
+var general_setting = require('./components/general-setting.vue');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -21,6 +22,11 @@ function init() {
 
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
+
+    // bootstrap the general setting tab
+    new Vue({el: '#general-setting', render : function(h){
+        return h(general_setting);
+    }});
 
     // bootstrap the teacher setting tab
     new Vue({el: '#teacher-setting', render : function(h){
@@ -60,44 +66,6 @@ function init() {
 
     $('#add_room').click(handleAddNewClassRoom);
     $('#edit_room').click(handleEditClassRoom);
-    $('#saveBasic').click(handleSaveBasic);
-}
-
-function handleSaveBasic(event) {
-    var form = $(this).closest('form');
-    var basicInfo = {};
-    // validate the input
-    var hasError = false;
-
-    // get the tenant contact
-    basicInfo.contact = form.find('input[name=contact]').val().trim();
-    if (!basicInfo.contact || basicInfo.contact.length == 0) {
-        form.find('input[name=contact]').closest(".form-group").addClass("has-error");
-        hasError = true;
-    } else {
-        form.find('input[name=contact]').closest(".form-group").removeClass("has-error");
-    }
-
-    // get the tenant address
-    basicInfo.address = form.find('input[name=address]').val().trim();
-    if (!basicInfo.address || basicInfo.address.length == 0) {
-        form.find('input[name=address]').closest(".form-group").addClass("has-error");
-        hasError = true;
-    } else {
-        form.find('input[name=address]').closest(".form-group").removeClass("has-error");
-    }
-
-    if (hasError) return;
-
-    var request = $.ajax("/api/setting/basic", {
-        type: "PATCH",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(basicInfo),
-        dataType: "json"
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("更新综合设置失败", jqXHR);
-    });
 }
 
 function handleAddNewClassRoom(event) {

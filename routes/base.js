@@ -90,8 +90,6 @@ router.get('/setting', helper.checkTenantUser, function (req, res) {
         title: '设置',
         currentUrl: 'setting',
         user: req.user,
-        tenantContact: req.tenant.contact || '',
-        tenantAddress: req.tenant.address || '',
         baseUrl: req.protocol + '://' + req.hostname + req.baseUrl,
         hostname: req.hostname
     });
