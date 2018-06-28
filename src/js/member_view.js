@@ -302,7 +302,7 @@ function flagFormatter(value, row, index) {
     } else if (flag == "yellow") {
         return '<span class="glyphicon glyphicon-flag text-warning"></span>';
     } else {
-        return '<span class="glyphicon glyphicon-flag text-muted"></span>';
+        return '';
     }
 }
 

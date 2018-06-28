@@ -112,11 +112,7 @@ module.exports = {
           "</a>"
         ].join("");
       } else {
-        return [
-          '<a class="flag text-muted" href="javascript:void(0)" title="">',
-          '<i class="glyphicon glyphicon-flag"></i>',
-          "</a>"
-        ].join("");
+        return "";
       }
     },
     checkinFormatter: function(value, row, index) {
