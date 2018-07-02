@@ -47,11 +47,11 @@ router.get('/consumption', function(req, res, next) {
         }
     }, {
         $group: {
-            //_id: "$" + unit, // group the data according to unit (month or week)
+            _id: "$" + unit, // group the data according to unit (month or week)
             
             // The only working solution is from below link, it looks like a hack
             // https://stackoverflow.com/questions/25497150/mongodb-aggregate-by-field-exists
-            _id: {unit: "$" + unit, isCourse: {$gt:["$courseID", null]}}, 
+            //_id: {unit: "$" + unit, isCourse: {$gt:["$courseID", null]}}, 
             // below methods are all failure
             //_id: {unit: "$" + unit, isCourse: { $ne: [ "$courseID", null ] }},
             //_id: {unit: "$" + unit, isCourse: { $eq: [ "$courseID", null]}}, 

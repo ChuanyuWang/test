@@ -97,9 +97,8 @@ module.exports = {
     preChartData: function(consumptionData, depositData, unitName) {
       var chartData = {
         xAxis: [],
-        series0: [], // consumption by non-course
-        series1: [], // deposit value list
-        series2: [] // consumption by course
+        series0: [], // consumption
+        series1: [] // deposit value list
       };
 
       if (!consumptionData && !depositData) {
@@ -110,15 +109,11 @@ module.exports = {
       // parse the comsumption data
       consumptionData.forEach(function(value, index, array) {
         if (!value) return;
-        var i = value._id && value._id.unit;
+        var i = value._id;
         if (typeof i !== "number") return;
 
         data[i] = data[i] || {};
-        if (value._id.isCourse === true) {
-          data[i].courseConsumption = value.total;
-        } else {
-          data[i].storyConsumption = value.total;
-        }
+        data[i].storyConsumption = value.total;
       });
       // parse the deposit data
       depositData.forEach(function(value, index, array) {
@@ -137,9 +132,6 @@ module.exports = {
           Math.round((value.storyConsumption || 0) * 10) / 10
         );
         chartData.series1.push(Math.round((value.deposit || 0) * 10) / 10);
-        chartData.series2.push(
-          Math.round((value.courseConsumption || 0) * 10) / 10
-        );
       });
       return chartData;
     },
@@ -162,7 +154,7 @@ module.exports = {
           }
         },
         legend: {
-          data: ["课程课时消费", "充值课时", "班级课时消费"],
+          data: ["消费课时", "充值课时"],
           top: "bottom"
         },
         xAxis: {
@@ -174,7 +166,7 @@ module.exports = {
         },
         series: [
           {
-            name: "课程课时消费",
+            name: "消费课时",
             type: "bar",
             stack: "one",
             barGap: 0,
@@ -185,13 +177,6 @@ module.exports = {
             type: "bar",
             stack: "two",
             data: data.series1
-          },
-          {
-            name: "班级课时消费",
-            type: "bar",
-            stack: "one",
-            barGap: 0,
-            data: data.series2
           }
         ]
       };
