@@ -1,5 +1,9 @@
-<style>
-
+<style lang='less'>
+.flag {
+  position: absolute;
+  margin-left: -6px;
+  font-size: larger;
+}
 </style>
 
 <template lang="pug">
@@ -112,7 +116,11 @@ module.exports = {
           "</a>"
         ].join("");
       } else {
-        return "";
+        return [
+          '<a class="flag text-muted" href="javascript:void(0)" title="">',
+          '<i class="glyphicon glyphicon-flag" style="opacity:0.5"></i>',
+          "</a>"
+        ].join("");
       }
     },
     checkinFormatter: function(value, row, index) {
