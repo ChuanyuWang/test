@@ -9,12 +9,26 @@ var date_picker = require('./components/date-picker.vue');
 var comment_dlg = require('./components/comment-modal.vue');
 var common = require('./common');
 var memberService = require('./services/members');
+var class_service = require('./services/classes');
 
 var viewData = {
     memberData: {
         membership: [],
         comments: [],
         summary: []
+    }
+};
+
+var commentDlg = {
+    data: function() {
+        return {
+            comment: ''
+        }
+    },
+    methods: {
+        show: function(value) {
+
+        }
     }
 };
 
@@ -113,7 +127,7 @@ var vueApp = {
         },
         addComment: function() {
             var vm = this;
-            this.$refs.commentDlg.show(function(memo){
+            this.$refs.commentDlg.show(function(memo) {
                 var comment = {
                     text: memo
                 };
@@ -125,7 +139,7 @@ var vueApp = {
         },
         editComment: function(commentIndex) {
             var vm = this;
-            this.$refs.commentDlg.show(this.memberData.comments[commentIndex].text, function(memo){
+            this.$refs.commentDlg.show(this.memberData.comments[commentIndex].text, function(memo) {
                 var comment = {
                     text: memo
                 };
@@ -147,6 +161,9 @@ $(document).ready(function() {
         viewData.memberData = data;
         // bootstrap the member view page
         new Vue({ extends: vueApp, data: viewData, el: '#member_app' });
+
+        // bootstrap the dialog of adding comment to class
+        new Vue({ extends: commentDlg, el: '#classComment_dlg' });
     });
 
     request.done(function(data, textStatus, jqXHR) {
@@ -192,12 +209,25 @@ function init() {
         }, {
             formatter: checkinFormatter
         }, {
-            formatter: flagFormatter
+            formatter: flagFormatter,
+            events: { 'click .flag': addFlag }
         }]
     });
 
     $('#loadHistoryBtn').click(loadHistory);
     $('#loadClassesBtn').click(loadClasses);
+}
+
+function addFlag(e, value, row, index) {
+    var booking = getBooking(row && row.booking);
+    if (!booking) return console.error("member booking not found")
+    var nextFlag = booking.flag === 'red' ? 'green' : 'red';
+
+    var request = class_service.flag(row._id, booking.member, nextFlag);
+    request.done(function(data, textStatus, jqXHR) {
+        booking.flag = nextFlag;
+        $("#classes_table").bootstrapTable('updateRow', { index: index, row: row });
+    });
 }
 
 function loadHistory(e) {
@@ -250,7 +280,7 @@ function linkNameFormatter(value, row, index) {
 function booksFormatter(value, row, index) {
     if ($.isArray(value)) {
         var result = '';
-        value.forEach(function(book){
+        value.forEach(function(book) {
             if (book.title) {
                 if (book.title.substr(0, 1) !== "《")
                     result += "《" + book.title + "》";
@@ -262,17 +292,23 @@ function booksFormatter(value, row, index) {
     }
 }
 
-function checkinFormatter(value, row, index) {
-    var result = '';
-    if ($.isArray(value)) {
-        value.some(function(booking){
+function getBooking(bookings) {
+    var result = null;
+    if ($.isArray(bookings)) {
+        bookings.some(function(booking) {
             if (booking.member === viewData.memberData._id) {
-                result = booking.status;
+                result = booking;
                 return true;
             }
             return false;
         });
     }
+    return result;
+}
+
+function checkinFormatter(value, row, index) {
+    var booking = getBooking(row && row.booking) || {};
+    var result = booking.status;
 
     if (result == "absent") {
         return '<span style="display:table-cell" class="text-danger glyphicon glyphicon-remove"></span>';
@@ -284,25 +320,17 @@ function checkinFormatter(value, row, index) {
 }
 
 function flagFormatter(value, row, index) {
-    var flag = '';
-    if ($.isArray(value)) {
-        value.some(function(booking){
-            if (booking.member === viewData.memberData._id) {
-                flag = booking.flag;
-                return true;
-            }
-            return false;
-        });
-    }
+    var booking = getBooking(row && row.booking) || {};
+    var flag = booking.flag;
 
     if (flag == "red") {
-        return '<span class="glyphicon glyphicon-flag text-danger"></span>';
+        return '<span style="cursor:pointer" class="flag text-danger glyphicon glyphicon-flag" title="红旗"></span>';
     } else if (flag == "green") {
-        return '<span class="glyphicon glyphicon-flag text-success"></span>';
+        return '<span style="cursor:pointer" class="flag text-success glyphicon glyphicon-flag" title="绿旗"></span>';
     } else if (flag == "yellow") {
-        return '<span class="glyphicon glyphicon-flag text-warning"></span>';
+        return '<span style="cursor:pointer" class="flag text-warning glyphicon glyphicon-flag" title="黄旗"></span>';
     } else {
-        return '';
+        return '<span style="cursor:pointer;opacity:0.5" class="flag text-muted glyphicon glyphicon-flag"></span>';
     }
 }
 
