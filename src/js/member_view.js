@@ -19,18 +19,8 @@ var viewData = {
     }
 };
 
-var commentDlg = {
-    data: function() {
-        return {
-            comment: ''
-        }
-    },
-    methods: {
-        show: function(value) {
-
-        }
-    }
-};
+// bootstrap the dialog of adding comment to class
+var commentDialog = null;
 
 var vueApp = {
     components: {
@@ -163,7 +153,7 @@ $(document).ready(function() {
         new Vue({ extends: vueApp, data: viewData, el: '#member_app' });
 
         // bootstrap the dialog of adding comment to class
-        new Vue({ extends: commentDlg, el: '#classComment_dlg' });
+        commentDialog = new Vue({ extends: comment_dlg, el: '#commentDlg' });
     });
 
     request.done(function(data, textStatus, jqXHR) {
@@ -211,6 +201,9 @@ function init() {
         }, {
             formatter: flagFormatter,
             events: { 'click .flag': addFlag }
+        }, {
+            formatter: commentFormatter,
+            events: { 'click .comment': addComment }
         }]
     });
 
@@ -227,6 +220,19 @@ function addFlag(e, value, row, index) {
     request.done(function(data, textStatus, jqXHR) {
         booking.flag = nextFlag;
         $("#classes_table").bootstrapTable('updateRow', { index: index, row: row });
+    });
+}
+
+function addComment(e, value, row, index) {
+    var booking = getBooking(row && row.booking);
+    if (!booking) return console.error("member booking not found")
+
+    commentDialog.show(booking.comment, function(newComment) {
+        var request = class_service.comment(row._id, booking.member, newComment);
+        request.done(function(data, textStatus, jqXHR) {
+            booking.comment = newComment;
+            $("#classes_table").bootstrapTable('updateRow', { index: index, row: row });
+        });
     });
 }
 
@@ -331,6 +337,16 @@ function flagFormatter(value, row, index) {
         return '<span style="cursor:pointer" class="flag text-warning glyphicon glyphicon-flag" title="黄旗"></span>';
     } else {
         return '<span style="cursor:pointer;opacity:0.5" class="flag text-muted glyphicon glyphicon-flag"></span>';
+    }
+}
+
+function commentFormatter(value, row, index) {
+    var booking = getBooking(row && row.booking) || {};
+    var comment = booking.comment || "";
+    if (comment) {
+        return comment + ' <span style="cursor:pointer" class="comment text-mute glyphicon glyphicon-pencil"></span>';
+    } else {
+        return '<span style="cursor:pointer" class="comment text-mute glyphicon glyphicon-pencil"></span>'
     }
 }
 

@@ -485,6 +485,45 @@ router.put('/:classID/flag', function(req, res, next) {
     });
 });
 
+router.put('/:classID/comment', function(req, res, next) {
+    var classes = req.db.collection("classes");
+    var memberToComment = req.body || {};
+
+    if (!memberToComment.memberid) {
+        var error = new Error('Add comment fails due to memberid is missing');
+        error.status = 400;
+        return next(error);
+    }
+
+    classes.findAndModify({
+        query: {
+            _id: mongojs.ObjectId(req.params.classID),
+            'booking.member': mongojs.ObjectId(memberToComment.memberid)
+        },
+        update: {
+            $set: {
+                'booking.$.comment': memberToComment.comment || ""
+            }
+        },
+        fields: NORMAL_FIELDS,
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Add comment to booking fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (doc) {
+            console.log("class %s commented by member %s", req.params.classID, memberToComment.memberid);
+            res.json(doc);
+        } else {
+            var error = new Error('备注失败，会员未参加此课程');
+            error.status = 400;
+            return next(error);
+        }
+    });
+});
+
 /**
  * make sure the datetime object is stored as ISODate
  * @param {Object} doc 

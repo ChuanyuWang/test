@@ -145,6 +145,19 @@ service.flag = function(classID, memberID, flag) {
     return request;
 }
 
+service.comment = function(classID, memberID, comment) {
+    var request = $.ajax("/api/classes/" + classID + "/comment", {
+        type: "PUT",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({"memberid": memberID, "comment": comment}),
+        dataType: "json"
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("备注失败", jqXHR);
+    });
+    return request;
+}
+
 function putCheckinStatus(classID, memberID, status) {
     var request = $.ajax("/api/classes/" + classID + "/checkin", {
         type: "PUT",
