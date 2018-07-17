@@ -96,6 +96,13 @@ module.exports = {
         "</a>"
       ].join("");
     },
+    memberFormatter: function(value, row, index) {
+      return [
+        '<a class="" target="_blank" href="./member/' + row.member[0]._id + '">',
+        '  <i class="glyphicon glyphicon-user"/> ' + value,
+        "</a>"
+      ].join("");
+    },
     flagFormatter (value, row, index) {
       var flag = this.getFlag(row.booking);
       if (flag == "red") {
@@ -211,7 +218,9 @@ module.exports = {
           {
             formatter: this.bookFormatter
           },
-          {},
+          {
+            formatter: this.memberFormatter
+          },
           {
             formatter: this.checkinFormatter
           },
