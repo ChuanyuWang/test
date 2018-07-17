@@ -81,6 +81,7 @@ module.exports = {
 
         {name:'签到*', role: 'user'},
         {name:'旗标', role: 'user'},
+        {name:'备注', role: 'user'},
         {name:'试听统计', role: 'user'}
       ]
     };
