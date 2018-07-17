@@ -42,7 +42,8 @@ div
         th(data-field='member.0.name',data-sortable='false') {{$t('member_name')}}
         //th(data-field='member.contact') 联系方式
         th(data-field='booking.status',data-sortable='false') {{$t('checkin')}}
-        th(data-field='flag',data-align='center') {{$t('flag')}}
+        th(data-field='flag',data-align='center',data-sortable='false') {{$t('flag')}}
+        th(data-field='booking.comment',data-visible='false',data-sortable='false') {{$t('comment')}}
 </template>
 
 <script>
@@ -95,7 +96,7 @@ module.exports = {
         "</a>"
       ].join("");
     },
-    flagFormatter: function(value, row, index) {
+    flagFormatter (value, row, index) {
       var flag = this.getFlag(row.booking);
       if (flag == "red") {
         return [
@@ -217,7 +218,7 @@ module.exports = {
           {
             formatter: this.flagFormatter,
             events: {'click .flag': this.addFlag}
-          }
+          }, {}
         ]
       });
   }

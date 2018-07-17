@@ -47,5 +47,6 @@
   "consume": "消费",
   "passive_title": "排名",
   "red_flag": "红旗",
-  "green_flag": "绿旗"
+  "green_flag": "绿旗",
+  "comment": "备注"
 }
