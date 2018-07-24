@@ -103,7 +103,7 @@ module.exports = {
         "</a>"
       ].join("");
     },
-    flagFormatter (value, row, index) {
+    flagFormatter: function(value, row, index) {
       var flag = this.getFlag(row.booking);
       if (flag == "red") {
         return [
