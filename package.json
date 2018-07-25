@@ -37,6 +37,8 @@
     "wechat-api": "^1.27.1"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "browserify-hmr": "^0.3.6",
     "browserify-shim": "^3.8.14",
     "grunt": "~1.0.2",
