@@ -6,6 +6,7 @@ var helper = require('../../helper');
 var TENANT_FIELDS = {
     name: 1,
     displayName: 1,
+    feature: 1,
     contact: 1,
     address: 1,
     addressLink: 1,

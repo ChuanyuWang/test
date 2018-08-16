@@ -14,6 +14,13 @@ div(style='padding:7px')
       div.col-sm-10
         input.form-control(type='text',name='displayName',v-model='displayName')
         span.help-block 显示在约课界面标题上的名称，一个门店只有一个名字，设置后可以再次更改
+    div.form-group(:class='{"has-error": errors.type}')
+      label.col-sm-2.control-label 主题:
+      div.col-sm-5
+        select.form-control(v-model='feature')
+          option(value='common') 早教
+          option(value='book') 绘本
+        span.help-block 设置课程主题，并在建立课程添加与主题相关的信息
     div.form-group(:class='{"has-error": errors.contact}')
       label.col-sm-2.control-label 客服电话:
       div.col-sm-10
@@ -50,6 +57,7 @@ module.exports = {
     return {
       name: "",
       displayName: "",
+      feature: "",
       contact: "",
       address: "",
       mapLink: ""
@@ -84,6 +92,7 @@ module.exports = {
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify({
           displayName: this.displayName,
+          feature: this.feature,
           contact: this.contact,
           address: this.address,
           addressLink: this.mapLink
@@ -100,6 +109,7 @@ module.exports = {
     update: function(setting) {
       this.name = setting.name;
       this.displayName = setting.displayName;
+      this.feature = setting.feature;
       this.contact = setting.contact;
       this.address = setting.address;
       this.mapLink = setting.addressLink;
