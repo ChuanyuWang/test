@@ -60,6 +60,10 @@ div
           div.col-sm-5
             p.form-control-static {{selectedTenant.version}}
         div.form-group
+          label.col-sm-3.control-label Feature:
+          div.col-sm-5
+            p.form-control-static {{selectedTenant.feature}}
+        div.form-group
           label.col-sm-3.control-label Classroom:
           div.col-sm-5
             p.form-control-static {{selectedTenant.classroom | classroomFilter}}
