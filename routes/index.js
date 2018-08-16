@@ -92,7 +92,8 @@ function getTenantInfo2(req, res, next) {
         
         req.db = util.connect('bqsq');
         req.tenant = tenant || {};
-        res.locals.navTitle = req.tenant.displayName;
+        res.locals.navTitle = req.tenant.displayName || "";
+        res.locals.tenant_feature = tenant.feature || "";
         next();
     });
 }
@@ -135,7 +136,8 @@ function getTenantInfo(req, res, next) {
         req.tenant = tenant;
         req.db = util.connect(tenant.name);
         // navTitle is the title on the navigation bar
-        res.locals.navTitle = tenant.displayName;
+        res.locals.navTitle = tenant.displayName || "";
+        res.locals.tenant_feature = tenant.feature || "";
         next();
     });
 }
