@@ -104,6 +104,7 @@ module.exports = {
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.update(data || {});
+        bootbox.alert("保存成功");
       });
     },
     update: function(setting) {
