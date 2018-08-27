@@ -175,7 +175,11 @@ function displayClass(item) {
         var btn_tip = '<p class="cls-status text-danger">(未上)</p>';
     } else {
         var btn_cancel = '';
-        var btn_tip = '<p class="cls-status text-info">(已上)</p>';
+        if (isAbsent(item)) {
+            var btn_tip = '<p class="cls-status text-danger">(缺席)</p>';
+        } else {
+            var btn_tip = '<p class="cls-status text-info">(已上)</p>';
+        }
     }
     
     lastRow = list.find('div.class-row:last-child');
@@ -193,6 +197,16 @@ function displayClass(item) {
         '</div>' +
         '<div style="clear:both"></div>' + // add a empty div with clear:both style to make parent div has real height
         '</div>');
+}
+
+function isAbsent(cls) {
+    var bookings = cls && cls.booking || [];
+    for (var i=0;i<bookings.length;i++) {
+        if (bookings[i].member === memberid) {
+            return bookings[i].status === 'absent';
+        }
+    }
+    return false;
 }
 
 function updateUserInfo(user) {
