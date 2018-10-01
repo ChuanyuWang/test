@@ -9,11 +9,11 @@ append css
 append js
   script(src=CDN_FILES.momentjs)
   if ENV_DEVELOPMENT
-    script(src="//cdn.bootcss.com/echarts/3.8.5/echarts.js")
+    script(src=CDN_FILES.echarts_dev)
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
   else
-    script(src="//cdn.bootcss.com/echarts/3.8.5/echarts.min.js")
+    script(src=CDN_FILES.echarts)
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
   script(src=CDN_FILES.bootbox)
