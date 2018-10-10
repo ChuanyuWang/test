@@ -6,7 +6,7 @@
 
 module.exports = {
     /**
-     * get the tenat name of current page, e.g.
+     * get the tenant name of current page, e.g.
      * return 'bqsq' from http://localhost:3000/t/bqsq/course/1/view
      */
     getTenantName: function() {
@@ -16,6 +16,17 @@ module.exports = {
         if (pathname.charAt(0) == 't') pathname = pathname.substring(1);
         if (pathname.charAt(0) == '/') pathname = pathname.substring(1);
         return pathname.split('/')[0];
+    },
+    /**
+     * get the tenant setting, e.g. {feature: 'book'}
+     */
+    getTenantSetting: function() {
+        var settings = {feature:'book'}; // default is 'book'
+        var el = $('tenant-setting');
+        if (el.length > 0) {
+            settings.feature = el.attr('feature') || 'book'; // default is 'book'
+        }
+        return settings;
     },
     /**
      * Data fomatter function of bootstrap-table to format date localized string by 'll'

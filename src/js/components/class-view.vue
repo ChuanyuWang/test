@@ -76,9 +76,9 @@ div.container
               button.btn.btn-default.btn-xs(type='button',style='',@click='cancelReservation(booking)') 取消
             p.small(style='color:#777;margin:5px 3px 0px;text-align:right') 于{{booking.bookDate | formatDate}}预约
         small(style='color:#777') 共{{membersCount}}人
-  div.page-header
+  div.page-header(v-if='feature=="book"')
     h3 绘本
-  form.form-horizontal
+  form.form-horizontal(v-if='feature=="book"')
     div.form-group
       div.col-sm-2
         button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.addBookDlg.show()',style='margin-bottom:7px')
@@ -107,6 +107,7 @@ div.container
  * --------------------------------------------------------------------------
  */
 
+var util = require('../common.js');
 var date_picker = require("./date-picker.vue");
 var teacher_service = require("../services/teachers");
 var class_service = require("../services/classes");
@@ -126,7 +127,8 @@ module.exports = {
       cls: tmp,
       quantity: 1,
       teachers: [],
-      bookedMembers: []
+      bookedMembers: [],
+      feature: null
     };
   },
   components: {
@@ -387,6 +389,10 @@ module.exports = {
     request.done(function(data, textStatus, jqXHR) {
       vm.bookedMembers = data || [];
     });
+
+    // load the setting of tenant
+    var setting = util.getTenantSetting();
+    vm.feature = setting.feature;
   }
 };
 </script>
