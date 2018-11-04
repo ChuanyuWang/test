@@ -62,7 +62,7 @@ module.exports = {
       startTime: moment(),
       name: '',
       cost: 1,
-      capacity: 8,
+      capacity: 6,
       age: { // by year
         min: 2,
         max: 4
