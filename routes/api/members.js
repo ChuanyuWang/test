@@ -393,7 +393,7 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
     });
 });
 
-router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), function(req, res, next) {
+router.patch('/:memberID/memberships/:cardIndex', function(req, res, next) {
     var members = req.db.collection("members");
     //'memo' is reserved field for passing the memo for history item
     if (req.body && req.body.hasOwnProperty('memo')) {
@@ -429,6 +429,17 @@ router.patch('/:memberID/memberships/:cardIndex', helper.requireRole('admin'), f
         //nothing changed, just return the original member object
         if (Object.keys(setQuery).length === 0) {
             return res.json(doc);
+        }
+
+        // user can only modify the expire
+        if (!helper.hasRole(req, 'admin')) {
+            for (const key in setQuery) {
+                if (setQuery.hasOwnProperty(key) && !key.endsWith(".expire")) {
+                    var err = new Error("没有权限执行此操作");
+                    err.status = 403;
+                    return next(err); 
+                }
+            }
         }
 
         members.findAndModify({

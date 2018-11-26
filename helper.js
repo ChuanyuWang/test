@@ -54,6 +54,19 @@ module.exports.requireRole = function(role) {
 };
 
 /**
+ * Check if the user of request has specific role
+ * 
+ * @param {Object} req http request
+ * @param {String} role user role
+ */
+module.exports.hasRole = function(req, role) {
+    if (req.isUnauthenticated() && req.user.role === role) {
+        return true;
+    }
+    return false;
+};
+
+/**
  * An Express middleware to check user is authenticated. 
  * Continue to next middleware if user is authenticated;
  * Otherwise respond with error message and status 401.
