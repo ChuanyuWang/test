@@ -60,7 +60,7 @@ module.exports.requireRole = function(role) {
  * @param {String} role user role
  */
 module.exports.hasRole = function(req, role) {
-    if (req.isUnauthenticated() && req.user.role === role) {
+    if (req.isAuthenticated() && req.user.role === role) {
         return true;
     }
     return false;
