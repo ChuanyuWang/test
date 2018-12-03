@@ -58,6 +58,7 @@ module.exports = {
         return value._id;
       });
       $(this.$el).find('table.member-table').bootstrapTable('uncheckBy', { field: '_id', values: selections });
+      $(this.$el).find('table.member-table').bootstrapTable('resetSearch');
       if (selectedIDs && selectedIDs.length) {
         // select the pass in ones
         $(this.$el).find('table.member-table').bootstrapTable('checkBy', { field: '_id', values: selectedIDs });

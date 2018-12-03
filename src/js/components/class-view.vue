@@ -293,7 +293,15 @@ module.exports = {
       if (this.quantity === "") this.quantity = 1;
 
       var vm = this;
-      if (selectedItems.length == 0) return bootbox.alert("请选择会员");
+      if (selectedItems.length == 0) return bootbox.alert({
+        message:"请选择会员",
+        size:"small",
+        buttons: {
+          ok: {
+            className: "btn-danger"
+          }
+        },
+      });
 
       var members = vm.bookings || [];
       var addedOnes = selectedItems.filter(function(element, index, array) {
