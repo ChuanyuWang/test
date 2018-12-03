@@ -5,10 +5,10 @@
 <template lang="pug">
 div
   div.row(style="margin-top:7px")
+    div#chart1.col-md-6(style="height:450px")
     div#chart2.col-md-6(style="height:450px")
-    div#chart3.col-md-6(style="height:450px")
   div.row(style="margin-top:15px")
-    div#chart4.col-md-12(style="height:400px")
+    div#chart3.col-md-12(style="height:400px")
 </template>
 
 <script>
@@ -22,7 +22,7 @@ var common = require("../common");
 var util = require("../services/util");
 
 module.exports = {
-  name: "consume-tab",
+  name: "passive-tab",
   props: {},
   data: function() {
     return {
@@ -99,7 +99,7 @@ module.exports = {
       // define the options of charts
       var option = {
         title: {
-          text: "长期未约课会员排名-前20",
+          text: "长期未上课会员排名-前20",
           subtext: "(不包含过期或未激活会员)",
           top: "top",
           left: "center"
@@ -113,7 +113,7 @@ module.exports = {
           }
         },
         legend: {
-          data: ["未约课天数"],
+          data: ["未上课天数"],
           top: "bottom"
         },
         xAxis: {
@@ -127,7 +127,7 @@ module.exports = {
         },
         series: [
           {
-            name: "未约课天数",
+            name: "未上课天数",
             type: "bar",
             barGap: 0,
             data: chartData
@@ -166,7 +166,7 @@ module.exports = {
       // define the options of charts
       var option = {
         title: {
-          text: "新会员未约课排名-2周以上",
+          text: "新会员未上课排名-2周以上",
           subtext: "(不包含过期或未激活会员)",
           top: "top",
           left: "center"
@@ -180,7 +180,7 @@ module.exports = {
           }
         },
         legend: {
-          data: ["未约课天数"],
+          data: ["未上课天数"],
           top: "bottom"
         },
         xAxis: {
@@ -194,7 +194,7 @@ module.exports = {
         },
         series: [
           {
-            name: "未约课天数",
+            name: "未上课天数",
             type: "bar",
             barGap: 0,
             data: chartData
@@ -345,13 +345,13 @@ module.exports = {
     });
 
     // initialize chart instance
-    this.passiveChart = echarts.init($(this.$el).find("#chart2")[0], "vintage");
+    this.passiveChart = echarts.init($(this.$el).find("#chart1")[0], "vintage");
     this.passiveChart2 = echarts.init(
-      $(this.$el).find("#chart3")[0],
+      $(this.$el).find("#chart2")[0],
       "vintage"
     );
     this.passiveChart3 = echarts.init(
-      $(this.$el).find("#chart4")[0],
+      $(this.$el).find("#chart3")[0],
       "vintage"
     );
   }

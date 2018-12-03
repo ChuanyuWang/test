@@ -179,11 +179,7 @@ router.get('/passive', function(req, res, next) {
                     $gte: begin
                 },
                 "cost": {
-                    $gt: 0
-                },
-                "courseID": {
-                    $exists: false,
-                    $eq: null
+                    $gte: 0
                 }
             }
         }, {
@@ -192,6 +188,9 @@ router.get('/passive', function(req, res, next) {
             $match: {
                 "booking.member": {
                     $in : memberList
+                },
+                "booking.status": {
+                    $eq: "checkin"
                 }
             }
         }, {
