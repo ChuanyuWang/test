@@ -5,9 +5,11 @@ block navlist
 
 append css
   link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
+  link(rel="stylesheet",href=CDN_FILES.bootstrap_datetimepicker_css)
 
 append js
   script(src=CDN_FILES.momentjs)
+  script(src=CDN_FILES.bootstrap_datetimepicker)
   if ENV_DEVELOPMENT
     script(src=CDN_FILES.echarts_dev)
     script(src=CDN_FILES.i18next_dev)

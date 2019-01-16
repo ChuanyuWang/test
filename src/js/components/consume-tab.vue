@@ -13,11 +13,9 @@ div
         option(value='month') 月
         option(value='week') 周
     div.col-md-3.pull-right(style="display:inline-flex")
-      p.form-control-static.text-nowrap(style="display:inline-table") 年份： 
-      select.form-control(v-model.number='year',@change='refreshChart')
-        option(value=2018) 2018
-        option(value=2017) 2017
-        option(value=2016) 2016
+      p.form-control-static.text-nowrap(style="display:inline-table") 年份：
+      div(data-placement="right")
+        date-picker(v-model='year', :config='yearPickerConfig', @input="refreshChart")
   div.row(style="margin-top:15px")
     div#consume_chart(style="height:400px")
 </template>
@@ -31,6 +29,7 @@ div
 
 var common = require("../common");
 var util = require('../services/util');
+var date_picker = require('./date-picker.vue');
 
 module.exports = {
   name: "consume-tab",
@@ -38,12 +37,15 @@ module.exports = {
   data: function() {
     return {
       consumeChart: null,
-      year: 2018,
+      yearPickerConfig: {"format": "YYYY", "locale": "zh-CN", "viewMode": "years"},
+      year: moment(new Date().getFullYear(), "YYYY"),
       unit: "month"
     };
   },
   watch: {},
-  components: {},
+  components: {
+    'date-picker': date_picker
+  },
   computed: {
     unitName: function() {
       switch (this.unit) {
@@ -70,7 +72,7 @@ module.exports = {
             depositQueryResult[0],
             vm.unitName
           ),
-          vm.year,
+          vm.year.year(),
           vm.unitName
         );
       };
@@ -81,7 +83,7 @@ module.exports = {
 
       var filter = {
         unit: vm.unit,
-        year: vm.year
+        year: vm.year.year()
       };
 
       //Execute the function drawChartFunc when both ajax requests are successful, or errorFunc if either one has an error.
