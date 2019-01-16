@@ -14,7 +14,7 @@ div
         option(value='week') 周
     div.col-md-3.pull-right(style="display:inline-flex")
       p.form-control-static.text-nowrap(style="display:inline-table") 年份：
-      div(data-placement="right")
+      div
         date-picker(v-model='year', :config='yearPickerConfig', @input="refreshChart")
   div.row(style="margin-top:15px")
     div#consume_chart(style="height:400px")
