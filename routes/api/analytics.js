@@ -23,8 +23,8 @@ router.get('/consumption', function(req, res, next) {
                 $exists: true
             },
             "date": {
-                $gte: new Date(year, 0),
-                $lt: new Date(year + 1, 0)
+                $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
+                $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
             },
             "cost": {
                 $gt: 0
@@ -41,13 +41,16 @@ router.get('/consumption', function(req, res, next) {
             month: {
                 $month: "$date"
             },
+            year: {
+                $year: "$date"
+            },
             totalCost: {
                 '$multiply': [{$ifNull: ["$cost", 0]}, {$ifNull: ["$booking.quantity", 1]}]
             }
         }
     }, {
         $group: {
-            _id: "$" + unit, // group the data according to unit (month or week)
+            _id: "$" + unit, // group the data according to unit (month or week or year)
             
             // The only working solution is from below link, it looks like a hack
             // https://stackoverflow.com/questions/25497150/mongodb-aggregate-by-field-exists
@@ -94,8 +97,8 @@ router.get('/deposit', function(req, res, next) {
     }, {
         $match: {
             "history.date": {
-                $gte: new Date(year, 0),
-                $lt: new Date(year + 1, 0)
+                $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
+                $lt: unit === 'year' ? new Date(9999, 0) :new Date(year + 1, 0)
             },
             "history.target": "membership.0.credit"
         }
@@ -107,13 +110,16 @@ router.get('/deposit', function(req, res, next) {
             month: {
                 $month: "$history.date"
             },
+            year: {
+                $year: "$history.date"
+            },
             delta: {
                 '$subtract': [{ $ifNull: [ '$history.new', 0 ] }, { $ifNull: [ '$history.old', 0 ] }]
             }
         }
     }, {
         $group: {
-            _id: "$" + unit, // group the data according to unit (month or week)
+            _id: "$" + unit, // group the data according to unit (month or week or year)
             total: {
                 $sum: "$delta"
             }

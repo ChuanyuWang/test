@@ -10,12 +10,13 @@ div
     div.col-md-3.pull-right(style="display:inline-flex")
       p.form-control-static.text-nowrap(style="display:inline-table") 单位：
       select.form-control(v-model='unit',@change='refreshChart')
+        option(value='year') 年
         option(value='month') 月
         option(value='week') 周
     div.col-md-3.pull-right(style="display:inline-flex")
       p.form-control-static.text-nowrap(style="display:inline-table") 年份：
       div
-        date-picker(v-model='year', :config='yearPickerConfig', @input="refreshChart")
+        date-picker(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
   div.row(style="margin-top:15px")
     div#consume_chart(style="height:400px")
 </template>
@@ -49,6 +50,9 @@ module.exports = {
   computed: {
     unitName: function() {
       switch (this.unit) {
+        case "year":
+          return "年";
+          break;
         case "month":
           return "月";
           break;
@@ -143,7 +147,7 @@ module.exports = {
       // define the options of charts
       var option = {
         title: {
-          text: year + "年课时消费明细",
+          text: (this.unit === 'year' ? "每" : year) + "年课时消费明细",
           top: "top",
           left: "center"
         },
