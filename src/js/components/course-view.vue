@@ -38,7 +38,7 @@ div.container
     li.active 查看班级
   div.page-header
     h3(style='margin-top:0;display:inline-block') 基本信息
-    button.btn.btn-danger(type='button',style='float:right',:disabled='!course._id',@click='deleteCourse') 删除班级
+    button.btn.btn-danger(type='button',style='float:right',:disabled='!course._id',@click='$refs.confirmDlg.show()') 删除班级
   form.form-horizontal
     div.form-group
       label.col-sm-2.control-label 状态:
@@ -127,6 +127,7 @@ div.container
   add-multi-class-modal(ref='modal',:classrooms='classrooms',@ok='addClass')
   view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
   show-booking-result-modal(ref='summaryDlg')
+  confirm-delete-modal(ref='confirmDlg', @ok='deleteCourse')
   member-select-modal(ref='memberSelectDlg',@ok='addMembers',:multi-selection='true')
     div.checkbox(slot='toolbar',style='position:absolute;top:25px;left:20px')
       label
@@ -146,6 +147,7 @@ var add_multi_class_modal = require("./add-multi-class-modal.vue");
 var view_member_course_modal = require("./view-member-course-modal.vue");
 var show_booking_result_modal = require("./show-booking-result-modal.vue");
 var member_select_modal = require("./member-select-modal.vue");
+var confirm_delete_modal = require("./confirm-delete-course.vue");
 
 module.exports = {
   name: "course-view",
@@ -164,7 +166,8 @@ module.exports = {
     "add-multi-class-modal": add_multi_class_modal,
     "view-member-course-modal": view_member_course_modal,
     "show-booking-result-modal": show_booking_result_modal,
-    "member-select-modal": member_select_modal
+    "member-select-modal": member_select_modal,
+    "confirm-delete-modal": confirm_delete_modal
   },
   computed: {
     membersCount: function() {
@@ -332,23 +335,9 @@ module.exports = {
       });
     },
     deleteCourse: function() {
-      var vm = this;
-      bootbox.confirm({
-        title: "确定删除班级吗？",
-        message: "班级中所有课程，包括已经开始的课程都将被删除，不保留记录",
-        buttons: {
-          confirm: {
-            className: "btn-danger"
-          }
-        },
-        callback: function(ok) {
-          if (ok) {
-            var request = course_service.removeCourse(vm.course._id);
-            request.done(function(data, textStatus, jqXHR) {
-              window.location.href = "../course";
-            });
-          }
-        }
+      var request = course_service.removeCourse(this.course._id);
+      request.done(function(data, textStatus, jqXHR) {
+        window.location.href = "../course";
       });
     },
     showAddClassDlg: function() {
