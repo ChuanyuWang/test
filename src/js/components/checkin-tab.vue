@@ -62,7 +62,8 @@ module.exports = {
   data: function() {
     return {
       timeFilter: 'today',
-      flagFilter: 'red'
+      flagFilter: 'red',
+      feature: null
     };
   },
   watch: {},
@@ -201,6 +202,10 @@ module.exports = {
   },
   created: function() {},
   mounted: function() {
+    // load the setting of tenant
+    var setting = common.getTenantSetting();
+    this.feature = setting.feature;
+
     $(this.$el)
       .find("#checkin_table")
       .bootstrapTable({
@@ -221,7 +226,8 @@ module.exports = {
             formatter: this.nameFormatter
           },
           {
-            formatter: this.bookFormatter
+            formatter: this.bookFormatter,
+            visible: this.feature === 'book'
           },
           {
             formatter: this.memberFormatter
