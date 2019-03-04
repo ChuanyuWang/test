@@ -144,13 +144,17 @@ block page
           input(type="radio",name="classFilter",value="ALL")
           |全部
       table#classes_table(data-striped='true',data-sort-name='date',data-sort-order='desc',data-pagination='true',data-page-size='10',data-unique-id="_id")
+        -var showBookCol = tenant_feature === "book"
         thead
           tr
             //th(data-field='_id',data-visible='false') ID
             th(data-field='name') 课程名称
             th(data-field='cost') 课时
             th(data-field='date',data-sortable='true') 课程日期
-            th(data-field='books') 绘本
+            if showBookCol
+              th(data-field='books') 绘本
+            else
+              th(data-field='books', data-visible='false') 绘本
             th(data-field='booking') 签到
             th 旗标
             th 备注
