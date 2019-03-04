@@ -112,7 +112,7 @@ div.container
             li.list-group-item(v-for="item in sortedClasses",:key='item._id')
               h4(style='margin: 3px 0') {{item.name}}
               small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
-              p(style='margin: 3px 0') 绘本: {{item.books | formatBooks}}
+              p(style='margin: 3px 0', v-if='feature=="book"') 绘本: {{item.books | formatBooks}}
               a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
                 i.glyphicon.glyphicon-calendar
               span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
@@ -142,6 +142,7 @@ div.container
  * --------------------------------------------------------------------------
  */
 
+var util = require('../common.js');
 var course_service = require("../services/courses");
 var add_multi_class_modal = require("./add-multi-class-modal.vue");
 var view_member_course_modal = require("./view-member-course-modal.vue");
@@ -159,7 +160,8 @@ module.exports = {
     return {
       course: this.data || {},
       members: [],
-      classes: []
+      classes: [],
+      feature: null
     };
   },
   components: {
@@ -571,6 +573,10 @@ module.exports = {
         // set members property
         vm.members = data && data.members || [];
     });
+
+    // load the setting of tenant
+    var setting = util.getTenantSetting();
+    vm.feature = setting.feature;
   }
 };
 </script>
