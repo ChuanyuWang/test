@@ -67,7 +67,7 @@ function init() {
 function validateInput(modal, memberInfo) {
     var hasError = false;
 
-    memberInfo.name = modal.find('input[name=name]').val();
+    memberInfo.name = modal.find('input[name=name]').val().trim();
     if (!memberInfo.name || memberInfo.name.length == 0) {
         modal.find('input[name=name]').closest(".form-group").addClass("has-error");
         hasError = true;
@@ -75,7 +75,7 @@ function validateInput(modal, memberInfo) {
         modal.find('input[name=name]').closest(".form-group").removeClass("has-error");
     }
 
-    memberInfo.contact = modal.find('input[name=contact]').val();
+    memberInfo.contact = modal.find('input[name=contact]').val().trim();
     if (!memberInfo.contact || memberInfo.contact.length == 0) {
         modal.find('input[name=contact]').closest(".form-group").addClass("has-error");
         hasError = true;
