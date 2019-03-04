@@ -21,10 +21,10 @@ module.exports = {
      * get the tenant setting, e.g. {feature: 'book'}
      */
     getTenantSetting: function() {
-        var settings = {feature:'book'}; // default is 'book'
+        var settings = {};
         var el = $('tenant-setting');
         if (el.length > 0) {
-            settings.feature = el.attr('feature') || 'book'; // default is 'book'
+            settings.feature = el.attr('feature') || 'common' // default is 'common'
         }
         return settings;
     },

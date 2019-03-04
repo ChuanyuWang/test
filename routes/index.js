@@ -137,7 +137,7 @@ function getTenantInfo(req, res, next) {
         req.db = util.connect(tenant.name);
         // navTitle is the title on the navigation bar
         res.locals.navTitle = tenant.displayName || "";
-        res.locals.tenant_feature = tenant.feature || "book"; // default is book
+        res.locals.tenant_feature = tenant.feature || "common"; // default is book
         next();
     });
 }
