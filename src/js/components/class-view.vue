@@ -125,7 +125,7 @@ module.exports = {
     // modify the booking and books property of cls
     var tmp = Object.assign({}, this.data, {
       books: this.data.books || [],
-      booking: this.booking || []
+      booking: this.data.booking || []
     });
     return {
       cls: tmp,
