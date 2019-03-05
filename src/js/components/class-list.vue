@@ -18,20 +18,20 @@ div
         div
           span.glyphicon.glyphicon-time(style='color:#999;margin-right:1px')
           |{{classItem.date | displayTime}}
-        div
+        div.hidden-print
           span.glyphicon.glyphicon-user(style='margin:0 2px',:title='reservation(classItem) + "人预约"')
           |{{reservation(classItem)}}
           span.glyphicon.glyphicon-book(style='margin:0 2px',:title='books(classItem) + "本绘本"')
           |{{books(classItem)}}
       div
         p(style='padding-bottom:7px;cursor:pointer',v-on:click='$emit("view", classItem)',title='点击查看课程详情') {{classItem.name}}
-      div.btn-group.btn-group-xs(style='align-self:flex-end')
+      div.btn-group.btn-group-xs.hidden-print(style='align-self:flex-end')
         a.btn.btn-primary(:href='"./class/" + classItem._id')
           |查看
           //span.badge(style='margin-left:3px') {{reservation(classItem)}}
         button.btn.btn-danger(v-on:click='$emit("delete", classItem)',title='删除')
           span.glyphicon.glyphicon-trash
-  div(style='display:flex')
+  div.hidden-print(style='display:flex')
     button.btn.btn-xs.btn-default(v-on:click='$emit("add")',style='margin:3px auto;border:none;color:#555',title='创建课程')
       span.glyphicon.glyphicon-plus
 </template>

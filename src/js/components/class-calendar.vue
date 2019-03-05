@@ -16,7 +16,7 @@
 <template lang="pug">
 div
   div.row(style='margin-top:15px;margin-bottom:15px')
-    div.col-lg-4.col-md-5.col-sm-6.col-xs-6.btn-group
+    div.col-lg-4.col-md-5.col-sm-6.col-xs-6.btn-group.hidden-print
       button.btn.btn-primary.btn-sm(@click='previousWeek') {{$t('previous_week')}}
       button.btn.btn-primary.btn-sm(@click='thisWeek') {{$t('this_week')}}
       button.btn.btn-primary.btn-sm(@click='nextWeek') {{$t('next_week')}}
