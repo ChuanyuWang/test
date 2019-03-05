@@ -121,8 +121,12 @@ module.exports = {
     classrooms: Array // Array of available classroom
   },
   data: function() {
-    var tmp = this.data;
-    tmp.books = tmp.books || [];
+    // clone the pass in data, because class-view component will 
+    // modify the booking and books property of cls
+    var tmp = Object.assign({}, this.data, {
+      books: this.data.books || [],
+      booking: this.booking || []
+    });
     return {
       cls: tmp,
       quantity: 1,
