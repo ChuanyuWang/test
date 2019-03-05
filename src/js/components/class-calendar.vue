@@ -39,6 +39,7 @@ div
   div.row(v-else)
     div.col-sm-12(style='height:200px;background-color:#eee')
       a.btn.btn-success(style='margin:83px auto;display:table',href='setting') {{$t('create_classroom')}}
+  p.small.pull-right.hidden-print *打印课程表时请选择横向，并根据打印机调整缩放比例，效果更佳
   create-class-modal(ref='createClsDlg',@ok='createClass')
   notification(ref='alertbar')
 </template>
