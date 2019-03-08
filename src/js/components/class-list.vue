@@ -64,6 +64,7 @@ module.exports = {
         else {
           var reservation = 0;
           booking.forEach(function(val, index, array) {
+            if (val.status === 'absent') return;
             reservation += (val.quantity || 0);
           });
           return reservation;
