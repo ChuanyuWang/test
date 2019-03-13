@@ -410,9 +410,9 @@ router.put('/:classID/checkin', function(req, res, next) {
             return next(error);
         }
 
-        now.setHours(now.getHours() - 8);
+        now.setHours(now.getHours() - 72);
         if (doc.date < now && req.user.role !== "admin") {
-            var error = new Error("不能在课程开始8小时后签到");
+            var error = new Error("不能在课程开始72小时后签到");
             error.status = 400;
             return next(error);
         }
