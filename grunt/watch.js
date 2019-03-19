@@ -20,7 +20,7 @@ module.exports = {
         }
     },
     public: {
-        files: ['public/js/*.js', 'public/css/*.css', '!public/js/admin.js'],
+        files: ['public/js/*.js', 'public/css/*.css'],
         tasks: ['eslint:browserFiles']
     },
     style: {

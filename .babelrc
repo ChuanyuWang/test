@@ -1,4 +1,3 @@
 {
-  "presets": ["env"],
-  "comments": true
+  "presets": ["es2015"]
 }
