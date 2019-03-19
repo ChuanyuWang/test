@@ -20,12 +20,12 @@ module.exports = {
         }
     },
     public: {
-        files: ['public/js/*.js', 'public/css/*.css'],
+        files: ['public/js/*.js', 'public/css/*.css', '!public/js/admin.js'],
         tasks: ['eslint:browserFiles']
     },
-    less: {
+    style: {
         files: [
-            'public/css/*.less'
+            'src/css/*.less'
         ],
         tasks: ['less'],
         options: {

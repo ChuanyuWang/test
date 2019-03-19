@@ -10,9 +10,9 @@ module.exports = {
             //['browserify-hmr',{ noServe : false }]
         ]
     },
-    app2: {
+    dev: {
         files: {
-            //'public/js/course_view.js': 'src/js/course_view.js'
+            //'public/js/admin.js': 'src/js/admin.js'
         },
         options: {
             plugin: [
@@ -20,7 +20,7 @@ module.exports = {
             ]
         }
     },
-    app: {
+    dist: {
         files: {
             'public/js/main.js': 'src/js/main.js',
             'public/js/class_view.js': 'src/js/class_view.js',

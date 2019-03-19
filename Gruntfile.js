@@ -9,7 +9,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'env:dist',
     'less',
-    'browserify',
+    'browserify:dist',
     'uglify'
   ]);
 
