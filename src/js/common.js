@@ -29,6 +29,13 @@ module.exports = {
         return settings;
     },
     /**
+     * get the tenant setting, e.g. {feature: 'book'}
+     */
+    getTenantLogoPath: function() {
+        var name = this.getTenantName();
+        return "/img/" + name + "-logo-2x.png";
+    },
+    /**
      * Data fomatter function of bootstrap-table to format date localized string by 'll'
      * 
      * @param {Object} value the field value

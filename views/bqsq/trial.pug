@@ -1,28 +1,16 @@
 extends ../mlayout
 
 block append js
+  script(src=CDN_FILES.momentjs)
+  if ENV_DEVELOPMENT
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
+  else
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
   script(src='/js/trial.js')
 block content
-  div#main.container
-    div.row
-      img.center-block(src=logoPath,style="width:200px")
-    form#opportunity
-      div.form-group(style='margin-bottom:auto')
-        p.form-control-static(style='color:#808080;text-align:center')
-          small 请填写宝宝的姓名和联系方式，客服会在收到申请后第一时间联系您
-      div.form-group
-        label.control-label 宝宝姓名:
-        input.form-control(type='text',name='name',placeholder='宝宝全名',autofocus)
-      div.form-group
-        label.control-label 联系方式:
-        input.form-control(type='tel',name='contact',placeholder='135xxx')
-      div.form-group
-        label.control-label 宝宝生日:
-        input.form-control(type='date',name='birth')
-      div.form-group
-        label.control-label 感兴趣的内容:
-        textarea.form-control(rows='2',name='remark',placeholder='选填')
-    button#reg_btn.btn.btn-primary(style="display:block;margin:0 auto") 提交
+  div#app
 
   div#error_dlg.modal(tabindex='-1',data-backdrop='static')
     div.modal-dialog.modal-sm
@@ -30,7 +18,7 @@ block content
         div.modal-header
           button.close(type="button",data-dismiss="modal",aria-label="Close")
             span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 提交失败
+          h4.modal-title 提交失败
         div.modal-body
           p#message
           p(style='color:#808080')
@@ -48,7 +36,7 @@ block content
         div.modal-header
           button.close(type="button",data-dismiss="modal",aria-label="Close")
             span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 提交成功
+          h4.modal-title 提交成功
         div.modal-body
           p#message 您的信息已经成功提交，我们的客服人员会在第一时间联系您
           p(style='color:#808080')
