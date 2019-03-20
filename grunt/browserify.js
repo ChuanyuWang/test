@@ -4,6 +4,7 @@ module.exports = {
         'banner': '/* Copyright 2016-2017 Chuanyu Wang */',
         'transform': [
             'vueify',
+            'babelify',
             'browserify-shim' // shim should be the last transformer
         ],
         plugin: [
@@ -12,7 +13,7 @@ module.exports = {
     },
     dev: {
         files: {
-            //'public/js/admin.js': 'src/js/admin.js'
+            //'public/js/trial.js': 'src/js/trial.js'
         },
         options: {
             plugin: [
