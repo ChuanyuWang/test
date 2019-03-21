@@ -17,9 +17,9 @@ module.exports = {
     cdnlibs: {
         jquery: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js',
         jquery_dev: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js',
-        bootstrap: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js',
-        bootstrap_css: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css',
-        bootstrap_dev: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.js',
+        bootstrap: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
+        bootstrap_css: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
+        bootstrap_dev: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.js',
         momentjs: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment-with-locales.min.js',
         momentjs_dev: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment-with-locales.js',
         vue: 'https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js',
