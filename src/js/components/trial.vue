@@ -9,6 +9,11 @@ div.container
     div.form-group(style='margin-bottom:auto')
       p.form-control-static(style='color:#808080;text-align:center')
         small 请填写宝宝的姓名和联系方式，客服会在收到申请后第一时间联系您
+    div.form-group(v-if="tenantName==='bqsq'")
+      label.control-label 门店：
+      select.form-control(v-model='location')
+        option(value='上海静安大融城店') 上海静安大融城店
+        option(value='上海嘉定五彩城店') 上海嘉定五彩城店
     div.form-group(:class='{"has-error": errors.name}')
       label.control-label 宝宝姓名:
       input.form-control(type='text',v-model.trim='name',placeholder='宝宝全名',autofocus)
@@ -39,10 +44,12 @@ module.exports = {
   data: function() {
     return {
       tenantLogo: common.getTenantLogoPath(),
+      tenantName: common.getTenantName(),
       name: "",
       contact: "",
       birthday: null,
-      remark: ""
+      remark: "",
+      location: "上海嘉定五彩城店"
     };
   },
   components: {},
@@ -76,6 +83,10 @@ module.exports = {
         remark: this.remark,
         source: common.getParam('source')
       };
+
+      if (this.tenantName === 'bqsq') {
+        opportunity.remark += (this.remark? ", " + this.location : this.location);
+      }
 
       $.ajax("/api/opportunities", {
         type: "POST",
