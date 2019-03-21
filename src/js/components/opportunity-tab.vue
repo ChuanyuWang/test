@@ -13,7 +13,7 @@ div
         th(data-field='contact') 联系方式
         th(data-field='birthday',data-sortable='true') 宝宝生日
         th(data-field='since',data-sortable='true') 登记时间
-        th(data-field='note') 备注
+        th(data-field='remark') 备注
         th(data-field='source') 来源
 </template>
 
