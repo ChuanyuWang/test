@@ -1,11 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * course.js
+ * course.js 
  * --------------------------------------------------------------------------
  */
 
 var common = require('./common');
 var util = require('./services/util');
+var course_service = require('./services/courses');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -60,7 +61,27 @@ function init() {
  * @public
  */
 function handleEndCourse(e, value, row, index) {
-    //TODO
+    bootbox.confirm({
+        title: "确定结束班级吗？",
+        message: "请在结束此班级前请确认所有课程全部结束",
+        buttons: {
+            confirm: {
+                className: "btn-danger",
+                label: "确认结束"
+            }
+        },
+        callback: function(ok) {
+            if (ok) {
+                var request = course_service.updateCourse(row._id, {
+                    status: "closed"
+                });
+                request.done(function(data, textStatus, jqXHR) {
+                    $('#course_table').bootstrapTable('refresh');
+                    bootbox.alert("班级状态设为已结束");
+                });
+            }
+        }
+    });
 }
 
 function membersFormatter(value, row, index) {
@@ -78,16 +99,20 @@ function viewFormatter(value, row, index) {
 
 function statusFormatter(value, row, index) {
     if (value == "active") return '进行中';
-    if (value == "closed") return '结束';
+    if (value == "closed") return '已结束';
     return value;
 }
 
 function actionFormatter(value, row, index) {
-    return [
-        '<button type="button" class="end btn btn-danger btn-xs">',
-        '  <span class="glyphicon glyphicon-ban-circle"></span> 结束',
-        '</button>'
-    ].join('');
+    if (row.status !== "closed") {
+        return [
+            '<button type="button" class="end btn btn-danger btn-xs">',
+            '  <span class="glyphicon glyphicon-ban-circle"></span> 结束',
+            '</button>'
+        ].join('');
+    } else {
+        return '';
+    }
 }
 
 function customQuery(params) {
@@ -95,10 +120,10 @@ function customQuery(params) {
     var statusEl = $('.status-filter input[type=checkbox]:checked');
     if (statusEl.length > 0) {
         var statusQuery = '';
-        for (var i=0;i<statusEl.length;i++) {
+        for (var i = 0; i < statusEl.length; i++) {
             statusQuery += statusEl[i].value + ',';
         }
-        params.status = statusQuery.substring(0, statusQuery.length-1);
+        params.status = statusQuery.substring(0, statusQuery.length - 1);
     }
 
     return params;

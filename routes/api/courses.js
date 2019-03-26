@@ -6,7 +6,7 @@ var reservation = require('./lib/reservation');
 
 var NORMAL_FIELDS = {
     name: 1,
-    status: 1,
+    status: 1, //"active"|"closed"
     classroom: 1,
     createDate: 1,
     remark: 1,

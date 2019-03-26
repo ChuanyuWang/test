@@ -542,7 +542,7 @@ module.exports = {
       if (this.course.status == "closed") {
         bootbox.alert({
           message:
-            "结束此班级后会删除所有未开始的课程<br><small>确定后，请点击保存进行修改</small>",
+            "请在结束此班级前请确认所有课程全部结束<br><small>确认后，请点击保存进行修改</small>",
           buttons: {
             ok: {
               label: "确定",
