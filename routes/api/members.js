@@ -360,7 +360,9 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
     convertNumberValue(req.body);
     members.findAndModify({
         query: {
-            _id: mongojs.ObjectId(req.params.memberID)
+            _id: mongojs.ObjectId(req.params.memberID),
+            // it's only allowed to create one membership card
+            $or: [{membership: {$size: 0}}, {membership:{$exists: false}}]
         },
         update: {
             $push: { membership: req.body }
@@ -371,6 +373,11 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
         if (err) {
             var error = new Error("Create membership fails");
             error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var error = new Error("创建会员卡失败，请核对会员状态，勿重复创建会员卡");
+            error.status = 400;
             return next(error);
         }
         console.log("membership %s is created by %j", req.body, req.user.username);
