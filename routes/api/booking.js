@@ -259,12 +259,25 @@ router.delete('/:classID', function(req, res, next) {
             //TODO, support multi membership card
             //TODO, handle the callback when member is not existed.
             //TODO, handle the callback when member is inactive.
-            tenantDB.collection("members").update({
-                _id: mongojs.ObjectId(req.body.memberid),
-                membership: { $size: 1 }
-            }, {
+            tenantDB.collection("members").update(
+                {
+                    _id: mongojs.ObjectId(req.body.memberid),
+                    "membership.0": { $exists: true }
+                }, {
                     $inc: { "membership.0.credit": doc.cost * quantity }
-                });
+                }, function(err, result) {
+                    if (err) {
+                        // TODO, handle error
+                        console.error(err);
+                    }
+                    // result = { ok: 1, nModified: 1, n: 1 }
+                    if (result.nModified === 1) {
+                        console.log(`Return expense to member ${req.body.memberid}`);
+                    } else {
+                        console.error(`Fail to return expense to member ${req.body.memberid}`);
+                    }
+                }
+            );
 
             res.json(doc);
         });
