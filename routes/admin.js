@@ -82,9 +82,9 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         return next(error);
     }
 
-    var namePattern = /^[a-z]+$/; // only letter or number
+    var namePattern = /^[a-z0-9]+$/; // only letter or number
     if (!namePattern.test(req.body.name)) {
-        var error = new Error("tenant name only supports letter");
+        var error = new Error("tenant name supports only letter and number");
         error.status = 400;
         return next(error);
     }
@@ -308,9 +308,9 @@ function upgradeFromThree(req, res, next, tenant_name) {
         ]
     }, { courseID: 1, booking: 1 }, function(err, docs) {
         if (err) return console.error(err); // TODO, handle error
-        for (var i = 0;i<docs.length;i++) {
+        for (var i = 0; i < docs.length; i++) {
             var doc = docs[i];
-        //docs.forEach(function(doc) {
+            //docs.forEach(function(doc) {
             var query = { $set: {} };
             if (doc.courseID) {
                 // fix the courseID field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
@@ -370,7 +370,7 @@ function upgradeFromFour(req, res, next, tenant_name) {
     }, { booking: 1 }, function(err, docs) {
         if (err) return console.error(err); // TODO, handle error
 
-        for (var i = 0;i<docs.length;i++) {
+        for (var i = 0; i < docs.length; i++) {
             var doc = docs[i];
             var query = { $set: {} };
             if (doc.booking && doc.booking.length > 0) {
