@@ -18,7 +18,7 @@
 module.exports.checkTenantUser = function(req, res, next) {
     // use the isUnauthenticated() method provided by passport
     if (req.isUnauthenticated()) {
-        req.flash('error', '用户未登陆或连接超时');
+        req.flash('error', '用户未登录或连接超时');
         res.redirect('/');
     } else if (req.user.tenant != req.tenant.name) {
         res.redirect('/t/' + req.user.tenant + '/home');

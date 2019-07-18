@@ -391,7 +391,7 @@ function upgradeFromFour(req, res, next, tenant_name) {
 
 function checkTenantUser(req, res, next) {
     if (!req.user) {
-        req.flash('error', '用户未登陆或连接超时');
+        req.flash('error', '用户未登录或连接超时');
         res.redirect('/');
     } else if (req.user.tenant != 'admin') {
         res.redirect('/t/' + req.user.tenant + '/home');
