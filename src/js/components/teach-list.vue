@@ -30,7 +30,7 @@ div
         h5.media-heading {{teacher.name}}
         p(v-if='!teacher._id') <未保存>
   div(style='display:flex')
-    button.btn.btn-default(v-on:click='$emit("add")',style='margin:3px auto;border:none;color:#555',title='创建课程')
+    button.btn.btn-default(v-on:click='$emit("add")',style='margin:3px auto;border:none;color:#555',title='添加老师')
       span.glyphicon.glyphicon-plus
 </template>
 
