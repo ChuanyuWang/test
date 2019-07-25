@@ -5,7 +5,7 @@
 div.container
   div.row
     img.center-block(:src="tenantLogo",style="width:200px")
-  form
+  form.col-sm-12.col-md-6.col-md-offset-3
     div.form-group(style='margin-bottom:auto')
       p.form-control-static(style='color:#808080;text-align:center')
         small 请填写宝宝的姓名和联系方式，客服会在收到申请后第一时间联系您
@@ -26,6 +26,7 @@ div.container
     div.form-group
       label.control-label 感兴趣的内容:
       textarea.form-control(rows='2',v-model.trim='remark',placeholder='选填')
+  div.row.col-12
   button.btn.btn-primary(:disabled='hasError' style="display:block;margin:0 auto" @click="handleSubmit") 提交
 </template>
 
@@ -81,11 +82,13 @@ module.exports = {
         contact: this.contact,
         birthday: new Date(this.birthday),
         remark: this.remark,
-        source: common.getParam('source')
+        source: common.getParam("source")
       };
 
-      if (this.tenantName === 'bqsq') {
-        opportunity.remark += (this.remark? ", " + this.location : this.location);
+      if (this.tenantName === "bqsq") {
+        opportunity.remark += this.remark
+          ? ", " + this.location
+          : this.location;
       }
 
       $.ajax("/api/opportunities", {
