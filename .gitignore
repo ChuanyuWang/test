@@ -7,3 +7,4 @@ config.db.js
 .vscode
 .eslintcache
 /public/css/
+package-lock.json
