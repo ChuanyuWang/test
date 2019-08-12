@@ -17,15 +17,6 @@ var NORMAL_FIELDS = {
     books: 1
 };
 
-var BASIC_FIELDS = {
-    name: 1,
-    date: 1,
-    capacity: 1,
-    age: 1,
-    classroom: 1,
-    teacher: 1
-};
-
 router.get('/', function(req, res, next) {
     var tenantDB = null;
     if (req.query.hasOwnProperty('tenant')) {
@@ -273,6 +264,26 @@ router.patch('/:classID', function(req, res, next) {
         error.status = 400;
         return next(error);
     }
+
+    // only below fields can be updated
+    var EDIT_FIELDS = {
+        name: 1,
+        date: 1,
+        capacity: 1,
+        age: 1,
+        classroom: 1,
+        teacher: 1
+    };
+
+    //check any invalid field in the body
+    for (var field in req.body) {
+        if (!(field in EDIT_FIELDS)) {
+            var error = new Error(`Invalid parameter "${field}" in class patch body`);
+            error.status = 400;
+            return next(error);
+        }
+    }
+
     convertDateObject(req.body);
     // save the teacher as reference object
     if (req.body.hasOwnProperty('teacher')) {
@@ -288,7 +299,7 @@ router.patch('/:classID', function(req, res, next) {
         update: {
             $set: req.body
         },
-        fields: BASIC_FIELDS,
+        fields: NORMAL_FIELDS,
         new: true
     }, function(err, doc, lastErrorObject) {
         if (err) {
@@ -307,15 +318,22 @@ router.patch('/:classID', function(req, res, next) {
 });
 
 // remove a class or event which there is no booking
-router.delete('/:classID', helper.requireRole("admin"), function(req, res, next) {
+router.delete('/:classID', function(req, res, next) {
     var classes = req.db.collection("classes");
-    classes.remove({
+    var query = {
         _id: mongojs.ObjectId(req.params.classID),
         $or: [
             { booking: { $size: 0 } },
             { booking: null }
         ]
-    }, true, function(err, result) {
+    };
+    if (req.user.role !== "admin") {
+        // non-admin could only remove the classes not startted
+        query.date = {
+            $gt: new Date()
+        };
+    }
+    classes.remove(query, true, function(err, result) {
         console.log("remove result is %j", result);
         if (err) {
             var error = new Error("删除课程失败");
@@ -323,11 +341,13 @@ router.delete('/:classID', helper.requireRole("admin"), function(req, res, next)
             return next(error);
         }
         if (result.n == 1) {
+            // result is {"ok":1,"n":1,"deletedCount":1}
             console.log("class %s is deleted", req.params.classID);
             res.json(result);
         } else {
+            // result is {"ok":1,"n":0,"deletedCount":0}
             console.log("can't find class %s to be deleted", req.params.classID);
-            var error = new Error("不能删除已经预约的课程或活动");
+            var error = new Error("不能删除已经预约的课程；店长不能删除已经开始的课程");
             error.status = 400;
             return next(error);
         }
