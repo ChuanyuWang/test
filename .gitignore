@@ -3,8 +3,8 @@ public/components
 public/js
 .sass-cache
 logs/
-config.db.js
+/config.db.js
 .vscode
 .eslintcache
 /public/css/
-package-lock.json
+/package-lock.json
