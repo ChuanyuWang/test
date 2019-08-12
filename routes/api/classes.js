@@ -17,6 +17,15 @@ var NORMAL_FIELDS = {
     books: 1
 };
 
+var BASIC_FIELDS = {
+    name: 1,
+    date: 1,
+    capacity: 1,
+    age: 1,
+    classroom: 1,
+    teacher: 1
+};
+
 router.get('/', function(req, res, next) {
     var tenantDB = null;
     if (req.query.hasOwnProperty('tenant')) {
@@ -70,9 +79,9 @@ router.get('/', function(req, res, next) {
     // query all classes filter by minimum age, empty or null value will be ignored
     if (parseFloat(req.query.minAge)) {
         query['$or'] = [
-             {'age.min': { $gte : parseInt(req.query.minAge * 12) }},
-             {'age.min': null},
-             {'age.min': 0}
+            { 'age.min': { $gte: parseInt(req.query.minAge * 12) } },
+            { 'age.min': null },
+            { 'age.min': 0 }
         ];
     }
     var classes = tenantDB.collection("classes");
@@ -117,16 +126,20 @@ router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
     // query checkin status
     if (req.query.hasOwnProperty('status')) {
         //query2['booking.status'] = req.query.status ? {$in: req.query.status.split(',')} : null;
-        query2['booking.status'] = {$in: req.query.status.split(',').map(function(value) {
-            return value ? value : null;
-        })};
+        query2['booking.status'] = {
+            $in: req.query.status.split(',').map(function(value) {
+                return value ? value : null;
+            })
+        };
     }
     // query flag status
     if (req.query.hasOwnProperty('flag')) {
         //query2['booking.status'] = req.query.status ? {$in: req.query.status.split(',')} : null;
-        query2['booking.flag'] = {$in: req.query.flag.split(',').map(function(value) {
-            return value ? value : null;
-        })};
+        query2['booking.flag'] = {
+            $in: req.query.flag.split(',').map(function(value) {
+                return value ? value : null;
+            })
+        };
     }
     // get all checkin status of this member
     if (req.query.hasOwnProperty('memberid')) {
@@ -157,7 +170,7 @@ router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
         }, {
             $group: {
                 _id: null,
-                total: {$sum: 1}
+                total: { $sum: 1 }
             }
         }
     ], function(err, totalDoc) {
@@ -173,16 +186,16 @@ router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
         classes.aggregate([
             {
                 $match: query
-            }, { 
-                $sort : { date : sort }
+            }, {
+                $sort: { date: sort }
             }, {
                 $unwind: "$booking"
             }, {
                 $match: query2
             }, {
-                $skip : parseInt(req.query.offset) || 0
+                $skip: parseInt(req.query.offset) || 0
             }, {
-                $limit : parseInt(req.query.limit) || 100 // return 100 checkin status if limit is not defined
+                $limit: parseInt(req.query.limit) || 100 // return 100 checkin status if limit is not defined
             }, {
                 $lookup: {
                     from: "members",
@@ -269,19 +282,13 @@ router.patch('/:classID', function(req, res, next) {
         _id: mongojs.ObjectId(req.params.classID)
     };
 
-    if (req.user.role !== "admin") {
-        // non-admin could only edit the classes not startted
-        query.date = {
-            $gt: new Date()
-        };
-    }
     var classes = req.db.collection("classes");
     classes.findAndModify({
         query: query,
         update: {
             $set: req.body
         },
-        fields: NORMAL_FIELDS,
+        fields: BASIC_FIELDS,
         new: true
     }, function(err, doc, lastErrorObject) {
         if (err) {
@@ -305,7 +312,7 @@ router.delete('/:classID', helper.requireRole("admin"), function(req, res, next)
     classes.remove({
         _id: mongojs.ObjectId(req.params.classID),
         $or: [
-            { booking: { $size : 0 } },
+            { booking: { $size: 0 } },
             { booking: null }
         ]
     }, true, function(err, result) {
@@ -396,7 +403,7 @@ router.put('/:classID/checkin', function(req, res, next) {
 
     classes.findOne({
         _id: mongojs.ObjectId(req.params.classID)
-    }, {date:1}, function(err, doc) {
+    }, { date: 1 }, function(err, doc) {
         if (err) {
             var error = new Error("Get class fails");
             error.innerError = err;
