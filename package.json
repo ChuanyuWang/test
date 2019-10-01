@@ -13,7 +13,7 @@
     "mongo-express": "env ME_CONFIG_MONGODB_ENABLE_ADMIN=true ME_CONFIG_MONGODB_ADMINUSERNAME=admin ME_CONFIG_MONGODB_ADMINPASSWORD=pass mongo-express"
   },
   "dependencies": {
-    "bower": "^1.7.9",
+    "bower": "^1.8.8",
     "compression": "^1.7.2",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^2.0.0",

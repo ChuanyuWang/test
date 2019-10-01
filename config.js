@@ -15,24 +15,24 @@ module.exports = {
      * 4. http://www.bootcdn.cn/ (reject .cc .top)
      */
     cdnlibs: {
-        jquery: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js',
-        jquery_dev: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js',
-        bootstrap: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
-        bootstrap_css: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
-        bootstrap_dev: 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.js',
-        momentjs: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment-with-locales.min.js',
-        momentjs_dev: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment-with-locales.js',
-        vue: 'https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js',
-        vue_dev: 'https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js',
-        i18next: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/11.3.2/i18next.min.js',
-        i18next_dev: 'https://cdnjs.cloudflare.com/ajax/libs/i18next/11.3.2/i18next.js',
-        bootstrap_table_css: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css',
-        bootstrap_table: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.js',
-        bootstrap_table_locale_zh_CN: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js',
-        bootstrap_datetimepicker: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
-        bootstrap_datetimepicker_css: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
-        bootbox: 'https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js',
-        echarts: 'https://cdnjs.cloudflare.com/ajax/libs/echarts/3.8.5/echarts.min.js',
-        echarts_dev: 'https://cdnjs.cloudflare.com/ajax/libs/echarts/3.8.5/echarts.js'
+        jquery: 'https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js',
+        jquery_dev: 'https://cdn.bootcss.com/jquery/3.4.1/jquery.js',
+        bootstrap: 'https://cdn.bootcss.com/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
+        bootstrap_css: 'https://cdn.bootcss.com/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
+        bootstrap_dev: 'https://cdn.bootcss.com/twitter-bootstrap/3.4.1/js/bootstrap.js',
+        momentjs: 'https://cdn.bootcss.com/moment.js/2.22.1/moment-with-locales.min.js',
+        momentjs_dev: 'https://cdn.bootcss.com/moment.js/2.22.1/moment-with-locales.js',
+        vue: 'https://cdn.bootcss.com/vue/2.5.22/vue.min.js',
+        vue_dev: 'https://cdn.bootcss.com/vue/2.5.22/vue.js',
+        i18next: '/libs/i18next.min.js',
+        i18next_dev: '/libs/i18next.js',
+        bootstrap_table_css: 'https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.css',
+        bootstrap_table: 'https://cdn.bootcss.com/bootstrap-table/1.12.1/bootstrap-table.min.js',
+        bootstrap_table_locale_zh_CN: 'https://cdn.bootcss.com/bootstrap-table/1.12.1/locale/bootstrap-table-zh-CN.min.js',
+        bootstrap_datetimepicker: 'https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
+        bootstrap_datetimepicker_css: 'https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
+        bootbox: 'https://cdn.bootcss.com/bootbox.js/4.4.0/bootbox.min.js',
+        echarts: 'https://cdn.bootcss.com/echarts/3.8.5/echarts.min.js',
+        echarts_dev: 'https://cdn.bootcss.com/echarts/3.8.5/echarts.js'
     }
 };
