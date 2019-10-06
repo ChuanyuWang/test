@@ -20,6 +20,12 @@ div.container
     div.form-group(:class='{"has-error": errors.contact}')
       label.control-label 联系方式:
       input.form-control(type='tel',v-model.trim='contact',placeholder='135xxx')
+    div.form-group(:class='{"has-error": errors.verifyCode}')
+      label.control-label 验证码:
+      div.input-group
+        input.form-control(type='number',v-model.trim='verifyCode')
+        span.input-group-btn
+          button.btn.btn-success(type="button", @click='showNoCaptcha') 发送验证码
     div.form-group(:class='{"has-error": errors.birthday}')
       label.control-label 宝宝生日:
       input.form-control(type='date',v-model='birthday')
@@ -28,6 +34,19 @@ div.container
       textarea.form-control(rows='2',v-model.trim='remark',placeholder='选填')
   div.row.col-12
   button.btn.btn-primary(:disabled='hasError' style="display:block;margin:0 auto" @click="handleSubmit") 提交
+
+  div#ncDialog.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 发送验证码
+        div.modal-body
+          div#__nc(style='margin-left:auto;margin-right:auto;width:100%;height:100%')
+            div#nc
+        div.modal-footer
+          button.btn.btn-danger(type="button",data-dismiss="modal") 取消
 </template>
 
 <script>
@@ -48,9 +67,11 @@ module.exports = {
       tenantName: common.getTenantName(),
       name: "",
       contact: "",
+      verifyCode: "",
       birthday: null,
       remark: "",
-      location: "上海嘉定五彩城店"
+      location: "上海嘉定五彩城店",
+      nc: null
     };
   },
   components: {},
@@ -60,6 +81,7 @@ module.exports = {
       if (!this.name || this.name.length == 0) errors.name = "姓名不能为空";
       if (!this.contact || this.contact.length == 0)
         errors.contact = "联系方式未指定";
+      if (!this.verifyCode) errors.verifyCode = "请输入验证码";
       if (!this.birthday || !moment(this.birthday).isValid())
         errors.birthday = "日期/时间格式不正确";
       return errors;
@@ -73,7 +95,7 @@ module.exports = {
   },
   filters: {},
   methods: {
-    handleSubmit(event) {
+    handleSubmit: function(event) {
       var opportunity = {
         since: new Date(),
         status: "open",
@@ -112,8 +134,63 @@ module.exports = {
         },
         dataType: "json"
       });
+    },
+    showNoCaptcha: function(event) {
+      this.nc.reset(); //请务必确保这里调用一次reset()方法
+      $("#ncDialog").modal("show");
+    },
+    sendVerifyCode: function(data) {
+      //window.console && console.log(nc_token);
+      //window.console && console.log(data.csessionid);
+      //window.console && console.log(data.sig);
+      setTimeout(() => {
+        $("#ncDialog").modal("hide");
+      }, 500);
     }
   },
-  created: function() {}
+  created: function() {},
+  mounted: function() {
+    var nc_token = [
+      "FFFF0N0N0000000084E3",
+      new Date().getTime(),
+      Math.random()
+    ].join(":");
+    this.nc = NoCaptcha.init({
+      renderTo: "#nc",
+      appkey: "FFFF0N0N0000000084E3",
+      scene: "nc_register_h5",
+      token: nc_token,
+      trans: { key1: "code200" },
+      elementID: ["usernameID"],
+      is_Opt: 0,
+      language: "cn",
+      timeout: 10000,
+      retryTimes: 5,
+      errorTimes: 5,
+      inline: false,
+      apimap: {
+        // 'analyze': '//a.com/nocaptcha/analyze.jsonp',
+        // 'uab_Url': '//aeu.alicdn.com/js/uac/909.js',
+      },
+      bannerHidden: false,
+      initHidden: false,
+      callback: this.sendVerifyCode,
+      error: function(s) {
+        window.console && console.error(s);
+      }
+    });
+    NoCaptcha.setEnabled(true);
+    //nc.reset(); //请务必确保这里调用一次reset()方法
+
+    NoCaptcha.upLang("cn", {
+      LOADING: "加载中...", //加载
+      SLIDER_LABEL: "请向右滑动验证", //等待滑动
+      CHECK_Y: "正在发送验证码...", //通过
+      ERROR_TITLE: "非常抱歉，这出错了...", //拦截
+      CHECK_N: "验证未通过", //准备唤醒二次验证
+      OVERLAY_INFORM: "经检测你当前操作环境存在风险，请输入验证码", //二次验证
+      TIPS_TITLE: "验证码错误，请重新输入" //验证码输错时的提示
+    });
+  }
 };
 </script>
