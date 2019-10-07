@@ -13,6 +13,7 @@ router.use('/setting', require('./api/setting'));
 router.use('/teachers', require('./api/teachers'));
 router.use('/opportunities', require('./api/opportunities'));
 router.use('/analytics', require('./api/analytics'));
+router.use('/function', require('./api/function'));
 
 function getTenantInfo(req, res, next) {
     if (req.isUnauthenticated() || req.tenant) {

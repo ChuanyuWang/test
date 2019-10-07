@@ -71,7 +71,14 @@ module.exports = {
       birthday: null,
       remark: "",
       location: "上海嘉定五彩城店",
-      nc: null
+      nc: null,
+      nc_appKey: "FFFF0N000000000084E3",
+      nc_token: [
+        "FFFF0N000000000084E3",
+        new Date().getTime(),
+        Math.random()
+      ].join(":"),
+      nc_scene: "nc_register_h5"
     };
   },
   components: {},
@@ -140,9 +147,32 @@ module.exports = {
       $("#ncDialog").modal("show");
     },
     sendVerifyCode: function(data) {
-      //window.console && console.log(nc_token);
-      //window.console && console.log(data.csessionid);
-      //window.console && console.log(data.sig);
+      window.console && console.log(this.nc_token);
+      window.console && console.log(data.csessionid);
+      window.console && console.log(data.sig);
+
+      var query = {
+        token: this.nc_token,
+        sig: data.sig,
+        sessionId: data.csessionid,
+        scene: this.nc_scene,
+        appKey: this.nc_appKey,
+        contact: this.contact
+      };
+
+      var request = $.ajax("/api/function/sendSMS", {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(query),
+        dataType: "json"
+      });
+      request.done(function(data, textStatus, jqXHR) {
+        console.log(data);
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        console.error(jqXHR);
+      });
+
       setTimeout(() => {
         $("#ncDialog").modal("hide");
       }, 500);
@@ -150,16 +180,11 @@ module.exports = {
   },
   created: function() {},
   mounted: function() {
-    var nc_token = [
-      "FFFF0N0N0000000084E3",
-      new Date().getTime(),
-      Math.random()
-    ].join(":");
     this.nc = NoCaptcha.init({
       renderTo: "#nc",
-      appkey: "FFFF0N0N0000000084E3",
-      scene: "nc_register_h5",
-      token: nc_token,
+      appkey: this.nc_appKey,
+      scene: this.nc_scene,
+      token: this.nc_token,
       trans: { key1: "code200" },
       elementID: ["usernameID"],
       is_Opt: 0,
