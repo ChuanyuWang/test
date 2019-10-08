@@ -4,7 +4,17 @@ var mongojs = require('mongojs');
 var util = require('../../util');
 var helper = require('../../helper');
 
-router.post('/', function (req, res, next) {
+var NORMAL_FIELDS = {
+    since: 1,
+    name: 1,
+    contact: 1,
+    status: 1, //"open"|"closed"
+    birthday: 1,
+    source: 1,
+    remark: 1
+};
+
+router.post('/', function(req, res, next) {
     var tenantDB = null;
     if (req.body.hasOwnProperty('tenant')) {
         tenantDB = util.connect(req.body.tenant);
@@ -22,15 +32,23 @@ router.post('/', function (req, res, next) {
         return;
     }
     var query = {
-        name : req.body.name,
-        contact : req.body.contact
+        name: req.body.name,
+        contact: req.body.contact
     };
-    
-    initDateField(req.body);
+
+    var newDoc = {
+        since: new Date(),
+        status: req.body.status,
+        name: req.body.name,
+        contact: req.body.contact,
+        birthday: new Date(req.body.birthday),
+        remark: req.body.remark,
+        source: req.body.source
+    };
 
     var opportunities = tenantDB.collection("opportunities");
     //if the same opportunity is posted twice, the last one will override the previous
-    opportunities.update(query, req.body, {upsert:true}, function (err, result) {
+    opportunities.update(query, newDoc, { upsert: true }, function(err, result) {
         if (err) {
             var error = new Error('Add opportunity fails with error');
             error.innerError = err;
@@ -47,7 +65,7 @@ router.post('/', function (req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', function (req, res) {
+router.get('/', function(req, res) {
     var opportunities = req.db.collection("opportunities");
     var query = {};
     if (req.query.name) {
@@ -56,36 +74,37 @@ router.get('/', function (req, res) {
     if (req.query.contact) {
         query['contact'] = req.query.contact;
     }
-    opportunities.find(query).sort({
-        since : -1
-    }, function (err, docs) {
+
+    opportunities.find(query, NORMAL_FIELDS).sort({
+        since: -1
+    }, function(err, docs) {
         if (err) {
             res.status(500).json({
-                'err' : err
+                'err': err
             });
             return;
         }
-        console.log("find opportunities: ", docs?docs.length:0);
+        console.log("find opportunities: ", docs ? docs.length : 0);
         res.json(docs);
     });
 });
 
-router.patch('/:opportunityID', helper.requireRole("admin"), function (req, res) {
+router.patch('/:opportunityID', helper.requireRole("admin"), function(req, res) {
     var opportunities = req.db.collection("opportunities");
 
     initDateField(req.body);
 
     opportunities.update({
-        _id : mongojs.ObjectId(req.params.opportunityID)
+        _id: mongojs.ObjectId(req.params.opportunityID)
     }, {
-        $set : req.body
-    }, function (err, result) {
+        $set: req.body
+    }, function(err, result) {
         if (err) {
             res.status(500).json({
-                'err' : err
+                'err': err
             });
             return;
-        } 
+        }
         if (result.n == 1) {
             console.log("opportunity %s is updated by %j", req.params.opportunityID, req.body);
         } else {
@@ -95,7 +114,7 @@ router.patch('/:opportunityID', helper.requireRole("admin"), function (req, res)
     });
 });
 
-router.delete ('/:memberID', helper.requireRole("admin"), function (req, res, next) {
+router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
     //TODO
     return next(new Error("Not implementation"));
 });

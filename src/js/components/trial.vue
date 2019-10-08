@@ -18,14 +18,14 @@ div.container
       label.control-label 宝宝姓名:
       input.form-control(type='text',v-model.trim='name',placeholder='宝宝全名',autofocus)
     div.form-group(:class='{"has-error": errors.contact}')
-      label.control-label 联系方式:
+      label.control-label 手机号:
       input.form-control(type='tel',v-model.trim='contact',placeholder='135xxx')
     div.form-group(:class='{"has-error": errors.verifyCode}')
       label.control-label 验证码:
       div.input-group
         input.form-control(type='number',v-model.trim='verifyCode')
         span.input-group-btn
-          button.btn.btn-success(type="button", @click='showNoCaptcha') 发送验证码
+          button.btn.btn-success(type="button", @click='showNoCaptcha', :disabled="errors.contact") 发送验证码
     div.form-group(:class='{"has-error": errors.birthday}')
       label.control-label 宝宝生日:
       input.form-control(type='date',v-model='birthday')
@@ -47,6 +47,17 @@ div.container
             div#nc
         div.modal-footer
           button.btn.btn-danger(type="button",data-dismiss="modal") 取消
+  div#errMsg.modal(tabindex='-1',data-backdrop='static')
+    div.modal-dialog.modal-sm
+      div.modal-content
+        div.modal-header
+          button.close(type="button",data-dismiss="modal",aria-label="Close")
+            span(aria-hidden="true") &times
+          h4.modal-title 出错啦
+        div.modal-body
+          p {{errorMessage}}
+        div.modal-footer
+          button.btn.btn-danger(type="button",data-dismiss="modal") 确定
 </template>
 
 <script>
@@ -78,7 +89,8 @@ module.exports = {
         new Date().getTime(),
         Math.random()
       ].join(":"),
-      nc_scene: "nc_register_h5"
+      nc_scene: "nc_register_h5",
+      errorMessage: ""
     };
   },
   components: {},
@@ -88,6 +100,9 @@ module.exports = {
       if (!this.name || this.name.length == 0) errors.name = "姓名不能为空";
       if (!this.contact || this.contact.length == 0)
         errors.contact = "联系方式未指定";
+      else if (!/^1[345789]\d{9}$/.test(this.contact)) {
+        errors.contact = "请输入正确的手机号码(11位)";
+      }
       if (!this.verifyCode) errors.verifyCode = "请输入验证码";
       if (!this.birthday || !moment(this.birthday).isValid())
         errors.birthday = "日期/时间格式不正确";
@@ -104,11 +119,11 @@ module.exports = {
   methods: {
     handleSubmit: function(event) {
       var opportunity = {
-        since: new Date(),
         status: "open",
         tenant: common.getTenantName(),
         name: this.name,
         contact: this.contact,
+        code: this.verifyCode,
         birthday: new Date(this.birthday),
         remark: this.remark,
         source: common.getParam("source")
@@ -143,13 +158,19 @@ module.exports = {
       });
     },
     showNoCaptcha: function(event) {
+      // Check phone number is valid
+      if (this.errors.contact) {
+        this.errorMessage = "请输入手机号码";
+        return $("#errMsg").modal("show");
+      }
       this.nc.reset(); //请务必确保这里调用一次reset()方法
       $("#ncDialog").modal("show");
     },
     sendVerifyCode: function(data) {
-      window.console && console.log(this.nc_token);
-      window.console && console.log(data.csessionid);
-      window.console && console.log(data.sig);
+      var vue = this;
+      //window.console && console.log(this.nc_token);
+      //window.console && console.log(data.csessionid);
+      //window.console && console.log(data.sig);
 
       var query = {
         token: this.nc_token,
@@ -168,14 +189,16 @@ module.exports = {
       });
       request.done(function(data, textStatus, jqXHR) {
         console.log(data);
+        $("#ncDialog").modal("hide");
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
         console.error(jqXHR);
-      });
-
-      setTimeout(() => {
         $("#ncDialog").modal("hide");
-      }, 500);
+        vue.errorMessage = jqXHR.responseJSON
+          ? jqXHR.responseJSON.message
+          : jqXHR.responseText;
+        $("#errMsg").modal("show");
+      });
     }
   },
   created: function() {},

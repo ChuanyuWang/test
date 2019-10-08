@@ -12,7 +12,7 @@ const config = require("../../config.db");
  * Send verify code
  */
 router.post('/sendSMS', validateCode, function(req, res, next) {
-    return res.end();
+    return res.json({});
     /*
         var db = dbUtility.connect(req.tenant.name);
     
@@ -97,15 +97,30 @@ function validateCode(req, res, next) {
 
         // The whole response has been received. Print out the result.
         resp.on('end', () => {
-            //console.log(JSON.parse(data));
-            console.log(data);
+            /**data is JSON string as below
+             * {
+                    Detail: '{"sigSource":0}',
+                    RiskLevel: '',
+                    RequestId: 'C59DD07B-3D1E-428E-9AC7-F8B619623A0C',
+                    Msg: 'pass_1',
+                    Code: 100
+                }
+                successful code is 100
+                duplicate code is 900 (send same Token, Sig and SessionId)
+             */
+            var result = JSON.parse(data);
+            if (result.Code !== 100) {
+                console.error(`validate code fail, contact is ${req.body.contact}, respond is ${result}`);
+                return next(new Error('人机验证失败，请重试'));
+            }
             return next();
         });
 
     }).on("error", (err) => {
         console.error("Error: " + err.message);
-        return next(err);
+        return next(new Error('人机验证失败，请重试'));
     });
+    //request.end() will automatically be called if the request was initiated via http.get()
 }
 
 module.exports = router;
