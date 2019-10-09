@@ -68,8 +68,13 @@ async function generateCode(req, res, next) {
         err.status = 400;
         return next(err);
     }
+    if (!req.body.hasOwnProperty('tenant')) {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
     // check if already submit phone for trial class
-    const odb = dbUtility.connect(req.tenant.name);
+    const odb = dbUtility.connect(req.body.tenant);
     const db = mongoist(odb);
     const opportunities = db.collection('opportunities');
     const doc = await opportunities.findOne({ contact: req.body.contact });

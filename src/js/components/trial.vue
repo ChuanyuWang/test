@@ -173,6 +173,7 @@ module.exports = {
       //window.console && console.log(data.sig);
 
       var query = {
+        tenant: common.getTenantName(),
         token: this.nc_token,
         sig: data.sig,
         sessionId: data.csessionid,
