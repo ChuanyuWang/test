@@ -1,41 +1,133 @@
 var express = require('express');
 var router = express.Router();
 //var helper = require('../../helper');
-//var dbUtility = require('../../util');
+var dbUtility = require('../../util');
 //var querystring = require('querystring');
 const https = require("https");
 const HmacSHA1 = require("crypto-js/hmac-sha1");
 const Base64 = require('crypto-js/enc-base64');
 const config = require("../../config.db");
+const AliCloud = require('@alicloud/pop-core');
+const mongoist = require('mongoist');
 
 /**
  * Send verify code
  */
-router.post('/sendSMS', validateCode, function(req, res, next) {
-    return res.json({});
-    /*
-        var db = dbUtility.connect(req.tenant.name);
-    
-        if (!req.body.hasOwnProperty('status'))
-            req.body.status = 'inactive';
-        delete req.body._id;
-    
-        var teachers = db.get("teachers");
-        teachers.insert(req.body).then(function(docs) {
-            console.log("teacher is added %j", docs);
-            return res.json(docs);
-        }).catch(function(err) {
-            var error = new Error("fail to add teacher");
-            error.innerError = err;
-            return next(error);
-        });
-    */
+router.post('/sendSMS', checkRobot, generateCode, function(req, res, next) {
+    var client = new AliCloud({
+        accessKeyId: config.accessKeyID,
+        accessKeySecret: config.accessKeySecret,
+        endpoint: 'https://dysmsapi.aliyuncs.com',
+        apiVersion: '2017-05-25'
+    });
+
+    var params = {
+        "PhoneNumbers": req.body.contact,
+        "SignName": "报名试听",
+        "TemplateCode": "SMS_174807779",
+        "TemplateParam": `{"code":${res.locals._code}}`
+    };
+
+    var requestOption = {
+        method: 'POST'
+    };
+
+    client.request('SendSms', params, requestOption).then((result) => {
+        /** result is as below
+         * {
+                "Message": "OK",
+                "RequestId": "EFE83E2E-6C64-4BE3-AD12-FBE2094277F8",
+                "BizId": "514321470550812459^0",
+                "Code": "OK"
+            }
+         */
+        if (result.Code === 'OK') {
+            console.log(`Send code "${res.locals._code}" to "${req.body.contact}" successfully`);
+            return res.json({});
+        } else {
+            console.error(`Fail to send code "${res.locals._code}" to "${req.body.contact}"`);
+            console.error(result);
+            return next(new Error(`发送验证码失败: ${result.Message}`));
+        }
+    }, (ex) => {
+        console.error(ex);
+        return next(new Error("发送验证码失败，请重试"));
+    });
 });
+
+/**
+ * sent_code collect is as below
+ * |phone|code|count|sendDate|
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+async function generateCode(req, res, next) {
+    if (!req.body.hasOwnProperty('contact')) {
+        var err = new Error("Missing param 'contact'");
+        err.status = 400;
+        return next(err);
+    }
+    // check if already submit phone for trial class
+    const odb = dbUtility.connect(req.tenant.name);
+    const db = mongoist(odb);
+    const opportunities = db.collection('opportunities');
+    const doc = await opportunities.findOne({ contact: req.body.contact });
+    if (doc) {
+        var err = new Error(`手机号${req.body.contact}已经报名试听`);
+        err.status = 400;
+        return next(err);
+    }
+
+    // check if time is expired, 10 minutes expired
+    const sentCode = db.collection('sent_code');
+    let code = await sentCode.findOne({ phone: req.body.contact });
+    if (!code) {
+        code = {
+            phone: req.body.contact,
+            code: getCode(4),
+            count: 1,
+            sendDate: new Date()
+        }
+    } else {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() - 10);
+        if (code.sendDate > now) {
+            var err = new Error(`请勿在10分钟内重复发送验证码`);
+            err.status = 400;
+            return next(err);
+        } else if (code.count > 100) {
+            var err = new Error(`Sent too many code to the phone number, over 100 times`);
+            err.status = 400;
+            return next(err);
+        } else {
+            code.code = getCode(4);
+            code.count += 1;
+            code.sendDate = new Date();
+        }
+    }
+
+    // generate code and store in req
+    res.locals._code = code.code;
+
+    // save code and contact in collection 'sent_code'
+    await sentCode.save(code);
+
+    return next();
+}
 
 function objToUrl(data) {
     return Object.keys(data).map(function(key) {
         return key + '=' + encodeURIComponent(data[key]);
     }).join('&');
+}
+
+function getCode(digit) {
+    let code = '';
+    for (let i = 0; i < digit; i++) {
+        code += Math.floor(Math.random() * 10);
+    }
+    return code;
 }
 
 /**
@@ -59,7 +151,7 @@ function generateAlibabaSignature(options, accessKeySecret, httpMethod) {
     return Base64.stringify(HmacSHA1(str, accessKeySecret + "&"));
 }
 
-function validateCode(req, res, next) {
+function checkRobot(req, res, next) {
     let date = new Date();
 
     let options = {

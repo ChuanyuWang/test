@@ -31,6 +31,9 @@ router.post('/', function(req, res, next) {
         res.status(400).send("Missing param 'name' or 'contact'");
         return;
     }
+    if (!req.body.hasOwnProperty('status'))
+        req.body.status = 'open';
+
     var query = {
         name: req.body.name,
         contact: req.body.contact
