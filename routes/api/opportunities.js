@@ -14,7 +14,7 @@ var NORMAL_FIELDS = {
     remark: 1
 };
 
-router.post('/', function(req, res, next) {
+router.post('/', verifyCode, function(req, res, next) {
     var tenantDB = null;
     if (req.body.hasOwnProperty('tenant')) {
         tenantDB = util.connect(req.body.tenant);
@@ -31,8 +31,6 @@ router.post('/', function(req, res, next) {
         res.status(400).send("Missing param 'name' or 'contact'");
         return;
     }
-    if (!req.body.hasOwnProperty('status'))
-        req.body.status = 'open';
 
     var query = {
         name: req.body.name,
@@ -41,7 +39,7 @@ router.post('/', function(req, res, next) {
 
     var newDoc = {
         since: new Date(),
-        status: req.body.status,
+        status: req.body.status || "open",
         name: req.body.name,
         contact: req.body.contact,
         birthday: new Date(req.body.birthday),
@@ -130,6 +128,46 @@ function initDateField(item) {
             item[fields[i]] = new Date(item[fields[i]]);
         }
     }
+}
+
+function verifyCode(req, res, next) {
+    var tenantDB = null;
+    if (req.body.hasOwnProperty('tenant')) {
+        tenantDB = util.connect(req.body.tenant);
+    } else if (req.db) {
+        // initialize the tenant db if it's authenticated user
+        tenantDB = req.db;
+    } else {
+        var err = new Error("Missing param 'tenant'");
+        err.status = 400;
+        return next(err);
+    }
+
+    if (!req.body.code || !req.body.contact) {
+        res.status(400).send("Missing param 'code' or 'contact'");
+        return;
+    }
+
+    var sent_code_collection = tenantDB.collection("sent_code");
+    let now = new Date();
+    now.setMinutes(now.getMinutes() - 10);
+    sent_code_collection.findOne({
+        phone: req.body.contact,
+        code: req.body.code,
+        sendDate: { $gte: now }
+    }, function(err, doc) {
+        if (err) {
+            var error = new Error('Get verify code fails');
+            error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var err = new Error("验证码无效，请重新提交");
+            err.status = 400;
+            return next(err);
+        }
+        return next();
+    });
 }
 
 module.exports = router;
