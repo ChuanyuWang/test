@@ -24,7 +24,7 @@ router.post('/sendSMS', checkRobot, generateCode, function(req, res, next) {
     var params = {
         "PhoneNumbers": req.body.contact,
         "SignName": "报名试听",
-        "TemplateCode": "SMS_174807779",
+        "TemplateCode": "SMS_175121681",
         "TemplateParam": `{"code":${res.locals._code}}`
     };
 

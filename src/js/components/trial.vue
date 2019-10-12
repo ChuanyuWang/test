@@ -189,7 +189,6 @@ module.exports = {
         dataType: "json"
       });
       request.done(function(data, textStatus, jqXHR) {
-        console.log(data);
         $("#ncDialog").modal("hide");
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
