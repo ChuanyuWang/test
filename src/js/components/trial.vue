@@ -192,7 +192,6 @@ module.exports = {
         $("#ncDialog").modal("hide");
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        console.error(jqXHR);
         $("#ncDialog").modal("hide");
         vue.errorMessage = jqXHR.responseJSON
           ? jqXHR.responseJSON.message
