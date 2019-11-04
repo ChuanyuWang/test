@@ -85,11 +85,16 @@ module.exports.isAuthenticated = function(req, res, next) {
 };
 
 /**
- * @param {String} tenantName the name of tenant
- * @return {String}
+ * @param {String} tenant the tenant object
+ * @return {String} the path to logo img
  */
-module.exports.getTenantLogo = function(tenantName) {
-    return '/img/' + tenantName + '-logo-2x.png';
+module.exports.getTenantLogo = function(tenant) {
+    if (tenant.logoPath)
+        return `/img/${tenant.logoPath}.png`;
+    else if (tenant.name)
+        return `/img/${tenant.name}-logo-2x.png`;
+    else
+        return "";
 };
 
 /**

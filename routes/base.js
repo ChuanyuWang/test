@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var helper = require('../helper');
 
-router.get('/home', helper.checkTenantUser, function (req, res) {
+router.get('/home', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/home', {
         title: '课程表',
         currentUrl: 'home',
@@ -11,7 +11,7 @@ router.get('/home', helper.checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/class/:classID', helper.checkTenantUser, function (req, res) {
+router.get('/class/:classID', helper.checkTenantUser, function(req, res) {
     res.locals.classID = req.params.classID;
     res.render('bqsq/pages/class_view', {
         title: '查看课程',
@@ -20,7 +20,7 @@ router.get('/class/:classID', helper.checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/member', helper.checkTenantUser, function (req, res) {
+router.get('/member', helper.checkTenantUser, function(req, res) {
     var members = req.db.collection("members");
     //TODO, support multi membership card
     members.aggregate([{
@@ -47,7 +47,7 @@ router.get('/member', helper.checkTenantUser, function (req, res) {
                 $sum: "$membership.credit" // the total of valid members' remaining credit
             }
         }
-    }], function (err, docs) {
+    }], function(err, docs) {
         if (err)
             console.error(err);
 
@@ -68,7 +68,7 @@ router.get('/member', helper.checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next) {
+router.get('/member/:memberID', helper.checkTenantUser, function(req, res, next) {
     res.locals.memberID = req.params.memberID;
     res.render('bqsq/pages/member_view', {
         title: '查看会员',
@@ -77,7 +77,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function (req, res, next
     });
 });
 
-router.get('/statistics', helper.checkTenantUser, function (req, res) {
+router.get('/statistics', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/statistics', {
         title: '统计',
         currentUrl: 'statistics',
@@ -85,7 +85,7 @@ router.get('/statistics', helper.checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/setting', helper.checkTenantUser, function (req, res) {
+router.get('/setting', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/setting', {
         title: '设置',
         currentUrl: 'setting',
@@ -95,10 +95,10 @@ router.get('/setting', helper.checkTenantUser, function (req, res) {
     });
 });
 
-router.get('/mybooking', function (req, res) {
+router.get('/mybooking', function(req, res) {
     res.render('bqsq/mybooking', {
         title: '我的课程',
-        logoPath: helper.getTenantLogo(req.tenant.name),
+        logoPath: helper.getTenantLogo(req.tenant),
         contact: req.tenant.contact,
         tel: helper.getTel(req.tenant.contact),
         address: req.tenant.address,
@@ -107,25 +107,25 @@ router.get('/mybooking', function (req, res) {
     });
 });
 
-router.get('/myReadBooks', function (req, res) {
+router.get('/myReadBooks', function(req, res) {
     res.render('bqsq/myReadBooks', {
         title: '我的英文绘本',
         contact: req.tenant.contact,
         tel: helper.getTel(req.tenant.contact),
         address: req.tenant.address,
         addressLink: req.tenant.addressLink || '#',
-        logoPath: helper.getTenantLogo(req.tenant.name)
+        logoPath: helper.getTenantLogo(req.tenant)
     });
 });
 
-router.get('/trial', function (req, res) {
+router.get('/trial', function(req, res) {
     res.render('bqsq/trial', {
         title: '报名试听',
         contact: req.tenant.contact,
         tel: helper.getTel(req.tenant.contact),
         address: req.tenant.address,
         addressLink: req.tenant.addressLink || '#',
-        logoPath: helper.getTenantLogo(req.tenant.name)
+        logoPath: helper.getTenantLogo(req.tenant)
     });
 });
 
