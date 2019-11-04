@@ -3,8 +3,6 @@
 
 <template lang="pug">
 div.container
-  div.row
-    img.center-block(:src="tenantLogo",style="width:200px")
   form.col-sm-12.col-md-6.col-md-offset-3
     div.form-group(style='margin-bottom:auto')
       p.form-control-static(style='color:#808080;text-align:center')
@@ -74,7 +72,6 @@ module.exports = {
   props: {},
   data: function() {
     return {
-      tenantLogo: common.getTenantLogoPath(),
       tenantName: common.getTenantName(),
       name: "",
       contact: "",
