@@ -54,6 +54,11 @@ div
           div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.displayName")
             input.form-control(v-if='!selectedTenant._id',v-model.trim='selectedTenant.displayName', placeholder='')
             p.form-control-static(v-else) {{selectedTenant.displayName}}
+        div.form-group(:class='{"has-error": errors.logoPath}')
+          label.col-sm-3.control-label Logo Path:
+          div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.logoPath")
+            input.form-control(v-if='!selectedTenant._id',v-model.trim='selectedTenant.logoPath', placeholder='')
+            p.form-control-static(v-else) {{selectedTenant.logoPath}}
         div.form-group
           label.col-sm-3.control-label Version:
           div.col-sm-5
@@ -140,6 +145,7 @@ module.exports = {
       if (!this.selectedTenant.name) errors.name = "letter only and not null";
       if (!this.selectedTenant.displayName)
         errors.displayName = "can't be empty";
+      if (!this.selectedTenant.logoPath) errors.logoPath = "can't be empty";
       return errors;
     },
     hasError: function() {
@@ -165,7 +171,13 @@ module.exports = {
   },
   methods: {
     addUnsaveOne: function() {
-      this.tenants.push({ name: "", displayName: "", status: "active" });
+      this.tenants.push({
+        name: "",
+        displayName: "",
+        status: "active",
+        feature: "common",
+        logoPath: ""
+      });
       this.setSelectedIndex(this.tenants.length - 1);
     },
     setSelectedIndex: function(index) {
@@ -206,7 +218,8 @@ module.exports = {
           name: vm.selectedTenant.name,
           displayName: vm.selectedTenant.displayName,
           status: vm.selectedTenant.status,
-          feature: vm.selectedTenant.feature
+          feature: vm.selectedTenant.feature,
+          logoPath: vm.selectedTenant.logoPath
         }),
         success: function(data) {
           vm.tenants.splice(vm.selectedIndex, 1, data);
