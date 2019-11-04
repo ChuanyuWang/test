@@ -20,7 +20,6 @@
 .detail-tenant-border {
   border-left: 2px solid #eee;
 }
-
 </style>
 
 <template lang="pug">
@@ -62,7 +61,10 @@ div
         div.form-group
           label.col-sm-3.control-label Feature:
           div.col-sm-5
-            p.form-control-static {{selectedTenant.feature}}
+            select.form-control(v-if='!selectedTenant._id',v-model.trim='selectedTenant.feature')
+              option(value='common') 早教
+              option(value='book') 绘本
+            p.form-control-static(v-else) {{selectedTenant.feature}}
         div.form-group
           label.col-sm-3.control-label Classroom:
           div.col-sm-5
@@ -127,7 +129,7 @@ module.exports = {
   },
   watch: {},
   components: {
-    'create-user-modal': createUserDlg
+    "create-user-modal": createUserDlg
   },
   computed: {
     hasData: function() {
@@ -158,7 +160,7 @@ module.exports = {
       value.forEach(function(val, index, array) {
         res.push(val.name);
       });
-      return res.join(';');
+      return res.join(";");
     }
   },
   methods: {
@@ -172,9 +174,9 @@ module.exports = {
     },
     getTenantUsers: function(tenant) {
       var vm = this;
-      var request = $.getJSON("/admin/api/users", {tenant:tenant.name});
+      var request = $.getJSON("/admin/api/users", { tenant: tenant.name });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-          console.error("get tenant user fails", jqXHR);
+        console.error("get tenant user fails", jqXHR);
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.users = data;
@@ -189,7 +191,7 @@ module.exports = {
         dataType: "json"
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-          console.error("create user fails", jqXHR);
+        console.error("create user fails", jqXHR);
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.users.push(data);
@@ -203,7 +205,8 @@ module.exports = {
         data: JSON.stringify({
           name: vm.selectedTenant.name,
           displayName: vm.selectedTenant.displayName,
-          status: vm.selectedTenant.status
+          status: vm.selectedTenant.status,
+          feature: vm.selectedTenant.feature
         }),
         success: function(data) {
           vm.tenants.splice(vm.selectedIndex, 1, data);
