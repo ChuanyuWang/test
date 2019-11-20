@@ -6,20 +6,20 @@ var util = require('../util');
 var RateLimit = require('express-rate-limit');
 
 var loginLimiter = new RateLimit({
-    windowMs: 1000*60, // 1 minutes
+    windowMs: 1000 * 60, // 1 minutes
     max: 5, // limit each IP to 10 requests per windowMs
     delayMs: 0, // disable delaying - full speed until the max limit is reached
     // Error message returned when max is exceeded.
     message: "Too many login requests, please try again later."
-  });
+});
 
 /* GET home page. */
-router.get('/', function (req, res) {
+router.get('/', function(req, res) {
     if (!req.user) {
         res.render('index', {
-            title : res.__('title'),
-            navTitle : res.__('title'),
-            errorMsg : req.flash('error')
+            title: res.__('title'),
+            navTitle: res.__('title'),
+            errorMsg: req.flash('error')
         });
     } else {
         navigateToUserHome(req, res);
@@ -27,14 +27,14 @@ router.get('/', function (req, res) {
 });
 
 /* login/logout API */
-router.get('/login', function (req, res) {
+router.get('/login', function(req, res) {
     res.redirect('/');
 });
 
 router.post('/login', loginLimiter, passport.authenticate('local', {
-        failureRedirect : '/',
-        failureFlash : '用户名或密码不正确'
-    }), function (req, res) {
+    failureRedirect: '/',
+    failureFlash: '用户名或密码不正确'
+}), function(req, res) {
     // If this function gets called, authentication was successful.
     // 'req.user' contains the authenticated user.
 
@@ -42,7 +42,7 @@ router.post('/login', loginLimiter, passport.authenticate('local', {
     navigateToUserHome(req, res);
 });
 
-router.get('/logout', function (req, res) {
+router.get('/logout', function(req, res) {
     req.logout();
     res.redirect('/');
 });
@@ -85,11 +85,11 @@ function getTenantInfo2(req, res, next) {
     }
     config_db.collection('tenants').findOne({
         name: 'bqsq'
-    }, function (err, tenant) {
+    }, function(err, tenant) {
         if (err) {
             console.error(err);
         }
-        
+
         req.db = util.connect('bqsq');
         req.tenant = tenant || {};
         res.locals.navTitle = req.tenant.displayName || "";
@@ -121,7 +121,7 @@ function getTenantInfo(req, res, next) {
     }
     config_db.collection('tenants').findOne({
         name: req.params.tenantName
-    }, function (err, tenant) {
+    }, function(err, tenant) {
         if (err) {
             var error = new Error("get tenant fails");
             error.innerError = err;
@@ -129,7 +129,7 @@ function getTenantInfo(req, res, next) {
         }
         if (!tenant) {
             var error = new Error(`tenant ${req.params.tenantName} doesn't exist`);
-            error.innerError = err;
+            error.status = 400;
             return next(error);
         }
 
