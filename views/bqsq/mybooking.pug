@@ -33,10 +33,16 @@ block content
           div.col-xs-offset-3.col-xs-9
             button.btn.btn-primary 查看预约
     div#user_info.row(style='display:none;margin:7px -7px 3px -7px')
-      p.pull-left.col-xs-10 你好，小朋友
+      p.pull-left.col-xs-10 你好, 
+        b
+        |小朋友<br>
+        small(style='color:#808080') 已预约课程共 
+          span.booked-total -
+          |课时, 还有
+          span.remain-total -
+          |课时可用
       div.col-xs-2(style='padding-right:9px')
         button.btn.btn-danger.btn-xs.pull-right 注销
-
     ul.nav.nav-tabs(role='tablist',style='display:none')
       li.active(role='presentation')
         a.btn-xs(href="#future",role='tab',data-toggle='tab',style='padding:3px 7px') 预约课程
