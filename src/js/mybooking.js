@@ -282,7 +282,6 @@ function updateSchedule(memberid, isHistory) {
             // no classes found
             if (!data.length) {
                 displayNoClassWarning();
-                return;
             }
 
             var total = 0;
