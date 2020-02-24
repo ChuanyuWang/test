@@ -6,7 +6,9 @@ div.container
   form.col-sm-12.col-md-6.col-md-offset-3
     div.form-group(style='margin-bottom:auto')
       p.form-control-static(style='color:#808080;text-align:center')
-        small 请填写宝宝的姓名和联系方式，客服会在收到申请后第一时间联系您
+        small(v-if="tenantName!=='bqsqdrc'") 请填写宝宝的姓名和联系方式，客服会在收到申请后第一时间联系您
+        small(v-else) 请填写宝宝的姓名和联系方式，客服会在收到申请后第一时间联系您，为您开通账号，咨询电话:
+          a(href='tel:15000359159') 15000359159
     div.form-group(v-if="tenantName==='bqsq'")
       label.control-label 门店：
       select.form-control(v-model='location')
