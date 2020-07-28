@@ -10,14 +10,14 @@ const MongoStore = require('connect-mongo')(session);
 var flash = require('connect-flash');
 var passport = require('passport');
 var config = require('./config');
-var db_config = require('./config.db');
 var i18n = require('i18n');
 
 // main application
 var app = express();
 app.locals.CDN_FILES = config.cdnlibs;
 
-var env = process.env.NODE_ENV || 'development';
+// app.get('env') returns 'development' if NODE_ENV is not defined. 
+var env = app.get('env');
 app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
@@ -68,13 +68,13 @@ app.use(session({
         url: util.connectionURI('config') + '?authSource=admin&w=1',
         touchAfter: 24 * 3600 // time period in seconds
     }),
-    cookie: { 
+    cookie: {
         //this attribute tells the browser to only send the cookie 
         // if the request is being sent over HTTPS.
         secure: !app.locals.ENV_DEVELOPMENT,
         //this attribute is used to help prevent attacks such as cross-site scripting, 
         // since it does not allow the cookie to be accessed via JavaScript.
-        httpOnly: true 
+        httpOnly: true
     }
 }));
 
@@ -134,7 +134,8 @@ app.use(function(err, req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+// app.get('env') returns 'development' if NODE_ENV is not defined. 
+if (app.locals.ENV_DEVELOPMENT) {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
