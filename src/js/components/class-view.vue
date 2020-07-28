@@ -107,7 +107,7 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var util = require('../common.js');
+var util = require("../common.js");
 var date_picker = require("./date-picker.vue");
 var teacher_service = require("../services/teachers");
 var class_service = require("../services/classes");
@@ -121,14 +121,14 @@ module.exports = {
     classrooms: Array // Array of available classroom
   },
   data: function() {
-    // clone the pass in data, because class-view component will 
+    // clone the pass in data, because class-view component will
     // modify the booking and books property of cls
-    var tmp = Object.assign({}, this.data, {
-      books: this.data.books || [],
-      booking: this.data.booking || []
-    });
+    var tmp = this.data || {};
     return {
-      cls: tmp,
+      cls: Object.assign({}, tmp, {
+        books: tmp.books || [],
+        booking: tmp.booking || []
+      }),
       quantity: 1,
       teachers: [],
       bookedMembers: [],
@@ -145,9 +145,9 @@ module.exports = {
       var vm = this;
       var result = vm.cls.booking || [];
       result.forEach(function(value, index, array) {
-        var name = '已删除';
+        var name = "已删除";
         vm.bookedMembers.some(function(member) {
-          if (member.member == value.member){
+          if (member.member == value.member) {
             name = member.userName;
             return true;
           }
@@ -172,8 +172,8 @@ module.exports = {
     age: function() {
       var age = this.cls.age || {}; // age field could be null
       return {
-        min: age.min ? Math.round(age.min/12 * 10) / 10 : null,
-        max: age.max ? Math.round(age.max/12 * 10) / 10 : null
+        min: age.min ? Math.round((age.min / 12) * 10) / 10 : null,
+        max: age.max ? Math.round((age.max / 12) * 10) / 10 : null
       };
     },
     errors: function() {
@@ -223,9 +223,10 @@ module.exports = {
         classroom: this.cls.classroom,
         teacher: this.cls.teacher,
         capacity: this.cls.capacity || 0, // default value take effect if capacity is ""
-        age: { // age is stored as months
-          min: this.age.min ? parseInt(this.age.min*12) : null,
-          max: this.age.max ? parseInt(this.age.max*12) : null
+        age: {
+          // age is stored as months
+          min: this.age.min ? parseInt(this.age.min * 12) : null,
+          max: this.age.max ? parseInt(this.age.max * 12) : null
         }
       });
       request.done(function(data, textStatus, jqXHR) {
@@ -297,15 +298,16 @@ module.exports = {
       if (this.quantity === "") this.quantity = 1;
 
       var vm = this;
-      if (selectedItems.length == 0) return bootbox.alert({
-        message:"请选择会员",
-        size:"small",
-        buttons: {
-          ok: {
-            className: "btn-danger"
+      if (selectedItems.length == 0)
+        return bootbox.alert({
+          message: "请选择会员",
+          size: "small",
+          buttons: {
+            ok: {
+              className: "btn-danger"
+            }
           }
-        },
-      });
+        });
 
       var members = vm.bookings || [];
       var addedOnes = selectedItems.filter(function(element, index, array) {
@@ -329,10 +331,10 @@ module.exports = {
         var request = class_service.addReservation(result[0]);
         request.done(function(data, textStatus, jqXHR) {
           vm.bookedMembers.push({
-            member: data['member']._id,
-            userName: data['member'].name
+            member: data["member"]._id,
+            userName: data["member"].name
           });
-          vm.cls.booking = data['class'].booking || [];
+          vm.cls.booking = data["class"].booking || [];
           bootbox.alert("预约成功");
         });
       } else {
@@ -397,10 +399,21 @@ module.exports = {
     // 'this' is refer to vm instance
     var vm = this;
     // load class reservations
-    var request = class_service.getReservations(this.cls._id);
-    request.done(function(data, textStatus, jqXHR) {
-      vm.bookedMembers = data || [];
-    });
+    if (this.cls._id) {
+      var request = class_service.getReservations(this.cls._id);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.bookedMembers = data || [];
+      });
+    } else {
+      bootbox.alert({
+        message: "查看的课程不存在",
+        buttons: {
+          ok: {
+            className: "btn-danger"
+          }
+        }
+      });
+    }
 
     // load the setting of tenant
     var setting = util.getTenantSetting();
