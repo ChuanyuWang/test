@@ -256,11 +256,11 @@ router.delete('/:classID', function(req, res, next) {
                 error.innerError = err;
                 return next(error);
             }
-            //TODO, support multi membership card
-            //TODO, handle the callback when member is not existed.
-            //TODO, handle the callback when member is inactive.
-            tenantDB.collection("members").update(
-                {
+            if (doc.cost > 0) {
+                //TODO, support multi membership card
+                //TODO, handle the callback when member is not existed.
+                //TODO, handle the callback when member is inactive.
+                tenantDB.collection("members").update({
                     _id: mongojs.ObjectId(req.body.memberid),
                     "membership.0": { $exists: true }
                 }, {
@@ -276,8 +276,8 @@ router.delete('/:classID', function(req, res, next) {
                     } else {
                         console.error(`Fail to return expense to member ${req.body.memberid}`);
                     }
-                }
-            );
+                });
+            }
 
             res.json(doc);
         });
@@ -328,8 +328,8 @@ function createNewBook(tenantDB, res, user, cls, quantity) {
             members.update({
                 _id: user._id
             }, {
-                    $inc: { "membership.0.credit": -quantity * doc.cost }
-                });
+                $inc: { "membership.0.credit": -quantity * doc.cost }
+            });
 
             membership.credit -= quantity * doc.cost;
         }
