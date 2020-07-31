@@ -41,9 +41,11 @@ router.get('/', function(req, res, next) {
     }
     // query courses by status only if status query is defined and not null
     if (req.query.status) {
-        query['status'] = {$in: req.query.status.split(',').map(function(value) {
-            return value ? value : null;
-        })};
+        query['status'] = {
+            $in: req.query.status.split(',').map(function(value) {
+                return value ? value : null;
+            })
+        };
     }
     courses.find(query, NORMAL_FIELDS, function(err, docs) {
         if (err) {
@@ -76,7 +78,7 @@ router.get('/:courseID/members', function(req, res, next) {
     var courses = req.db.collection("courses");
     courses.aggregate([
         {
-            $match: {_id: mongojs.ObjectId(req.params.courseID)}
+            $match: { _id: mongojs.ObjectId(req.params.courseID) }
         }, {
             $unwind: "$members"
         }, {
@@ -98,7 +100,7 @@ router.get('/:courseID/members', function(req, res, next) {
             error.innerError = err;
             return next(error);
         }
-        console.log("get course members: %j", docs ? docs.length:0);
+        console.log("get course members: %j", docs ? docs.length : 0);
         if (!docs || docs.length === 0) {
             return res.json({
                 _id: req.params.courseID,
@@ -324,11 +326,14 @@ router.delete('/:courseID/classes', function(req, res, next) {
             // return the cost to membership card
             var bulk1 = req.db.collection('members').initializeUnorderedBulkOp();
             booking.forEach(function(booking_item) {
+                console.log("return %f credit to member %s", doc.cost * booking_item.quantity, booking_item.member);
                 bulk1.find({ _id: booking_item.member }).updateOne({
                     $inc: { "membership.0.credit": doc.cost * booking_item.quantity }
                 });
             });
             bulk1.execute(function(err, result) {
+                // result is {"writeErrors":[],"writeConcernErrors":[],"nInserted":0,"nUpserted":1,
+                // "nMatched":0,"nModified":0,"nRemoved":0,"upserted":[],"ok":1}
                 //TODO, handle error
                 if (err) console.error(err);
                 else console.log("return the cost to membership card with %j", result);
@@ -351,7 +356,7 @@ router.delete('/:courseID', function(req, res, next) {
         // remove all classes with courseID
         req.db.collection("classes").remove({
             courseID: mongojs.ObjectId(req.params.courseID)
-        }, {justOne: false}, function(err, result) {
+        }, { justOne: false }, function(err, result) {
             if (err) console.error("delete course's classes fails");
             else console.log("delete classes of course %s", req.params.courseID);
         });
@@ -412,7 +417,7 @@ function removeCourseMember(db, courseID, memberID, callback) {
             }, function(err, doc, lastErrorObject) {
                 //TODO, handle error
                 if (err) console.error(err);
-                if (doc) console.log(`return ${expense} credit to member ${doc.name}`);
+                if (doc) console.log("return %f credit to member %s (after: %j)", expense, memberID, doc.membership);
                 else console.log(`member ${memberID} doesn't exist`)
             });
         }
@@ -488,6 +493,7 @@ function createReservation(db, result, callback) {
     Object.keys(result.memberSummary).forEach(function(memberID) {
         var res = result.memberSummary[memberID];
         if (res.expense > 0) {
+            console.log("deduct %f credit from member %s", res.expense, memberID);
             bulk1.find({ _id: mongojs.ObjectId(memberID) }).updateOne({
                 $inc: { "membership.0.credit": -res.expense }
             });
@@ -496,7 +502,7 @@ function createReservation(db, result, callback) {
     bulk1.execute(function(err, res) {
         //TODO, handle error
         if (err) console.error(err);
-        else console.log(`deduct the expense from membership card with ${res}`);
+        else console.log("deduct the expense from membership card with %j", res);
     });
     //add the booking info into corresponding classes
     var bulk2 = db.collection('classes').initializeUnorderedBulkOp();
@@ -511,7 +517,7 @@ function createReservation(db, result, callback) {
     bulk2.execute(function(err, res) {
         //TODO, handle error
         if (err) console.error(err);
-        else console.log(`add booking info into classes with ${res}`);
+        else console.log("add booking info into classes with %j", res);
         callback(null, res)
     });
 }
