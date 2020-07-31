@@ -72,9 +72,11 @@ router.get('/', getMemberLeftClasses, function(req, res, next) {
     }
     // query members by status
     if (req.query.hasOwnProperty('status')) {
-        query['status'] = {$in: req.query.status.split(',').map(function(value) {
-            return value ? value : null;
-        })};
+        query['status'] = {
+            $in: req.query.status.split(',').map(function(value) {
+                return value ? value : null;
+            })
+        };
     }
     members.find(query, NORMAL_FIELDS).sort({
         since: -1
@@ -315,7 +317,7 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
         queryString[`comments.${req.params.commentIndex}.author`] = req.user.username;
     }
     var updateString = {
-        $set : {}
+        $set: {}
     };
     updateString.$set[`comments.${req.params.commentIndex}.text`] = req.body.text;
     updateString.$set[`comments.${req.params.commentIndex}.updated`] = new Date();
@@ -362,7 +364,7 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
         query: {
             _id: mongojs.ObjectId(req.params.memberID),
             // it's only allowed to create one membership card
-            $or: [{membership: {$size: 0}}, {membership:{$exists: false}}]
+            $or: [{ membership: { $size: 0 } }, { membership: { $exists: false } }]
         },
         update: {
             $push: { membership: req.body }
@@ -380,22 +382,22 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
             error.status = 400;
             return next(error);
         }
-        console.log("membership %s is created by %j", req.body, req.user.username);
+        console.log("membership card %j is created by %s", req.body, req.user.username);
         // update the history when a new membership card is added
         var setQuery = {}, historyItems = [];
         genMembershipSetQueries(req.user.username, doc.membership.length - 1, {}, req.body, setQuery, historyItems, memo);
         members.update({
             _id: mongojs.ObjectId(req.params.memberID)
         }, {
-                $push: {
-                    history: {
-                        $each: historyItems
-                    }
+            $push: {
+                history: {
+                    $each: historyItems
                 }
-            }, function(err, result) {
-                if (err) console.error(err);
-                console.log('update history by creating new card %j', result);
-            });
+            }
+        }, function(err, result) {
+            if (err) console.error(err);
+            console.log('update history by creating new card %j', result);
+        });
         res.json(doc);
     });
 });
@@ -444,7 +446,7 @@ router.patch('/:memberID/memberships/:cardIndex', function(req, res, next) {
                 if (setQuery.hasOwnProperty(key) && !key.endsWith(".expire")) {
                     var err = new Error("没有权限执行此操作");
                     err.status = 403;
-                    return next(err); 
+                    return next(err);
                 }
             }
         }
@@ -465,7 +467,7 @@ router.patch('/:memberID/memberships/:cardIndex', function(req, res, next) {
                 error.innerError = err;
                 return next(error);
             }
-            console.log("update member %s by %s successfully", req.params.memberID, req.user.username);
+            console.log("update membership card %j by %s", setQuery, req.user.username);
             res.json(doc);
         });
     });
@@ -480,12 +482,12 @@ router.get('/:memberID/summary', function(req, res, next) {
     }, {
         $project: {
             "after": {
-                $cond: { if: { $gte: [ "$date", new Date() ] }, then: 1, else: 0 }
+                $cond: { if: { $gte: ["$date", new Date()] }, then: 1, else: 0 }
             },
             "before": {
-                $cond: { if: { $gte: [ "$date", new Date() ] }, then: 0, else: 1 }
+                $cond: { if: { $gte: ["$date", new Date()] }, then: 0, else: 1 }
             },
-            'courseID' : 1
+            'courseID': 1
         }
     }, {
         $group: {
@@ -511,9 +513,11 @@ router.get('/:memberID/summary', function(req, res, next) {
         });
 
         var courses = req.db.collection("courses");
-        courses.find({ _id : {
-            $in : courseList
-        }}, {'name' : 1}, function(err, foundCourses) {
+        courses.find({
+            _id: {
+                $in: courseList
+            }
+        }, { 'name': 1 }, function(err, foundCourses) {
             if (err) {
                 var error = new Error("Find courses fails when get member's summary");
                 error.innerError = err;
@@ -521,7 +525,7 @@ router.get('/:memberID/summary', function(req, res, next) {
             }
 
             foundCourses.forEach(function(value, index, array) {
-                var courseAgg = docs.find(function(value2, index2, array2){
+                var courseAgg = docs.find(function(value2, index2, array2) {
                     return value._id.toString() == value2._id;
                 });
                 courseAgg.courseName = value.name;
@@ -676,7 +680,7 @@ function isEqual(a, b) {
 function getMemberLeftClasses(req, res, next) {
     // check whether to fetch the remaining classes for each member
     if (!req.query.hasOwnProperty('appendLeft')) return next();
-    
+
     var classes_col = req.db.collection("classes");
     classes_col.aggregate([{
         $match: {
@@ -684,7 +688,7 @@ function getMemberLeftClasses(req, res, next) {
         }
     }, {
         $project: {
-            'booking' : 1
+            'booking': 1
         }
     }, {
         $unwind: "$booking"
