@@ -217,16 +217,14 @@ router.delete('/:classID', function(req, res, next) {
             } else {
                 var error = new Error("不能在课程开始1小时后取消预约");
                 error.status = 400;
-                next(error);
-                return;
+                return next(error);
             }
         } else if (Date.now() + 86400000 > doc.date.getTime()) {
             // be free to cancel the booking if it's less than 24 hours before begin
             // 24 hours = 86400000 ms (24*60*60*1000)
             var error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
             error.status = 400;
-            next(error);
-            return;
+            return next(error);
         }
 
         // find the booking quantity of member
@@ -258,28 +256,32 @@ router.delete('/:classID', function(req, res, next) {
             }
             if (doc.cost > 0) {
                 //TODO, support multi membership card
-                //TODO, handle the callback when member is not existed.
                 //TODO, handle the callback when member is inactive.
-                tenantDB.collection("members").update({
-                    _id: mongojs.ObjectId(req.body.memberid),
-                    "membership.0": { $exists: true }
-                }, {
-                    $inc: { "membership.0.credit": doc.cost * quantity }
-                }, function(err, result) {
+                tenantDB.collection("members").findAndModify({
+                    query: {
+                        _id: mongojs.ObjectId(req.body.memberid),
+                        "membership.0": { $exists: true }
+                    },
+                    update: {
+                        $inc: { "membership.0.credit": doc.cost * quantity }
+                    },
+                    fields: { membership: 1 },
+                    new: true
+                }, function(err, m, lastErrorObject) {
                     if (err) {
                         // TODO, handle error
                         console.error(err);
                     }
-                    // result = { ok: 1, nModified: 1, n: 1 }
-                    if (result.nModified === 1) {
-                        console.log(`Return expense to member ${req.body.memberid}`);
+                    if (m) {
+                        console.log(`return ${doc.cost * quantity} credit to member ${req.body.memberid} (after: ${JSON.stringify(m.membership)})`);
                     } else {
+                        //TODO, handle the callback when member is not existed.
                         console.error(`Fail to return expense to member ${req.body.memberid}`);
                     }
                 });
             }
 
-            res.json(doc);
+            return res.json(doc);
         });
     });
 });
@@ -319,26 +321,35 @@ function createNewBook(tenantDB, res, user, cls, quantity) {
         }
 
         //TODO, support multi membership card
-        var membership = null;
         if (user.membership && user.membership.length > 0 && doc.cost > 0) {
-            membership = user.membership[0];
-
             // update the credit value in membership
             var members = tenantDB.collection("members");
-            members.update({
-                _id: user._id
-            }, {
-                $inc: { "membership.0.credit": -quantity * doc.cost }
+            members.findAndModify({
+                query: {
+                    _id: user._id
+                }, update: {
+                    $inc: { "membership.0.credit": -quantity * doc.cost }
+                }, fields: { membership: 1 },
+                new: true
+            }, function(err, m, lastErrorObject) {
+                if (err) console.error(err);
+                if (m) {
+                    console.log("deduct %f credit from member %s (after: %j)", quantity * doc.cost, user._id, m.membership);
+                    user.membership = m.membership;
+                }
+                //return the status of booking class
+                return res.json({
+                    class: doc,
+                    member: user
+                });
             });
-
-            membership.credit -= quantity * doc.cost;
+        } else {
+            //return the status of booking class
+            return res.json({
+                class: doc,
+                member: user
+            });
         }
-
-        //return the status of booking class
-        res.json({
-            class: doc,
-            member: user
-        });
     });
 }
 
