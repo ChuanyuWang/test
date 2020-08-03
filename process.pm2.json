@@ -13,6 +13,7 @@
       "error_file": "logs/err.log",
       "out_file": "logs/out.log",
       "combine_logs": true,
+      "merge_logs": true,
       "env": {
         "NODE_ENV": "development",
         "PORT": 3000
