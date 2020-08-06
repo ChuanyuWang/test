@@ -6,13 +6,20 @@ module.exports = {
             dev: {
                 type: 'stdout',
                 layout: {
-                    type: 'pattern', pattern: '[%d{hh.mm.ss.SSS}] [%p] <%f{1}:%l> %m'
+                    type: 'pattern',
+                    pattern: '[%d{hh.mm.ss.SSS}] [%p] <%f{1}:%l> %m'
                 }
             },
             out: {
                 type: 'stdout',
                 layout: {
-                    type: 'pattern', pattern: '[%d{ISO8601}Z] [%p] %m'
+                    type: 'pattern',
+                    pattern: '[%x{ISOTime}] [%p] %m',
+                    tokens: {
+                        ISOTime: function(logEvent) {
+                            return logEvent.startTime.toISOString();
+                        }
+                    }
                 }
             }
         },
