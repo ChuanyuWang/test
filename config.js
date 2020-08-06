@@ -1,6 +1,11 @@
 module.exports = {
     port: 7004,
     log4js: {
+        /**
+         * use the `disableClustering: true` option in your log4js configuration
+         * to have every process behave as if it were the master process. 
+         * Be careful if you’re logging to files.
+         */
         disableClustering: true,
         appenders: {
             dev: {
