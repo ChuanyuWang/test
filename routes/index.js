@@ -1,7 +1,6 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-var logger = require('log4js').getLogger();
 var util = require('../util');
 var RateLimit = require('express-rate-limit');
 
@@ -38,7 +37,7 @@ router.post('/login', loginLimiter, passport.authenticate('local', {
     // If this function gets called, authentication was successful.
     // 'req.user' contains the authenticated user.
 
-    logger.info(`User >>${req.user.username}<< login ${req.user.tenant}`);
+    console.log(`User >>${req.user.username}<< login ${req.user.tenant}`);
     navigateToUserHome(req, res);
 });
 
