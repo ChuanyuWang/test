@@ -1,11 +1,25 @@
 module.exports = {
     port: 7004,
     log4js: {
-        appenders: [{
-            type: "console"
+        disableClustering: true,
+        appenders: {
+            dev: {
+                type: 'stdout',
+                layout: {
+                    type: 'pattern', pattern: '[%d{hh.mm.ss.SSS}] [%p] <%f{1}:%l> %m'
+                }
+            },
+            out: {
+                type: 'stdout',
+                layout: {
+                    type: 'pattern', pattern: '[%d{ISO8601}Z] [%p] %m'
+                }
+            }
+        },
+        categories: {
+            default: { appenders: ['dev'], level: 'trace', enableCallStack: true },
+            production: { appenders: ['out'], level: 'info', enableCallStack: false }
         }
-        ],
-        replaceConsole: true
     },
     /**
      * Free CDN library

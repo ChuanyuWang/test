@@ -3,7 +3,7 @@ var compression = require('compression')
 var path = require('path');
 var util = require('./util');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
 //var cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -24,7 +24,11 @@ app.locals.ENV_DEVELOPMENT = env == 'development';
 // set the logging
 var log4js = require('log4js');
 log4js.configure(config.log4js);
-log4js.getLogger().setLevel("TRACE");
+const logger = app.locals.ENV_DEVELOPMENT ? log4js.getLogger() : log4js.getLogger('production');
+// Console replacement
+console.log = logger.info.bind(logger);
+console.debug = logger.debug.bind(logger);
+console.error = logger.error.bind(logger);
 
 //setting various HTTP headers.
 app.use(require('helmet')());
@@ -45,9 +49,9 @@ app.locals.pretty = true; // output the pretty html for consistency
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));
 if (app.locals.ENV_DEVELOPMENT) {
-    app.use(logger('dev'));
+    app.use(morgan('dev'));
 } else {
-    app.use(logger('common'));
+    app.use(morgan('common'));
 }
 
 // Use gzip compression
