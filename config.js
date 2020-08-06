@@ -12,7 +12,7 @@ module.exports = {
                 type: 'stdout',
                 layout: {
                     type: 'pattern',
-                    pattern: '[%d{hh.mm.ss.SSS}] [%p] <%f{1}:%l> %m'
+                    pattern: '[%d{hh:mm:ss.SSS}] [%p] <%f{1}:%l> %m'
                 }
             },
             out: {
