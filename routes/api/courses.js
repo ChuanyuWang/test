@@ -357,8 +357,9 @@ router.delete('/:courseID', function(req, res, next) {
         req.db.collection("classes").remove({
             courseID: mongojs.ObjectId(req.params.courseID)
         }, { justOne: false }, function(err, result) {
+            // result is {"n":0,"ok":1,"deletedCount":0}
             if (err) console.error("delete course's classes fails");
-            else console.log("delete classes of course %s", req.params.courseID);
+            else console.log("delete classes of course %s with result %j", req.params.courseID, result);
         });
         // check the result and respond
         if (result.n == 1) {
