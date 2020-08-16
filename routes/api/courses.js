@@ -344,33 +344,51 @@ router.delete('/:courseID/classes', function(req, res, next) {
 });
 
 router.delete('/:courseID', function(req, res, next) {
-    var courses = req.db.collection("courses");
-    courses.remove({
-        _id: mongojs.ObjectId(req.params.courseID)
-    }, { justOne: true }, function(err, result) {
+    req.db.collection('classes').find({
+        'courseID': mongojs.ObjectId(req.params.courseID),
+        'cost': { $gt: 0 },
+        'booking.0': { $exists: true }
+    }, { 'booking': 1, 'cost': 1 }, function(err, docs) {
         if (err) {
-            var error = new Error("delete course fails");
+            var error = new Error(`query classes of course ${req.params.courseID} fails`);
             error.innerError = err;
             return next(error);
         }
-        // remove all classes with courseID
-        req.db.collection("classes").remove({
-            courseID: mongojs.ObjectId(req.params.courseID)
-        }, { justOne: false }, function(err, result) {
-            // result is {"n":0,"ok":1,"deletedCount":0}
-            if (err) console.error("delete course's classes fails");
-            else console.log("delete classes of course %s with result %j", req.params.courseID, result);
-        });
-        // check the result and respond
-        if (result.n == 1) {
-            console.log("course %s is deleted", req.params.courseID);
-            res.json(result);
-        } else {
-            console.log("can't find course %s to be deleted", req.params.courseID);
-            var error = new Error("can't find course to be deleted");
-            error.status = 400;
+
+        if (docs && docs.length > 0) {
+            var error = new Error(`无法删除班级，班级中包含已经预约的付费课程，请取消后再尝试删除`);
             return next(error);
         }
+
+        var courses = req.db.collection("courses");
+        courses.remove({
+            _id: mongojs.ObjectId(req.params.courseID)
+        }, { justOne: true }, function(err, result) {
+            if (err) {
+                var error = new Error("delete course fails");
+                error.innerError = err;
+                return next(error);
+            }
+
+            // remove all classes with courseID
+            req.db.collection("classes").remove({
+                courseID: mongojs.ObjectId(req.params.courseID)
+            }, { justOne: false }, function(err, result) {
+                // result is {"n":0,"ok":1,"deletedCount":0}
+                if (err) console.error("delete course's classes fails");
+                else console.log("delete classes of course %s with result %j", req.params.courseID, result);
+            });
+            // check the result and respond
+            if (result.n == 1) {
+                console.log("course %s is deleted", req.params.courseID);
+                res.json(result);
+            } else {
+                console.log("can't find course %s to be deleted", req.params.courseID);
+                var error = new Error("can't find course to be deleted");
+                error.status = 400;
+                return next(error);
+            }
+        });
     });
 });
 
