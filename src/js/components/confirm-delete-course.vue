@@ -48,6 +48,7 @@ module.exports = {
   },
   methods: {
     show: function() {
+      this.value = '';
       $(this.$el).modal('show');
     },
     handleOk: function() {
