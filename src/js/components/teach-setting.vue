@@ -84,7 +84,7 @@ module.exports = {
     var vm = this;
     var request = teacher_service.getAll();
     request.done(function(data, textStatus, jqXHR) {
-      vm.data = data;
+      vm.data = data || [];
     });
   }
 };
