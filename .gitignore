@@ -1,11 +1,9 @@
 node_modules/
 public/components
 public/js
-package-lock.json
 .sass-cache
 logs/
 /config.db.js
 .vscode
 .eslintcache
 /public/css/
-/package-lock.json
