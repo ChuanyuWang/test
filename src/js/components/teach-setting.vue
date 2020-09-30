@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -15,8 +14,8 @@ div.row
  * --------------------------------------------------------------------------
  */
 
-var teacher_list = require("./teach-list.vue");
-var teacher_detail = require("./teach-detail.vue");
+var teacher_list = require("./teach-list.vue").default;
+var teacher_detail = require("./teach-detail.vue").default;
 var teacher_service = require("../services/teachers");
 
 module.exports = {

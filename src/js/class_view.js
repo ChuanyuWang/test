@@ -7,7 +7,7 @@
 
 var i18nextplugin = require('./locales/i18nextplugin');
 var class_service = require('./services/classes');
-var classView = require('./components/class-view.vue');
+var classView = require('./components/class-view.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -21,8 +21,8 @@ $(document).ready(function() {
         new Vue({
             el: '#class_app',
             //template: '<class-view :data="cls"/>',
-            data: {cls:data},
-            components: { 'class-view' : classView }
+            components: { 'class-view': classView },
+            data: { cls: data }
         });
     });
 });

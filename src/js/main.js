@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('./locales/i18nextplugin');
-var calendar = require('./components/class-calendar.vue');
+var calendar = require('./components/class-calendar.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -12,7 +12,7 @@ $(document).ready(function() {
 
     /* global _getClassrooms */
     // bootstrap the class calendar page
-    var app = new Vue({ extends: calendar, el: '#app', propsData: { classrooms: _getClassrooms() } });
+    var app = new Vue({ el: '#app', extends: calendar, propsData: { classrooms: _getClassrooms() } });
     app.updateSchedule();
 });
 

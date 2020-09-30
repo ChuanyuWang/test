@@ -6,7 +6,7 @@
  */
 var i18nextplugin = require('./locales/i18nextplugin');
 var course_service = require("./services/courses");
-var courseView = require('./components/course-view.vue');
+var courseView = require('./components/course-view.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -18,8 +18,8 @@ $(document).ready(function() {
         //new Vue({extends: classApp, el: '#class_app', props: {data: data}, propsData: { classrooms: _getClassrooms() }});
         new Vue({
             el: '#course_app',
-            data: {course:data},
-            components: { 'course-view' : courseView }
+            components: { 'course-view': courseView },
+            data: { course: data }
         });
     });
 });

@@ -120,7 +120,7 @@ div
  * --------------------------------------------------------------------------
  */
 
-var createUserDlg = require("./create-user-modal.vue");
+var createUserDlg = require("./create-user-modal.vue").default;
 
 module.exports = {
   name: "admin-console",

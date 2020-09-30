@@ -5,10 +5,10 @@
  */
 
 var i18nextplugin = require('./locales/i18nextplugin');
-var trial_app = require('./components/trial.vue');
+var trial_app = require('./components/trial.vue').default;
 
 // DOM Ready =============================================================
-$(document).ready(function () {
+$(document).ready(function() {
     init();
 });
 
@@ -22,5 +22,5 @@ function init() {
     //moment.locale('zh-CN');
     //bootbox.setLocale('zh_CN');
 
-    new Vue({ extends: trial_app, el: '#app' });
+    new Vue({ el: '#app', extends: trial_app });
 }

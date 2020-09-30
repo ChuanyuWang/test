@@ -5,9 +5,9 @@
  */
 var util = require('./services/util');
 var i18nextplugin = require('./locales/i18nextplugin');
-var teach_setting = require('./components/teach-setting.vue');
-var users_setting = require('./components/users-setting.vue');
-var general_setting = require('./components/general-setting.vue');
+var teach_setting = require('./components/teach-setting.vue').default;
+var users_setting = require('./components/users-setting.vue').default;
+var general_setting = require('./components/general-setting.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -24,19 +24,25 @@ function init() {
     Vue.use(i18nextplugin);
 
     // bootstrap the general setting tab
-    new Vue({el: '#general-setting', render : function(h){
-        return h(general_setting);
-    }});
+    new Vue({
+        el: '#general-setting', render: function(h) {
+            return h(general_setting);
+        }
+    });
 
     // bootstrap the teacher setting tab
-    new Vue({el: '#teacher-setting', render : function(h){
-        return h(teach_setting);
-    }});
+    new Vue({
+        el: '#teacher-setting', render: function(h) {
+            return h(teach_setting);
+        }
+    });
 
     // bootstrap the users setting tab
-    new Vue({el: '#users-setting', render : function(h){
-        return h(users_setting);
-    }});
+    new Vue({
+        el: '#users-setting', render: function(h) {
+            return h(users_setting);
+        }
+    });
 
     // initialize the classroom table
     $('#classroom_table').bootstrapTable({

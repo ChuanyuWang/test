@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -31,12 +30,10 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var checkinTab = require("./checkin-tab.vue");
-var opportunityTab = require("./opportunity-tab.vue");
-var consumeTab = require("./consume-tab.vue");
-var passiveTab = require("./passive-tab.vue");
-var class_service = require("../services/classes");
+var checkinTab = require("./checkin-tab.vue").default;
+var opportunityTab = require("./opportunity-tab.vue").default;
+var consumeTab = require("./consume-tab.vue").default;
+var passiveTab = require("./passive-tab.vue").default;
 
 module.exports = {
   name: "statistics-page",
@@ -54,7 +51,7 @@ module.exports = {
   computed: {},
   filters: {},
   methods: {},
-  created: function() {},
+  created: function() { },
   mounted: function() {
     var vm = this;
 
@@ -65,7 +62,7 @@ module.exports = {
 
     // refresh the chart when user switch to hint tab first time
     $(this.$el).find('a[href="#hint"]').one('shown.bs.tab', function(e) {
-        vm.$refs.passiveChart.refreshPassiveChart();
+      vm.$refs.passiveChart.refreshPassiveChart();
     });
   }
 };

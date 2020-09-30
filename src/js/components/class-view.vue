@@ -108,11 +108,11 @@ div.container
  */
 
 var util = require("../common.js");
-var date_picker = require("./date-picker.vue");
+var date_picker = require("./date-picker.vue").default;
 var teacher_service = require("../services/teachers");
 var class_service = require("../services/classes");
-var member_select_modal = require("./member-select-modal.vue");
-var add_book_modal = require("./add-book-modal.vue");
+var member_select_modal = require("./member-select-modal.vue").default;
+var add_book_modal = require("./add-book-modal.vue").default;
 
 module.exports = {
   name: "class-view",

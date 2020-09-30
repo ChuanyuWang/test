@@ -5,7 +5,7 @@
  */
 
 var i18nextplugin = require('./locales/i18nextplugin');
-var adminConsole = require('./components/admin-console.vue');
+var adminConsole = require('./components/admin-console.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -15,7 +15,7 @@ $(document).ready(function() {
     new Vue({
         el: '#admin-app',
         //data: {cls:data},
-        components: { 'admin-console' : adminConsole }
+        components: { 'admin-console': adminConsole }
     });
 
     $('.nav-tabs a').click(function(e) {

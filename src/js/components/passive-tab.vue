@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -18,7 +17,6 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
 var util = require("../services/util");
 
 module.exports = {
@@ -321,7 +319,7 @@ module.exports = {
       this.passiveChart3.setOption(option);
     }
   },
-  created: function() {},
+  created: function() { },
   mounted: function() {
     // register vintage Theme for echarts
     var colorPalette = [

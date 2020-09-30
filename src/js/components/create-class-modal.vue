@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -49,7 +48,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('./date-picker.vue');
+var date_picker = require('./date-picker.vue').default;
 
 module.exports = {
   components: {
@@ -124,8 +123,8 @@ module.exports = {
         capacity: this.capacity,
         classroom: this.classroom,
         age: { // age is stored as months
-          min: this.age.min ? parseInt(this.age.min*12) : null,
-          max: this.age.max ? parseInt(this.age.max*12) : null
+          min: this.age.min ? parseInt(this.age.min * 12) : null,
+          max: this.age.max ? parseInt(this.age.max * 12) : null
         }
       };
       this.$emit("ok", createdClass);

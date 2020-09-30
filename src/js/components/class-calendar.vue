@@ -1,14 +1,14 @@
 <style lang='less'>
 .class-table {
-  table-layout : fixed;
+  table-layout: fixed;
   tbody td p {
-    display:inline-block;
-    height : 100%;
+    display: inline-block;
+    height: 100%;
     padding-bottom: 16px;
-    margin-bottom : -6px;
+    margin-bottom: -6px;
   }
   tbody tr td {
-    overflow:hidden;
+    overflow: hidden;
   }
 }
 </style>
@@ -77,10 +77,10 @@ function getMonday(date) {
 module.exports = {
   name: "app",
   components: {
-    'notification': require("./notification.vue"),
-    "date-picker": require("./date-picker.vue"),
-    "class-list": require("./class-list.vue"),
-    "create-class-modal": require("./create-class-modal.vue")
+    'notification': require("./notification.vue").default,
+    "date-picker": require("./date-picker.vue").default,
+    "class-list": require("./class-list.vue").default,
+    "create-class-modal": require("./create-class-modal.vue").default
   },
   props: {
     classrooms: Array // Array of available classroom

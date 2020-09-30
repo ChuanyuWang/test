@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('./locales/i18nextplugin');
-var statisticsPage = require('./components/statistics-page.vue');
+var statisticsPage = require('./components/statistics-page.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -14,7 +14,7 @@ $(document).ready(function() {
     new Vue({
         el: '#statistics-app',
         //data: {cls:data},
-        components: { 'statistics-page' : statisticsPage }
+        components: { 'statistics-page': statisticsPage }
     });
 });
 

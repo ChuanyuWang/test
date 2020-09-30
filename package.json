@@ -1,13 +1,14 @@
 {
   "name": "e-education",
-  "version": "0.5.3",
+  "version": "0.9.0",
   "description": "On-line course management",
   "private": true,
-  "main": "app.js",
+  "main": "./bin/www",
   "scripts": {
-    "grunt": "grunt",
-    "dev": "grunt default",
-    "build": "grunt build",
+    "grunt": "grunt build",
+    "dev": "nodemon",
+    "lint": "eslint . --ext .js,.vue",
+    "build": "webpack --config webpack.config.prod.js",
     "bower": "bower",
     "start": "node ./bin/www",
     "mongo-express": "env ME_CONFIG_MONGODB_ENABLE_ADMIN=true ME_CONFIG_MONGODB_ADMINUSERNAME=admin ME_CONFIG_MONGODB_ADMINPASSWORD=pass mongo-express"
@@ -47,6 +48,11 @@
     "browserify": "^16.5.0",
     "browserify-hmr": "^0.3.7",
     "browserify-shim": "^3.8.14",
+    "css-loader": "^4.3.0",
+    "eslint": "^7.10.0",
+    "eslint-plugin-compat": "^3.8.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "eslint-webpack-plugin": "^2.1.0",
     "grunt": "~1.0.4",
     "grunt-browserify": "^5.3.0",
     "grunt-contrib-less": "~1.4.0",
@@ -55,10 +61,19 @@
     "grunt-develop": "^0.4.0",
     "grunt-env": "^0.4.4",
     "grunt-eslint": "^22.0.0",
-    "less": "~2.7.2",
+    "less": "^3.12.2",
+    "less-loader": "^7.0.1",
     "load-grunt-config": "^3.0.0",
+    "nodemon": "^2.0.4",
+    "pug-plain-loader": "^1.0.0",
     "time-grunt": "^1.4.0",
-    "vueify": "^9.4.1"
+    "vue-loader": "^15.9.3",
+    "vue-template-compiler": "^2.5.22",
+    "vueify": "^9.4.1",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-hot-middleware": "^2.25.0"
   },
   "optionalDependencies": {
     "mongo-express": "^0.42.2"
@@ -79,5 +94,22 @@
   "homepage": "https://github.com/ChuanyuWang/test#readme",
   "browserify-shim": {
     "vue": "global:Vue"
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "ignore": [
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "routes/",
+      "locales/",
+      "./*.js"
+    ],
+    "env": {
+      "NODE_ENV": "development",
+      "HOTRELOAD": true
+    },
+    "delay": "500"
   }
 }

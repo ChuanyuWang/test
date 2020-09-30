@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -63,12 +62,12 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('./date-picker.vue');
+var date_picker = require('./date-picker.vue').default;
 var teacher_service = require('../services/teachers');
 
 module.exports = {
   components: {
-      'date-picker': date_picker
+    'date-picker': date_picker
   },
   props: {
     classrooms: Array // list of available classrooms
@@ -105,7 +104,7 @@ module.exports = {
       })
     },
     dateFormat: function() {
-      return this.isRepeated ? {'format':'LT', "locale": "zh-CN"} : {'format':'lll', "locale": "zh-CN"};
+      return this.isRepeated ? { 'format': 'LT', "locale": "zh-CN" } : { 'format': 'lll', "locale": "zh-CN" };
     }
   },
   filters: {},
@@ -127,12 +126,12 @@ module.exports = {
   created: function() {
     // Load all teachers for selection
     var vm = this;
-    var request = teacher_service.getAll({status:'active'});
+    var request = teacher_service.getAll({ status: 'active' });
     request.done(function(data, textStatus, jqXHR) {
-        var all = data || [];
-        // all the unassigned option with null as id
-        all.push({name:'<未指定>',_id:null});
-        vm.teachers = all;
+      var all = data || [];
+      // all the unassigned option with null as id
+      all.push({ name: '<未指定>', _id: null });
+      vm.teachers = all;
     });
   }
 };

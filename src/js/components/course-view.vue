@@ -3,23 +3,24 @@
   margin: 15px 0;
   padding-bottom: 3px;
 }
-.participation-status div:hover{
+.participation-status div:hover {
   border-color: black;
   border-width: 1px;
   border-style: solid;
 }
 .participation-status-legend .progress {
   margin-bottom: 5px;
-  width:70px;
+  width: 70px;
   .progress-bar {
-    width:100%;  
+    width: 100%;
   }
 }
 .list-item {
   display: inline-block;
   margin-right: 10px;
 }
-.list-enter-active, .list-leave-active {
+.list-enter-active,
+.list-leave-active {
   transition: all 1s;
 }
 .list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
@@ -144,11 +145,11 @@ div.container
 
 var util = require('../common.js');
 var course_service = require("../services/courses");
-var add_multi_class_modal = require("./add-multi-class-modal.vue");
-var view_member_course_modal = require("./view-member-course-modal.vue");
-var show_booking_result_modal = require("./show-booking-result-modal.vue");
-var member_select_modal = require("./member-select-modal.vue");
-var confirm_delete_modal = require("./confirm-delete-course.vue");
+var add_multi_class_modal = require("./add-multi-class-modal.vue").default;
+var view_member_course_modal = require("./view-member-course-modal.vue").default;
+var show_booking_result_modal = require("./show-booking-result-modal.vue").default;
+var member_select_modal = require("./member-select-modal.vue").default;
+var confirm_delete_modal = require("./confirm-delete-course.vue").default;
 
 module.exports = {
   name: "course-view",
@@ -300,7 +301,7 @@ module.exports = {
       }).tooltip('show');
     },
     getClassroomName: function(value) {
-      for (var i=0;i<this.classrooms.length;i++) {
+      for (var i = 0; i < this.classrooms.length; i++) {
         if (this.classrooms[i].id == value)
           return this.classrooms[i].name;
       }
@@ -323,7 +324,7 @@ module.exports = {
         }
         return false;
       };
-      if (booking.some(hasReservation)){
+      if (booking.some(hasReservation)) {
         return checkinStatus;
       } else {
         return 'nonparticipant'
@@ -564,14 +565,14 @@ module.exports = {
     var vm = this;
     var request = course_service.getCourseClasses(vm.course._id);
     request.done(function(data, textStatus, jqXHR) {
-        // set classes property
-        vm.classes = data || [];
+      // set classes property
+      vm.classes = data || [];
     });
 
     var request2 = course_service.getCourseMembers(vm.course._id);
     request2.done(function(data, textStatus, jqXHR) {
-        // set members property
-        vm.members = data && data.members || [];
+      // set members property
+      vm.members = data && data.members || [];
     });
 
     // load the setting of tenant

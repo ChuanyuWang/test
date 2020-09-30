@@ -4,9 +4,9 @@
  * --------------------------------------------------------------------------
  */
 
-var cardComp = require('./components/card.vue');
-var date_picker = require('./components/date-picker.vue');
-var comment_dlg = require('./components/comment-modal.vue');
+var cardComp = require('./components/card.vue').default;
+var date_picker = require('./components/date-picker.vue').default;
+var comment_dlg = require('./components/comment-modal.vue').default;
 var common = require('./common');
 var memberService = require('./services/members');
 var class_service = require('./services/classes');
@@ -150,10 +150,10 @@ $(document).ready(function() {
     request.done(function(data, textStatus, jqXHR) {
         viewData.memberData = data;
         // bootstrap the member view page
-        new Vue({ extends: vueApp, data: viewData, el: '#member_app' });
+        new Vue({ el: '#member_app', extends: vueApp, data: viewData });
 
         // bootstrap the dialog of adding comment to class
-        commentDialog = new Vue({ extends: comment_dlg, el: '#commentDlg' });
+        commentDialog = new Vue({ el: '#commentDlg', extends: comment_dlg });
     });
 
     request.done(function(data, textStatus, jqXHR) {

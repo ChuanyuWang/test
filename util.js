@@ -30,8 +30,6 @@ helpers.connect = function(database) {
         return db;
     }
 
-    //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
-    var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
     var options = {
         authSource: 'admin',
         poolSize: 5
@@ -140,6 +138,6 @@ function findConnection(databaseName, connections) {
         }
     }
     return null;
-};
+}
 
 module.exports = helpers;

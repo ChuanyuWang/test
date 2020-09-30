@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -28,9 +27,8 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
 var util = require('../services/util');
-var date_picker = require('./date-picker.vue');
+var date_picker = require('./date-picker.vue').default;
 
 module.exports = {
   name: "consume-tab",
@@ -38,7 +36,7 @@ module.exports = {
   data: function() {
     return {
       consumeChart: null,
-      yearPickerConfig: {"format": "YYYY", "locale": "zh-CN", "viewMode": "years"},
+      yearPickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
       year: moment(new Date().getFullYear(), "YYYY"),
       unit: "month"
     };
@@ -68,7 +66,7 @@ module.exports = {
   methods: {
     refreshChart: function() {
       var vm = this;
-      
+
       var drawChartFunc = function(consumptionQueryResult, depositQueryResult) {
         vm.drawChart(
           vm.preChartData(
@@ -191,7 +189,7 @@ module.exports = {
       this.consumeChart.setOption(option);
     }
   },
-  created: function() {},
+  created: function() { },
   mounted: function() {
     // register vintage Theme for echarts
     var colorPalette = [
@@ -213,7 +211,7 @@ module.exports = {
         color: colorPalette
       }
     });
-    
+
     this.consumeChart = echarts.init(
       $(this.$el).find("#consume_chart")[0],
       "vintage"

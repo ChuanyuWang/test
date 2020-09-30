@@ -62,6 +62,27 @@ app.use(express.urlencoded({
     extended: true
 }));
 
+// Load the webpack-dev-middleware to support hot reload if it's enabled
+if (app.locals.ENV_DEVELOPMENT && process.env.HOTRELOAD === "true") {
+    console.log("[HotReload] webpack-dev-middleware is loaded");
+    const webpack = require('webpack');
+    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const config = require('./webpack.config.js'); // load dev webpack configuration
+    const compiler = webpack(config);
+    app.use(webpackDevMiddleware(compiler, {
+        // router "/js/*" requset to this middleware (in-memory)
+        publicPath: config.output.publicPath,
+    }));
+
+    /**
+     * path - The path which the middleware will serve the event stream on, must match the client setting
+     * heartbeat - How often to send heartbeat updates to the client to keep the connection alive. Should be less than the client's timeout setting - usually set to half its value.
+     */
+    app.use(require("webpack-hot-middleware")(compiler, {
+        log: console.log, path: '/__webpack_hmr', heartbeat: 1000
+    }));
+}
+
 //app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
