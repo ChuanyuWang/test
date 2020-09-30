@@ -6,7 +6,7 @@ var mongojs = require('mongojs');
 
 var VERSION = 5;
 var config_db = null;
-// initialize the 'config' database for setting router
+// initialize the 'config' database for admin router
 router.use(function(req, res, next) {
     config_db = config_db || util.connect('config');
     next();
@@ -76,7 +76,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         return next(error);
     }
 
-    if (['config', 'test', 'chuanyu', 'admin', 'setting', 'settings'].indexOf(req.body.name) > -1) {
+    if (['config', 'test', 'chuanyu', 'admin', 'setting', 'settings', 'api'].indexOf(req.body.name) > -1) {
         var error = new Error("tenant name is duplicated");
         error.status = 400;
         return next(error);
