@@ -17,7 +17,11 @@ var helpers = {};
 
 helpers.connectionURI = function(database) {
     //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
-    return util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
+    if (config.user) {
+        return util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
+    } else {
+        return util.format("mongodb://%s/%s", config.host, database);
+    }
 };
 
 helpers.connect = function(database) {
@@ -78,9 +82,7 @@ helpers.connect2 = function(database) {
         authSource: 'admin'
     };
 
-    //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
-    var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
-    var conn = mongoose.createConnection(uriString, options);
+    var conn = mongoose.createConnection(helpers.connectionURI(database), options);
     conn.then(function(params) {
         console.log('[mongoose] database "%s" is connected', database);
     }, function(err) {
@@ -116,9 +118,7 @@ helpers.connect3 = function(database) {
         authSource: 'admin'
     };
 
-    //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
-    var uriString = util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
-    var conn = monk(uriString, options);
+    var conn = monk(helpers.connectionURI(database), options);
     conn.then(function(params) {
         console.log('[monk] database "%s" is connected', database);
     }, function(err) {
