@@ -8,7 +8,7 @@ var i18nextplugin = require('./locales/i18nextplugin');
 var adminConsole = require('./components/admin-console.vue').default;
 
 // DOM Ready =============================================================
-$(document).ready(function() {
+$(function() {
     init();
 
     // bootstrap the admin console

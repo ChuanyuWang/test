@@ -24,7 +24,7 @@
 
 <template lang="pug">
 div
-  div.panel.col-sm-3(:data='data',style='padding-top:15px',@add='addUnsaveOne')
+  div.panel.col-sm-3(style='padding-top:15px',@add='addUnsaveOne')
     template(v-for='(tenant, index) in tenants')
       div.media.tenant-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-tenant" : ""]')
         div.media-left
@@ -41,7 +41,7 @@ div
       form.form-horizontal(v-show='hasData')
         div.form-group
           label.col-sm-3.control-label {{$t('status')}}:
-          select.col-sm-5.form-control(v-model='selectedTenant.status',style='margin-left:15px;width:auto')
+          select.col-sm-5.form-control(v-model='selectedTenant.status',style='margin-left:15px;width:auto', @change='changeStatus()')
             option.text-success(value='active') active
             option.text-danger(value='inactive') inactive
         div.form-group(:class='{"has-error": errors.name}')
@@ -179,6 +179,22 @@ module.exports = {
         logoPath: ""
       });
       this.setSelectedIndex(this.tenants.length - 1);
+    },
+    changeStatus: function(e) {
+      var request = $.ajax("/admin/api/tenant/" + this.selectedTenant.name, {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+          status: this.selectedTenant.status
+        }),
+        dataType: "json"
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("change tenant fails", jqXHR);
+      });
+      request.done(function(data, textStatus, jqXHR) {
+        // TODO
+      });
     },
     setSelectedIndex: function(index) {
       this.selectedIndex = index;

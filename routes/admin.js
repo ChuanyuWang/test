@@ -4,7 +4,7 @@ var Account = require('../account');
 var util = require('../util');
 var mongojs = require('mongojs');
 
-var VERSION = 5;
+var VERSION = 5; // current tenant version
 var config_db = null;
 // initialize the 'config' database for admin router
 router.use(function(req, res, next) {
@@ -108,6 +108,41 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
             console.log("tenant %j is created", req.body);
             res.send(doc);
         });
+    });
+});
+
+// update the tenant
+router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
+    // Only tenant status will be updated by admin
+    if (!req.body.status) {
+        var error = new Error("tenant status is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
+    var tenants = config_db.collection('tenants');
+    tenants.findAndModify({
+        query: {
+            name: req.params.name
+        },
+        update: {
+            $set: { status: req.body.status === "inactive" ? "inactive" : "active" }
+        },
+        new: true
+    }, function(err, doc, lastErrorObject) {
+        if (err) {
+            var error = new Error("Update tenant fails");
+            error.innerError = err;
+            return next(error);
+        }
+        if (!doc) {
+            var error = new Error(`Tenant ${req.params.name} doesn't exist`);
+            error.status = 400;
+            return next(error);
+        }
+
+        console.log("tenant %s is updated by %j", req.params.name, req.body);
+        res.send(doc);
     });
 });
 
