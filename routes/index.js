@@ -122,18 +122,26 @@ function getTenantInfo(req, res, next) {
         name: req.params.tenantName
     }, function(err, tenant) {
         if (err) {
-            var error = new Error("get tenant fails");
+            let error = new Error("get tenant fails");
             error.innerError = err;
             return next(error);
         }
         if (!tenant) {
-            var error = new Error(`tenant ${req.params.tenantName} doesn't exist`);
+            let error = new Error(`tenant ${req.params.tenantName} doesn't exist`);
             error.status = 400;
             return next(error);
         }
 
         if (tenant.status === 'inactive') {
-            return next(new Error("门店已关闭或停用，请稍后再试"));
+            if (req.user) {
+                // force to logout if user login inactive tenant
+                if (req.user.tenant === tenant.name) {
+                    req.logout();
+                }
+            }
+            let error = new Error("门店已关闭或停用，请稍后再试。");
+            error.status = 400;
+            return next(error);
         }
 
         req.tenant = tenant;
