@@ -132,6 +132,10 @@ function getTenantInfo(req, res, next) {
             return next(error);
         }
 
+        if (tenant.status === 'inactive') {
+            return next(new Error("门店已关闭或停用，请稍后再试"));
+        }
+
         req.tenant = tenant;
         req.db = util.connect(tenant.name);
         // navTitle is the title on the navigation bar

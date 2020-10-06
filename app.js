@@ -166,7 +166,7 @@ if (app.locals.ENV_DEVELOPMENT) {
         res.render('error', {
             message: err.message,
             error: err,
-            title: 'error'
+            title: res.__('error_title')
         });
     });
 }
