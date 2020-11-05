@@ -32,7 +32,7 @@ if (ua.indexOf('micromessenger') > -1) { // we are within wechat
     }
 }
 
-//getOpenId("abc"); // testing only
+//getOpenId("071wHvFa1DEwVz00lsIa1XQYSn0wHvF6"); // testing only
 
 // DOM Ready =============================================================
 $(document).ready(function() {
