@@ -16,26 +16,29 @@ var currentMonday = null;
 // the minimum age
 var minimumAge = null; // default is all
 
-// DOM Ready =============================================================
-$(document).ready(function () {
-    init();
-    
-    // try to get the openid of weixin user
-    window._openid = getCurrentUser(); /*global getCurrentUser*/
-    if (!_openid || _openid.length == 0) {
-        $.ajax("api/currentuser", {
-            type : "GET",
-            data : {
-                timeKey : getTimeKey() /*global getTimeKey*/
-            },
-            success : function (data) {
-                _openid = data.openid; // could be null
-            },
-            dataType : "json"
-        });
+var ua = navigator.userAgent.toLowerCase();
+if (ua.indexOf('micromessenger') > -1) { // we are within wechat
+    var tenant = common.getTenantName();
+    if (tenant === "test") {
+        var code = common.getParam("code");
+        if (!code) {
+            // TODO, get appID from tenant if wechat integration is enabled
+            var appID = "wxe4283737fc91496e";
+            var localURL = location.href;
+            location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appID + "&redirect_uri=" + encodeURIComponent(localURL) + "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
+        } else {
+            getOpenId(code);
+        }
     }
+}
 
-    $('#book_dlg').on('show.bs.modal', function (event) {
+//getOpenId("abc"); // testing only
+
+// DOM Ready =============================================================
+$(document).ready(function() {
+    init();
+
+    $('#book_dlg').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var item_id = button.closest('.book-col').data('id');
         var item = cls_cache[item_id];
@@ -45,7 +48,7 @@ $(document).ready(function () {
             console.error("Can't get the class or event item with id %s", item_id);
             return;
         }
-        
+
         var modal = $(this);
         modal.find('#quantity').val(1);
         modal.find('#time').text(moment(item.date).format('MMMDoah:mm'));
@@ -54,22 +57,22 @@ $(document).ready(function () {
         modal.find('#contact').val(localStorage._contact);
         modal.find('#book_ok').data('id', item._id);
     });
-    
+
     $('#book_ok').click(handleBookOK);
 
-    $('#previous_week').click(function (event) {
+    $('#previous_week').click(function(event) {
         $("this").prop("disabled", true);
         currentMonday.subtract(7, 'days');
         updateSchedule($("this"));
     });
 
-    $('#next_week').click(function (event) {
+    $('#next_week').click(function(event) {
         $("this").prop("disabled", true);
         currentMonday.add(7, 'days');
         updateSchedule($("this"));
     });
-    
-    $('#current_week').click(function (event) {
+
+    $('#current_week').click(function(event) {
         $("this").prop("disabled", true);
         currentMonday = getMonday(moment());
         updateSchedule($("this"));
@@ -135,7 +138,7 @@ function init() {
         option_ele.prop('selected', true);
     }
     // handle user change the classroom after set the selected option, if there is filter control
-    $('#chooseRoom').change(function (event) {
+    $('#chooseRoom').change(function(event) {
         var selectedOptions = $(this).find('option:selected');
         if (selectedOptions.length == 1) {
             // update the title
@@ -182,7 +185,7 @@ function handleBookOK(event) {
     var hasError = false;
     // validate the input
     var bookInfo = {
-        classid : item_id
+        classid: item_id
     };
     bookInfo.name = modal.find('#name').val().trim();
     if (!bookInfo.name || bookInfo.name.length == 0) {
@@ -213,8 +216,8 @@ function handleBookOK(event) {
         try {
             localStorage._name = bookInfo.name;
             localStorage._contact = bookInfo.contact;
-        }catch (oException) {
-            if(oException.name == 'QuotaExceededError'){
+        } catch (oException) {
+            if (oException.name == 'QuotaExceededError') {
                 console.error('超出本地存储限额！');
                 //clear the local storage
                 localStorage.clear();
@@ -227,10 +230,10 @@ function handleBookOK(event) {
 function addNewBook(bookInfo) {
     bookInfo.tenant = common.getTenantName();
     $.ajax("/api/booking", {
-        type : "POST",
-        contentType : "application/json; charset=utf-8",
-        data : JSON.stringify(bookInfo),
-        success : function (data) {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(bookInfo),
+        success: function(data) {
             //console.log("book successfully with ", bookInfo);
             // update cache
             var classInfo = data['class'];
@@ -246,10 +249,10 @@ function addNewBook(bookInfo) {
 
             displaySuccess(data['member'], classInfo);
         },
-        error : function (jqXHR, status, err) {
+        error: function(jqXHR, status, err) {
             displayError(jqXHR.responseJSON, bookInfo);
         },
-        dataType : "json"
+        dataType: "json"
     });
 }
 
@@ -263,34 +266,36 @@ function displaySuccess(member, classInfo) {
     //TODO, support multi membership card
     var credit = 0;
     if (member.membership && member.membership.length > 0) {
-        credit = Math.round(member.membership[0].credit * 10)/10;
+        credit = Math.round(member.membership[0].credit * 10) / 10;
         message += '<br>您还剩余' + credit + '课时';
     }
     if (member.membership && member.membership.length > 0) {
         message += '，有效期至' + moment(member.membership[0].expire).format('ll');
     }
-    
+
     $('#success_dlg').find("p#message").html(message);
     $('#success_dlg').modal('show');
-    
+
     // send a message to user through weixin
     if (_openid) {
+        var tenant = common.getTenantName();
         var msg = {
-            openid : _openid,
-            message : "您已预约" + moment(classInfo.date).format('MMMDoah:mm') 
-                + "的课程，请准时参加。\n您还剩余" + credit + "课时"
+            openid: _openid,
+            message: "您已预约" + moment(classInfo.date).format('MMMDoah:mm')
+                + "的课程，请准时参加。\n您还剩余" + credit + "课时",
+            tenant: tenant
         };
-        $.ajax("api/sendText", {
-            type : "POST",
-            contentType : "application/json; charset=utf-8",
-            data : JSON.stringify(msg),
-            success : function (data) {
+        $.ajax("/api/sendNotification", {
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(msg),
+            success: function(data) {
                 //TODO
             },
-            error : function (jqXHR, status, err) {
+            error: function(jqXHR, status, err) {
                 console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
             },
-            dataType : "json"
+            dataType: "json"
         });
     }
 }
@@ -307,30 +312,30 @@ function displayClass(item) {
         list.append('<div class="class-separator"></div>');
         // append a new class row
         list.append('<div class="row class-row">' +
-                        '<div class="col-xs-2 date-col">' + 
-                            '<p>' + tmp + '<br><small>' + date.format('ddd') + '</small></p>' + 
-                        '</div>' + 
-                        '<div class="col-xs-10 content-col"></div>' + 
-                    '</div>');
+            '<div class="col-xs-2 date-col">' +
+            '<p>' + tmp + '<br><small>' + date.format('ddd') + '</small></p>' +
+            '</div>' +
+            '<div class="col-xs-10 content-col"></div>' +
+            '</div>');
     }
 
     // insert a class in last row
     var cls_col = '<p>' + item.name + '</p>';
-    
+
     var cls_cost = '';
     if (item.cost && item.cost > 0) {
         cls_cost = '<span class="cls-tip"><span class="glyphicon glyphicon-bell"></span>' + item.cost + '课时</span>';
     } else if (item.courseID) {
-        cls_cost ='';
+        cls_cost = '';
     } else {
         cls_cost = '<span class="cls-free">公益活动</span>';
     }
 
     var cls_tip = ['<p class="cls-tip"><span class="glyphicon glyphicon-time"></span>',
-                    date.format('HH:mm') + ' ',
-                    cls_cost + ' ',
-                    getAgeLimit(item),
-                    '</p>'].join('');
+        date.format('HH:mm') + ' ',
+        cls_cost + ' ',
+        getAgeLimit(item),
+        '</p>'].join('');
 
     var remaining = common.classRemaining(item);
     if (date < moment().subtract(1, 'hours')) {
@@ -344,17 +349,17 @@ function displayClass(item) {
         var btn_book = '<button class="btn btn-danger book-btn">已满</button>';
         var btn_tip = '<button class="btn btn-danger remain-btn" disabled="disabled">剩余<span class="badge remain-span">0</span></button>';
     }
-    
+
     lastRow = list.find('div.class-row:last-child');
     lastRow.find('.content-col').append(
         '<div>' +
-        '<div class="cls-col">' + 
-            cls_col + 
-            cls_tip + 
-        '</div>' + 
-        '<div class="book-col" data-id="' + item._id + '">' + 
-            btn_book + 
-            btn_tip + 
+        '<div class="cls-col">' +
+        cls_col +
+        cls_tip +
+        '</div>' +
+        '<div class="book-col" data-id="' + item._id + '">' +
+        btn_book +
+        btn_tip +
         '</div>' +
         '</div>');
 }
@@ -364,16 +369,16 @@ function updateSchedule(control) {
     var begin = moment(currentMonday);
     var end = moment(currentMonday).add(7, 'days');
     $.ajax("/api/classes", {
-        type : "GET",
+        type: "GET",
         //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-        data : {
-            from : begin.toISOString(),
-            to : end.toISOString(),
-            classroom : classroomID,
-            tenant : common.getTenantName(),
-            minAge : minimumAge
+        data: {
+            from: begin.toISOString(),
+            to: end.toISOString(),
+            classroom: classroomID,
+            tenant: common.getTenantName(),
+            minAge: minimumAge
         },
-        success : function (data) {
+        success: function(data) {
             for (var i = 0; i < data.length; i++) {
                 //cache every displayed class or event
                 cls_cache[data[i]._id] = data[i];
@@ -384,15 +389,15 @@ function updateSchedule(control) {
             }
             scrollToToday();
         },
-        error : function (jqXHR, status, err) {
+        error: function(jqXHR, status, err) {
             console.error(jqXHR.responseText);
         },
-        complete : function (jqXHR, status) {
+        complete: function(jqXHR, status) {
             if (control) {
                 control.prop("disabled", false);
             }
         },
-        dataType : "json"
+        dataType: "json"
     });
 }
 
@@ -430,8 +435,8 @@ function clearSchedule() {
 
 function getAgeLimit(cls) {
     var age = cls.age || {};
-    age.min = age.min ? Math.round(age.min/12*10)/10 : null;
-    age.max = age.max ? Math.round(age.max/12*10)/10 : null;
+    age.min = age.min ? Math.round(age.min / 12 * 10) / 10 : null;
+    age.max = age.max ? Math.round(age.max / 12 * 10) / 10 : null;
     if (age.min && age.max) {
         return "年龄" + age.min + "至" + age.max + "岁";
     } else if (age.min) {
@@ -440,4 +445,19 @@ function getAgeLimit(cls) {
         return "年龄小于" + age.max + "岁";
     }
     return "";
+}
+
+function getOpenId(code) {
+    var tenant = common.getTenantName();
+    $.ajax("/api/getOpenID", {
+        type: "GET",
+        data: {
+            "code": code,
+            "tenant": tenant
+        },
+        success: function(data) {
+            _openid = (data || {}).openid;
+        },
+        dataType: "json"
+    });
 }

@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.7",
+    "bent": "^7.3.12",
     "bower": "^1.8.8",
     "compression": "^1.7.2",
     "connect-flash": "^0.1.1",
