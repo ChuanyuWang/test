@@ -59,43 +59,8 @@ router.use('/api', require('./api'));
 router.use('/admin', require("./admin"));
 
 // route different tenant
-router.use('/bqsq', getTenantInfo2, require("./tenant"));
 router.use('/mygirl', require('./mygirl')); // load customize tenant before others
 router.use('/t/:tenantName/', getTenantInfo, require("./tenant"));
-
-// remove bqsq tenant path later
-function getTenantInfo2(req, res, next) {
-    // cache the tenant object in request, e.g.
-    /* tenant object
-    {
-        appid : 'wxe5e454c5dff8c7b2',
-        appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
-        token : 'Hibanana',
-        encodingAESKey : '',
-        name : 'test',
-        displayName : '大Q小q',
-        version : 1,
-        classroom : []
-    };
-    */
-    var config_db = util.connect('config');
-    if (!config_db) {
-        return next(new Error("database config is not existed"));
-    }
-    config_db.collection('tenants').findOne({
-        name: 'bqsq'
-    }, function(err, tenant) {
-        if (err) {
-            console.error(err);
-        }
-
-        req.db = util.connect('bqsq');
-        req.tenant = tenant || {};
-        res.locals.navTitle = req.tenant.displayName || "";
-        res.locals.tenant_feature = tenant.feature || "";
-        next();
-    });
-}
 
 function getTenantInfo(req, res, next) {
     // cache the tenant object in request, e.g.
@@ -107,6 +72,7 @@ function getTenantInfo(req, res, next) {
         encodingAESKey : '',
         name : 'test',
         displayName : '大Q小q',
+        feature: 'book',
         version : 1,
         classroom : [],
         contact : '136-6166-4265',
@@ -148,7 +114,7 @@ function getTenantInfo(req, res, next) {
         req.db = util.connect(tenant.name);
         // navTitle is the title on the navigation bar
         res.locals.navTitle = tenant.displayName || "";
-        res.locals.tenant_feature = tenant.feature || "common"; // default is book
+        res.locals.tenant_feature = tenant.feature || "common"; // default is common
         next();
     });
 }
