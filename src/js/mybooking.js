@@ -7,31 +7,13 @@ var common = require('./common');
 // local cache for class or event
 var cls_cache = {};
 // open id of Weichat user
-var _openid = undefined;
+//var _openid = undefined;
 
 var memberid = undefined;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
-
-    // try to get the openid of weixin user
-    window._openid = getCurrentUser(); /*global getCurrentUser*/
-    if (!_openid || _openid.length == 0) {
-        $.ajax("api/currentuser", {
-            type: "GET",
-            data: {
-                timeKey: getTimeKey() /*global getTimeKey*/
-            },
-            success: function(data) {
-                _openid = data.openid; // could be null
-            },
-            error: function(jqXHR, textStatus, error) {
-                console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
-            },
-            dataType: "json"
-        });
-    }
 
     $('.nav-tabs a').click(function(e) {
         // delay the update until DOM tree status refresh
