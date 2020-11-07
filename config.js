@@ -1,5 +1,4 @@
 module.exports = {
-    port: 7004,
     log4js: {
         /**
          * use the `disableClustering: true` option in your log4js configuration
