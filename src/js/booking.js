@@ -55,7 +55,7 @@ $(document).ready(function() {
         modal.find('#content').text(item.name);
         modal.find('#name').val(localStorage._name);
         modal.find('#contact').val(localStorage._contact);
-        modal.find('#book_ok').data('id', item._id);
+        modal.find('#book_ok').data('id', item._id); // pass the selected class id to click handler
     });
 
     $('#book_ok').click(handleBookOK);

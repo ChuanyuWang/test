@@ -47,6 +47,11 @@ module.exports = {
         bootstrap_dev: 'https://cdn.bootcss.com/twitter-bootstrap/3.4.1/js/bootstrap.js',
         momentjs: 'https://cdn.bootcss.com/moment.js/2.22.1/moment-with-locales.min.js',
         momentjs_dev: 'https://cdn.bootcss.com/moment.js/2.22.1/moment-with-locales.js',
+        /**
+         * Steps of upgrade vue version?
+         * 1. Update vue CDN version
+         * 2. Update vue-template-compiler version, the same as vue
+         */
         vue: 'https://cdn.bootcss.com/vue/2.6.12/vue.min.js',
         vue_dev: 'https://cdn.bootcss.com/vue/2.6.12/vue.js',
         i18next: 'https://cdn.bootcdn.net/ajax/libs/i18next/11.3.2/i18next.min.js',
