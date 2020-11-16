@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
 var dbUtility = require('../../util');
-var monk = require('monk');
+const mongoist = require('mongoist');
 
 var NORMAL_FIELDS = {
     name: 1,
@@ -15,7 +15,7 @@ var NORMAL_FIELDS = {
 router.use(helper.isAuthenticated);
 
 router.get('/', function(req, res, next) {
-    var teachers = dbUtility.connect3(req.tenant.name).get('teachers');
+    const teachers = dbUtility.connect4(req.db).collection('teachers');
     var query = {};
     if (req.query.hasOwnProperty('name')) {
         query['name'] = req.query.name;
@@ -41,14 +41,14 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
         return next(error);
     }
 
-    var db = dbUtility.connect3(req.tenant.name);
+    const db = dbUtility.connect4(req.tenant.name);
 
     convertDateObject(req.body);
     if (!req.body.hasOwnProperty('status'))
         req.body.status = 'inactive';
     delete req.body._id;
 
-    var teachers = db.get("teachers");
+    var teachers = db.collection("teachers");
     teachers.insert(req.body).then(function(docs) {
         console.log("teacher is added %j", docs);
         return res.json(docs);
@@ -60,18 +60,20 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
 });
 
 router.patch('/:teacherID', helper.requireRole("admin"), function(req, res, next) {
-    var db = dbUtility.connect3(req.tenant.name);
-    var teachers = db.get("teachers");
+    const db = dbUtility.connect4(req.tenant.name);
+    var teachers = db.collection("teachers");
     convertDateObject(req.body);
     delete req.body._id;
 
-    teachers.findOneAndUpdate({
-        _id: monk.id(req.params.teacherID)
-    }, {
-        $set: req.body
-    }, {
-        projection: NORMAL_FIELDS,
-        returnOriginal: false
+    teachers.findAndModify({
+        query: {
+            _id: mongoist.ObjectId(req.params.teacherID)
+        },
+        update: {
+            $set: req.body
+        },
+        fields: NORMAL_FIELDS,
+        new: true
     }).then(function(updatedDoc) {
         if (updatedDoc) {
             console.log("teacher %s is updated by %j", req.params.teacherID, req.body);
@@ -89,30 +91,32 @@ router.patch('/:teacherID', helper.requireRole("admin"), function(req, res, next
 });
 
 router.delete('/:teacherID', helper.requireRole("admin"), function(req, res, next) {
-    var db = dbUtility.connect3(req.tenant.name);
-    var classes = db.get('classes');
-    classes.findOne({teacher:monk.id(req.params.teacherID)},'name').then(function(doc) {
-        let teachers = db.get("teachers");
+    const db = dbUtility.connect4(req.tenant.name);
+    const classes = db.collection('classes');
+    classes.findOne({ teacher: mongoist.ObjectId(req.params.teacherID) }, { 'name': 1 }).then(function(doc) {
+        let teachers = db.collection("teachers");
         if (doc) {
-            // set the teacher's status as 'deleted'
-            return teachers.findOneAndUpdate({
-                _id: monk.id(req.params.teacherID)
-            }, {
-                $set: {'status': "deleted"}
-            }, {
-                projection: NORMAL_FIELDS,
-                returnOriginal: false
+            // set the teacher's status as 'deleted' if any class exists
+            return teachers.findAndModify({
+                query: {
+                    _id: mongoist.ObjectId(req.params.teacherID)
+                },
+                update: {
+                    $set: { 'status': "deleted" }
+                },
+                fields: NORMAL_FIELDS,
+                new: true
             }).then(function(doc) {
                 console.log("teacher %s is marked as deleted", req.params.teacherID);
                 return doc;
             });
         } else {
-            return teachers.remove({_id: monk.id(req.params.teacherID)}, {
-                single: true
+            return teachers.remove({ _id: mongoist.ObjectId(req.params.teacherID) }, {
+                justOne: true
             }).then(function(result) {
-                // result.result == {"ok":1,"n":1}
+                // result == {"ok":1,"n":1, "deletedCount":1}
                 console.log("teacher %s is deleted", req.params.teacherID);
-                return result.result;
+                return result;
             });
         }
     }).then(function(result) {
