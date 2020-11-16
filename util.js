@@ -3,6 +3,7 @@ var util = require('util');
 var config = require('./config.db');
 var mongoose = require('mongoose');
 var monk = require('monk');
+const mongoist = require('mongoist');
 
 // Use native promises, more refer to http://mongoosejs.com/docs/promises.html
 mongoose.Promise = global.Promise;
@@ -129,6 +130,18 @@ helpers.connect3 = function(database) {
     // Store the connection in the connections pool.
     monkConnections[database] = conn;
     return conn;
+};
+
+/**
+ * Create a mongodb connection using mongoist
+ * @param {string | object} database database name or `mongojs` instance
+ */
+helpers.connect4 = function(database) {
+    if (typeof database === 'string') {
+        const connection = helpers.connect(database);
+        return mongoist(connection);
+    }
+    return mongoist(database);
 };
 
 function findConnection(databaseName, connections) {
