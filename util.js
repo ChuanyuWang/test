@@ -2,7 +2,6 @@ var mongojs = require('mongojs');
 var util = require('util');
 var config = require('./config.db');
 var mongoose = require('mongoose');
-var monk = require('monk');
 const mongoist = require('mongoist');
 
 // Use native promises, more refer to http://mongoosejs.com/docs/promises.html
@@ -11,7 +10,6 @@ mongoose.Promise = global.Promise;
 // Store all connected connections.
 var connections = [];
 var connections2 = {};
-var monkConnections = {};
 
 // export helper functions
 var helpers = {};
@@ -93,42 +91,6 @@ helpers.connect2 = function(database) {
 
     // Store the connection in the connections pool.
     connections2[database] = conn;
-    return conn;
-};
-
-/**
- * 
- * @param {String} database name of database to be connected
- * @returns connection created by `monk(uri, options)`
- */
-helpers.connect3 = function(database) {
-    if (typeof database != "string" || database.length == 0) {
-        throw new Error("parameter database is not string or empty");
-    }
-    //  If a connection was found, return with it.
-    if (monkConnections[database]) {
-        return monkConnections[database];
-    }
-    var options = {
-        //keepAlive: 120,
-        reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-        reconnectInterval: 500, // Reconnect every 500ms
-        poolSize: 3, // Maintain up to 3 socket connections for each database
-        // If not connected, return errors immediately rather than waiting for reconnect
-        bufferMaxEntries: 0,
-        authSource: 'admin'
-    };
-
-    var conn = monk(helpers.connectionURI(database), options);
-    conn.then(function(params) {
-        console.log('[monk] database "%s" is connected', database);
-    }, function(err) {
-        console.error('[monk] connect database "%s" with error', database, err);
-        delete monkConnections[database];
-    });
-
-    // Store the connection in the connections pool.
-    monkConnections[database] = conn;
     return conn;
 };
 

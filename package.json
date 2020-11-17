@@ -28,7 +28,6 @@
     "mongoist": "^2.5.3",
     "mongojs": "~2.6.0",
     "mongoose": "^4.13.7",
-    "monk": "^6.0.5",
     "morgan": "^1.10.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",

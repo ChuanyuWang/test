@@ -20,10 +20,10 @@ var NORMAL_FIELDS = {
 router.get('/', function(req, res, next) {
     var tenantDB = null;
     if (req.query.hasOwnProperty('tenant')) {
-        tenantDB = util.connect3(req.query.tenant);
+        tenantDB = util.connect4(req.query.tenant);
     } else if (req.tenant.name) {
         // initialize the tenant db if it's authenticated user
-        tenantDB = util.connect3(req.tenant.name);
+        tenantDB = util.connect4(req.tenant.name);
     } else {
         var err = new Error("Missing param 'tenant'");
         err.status = 400;
@@ -76,12 +76,7 @@ router.get('/', function(req, res, next) {
         ];
     }
     var classes = tenantDB.collection("classes");
-    classes.find(query, {
-        fields: NORMAL_FIELDS,
-        sort: {
-            date: sort
-        }
-    }).then(function(docs) {
+    classes.findAsCursor(query, NORMAL_FIELDS).sort({ date: sort }).toArray().then(function(docs) {
         console.log("find classes: ", docs ? docs.length : 0);
         return res.json(docs);
     }).catch(function(err) {
