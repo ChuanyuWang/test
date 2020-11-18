@@ -34,9 +34,8 @@ console.error = logger.error.bind(logger);
 app.use(require('helmet')());
 
 // passport config
-var Account = require('./account');
-var LocalStrategy = require('passport-local').Strategy;
-passport.use(new LocalStrategy(Account.authenticate()));
+const Account = require('./account');
+passport.use(Account.createStrategy());
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
