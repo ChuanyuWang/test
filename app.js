@@ -11,6 +11,7 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var config = require('./config');
 var i18n = require('i18n');
+const helmet = require('helmet');
 
 // main application
 var app = express();
@@ -31,7 +32,21 @@ console.debug = logger.debug.bind(logger);
 console.error = logger.error.bind(logger);
 
 //setting various HTTP headers.
-app.use(require('helmet')());
+app.use(helmet({
+    contentSecurityPolicy: false,
+}));
+// Sets all of the defaults, but overrides script-src
+/* Uncomment below code when enable contentSecurityPolicy
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "style-src": [`'self'`, `'unsafe-inline'`, "cdn.bootcdn.net/"],
+            "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "cdn.bootcdn.net/"],
+        },
+    })
+);
+*/
 
 // passport config
 const Account = require('./account');
