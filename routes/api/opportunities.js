@@ -49,7 +49,7 @@ router.post('/', verifyCode, function(req, res, next) {
 
     var opportunities = tenantDB.collection("opportunities");
     //if the same opportunity is posted twice, the last one will override the previous
-    opportunities.update(query, newDoc, { upsert: true }, function(err, result) {
+    opportunities.updateOne(query, { $set: newDoc }, { upsert: true }, function(err, result) {
         if (err) {
             var error = new Error('Add opportunity fails with error');
             error.innerError = err;
