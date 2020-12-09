@@ -82,7 +82,7 @@ module.exports = {
       remark: "",
       location: "上海嘉定五彩城店",
       nc: null,
-      nc_appKey: "FFFF0N000000000084E3",
+      //nc_appKey: "FFFF0N000000000084E3", // comment out for purpose
       nc_token: [
         "FFFF0N000000000084E3",
         new Date().getTime(),
@@ -97,9 +97,7 @@ module.exports = {
     errors: function() {
       var errors = {};
       if (!this.name || this.name.length == 0) errors.name = "姓名不能为空";
-      if (!this.contact || this.contact.length == 0)
-        errors.contact = "联系方式未指定";
-      else if (!/^1[345789]\d{9}$/.test(this.contact)) {
+      if (!/^1[345789]\d{9}$/.test(this.contact)) {
         errors.contact = "请输入正确的手机号码(11位)";
       }
       if (!this.verifyCode) errors.verifyCode = "请输入验证码";
@@ -162,8 +160,10 @@ module.exports = {
         this.errorMessage = "请输入手机号码";
         return $("#errMsg").modal("show");
       }
-      this.nc.reset(); //请务必确保这里调用一次reset()方法
-      $("#ncDialog").modal("show");
+      // 阿里云盾人机验证收取最低10元/天的费用，所以取消调用，直接发送手机验证码
+      //this.nc.reset(); //请务必确保这里调用一次reset()方法
+      //$("#ncDialog").modal("show");
+      this.sendVerifyCode({ sig: "", csessionid: "" });
     },
     sendVerifyCode: function(data) {
       var vue = this;
@@ -199,7 +199,7 @@ module.exports = {
       });
     }
   },
-  created: function() {},
+  created: function() { },
   mounted: function() {
     this.nc = NoCaptcha.init({
       renderTo: "#nc",

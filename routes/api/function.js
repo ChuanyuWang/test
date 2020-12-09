@@ -13,7 +13,7 @@ const mongoist = require('mongoist');
 /**
  * Send verify code
  */
-router.post('/sendSMS', checkRobot, generateCode, function(req, res, next) {
+router.post('/sendSMS', /* checkRobot, */ generateCode, function(req, res, next) {
     var client = new AliCloud({
         accessKeyId: config.accessKeyID,
         accessKeySecret: config.accessKeySecret,
@@ -25,7 +25,7 @@ router.post('/sendSMS', checkRobot, generateCode, function(req, res, next) {
         "PhoneNumbers": req.body.contact,
         "SignName": "报名试听",
         "TemplateCode": "SMS_175121681",
-        "TemplateParam": `{"code":${res.locals._code}}`
+        "TemplateParam": `{"code":"${res.locals._code}"}`
     };
 
     var requestOption = {
@@ -156,6 +156,7 @@ function generateAlibabaSignature(options, accessKeySecret, httpMethod) {
     return Base64.stringify(HmacSHA1(str, accessKeySecret + "&"));
 }
 
+// eslint-disable-next-line
 function checkRobot(req, res, next) {
     let date = new Date();
 
