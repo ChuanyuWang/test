@@ -37,9 +37,9 @@ router.get('/api/users', isAuthenticated, function(req, res, next) {
 });
 
 router.post('/api/users', isAuthenticated, function(req, res, next) {
-    //TODO, check the tenant name existed
+    let userRole = req.body.role === 'admin' ? 'admin' : 'user';
     Account.register(new Account({
-        username: req.body.user, tenant: req.body.tenant, displayName: req.body.display, role: req.body.role
+        username: req.body.user, tenant: req.body.tenant, displayName: req.body.display, role: userRole
     }), req.body.password, function(err, account) {
         if (err) {
             var error = new Error("create tenant user fails");
@@ -52,6 +52,33 @@ router.post('/api/users', isAuthenticated, function(req, res, next) {
             displayName: account.displayName,
             role: account.role
         });
+    });
+});
+
+router.patch('/api/user/:userID', isAuthenticated, function(req, res, next) {
+    let newPassword = req.body.newPassword;
+
+    if (!newPassword || newPassword.length < 8) {
+        var error = new Error("新密码不能为空或小于8位");
+        error.status = 400;
+        return next(error);
+    }
+    Account.findByUsername(req.params.userID, function(err, sanitizedUser) {
+        if (err) {
+            var error = new Error(`Fail to find user ${req.params.userID}`);
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("Find user successfully", sanitizedUser);
+
+        if (sanitizedUser) {
+            sanitizedUser.setPassword(newPassword, function() {
+                sanitizedUser.save();
+                res.status(200).json({ message: 'password set successful' });
+            });
+        } else {
+            return next(new Error(`User ${req.params.userID} doesn't exist`));
+        }
     });
 });
 

@@ -96,6 +96,7 @@ div
                   th Name
                   th Role
                   th Delete
+                  th Password
               tbody
                 tr(v-for='user in users')
                   td {{user.username}}
@@ -104,6 +105,9 @@ div
                   td
                     a.text-danger
                       i.glyphicon.glyphicon-remove
+                  td
+                    a.text-info(@click='setPassword(user.username)')
+                      i.glyphicon.glyphicon-edit
         div.form-group
           div.col-sm-offset-3.col-sm-9
             button.btn.btn-primary(type='button',v-if='selectedTenant._id',@click='upgradeTenant(selectedTenant.name)') Upgrade
@@ -190,7 +194,7 @@ module.exports = {
         dataType: "json"
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        console.error("change tenant fails", jqXHR);
+        console.error("change tenant fails", jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
       request.done(function(data, textStatus, jqXHR) {
         // TODO
@@ -211,7 +215,6 @@ module.exports = {
       });
     },
     createUser: function(user) {
-      var vm = this;
       var request = $.ajax("/admin/api/users", {
         type: "POST",
         contentType: "application/json; charset=utf-8",
@@ -219,11 +222,39 @@ module.exports = {
         dataType: "json"
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        console.error("create user fails", jqXHR);
+        console.error("create user fails", jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
         alert(jqXHR.responseJSON.message);
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.users.push(data);
+      });
+    },
+    setPassword: function(username) {
+      bootbox.prompt({
+        size: "small",
+        title: "Set new password",
+        inputType: "password",
+        placeholder: "set passowrd for user: " + username,
+        callback: function(result) {
+          /* result = String containing user input if OK clicked or null if Cancel clicked */
+          if (!result) return;
+          var request = $.ajax("/admin/api/user/" + username, {
+            type: "PATCH",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+              newPassword: result.trim()
+            }),
+            dataType: "json"
+          });
+          request.fail(function(jqXHR, textStatus, errorThrown) {
+            console.error("set user password fails", jqXHR);
+            alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+          });
+          request.done(function(data, textStatus, jqXHR) {
+            console.log(data);
+            alert("Set user password successfully");
+          });
+        }
       });
     },
     createTenant: function() {
