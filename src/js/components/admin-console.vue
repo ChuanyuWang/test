@@ -220,6 +220,7 @@ module.exports = {
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
         console.error("create user fails", jqXHR);
+        alert(jqXHR.responseJSON.message);
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.users.push(data);
