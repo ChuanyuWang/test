@@ -215,6 +215,7 @@ module.exports = {
       });
     },
     createUser: function(user) {
+      var vm = this;
       var request = $.ajax("/admin/api/users", {
         type: "POST",
         contentType: "application/json; charset=utf-8",
