@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -19,11 +18,11 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
           div.form-group(:class='{"has-error": errors.user}',:title='errors.user')
             label.control-label.col-sm-4 User Name:
             div.col-sm-5
-              input.form-control(type='text',v-model.trim='user',placeholder='')
+              input.form-control(type='text',v-model.trim='user',autoComplete='nope')
           div.form-group(:class='{"has-error": errors.password}',:title='errors.password')
             label.control-label.col-sm-4 Password:
             div.col-sm-5
-              input.form-control(type='password',v-model.trim='password',placeholder='')
+              input.form-control(type='password',v-model.trim='password',autoComplete='new-password')
           div.form-group(:class='{"has-error": errors.display}',:title='errors.display')
             label.control-label.col-sm-4 Display Name:
             div.col-sm-5
@@ -31,7 +30,9 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
           div.form-group
             label.control-label.col-sm-4 Role:
             div.col-sm-5
-              input.form-control(type='text',v-model.trim='role',placeholder='admin',autocomplete='nope')
+              select.form-control(v-model.trim='role')
+                option(value='admin') admin
+                option(value='user') user
       div.modal-footer
         button.btn.btn-default(type="button",data-dismiss="modal") Cancel
         button.btn.btn-success(type="button",@click='handleOk',:disabled='hasError') Create
@@ -52,7 +53,7 @@ module.exports = {
       password: '',
       tenant: '',
       display: '',
-      role: ''
+      role: 'admin'
     };
   },
   watch: {
