@@ -55,24 +55,30 @@ block page
         div.modal-body
           form.form-horizontal
             div.form-group
-              label.control-label.col-sm-2(for='name') 宝宝姓名:
+              label.control-label.col-sm-2(for='name') 姓名:
               div.col-sm-4
-                input.form-control(type='text',name='name',placeholder='宝宝姓名')
+                input.form-control(type='text',name='name',placeholder='小朋友的姓名')
+              div.col-sm-4
+                p.form-control-static(style='color:#808080')
+                  small 必填
             div.form-group
               label.control-label.col-sm-2(for='contact') 联系方式:
               div.col-sm-4
                 input.form-control(type='tel',name='contact',placeholder='135xxx')
+              div.col-sm-4
+                p.form-control-static(style='color:#808080')
+                  small 必填
             div.form-group
-              label.control-label.col-sm-2(for='birth') 宝宝生日:
+              label.control-label.col-sm-2(for='birth') 生日:
               div.col-sm-4
                 div#birth_date.input-group.date
                   input.form-control(type='text',name='brith')
                   span.input-group-addon
                     span.glyphicon.glyphicon-calendar
             div.form-group
-              label.control-label.col-sm-2(for='note') 简介:
+              label.control-label.col-sm-2(for='note') 描述:
               div.col-sm-10
-                textarea.form-control(rows='3', name='note')
+                textarea.form-control(rows='3', name='note',placeholder='添加更多备注信息, 比如昵称')
         div.modal-footer
           button.btn.btn-default(type="button",data-dismiss="modal") 取消
           button#add_member.btn.btn-success(type="button") 添加

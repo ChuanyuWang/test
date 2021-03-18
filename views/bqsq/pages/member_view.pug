@@ -60,13 +60,13 @@ block page
         div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.contact")
           input.form-control(v-model.trim='memberData.contact', placeholder='135xxx')
       div.form-group(:class='{"has-error": errors.birthday}')
-        label.control-label.col-sm-2 宝宝生日:
+        label.control-label.col-sm-2 生日:
         div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
           date-picker(v-model='memberData.birthday')
       div.form-group
-        label.control-label.col-sm-2 简介:
+        label.control-label.col-sm-2 描述:
         div.col-sm-8
-          textarea.form-control(rows='3', name='note',v-model.trim='memberData.note',style='resize:vertical;min-height:70px')
+          textarea.form-control(rows='3', placeholder='添加更多备注信息, 比如昵称', name='note',v-model.trim='memberData.note',style='resize:vertical;min-height:70px')
       div.form-group
         div.col-sm-offset-2.col-sm-10
           button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
