@@ -76,6 +76,7 @@ router.get('/', function(req, res, next) {
         ];
     }
     var classes = tenantDB.collection("classes");
+    // the return results will always sorted by class date
     classes.findAsCursor(query, NORMAL_FIELDS).sort({ date: sort }).toArray().then(function(docs) {
         console.log("find classes: ", docs ? docs.length : 0);
         return res.json(docs);

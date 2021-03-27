@@ -23,6 +23,11 @@ helpers.connectionURI = function(database) {
     }
 };
 
+/**
+ * Return the database instance created by mongojs
+ * @param {String} database 
+ * @returns 
+ */
 helpers.connect = function(database) {
     if (typeof database != "string" || database.length == 0) {
         throw new Error("parameter database is not string or empty");
@@ -103,6 +108,7 @@ helpers.connect4 = function(database) {
         const connection = helpers.connect(database);
         return mongoist(connection);
     }
+    // get the mongoist database from exiting mongojs db
     return mongoist(database);
 };
 
