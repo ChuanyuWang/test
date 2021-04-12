@@ -38,6 +38,7 @@ module.exports = {
      * 2. https://www.staticfile.org/
      * 3. https://docs.microsoft.com/en-us/aspnet/ajax/cdn/overview
      * 4. http://www.bootcdn.cn/ (reject .cc .top)
+     * 5. https://unpkg.com/
      */
     cdnlibs: {
         jquery: 'https://cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js',
@@ -56,9 +57,11 @@ module.exports = {
         vue_dev: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.js',
         i18next: 'https://cdn.bootcdn.net/ajax/libs/i18next/11.3.2/i18next.min.js',
         i18next_dev: 'https://cdn.bootcdn.net/ajax/libs/i18next/11.3.2/i18next.js',
-        bootstrap_table_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.12.2/bootstrap-table.min.css',
-        bootstrap_table: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.12.2/bootstrap-table.min.js',
-        bootstrap_table_locale_zh_CN: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.12.2/locale/bootstrap-table-zh-CN.min.js',
+        bootstrap_table_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/bootstrap-table.min.css',
+        table_export: 'https://unpkg.com/tableexport.jquery.plugin@1.10.22/tableExport.min.js',
+        bootstrap_table: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/bootstrap-table.min.js',
+        bootstrap_table_export: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/extensions/export/bootstrap-table-export.min.js',
+        bootstrap_table_locale_zh_CN: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/locale/bootstrap-table-zh-CN.min.js',
         bootstrap_datetimepicker: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
         bootstrap_datetimepicker_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
         bootbox: 'https://cdn.bootcdn.net/ajax/libs/bootbox.js/4.4.0/bootbox.min.js',
