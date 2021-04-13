@@ -131,6 +131,10 @@ function initDateField(item) {
 }
 
 function verifyCode(req, res, next) {
+    if (req.app.locals.ENV_DEVELOPMENT) {
+        // skip code verification if it's development mode
+        return next();
+    }
     var tenantDB = null;
     if (req.body.hasOwnProperty('tenant')) {
         tenantDB = util.connect(req.body.tenant);
