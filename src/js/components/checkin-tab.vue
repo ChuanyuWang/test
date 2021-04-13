@@ -98,7 +98,7 @@ module.exports = {
       options: {
         locale: "zh-CN",
         //sortName: 'date',
-        sortOrder: "asc",
+        sortOrder: "desc",
         toolbar: '#checkin_toolbar',
         queryParams: this.statusQuery,
         url: "/api/classes/checkin",
