@@ -58,7 +58,7 @@ module.exports = {
         {
           field: "date",
           title: this.$t("datetime"),
-          sortable: false,
+          sortable: true,
           formatter: common.dateFormatter
         }, {
           field: "name",
@@ -97,7 +97,7 @@ module.exports = {
       ],
       options: {
         locale: "zh-CN",
-        //sortName: 'date',
+        sortName: 'date',
         sortOrder: "desc",
         toolbar: '#checkin_toolbar',
         queryParams: this.statusQuery,
