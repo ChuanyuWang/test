@@ -54,7 +54,6 @@ module.exports = {
       options: {
         locale: "zh-CN",
         toolbar: '#opps_toolbar',
-        //rowStyle: highlightExpire,
         queryParams: this.statusQuery,
         url: "/api/opportunities",
         //sidePagination: "server",
