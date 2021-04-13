@@ -1,7 +1,5 @@
 <style lang='less'>
 .flag {
-  position: absolute;
-  margin-left: -6px;
   font-size: larger;
 }
 </style>
@@ -109,6 +107,13 @@ module.exports = {
         "</a>"
       ].join("");
     },
+    flagStyle: function(value, row, index, field) {
+      return {
+        css: {
+          padding: '0px'
+        }
+      }
+    },
     flagFormatter: function(value, row, index) {
       var flag = this.getFlag(row.booking);
       if (flag == "red") {
@@ -131,7 +136,7 @@ module.exports = {
         ].join("");
       } else {
         return [
-          '<a class="flag text-muted" href="javascript:void(0)" title="">',
+          '<a class="flag text-muted" href="javascript:void(0)" title="未设置">',
           '<i class="glyphicon glyphicon-flag" style="opacity:0.5"></i>',
           "</a>"
         ].join("");
@@ -158,49 +163,49 @@ module.exports = {
       });
     },
     statusQuery: function(params) {
-        // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
-        var statusEl = $('#checkin_toolbar input[type=checkbox]:checked');
-        if (statusEl.length > 0) {
-            var statusQuery = '';
-            for (var i=0;i<statusEl.length;i++) {
-                statusQuery += statusEl[i].value + ',';
-            }
-            params.status = statusQuery.substring(0, statusQuery.length-1);
+      // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
+      var statusEl = $('#checkin_toolbar input[type=checkbox]:checked');
+      if (statusEl.length > 0) {
+        var statusQuery = '';
+        for (var i = 0; i < statusEl.length; i++) {
+          statusQuery += statusEl[i].value + ',';
         }
-        switch (this.flagFilter) {
-          case 'red':
-            params.flag = 'red,'; // include red flag and 'null' flag
-            break;
-          case 'green':
-            params.flag = 'green';
-            break;
-          default:
-            break;
-        }
-        switch (this.timeFilter) {
-          case 'today':
-            params.from = moment().startOf('day').toISOString();
-            params.to = moment().endOf('day').toISOString();
-            break;
-          case 'yesterday':
-            params.from = moment().startOf('day').subtract(24, 'hours').toISOString();
-            params.to = moment().startOf('day').toISOString();
-            break;
-          case 'past_week':
-            params.from = moment().startOf('day').subtract(7, 'days').toISOString();
-            params.to = moment().endOf('day').toISOString();
-            break;
-          case 'past_month':
-            params.from = moment().startOf('day').subtract(30, 'days').toISOString();
-            params.to = moment().endOf('day').toISOString();
-            break;
-          default:
-            break;
-        }
-        return params;
+        params.status = statusQuery.substring(0, statusQuery.length - 1);
+      }
+      switch (this.flagFilter) {
+        case 'red':
+          params.flag = 'red,'; // include red flag and 'null' flag
+          break;
+        case 'green':
+          params.flag = 'green';
+          break;
+        default:
+          break;
+      }
+      switch (this.timeFilter) {
+        case 'today':
+          params.from = moment().startOf('day').toISOString();
+          params.to = moment().endOf('day').toISOString();
+          break;
+        case 'yesterday':
+          params.from = moment().startOf('day').subtract(24, 'hours').toISOString();
+          params.to = moment().startOf('day').toISOString();
+          break;
+        case 'past_week':
+          params.from = moment().startOf('day').subtract(7, 'days').toISOString();
+          params.to = moment().endOf('day').toISOString();
+          break;
+        case 'past_month':
+          params.from = moment().startOf('day').subtract(30, 'days').toISOString();
+          params.to = moment().endOf('day').toISOString();
+          break;
+        default:
+          break;
+      }
+      return params;
     }
   },
-  created: function() {},
+  created: function() { },
   mounted: function() {
     // load the setting of tenant
     var setting = common.getTenantSetting();
@@ -237,7 +242,8 @@ module.exports = {
           },
           {
             formatter: this.flagFormatter,
-            events: {'click .flag': this.addFlag}
+            cellStyle: this.flagStyle,
+            events: { 'click .flag': this.addFlag }
           }, {}
         ]
       });
