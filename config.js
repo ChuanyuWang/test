@@ -60,6 +60,7 @@ module.exports = {
         bootstrap_table_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/bootstrap-table.min.css',
         table_export: 'https://unpkg.com/tableexport.jquery.plugin@1.10.22/tableExport.min.js',
         bootstrap_table: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/bootstrap-table.min.js',
+        bootstrap_table_vue: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/bootstrap-table-vue.min.js',
         bootstrap_table_export: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/extensions/export/bootstrap-table-export.min.js',
         bootstrap_table_locale_zh_CN: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/locale/bootstrap-table-zh-CN.min.js',
         bootstrap_datetimepicker: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',

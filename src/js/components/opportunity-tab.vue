@@ -4,16 +4,7 @@
 <template lang="pug">
 div
   div#opps_toolbar(style='line-height:1.5;display:inline-block')
-  table#opps_table(data-show-refresh='true',data-checkbox-header='false',data-sort-name='since',data-sort-order='desc',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-search='true',data-striped='true',data-show-columns='true',data-unique-id="_id")
-    thead
-      tr
-        th(data-field='status',data-align='center')
-        th(data-field='name',data-sortable='true') 宝宝姓名
-        th(data-field='contact') 联系方式
-        th(data-field='birthday',data-sortable='true') 宝宝生日
-        th(data-field='since',data-sortable='true') 登记时间
-        th(data-field='remark') 备注
-        th(data-field='source') 来源
+  bootstrap-table(ref='oppTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -29,10 +20,63 @@ module.exports = {
   name: "opportunity-tab",
   props: {},
   data: function() {
-    return {};
+    return {
+      columns: [
+        {
+          field: "status",
+          formatter: this.statusFormatter,
+          events: { "click .phone": this.changePhone }
+        }, {
+          field: "name",
+          title: "宝宝姓名",
+          sortable: true
+        }, {
+          field: "contact",
+          title: "联系方式"
+        }, {
+          field: "birthday",
+          title: "宝宝生日",
+          sortable: true,
+          formatter: common.dateFormatter
+        }, {
+          field: "since",
+          title: "登记时间",
+          sortable: true,
+          formatter: common.dateFormatter
+        }, {
+          field: "remark",
+          title: "备注"
+        }, {
+          field: "source",
+          title: "来源"
+        }
+      ],
+      options: {
+        locale: "zh-CN",
+        maintainSelected: true,
+        toolbar: '#opps_toolbar',
+        //rowStyle: highlightExpire,
+        queryParams: this.statusQuery,
+        url: "/api/opportunities",
+        //sidePagination: "server",
+        showRefresh: true,
+        checkboxHeader: true,
+        sortName: "since",
+        sortOrder: "desc",
+        pagination: true,
+        pageSize: 15,
+        pageList: [10, 15, 20, 50, 100],
+        search: true,
+        striped: true,
+        showColumns: true,
+        uniqueId: "_id"
+      }
+    };
   },
   watch: {},
-  components: {},
+  components: {
+    "BootstrapTable": BootstrapTable
+  },
   computed: {},
   filters: {},
   methods: {
@@ -47,9 +91,7 @@ module.exports = {
         data: JSON.stringify({ status: newStatus }),
         success: function(data) {
           row.status = newStatus;
-          $(vm.$el)
-            .find("#opps_table")
-            .bootstrapTable("updateRow", { index: index, row: row });
+          vm.$refs.oppTable.updateRow(index, row);
         },
         error: function(jqXHR, status, err) {
           console.error(
@@ -83,35 +125,6 @@ module.exports = {
     }
   },
   created: function() { },
-  mounted: function() {
-    $(this.$el)
-      .find("#opps_table")
-      .bootstrapTable({
-        locale: "zh-CN",
-        //sortOrder: "asc",
-        maintainSelected: true,
-        toolbar: '#opps_toolbar',
-        //rowStyle: highlightExpire,
-        queryParams: this.statusQuery,
-        url: "/api/opportunities",
-        //sidePagination: "server",
-        columns: [
-          {
-            formatter: this.statusFormatter,
-            events: { "click .phone": this.changePhone }
-          },
-          {},
-          {},
-          {
-            formatter: common.dateFormatter
-          },
-          {
-            formatter: common.dateFormatter
-          },
-          {},
-          {}
-        ]
-      });
-  }
+  mounted: function() { }
 };
 </script>
