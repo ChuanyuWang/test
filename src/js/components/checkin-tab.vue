@@ -31,17 +31,7 @@ div
       input(type="checkbox",value='',@click='refreshCheckinStatus',checked)
       | {{$t('uncheckin')}}
       span.glyphicon.glyphicon-question-sign(style='margin-left:3px;color:#777')
-  table#checkin_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-striped='true',data-show-columns='true',data-unique-id="_id",data-click-to-select="true")
-    thead
-      tr
-        th(data-field='date',data-sortable='false') {{$t('datetime')}}
-        th(data-field='name',data-sortable='false') {{$t('class')}}
-        th(data-field='books',data-sortable='false') {{$t('book')}}
-        th(data-field='member.0.name',data-sortable='false') {{$t('member_name')}}
-        //th(data-field='member.contact') 联系方式
-        th(data-field='booking.status',data-sortable='false') {{$t('checkin')}}
-        th(data-field='flag',data-align='center',data-sortable='false') {{$t('flag')}}
-        th(data-field='booking.comment',data-visible='false',data-sortable='false') {{$t('comment')}}
+  bootstrap-table(ref='checkinTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -58,20 +48,83 @@ module.exports = {
   name: "checkin-tab",
   props: {},
   data: function() {
+    // load the setting of tenant from html root-level elements
+    var setting = common.getTenantSetting();
     return {
       timeFilter: 'today',
       flagFilter: 'red',
-      feature: null
+      feature: setting.feature,
+      columns: [
+        {
+          field: "date",
+          title: this.$t("datetime"),
+          sortable: false,
+          formatter: common.dateFormatter
+        }, {
+          field: "name",
+          title: this.$t("class"),
+          sortable: false,
+          formatter: this.nameFormatter
+        }, {
+          field: "books",
+          title: this.$t("book"),
+          sortable: false,
+          formatter: this.bookFormatter,
+          visible: setting.feature === 'book'
+        }, {
+          field: "member.0.name",
+          title: this.$t("member_name"),
+          sortable: false,
+          formatter: this.memberFormatter
+        }, {
+          field: "booking.status",
+          title: this.$t("checkin"),
+          sortable: false,
+          formatter: this.checkinFormatter
+        }, {
+          field: "flag",
+          title: this.$t("flag"),
+          align: "center",
+          formatter: this.flagFormatter,
+          cellStyle: this.flagStyle,
+          events: { 'click .flag': this.addFlag }
+        }, {
+          field: "booking.comment",
+          title: this.$t("comment"),
+          sortable: false,
+          visible: false
+        }
+      ],
+      options: {
+        locale: "zh-CN",
+        //sortName: 'date',
+        sortOrder: "asc",
+        toolbar: '#checkin_toolbar',
+        queryParams: this.statusQuery,
+        url: "/api/classes/checkin",
+        sidePagination: "server",
+        showRefresh: true,
+        checkboxHeader: false,
+        pagination: true,
+        pageSize: 15,
+        pageList: [10, 15, 20, 50, 100],
+        striped: true,
+        showColumns: true,
+        uniqueId: "_id",
+        clickToSelect: true
+      }
     };
   },
   watch: {},
-  components: {},
+  components: {
+    "BootstrapTable": BootstrapTable
+  },
   computed: {},
   filters: {},
   methods: {
     refreshCheckinStatus: function() {
       // refresh the table when user changes the status filter
-      $(this.$el).find("#checkin_table").bootstrapTable('refresh');
+      this.$refs.checkinTable.refresh();
     },
     bookFormatter: function(value, row, index) {
       var result = "";
@@ -159,7 +212,7 @@ module.exports = {
       var request = class_service.flag(row._id, row.booking.member, nextFlag);
       request.done(function(data, textStatus, jqXHR) {
         row.booking.flag = nextFlag;
-        $(vm.$el).find("#checkin_table").bootstrapTable('updateRow', { index: index, row: row });
+        vm.$refs.checkinTable.updateRow(index, row);
       });
     },
     statusQuery: function(params) {
@@ -206,47 +259,6 @@ module.exports = {
     }
   },
   created: function() { },
-  mounted: function() {
-    // load the setting of tenant
-    var setting = common.getTenantSetting();
-    this.feature = setting.feature;
-
-    $(this.$el)
-      .find("#checkin_table")
-      .bootstrapTable({
-        locale: "zh-CN",
-        //sortName: 'date',
-        sortOrder: "asc",
-        maintainSelected: true,
-        toolbar: '#checkin_toolbar',
-        //rowStyle: highlightExpire,
-        queryParams: this.statusQuery,
-        url: "/api/classes/checkin",
-        sidePagination: "server",
-        columns: [
-          {
-            formatter: common.dateFormatter
-          },
-          {
-            formatter: this.nameFormatter
-          },
-          {
-            formatter: this.bookFormatter,
-            visible: this.feature === 'book'
-          },
-          {
-            formatter: this.memberFormatter
-          },
-          {
-            formatter: this.checkinFormatter
-          },
-          {
-            formatter: this.flagFormatter,
-            cellStyle: this.flagStyle,
-            events: { 'click .flag': this.addFlag }
-          }, {}
-        ]
-      });
-  }
+  mounted: function() { }
 };
 </script>
