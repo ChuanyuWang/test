@@ -109,8 +109,7 @@ module.exports = {
         pageList: [10, 15, 20, 50, 100],
         striped: true,
         showColumns: true,
-        uniqueId: "_id",
-        clickToSelect: true
+        uniqueId: "_id"
       }
     };
   },
