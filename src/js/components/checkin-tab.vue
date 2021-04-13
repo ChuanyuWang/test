@@ -104,7 +104,6 @@ module.exports = {
         url: "/api/classes/checkin",
         sidePagination: "server",
         showRefresh: true,
-        checkboxHeader: false,
         pagination: true,
         pageSize: 15,
         pageList: [10, 15, 20, 50, 100],

@@ -45,7 +45,6 @@ function init() {
 
     $('#member_table').bootstrapTable({
         locale: 'zh-CN',
-        maintainSelected: true,
         rowStyle: highlightExpire,
         queryParams: customQuery,
         columns: [{
@@ -140,10 +139,10 @@ function customQuery(params) {
     var statusEl = $('#toolbar input[type=checkbox]:checked');
     if (statusEl.length > 0) {
         var statusQuery = '';
-        for (var i=0;i<statusEl.length;i++) {
+        for (var i = 0; i < statusEl.length; i++) {
             statusQuery += statusEl[i].value + ',';
         }
-        params.status = statusQuery.substring(0, statusQuery.length-1);
+        params.status = statusQuery.substring(0, statusQuery.length - 1);
     }
     // Append the field 'unStartedClassCount' to returned members
     params.appendLeft = true;
