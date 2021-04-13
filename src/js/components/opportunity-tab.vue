@@ -1,11 +1,10 @@
 <style>
-
 </style>
 
 <template lang="pug">
 div
   div#opps_toolbar(style='line-height:1.5;display:inline-block')
-  table#opps_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-search='true',data-striped='true',data-show-columns='true',data-unique-id="_id")
+  table#opps_table(data-show-refresh='true',data-checkbox-header='false',data-sort-name='since',data-sort-order='desc',data-pagination='true',data-page-size='15',data-page-list='[10,15,20,50,100]',data-search='true',data-striped='true',data-show-columns='true',data-unique-id="_id")
     thead
       tr
         th(data-field='status',data-align='center')
@@ -83,7 +82,7 @@ module.exports = {
       return params;
     }
   },
-  created: function() {},
+  created: function() { },
   mounted: function() {
     $(this.$el)
       .find("#opps_table")
