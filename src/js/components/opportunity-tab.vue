@@ -29,14 +29,14 @@ module.exports = {
         }, {
           field: "name",
           title: "宝宝姓名",
-          sortable: true
+          sortable: false
         }, {
           field: "contact",
           title: "联系方式"
         }, {
           field: "birthday",
           title: "宝宝生日",
-          sortable: true,
+          sortable: false,
           formatter: common.dateFormatter
         }, {
           field: "since",
