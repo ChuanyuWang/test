@@ -4,13 +4,10 @@ block navlist
   include navigation.pug
 
 append css
-  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
 
 append js
   script(src=CDN_FILES.momentjs)
   script(src=CDN_FILES.bootbox)
-  script(src=CDN_FILES.bootstrap_table)
-  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   script(src='/js/course.js')
 
 block page

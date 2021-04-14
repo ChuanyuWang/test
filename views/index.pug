@@ -5,6 +5,7 @@ block append css
     link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
   else
     link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
 
 block append js
   if ENV_DEVELOPMENT
@@ -13,6 +14,8 @@ block append js
   else
     script(src=CDN_FILES.jquery)
     script(src=CDN_FILES.bootstrap)
+  script(src=CDN_FILES.bootstrap_table)
+  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
 
 block content
   nav.navbar.navbar-inverse.navbar-fixed-top

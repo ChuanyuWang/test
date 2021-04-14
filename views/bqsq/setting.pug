@@ -4,15 +4,12 @@ block navlist
   include navigation.pug
 
 append css
-  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
   link(rel="stylesheet",href=CDN_FILES.bootstrap_datetimepicker_css)
 
 append js
   script(src=CDN_FILES.momentjs)
   script(src=CDN_FILES.bootbox)
   script(src=CDN_FILES.bootstrap_datetimepicker)
-  script(src=CDN_FILES.bootstrap_table)
-  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
   if ENV_DEVELOPMENT
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
