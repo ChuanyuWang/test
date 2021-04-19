@@ -73,11 +73,19 @@ router.get('/', async function(req, res, next) {
         let sort = req.query.order == 'asc' ? 1 : -1;
         let offset = parseInt(req.query.offset) || 0;
         let limit = parseInt(req.query.limit) || 100;
+        let search = req.query.search || "";
 
         let tenantDB = await db_utils.connect(req.tenant.name);
         let opportunities = tenantDB.collection("opportunities");
 
         let query = {};
+        if (search) {
+            // search both name and contact
+            query['$or'] = [
+                { 'name': new RegExp(search, 'i') },
+                { 'contact': new RegExp(search, 'i') }
+            ];
+        }
         let cursor = await opportunities.find(query, {
             projection: NORMAL_FIELDS,
             sort: [["since", sort]]
