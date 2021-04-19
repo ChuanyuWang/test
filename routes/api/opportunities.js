@@ -3,6 +3,7 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var util = require('../../util');
 var helper = require('../../helper');
+const db_utils = require('../../server/databaseManager');
 
 var NORMAL_FIELDS = {
     since: 1,
@@ -66,28 +67,34 @@ router.post('/', verifyCode, function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', function(req, res) {
-    var opportunities = req.db.collection("opportunities");
-    var query = {};
-    if (req.query.name) {
-        query['name'] = req.query.name;
-    }
-    if (req.query.contact) {
-        query['contact'] = req.query.contact;
-    }
+router.get('/', async function(req, res, next) {
+    //let opportunities = req.db.collection("opportunities");
+    try {
+        let sort = req.query.order == 'asc' ? 1 : -1;
+        let offset = parseInt(req.query.offset) || 0;
+        let limit = parseInt(req.query.limit) || 100;
 
-    opportunities.find(query, NORMAL_FIELDS).sort({
-        since: -1
-    }, function(err, docs) {
-        if (err) {
-            res.status(500).json({
-                'err': err
-            });
-            return;
-        }
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let opportunities = tenantDB.collection("opportunities");
+
+        let query = {};
+        let cursor = await opportunities.find(query, {
+            projection: NORMAL_FIELDS,
+            sort: [["since", sort]]
+        });
+        let total = await cursor.count();
+        let docs = await cursor.skip(offset).limit(limit).toArray();
+        //console.log(`offset is ${offset}, limit is ${limit}, total is ${total}`);
         console.log("find opportunities: ", docs ? docs.length : 0);
-        res.json(docs);
-    });
+        return res.json({
+            total: total,
+            rows: docs
+        });
+    } catch (err) {
+        var error = new Error("find opportunities fails");
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 router.patch('/:opportunityID', helper.requireRole("admin"), function(req, res) {

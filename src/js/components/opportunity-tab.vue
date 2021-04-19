@@ -56,7 +56,7 @@ module.exports = {
         toolbar: '#opps_toolbar',
         queryParams: this.statusQuery,
         url: "/api/opportunities",
-        //sidePagination: "server",
+        sidePagination: "server",
         showRefresh: true,
         sortName: "since",
         sortOrder: "desc",
