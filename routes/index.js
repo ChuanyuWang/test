@@ -63,6 +63,11 @@ router.use('/mygirl', require('./mygirl')); // load customize tenant before othe
 router.use('/t/:tenantName/', getTenantInfo, require("./tenant"));
 
 function getTenantInfo(req, res, next) {
+    if (['config', 'test', 'chuanyu', 'admin', 'setting', 'settings', 'api'].indexOf(req.params.tenantName) > -1) {
+        var error = new Error("tenant name is illegal");
+        error.status = 400;
+        return next(error);
+    }
     // cache the tenant object in request, e.g.
     /* tenant object
     {
