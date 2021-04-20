@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var util = require('../../util');
+var db_utils = require('../../server/databaseManager');
 var helper = require('../../helper');
 
 var TENANT_FIELDS = {
@@ -15,9 +15,15 @@ var TENANT_FIELDS = {
 
 var config_db = null;
 // initialize the 'config' database for setting router
-router.use(function (req, res, next) {
-    config_db = config_db || util.connect('config');
-    next();
+router.use(async function(req, res, next) {
+    try {
+        config_db = config_db || await db_utils.mongojsDB('config');
+        return next();
+    } catch (err) {
+        let error = new Error("get config database fails");
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 router.get('/classrooms', function(req, res, next) {
@@ -34,14 +40,14 @@ router.get('/classrooms', function(req, res, next) {
     }
 
     config_db.collection('tenants').findOne({
-        name : tenantName
-    }, {classroom: 1}, function(err, doc) {
+        name: tenantName
+    }, { classroom: 1 }, function(err, doc) {
         if (err) {
             var error = new Error("Get classroom list fails with tenant: " + tenantName);
             error.status = 400;
             return next(error);
         }
-        
+
         if (!doc) {
             var error = new Error("Not found classroom with tenant: " + tenantName);
             error.status = 400;
@@ -113,36 +119,36 @@ router.post('/classrooms', helper.requireRole("admin"), function(req, res, next)
         error.status = 400;
         return next(error);
     }
-    
+
     var tenants = config_db.collection('tenants');
     tenants.findOne({
-        name : req.user.tenant,
-        'classroom.id' : req.body.id
+        name: req.user.tenant,
+        'classroom.id': req.body.id
     }, function(err, doc) {
         if (doc) {
             var error = new Error("创建教室失败，教室ID重复");
             error.status = 400;
             return next(error);
         }
-        
+
         tenants.update({
-            name : req.user.tenant
+            name: req.user.tenant
         }, {
-            $push : {
-                classroom : req.body
+            $push: {
+                classroom: req.body
             }
-        }, function (err, result){
+        }, function(err, result) {
             if (err) {
                 var error = new Error("创建教室失败");
                 error.innerError = err;
                 return next(error);
             }
-            
+
             if (result.n == 1) {
                 console.log("classroom %j is created", req.body);
                 req.tenant.classroom = req.tenant.classroom || [];
                 req.tenant.classroom.push(req.body);
-                
+
                 // link all classes or events to this classroom
                 if (req.tenant.classroom.length == 1) {
                     migrateFreeClass(req.body, req.db);
@@ -156,85 +162,85 @@ router.post('/classrooms', helper.requireRole("admin"), function(req, res, next)
 });
 
 router.route('/classrooms/:roomID')
-.all(helper.requireRole("admin"))
-.get(function(req, res, next){
-    //TODO, get a classroom
-    next(new Error('not implemented'));
-})
-.delete (function (req, res, next) {
-    var tenants = config_db.collection('tenants');
-    tenants.update({
-        name : req.user.tenant
-    }, {
-        $pull : {
-            classroom : {
-                id : req.params.roomID
-            }
-        }
-    }, function (err, result){
-        if (err) {
-            var error = new Error("删除教室失败");
-            error.innerError = err;
-            return next(error);
-        }
-        
-        if (result.n == 1) {
-            console.log("classroom %j is delete", req.params.roomID);
-            
-            // update the tenant object in cache
-            req.tenant.classroom = req.tenant.classroom || [];
-            for (var i=0;i<req.tenant.classroom.length;i++) {
-                var room = req.tenant.classroom[i];
-                if (room && room.id == req.params.roomID) {
-                    req.tenant.classroom.splice(i, 1);
-                    break;
+    .all(helper.requireRole("admin"))
+    .get(function(req, res, next) {
+        //TODO, get a classroom
+        next(new Error('not implemented'));
+    })
+    .delete(function(req, res, next) {
+        var tenants = config_db.collection('tenants');
+        tenants.update({
+            name: req.user.tenant
+        }, {
+            $pull: {
+                classroom: {
+                    id: req.params.roomID
                 }
             }
-        } else {
-            console.error("classroom %j fails to be deleted", req.params.roomID);
-        }
-        res.json(result);
-    });
-})
-.put(function (req, res, next) {
-    //TODO, update a classroom
-    next(new Error('not implemented'));
-})
-.patch(function(req, res, next) {
-    var tenants = config_db.collection('tenants');
-    tenants.findAndModify({
-        query: {
-            name : req.user.tenant,
-            'classroom.id': req.params.roomID
-        },
-        update: {
-            $set: {
-                'classroom.$.name': req.body.name,
-                'classroom.$.visibility': req.body.visibility
+        }, function(err, result) {
+            if (err) {
+                var error = new Error("删除教室失败");
+                error.innerError = err;
+                return next(error);
             }
-        },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("update tenant's classroom fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("update tenant %s classroom %s", req.user.tenant, req.params.roomID);
-        res.json(doc);
+
+            if (result.n == 1) {
+                console.log("classroom %j is delete", req.params.roomID);
+
+                // update the tenant object in cache
+                req.tenant.classroom = req.tenant.classroom || [];
+                for (var i = 0; i < req.tenant.classroom.length; i++) {
+                    var room = req.tenant.classroom[i];
+                    if (room && room.id == req.params.roomID) {
+                        req.tenant.classroom.splice(i, 1);
+                        break;
+                    }
+                }
+            } else {
+                console.error("classroom %j fails to be deleted", req.params.roomID);
+            }
+            res.json(result);
+        });
+    })
+    .put(function(req, res, next) {
+        //TODO, update a classroom
+        next(new Error('not implemented'));
+    })
+    .patch(function(req, res, next) {
+        var tenants = config_db.collection('tenants');
+        tenants.findAndModify({
+            query: {
+                name: req.user.tenant,
+                'classroom.id': req.params.roomID
+            },
+            update: {
+                $set: {
+                    'classroom.$.name': req.body.name,
+                    'classroom.$.visibility': req.body.visibility
+                }
+            },
+            new: true
+        }, function(err, doc, lastErrorObject) {
+            if (err) {
+                var error = new Error("update tenant's classroom fails");
+                error.innerError = err;
+                return next(error);
+            }
+            console.log("update tenant %s classroom %s", req.user.tenant, req.params.roomID);
+            res.json(doc);
+        });
     });
-});
 
 function migrateFreeClass(room, database) {
     // https://docs.mongodb.com/manual/tutorial/query-for-null-fields/
     var classes = database.collection("classes");
     classes.update({
-        classroom : null
+        classroom: null
     }, {
-        $set : {
-            classroom : room.id
+        $set: {
+            classroom: room.id
         }
-    }, {multi: true}, function(err, result){
+    }, { multi: true }, function(err, result) {
         if (err) {
             var error = new Error("update classes with default classroom fails");
             error.innerError = err;
