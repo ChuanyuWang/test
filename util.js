@@ -43,7 +43,7 @@ helpers.connect = function(database) {
         poolSize: 5
         /* keepAlive : 120 */
     };
-    var db = mongojs(helpers.connectionURI(database), [], options);
+    var db = mongojs(connectionURI(database), [], options);
 
     // Store the connection in the connections array.
     connections.push({
