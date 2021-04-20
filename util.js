@@ -14,14 +14,14 @@ var connections2 = {};
 // export helper functions
 var helpers = {};
 
-helpers.connectionURI = function(database) {
+function connectionURI(database) {
     //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
     if (config.user) {
         return util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
     } else {
         return util.format("mongodb://%s/%s", config.host, database);
     }
-};
+}
 
 /**
  * Return the database instance created by mongojs
@@ -86,7 +86,7 @@ helpers.connect2 = function(database) {
         authSource: 'admin'
     };
 
-    var conn = mongoose.createConnection(helpers.connectionURI(database), options);
+    var conn = mongoose.createConnection(connectionURI(database), options);
     conn.then(function(params) {
         console.log('[mongoose] database "%s" is connected', database);
     }, function(err) {
