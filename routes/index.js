@@ -1,7 +1,7 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-var util = require('../util');
+var db_utils = require('../server/databaseManager');
 var RateLimit = require('express-rate-limit');
 
 var loginLimiter = new RateLimit({
@@ -62,8 +62,8 @@ router.use('/admin', require("./admin"));
 router.use('/mygirl', require('./mygirl')); // load customize tenant before others
 router.use('/t/:tenantName/', getTenantInfo, require("./tenant"));
 
-function getTenantInfo(req, res, next) {
-    if (['config', 'test', 'chuanyu', 'admin', 'setting', 'settings', 'api'].indexOf(req.params.tenantName) > -1) {
+async function getTenantInfo(req, res, next) {
+    if (['config', 'chuanyu', 'admin', 'setting', 'settings', 'api'].indexOf(req.params.tenantName) > -1) {
         var error = new Error("tenant name is illegal");
         error.status = 400;
         return next(error);
@@ -78,25 +78,24 @@ function getTenantInfo(req, res, next) {
         name : 'test',
         displayName : '大Q小q',
         feature: 'book',
-        version : 1,
-        classroom : [],
+        version : 5,
+        classroom : [ { id: 'wucai', name: '五彩城' },
+                    { id: 'a', name: 'aa', visibility: null },
+                    { id: 'bb', name: 'bbb', visibility: 'internal' } ],
         contact : '136-6166-4265',
         address : '宝翔路801号五彩城3楼307'
         addressLink : 'http://j.map.baidu.com/39KKB'
     };
     */
-    var config_db = util.connect('config');
-    if (!config_db) {
-        return next(new Error("database config is not existed"));
-    }
-    config_db.collection('tenants').findOne({
-        name: req.params.tenantName
-    }, function(err, tenant) {
-        if (err) {
-            let error = new Error("get tenant fails");
-            error.innerError = err;
-            return next(error);
+    try {
+        let config_db = await db_utils.connect('config');
+        if (!config_db) {
+            return next(new Error("database config is not existed"));
         }
+        let tenant = await config_db.collection('tenants').findOne({
+            name: req.params.tenantName
+        });
+
         if (!tenant) {
             let error = new Error(`tenant ${req.params.tenantName} doesn't exist`);
             error.status = 400;
@@ -116,12 +115,16 @@ function getTenantInfo(req, res, next) {
         }
 
         req.tenant = tenant;
-        req.db = util.connect(tenant.name);
+        req.db = await db_utils.mongojsDB(tenant.name);
         // navTitle is the title on the navigation bar
         res.locals.navTitle = tenant.displayName || "";
         res.locals.tenant_feature = tenant.feature || "common"; // default is common
-        next();
-    });
+        return next();
+    } catch (err) {
+        let error = new Error("get tenant fails");
+        error.innerError = err;
+        return next(error);
+    }
 }
 
 module.exports = router;
