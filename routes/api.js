@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var util = require('../util');
+const db_utils = require('../server/databaseManager');
 const credentials = require('../config.db');
 const bent = require('bent');
 const getAccessToken = bent('https://api.weixin.qq.com/sns/oauth2/access_token', 'GET', 'json', 200);
@@ -64,41 +64,33 @@ router.post('/sendNotification', async function(req, res, next) {
     }
 });
 
-function getTenantInfo(req, res, next) {
+async function getTenantInfo(req, res, next) {
     if (req.isUnauthenticated() || req.tenant) {
         return next();
     }
+    try {
+        let tenantName = req.user.tenant;
 
-    var tenantName = req.user.tenant;
-    req.db = util.connect(tenantName);
-    // cache the tenant object in request, e.g.
-    /* tenant object
-    {
-        appid : 'wxe5e454c5dff8c7b2',
-        appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
-        token : 'Hibanana',
-        encodingAESKey : '',
-        name : 'test',
-        displayName : '大Q小q',
-        version : 1,
-        classroom : []
-    };
-    */
-    var config_db = util.connect('config');
-    if (!config_db) {
-        console.error("database config is not existed");
-        next();
-    }
-    config_db.collection('tenants').findOne({
-        name: tenantName
-    }, function(err, tenant) {
-        if (err) {
-            console.error(err);
+        let config_db = await db_utils.connect('config');
+        if (!config_db) {
+            return next(new Error("database config is not existed"));
         }
-
+        let tenant = await config_db.collection('tenants').findOne({
+            name: tenantName
+        });
+        if (!tenant) {
+            let error = new Error(`tenant ${tenantName} doesn't exist`);
+            error.status = 400;
+            return next(error);
+        }
         req.tenant = tenant || {};
-        next();
-    });
+        req.db = await db_utils.mongojsDB(tenantName);
+        return next();
+    } catch (err) {
+        let error = new Error("get tenant fails");
+        error.innerError = err;
+        return next(error);
+    }
 }
 
 module.exports = router;
