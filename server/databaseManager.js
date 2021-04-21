@@ -5,7 +5,7 @@ const { MongoClient } = require('mongodb');
 
 let mongoClient = null;
 
-//const dbCache = new Map();
+const dbCache = new Map();
 const manager = {};
 
 manager.connectionURI = function(database) {
@@ -36,9 +36,25 @@ manager.connect = async function(database) {
 }
 
 manager.mongojsDB = async function(database) {
+    if (dbCache.has(database)) {
+        return dbCache.get(database);
+    }
     let db = await manager.connect(database);
+    dbCache.set(database, mongojs(db));
+    db.once("error", err => {
+        console.error(err);
+        dbCache.delete(database);
+    });
+    db.once("timeout", err => {
+        console.error(err);
+        dbCache.delete(database);
+    });
+    db.once("close", err => {
+        console.error(err);
+        dbCache.delete(database);
+    });
     // return the mongojs db wrapper
-    return mongojs(db);
+    return dbCache.get(database);
 }
 
 module.exports = manager;
