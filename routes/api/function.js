@@ -1,14 +1,13 @@
 var express = require('express');
 var router = express.Router();
 //var helper = require('../../helper');
-var dbUtility = require('../../util');
+var db_utils = require('../../server/databaseManager');
 //var querystring = require('querystring');
 const https = require("https");
 const HmacSHA1 = require("crypto-js/hmac-sha1");
 const Base64 = require('crypto-js/enc-base64');
 const config = require("../../config.db");
 const AliCloud = require('@alicloud/pop-core');
-const mongoist = require('mongoist');
 
 /**
  * Send verify code
@@ -74,8 +73,7 @@ async function generateCode(req, res, next) {
         return next(err);
     }
     // check if already submit phone for trial class
-    const odb = dbUtility.connect(req.body.tenant);
-    const db = mongoist(odb);
+    const db = await db_utils.connect(req.body.tenant);
     const opportunities = db.collection('opportunities');
     const doc = await opportunities.findOne({ contact: req.body.contact });
     if (doc) {

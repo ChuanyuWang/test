@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var util = require('../../util');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 
@@ -15,24 +14,13 @@ var NORMAL_FIELDS = {
     remark: 1
 };
 
-router.post('/', verifyCode, function(req, res, next) {
-    var tenantDB = null;
-    if (req.body.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.body.tenant);
-    } else if (req.db) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = req.db;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
-    }
-
+router.post('/', getTenantInfo, verifyCode, function(req, res, next) {
     if (!req.body.name || !req.body.contact) {
         res.status(400).send("Missing param 'name' or 'contact'");
         return;
     }
 
+    let tenantDB = req.db;
     var query = {
         name: req.body.name,
         contact: req.body.contact
@@ -145,27 +133,45 @@ function initDateField(item) {
     }
 }
 
+async function getTenantInfo(req, res, next) {
+    try {
+        if (req.body.hasOwnProperty('tenant')) {
+            let tenantName = req.body.tenant;
+            let config_db = await db_utils.connect('config');
+            let tenant = await config_db.collection('tenants').findOne({
+                name: tenantName
+            });
+            if (!tenant) {
+                let error = new Error(`tenant ${tenantName} doesn't exist`);
+                error.status = 400;
+                return next(error);
+            }
+            req.db = await db_utils.mongojsDB(tenantName);
+            return next();
+        } else if (req.db) {
+            var err = new Error("Missing param 'tenant'");
+            err.status = 400;
+            return next(err);
+        }
+    } catch (error) {
+        let err = new Error("get tenant fails");
+        err.innerError = error;
+        return next(err);
+    }
+}
+
 function verifyCode(req, res, next) {
     if (req.app.locals.ENV_DEVELOPMENT) {
         // skip code verification if it's development mode
         return next();
-    }
-    var tenantDB = null;
-    if (req.body.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.body.tenant);
-    } else if (req.db) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = req.db;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
     }
 
     if (!req.body.code || !req.body.contact) {
         res.status(400).send("Missing param 'code' or 'contact'");
         return;
     }
+
+    let tenantDB = req.db;
 
     var sent_code_collection = tenantDB.collection("sent_code");
     let now = new Date();
