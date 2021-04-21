@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 var helper = require('../../helper');
-var util = require('../../util');
+var db_utils = require('../../server/databaseManager');
 
 var NORMAL_FIELDS = {
     status: 1,
@@ -15,19 +15,7 @@ var NORMAL_FIELDS = {
     membership: 1
 };
 
-router.post('/validate', function(req, res, next) {
-    var tenantDB = null;
-    if (req.body.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.body.tenant);
-    } else if (req.db) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = req.db;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
-    }
-
+router.post('/validate', async function(req, res, next) {
     var query = {};
     if (req.body.hasOwnProperty('name') && req.body.hasOwnProperty('contact')) {
         query['name'] = req.body.name;
@@ -38,17 +26,26 @@ router.post('/validate', function(req, res, next) {
         return next(err);
     }
 
-    var members = tenantDB.collection("members");
-    members.findOne(query, NORMAL_FIELDS, function(err, doc) {
-        if (err) {
-            res.status(500).json({
-                'err': err
-            });
-            return;
+    try {
+        let tenantDB = null;
+        if (req.body.hasOwnProperty('tenant')) {
+            tenantDB = await db_utils.connect(req.body.tenant);
+        } else {
+            var err = new Error("Missing param 'tenant'");
+            err.status = 400;
+            return next(err);
         }
+
+        let members = tenantDB.collection("members");
+        let doc = await members.findOne(query, { projection: NORMAL_FIELDS });
         console.log("validate member: %j", doc);
+        // return null if member doesn't exist
         res.json(doc);
-    });
+    } catch (error) {
+        let err = new Error("validate member fails");
+        err.innerError = error;
+        return next(err);
+    }
 });
 
 /// Below APIs are visible to authenticated users only
