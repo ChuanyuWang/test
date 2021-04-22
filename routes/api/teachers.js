@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
-var dbUtility = require('../../util');
 const mongoist = require('mongoist');
 
 var NORMAL_FIELDS = {
@@ -15,7 +14,7 @@ var NORMAL_FIELDS = {
 router.use(helper.isAuthenticated);
 
 router.get('/', function(req, res, next) {
-    const teachers = dbUtility.connect4(req.db).collection('teachers');
+    const teachers = mongoist(req.db).collection('teachers');
     var query = {};
     if (req.query.hasOwnProperty('name')) {
         query['name'] = req.query.name;
@@ -41,7 +40,7 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
         return next(error);
     }
 
-    const db = dbUtility.connect4(req.tenant.name);
+    const db = mongoist(req.db);
 
     convertDateObject(req.body);
     if (!req.body.hasOwnProperty('status'))
@@ -60,7 +59,7 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
 });
 
 router.patch('/:teacherID', helper.requireRole("admin"), function(req, res, next) {
-    const db = dbUtility.connect4(req.tenant.name);
+    const db = mongoist(req.db);
     var teachers = db.collection("teachers");
     convertDateObject(req.body);
     delete req.body._id;
@@ -88,7 +87,7 @@ router.patch('/:teacherID', helper.requireRole("admin"), function(req, res, next
 
 router.delete('/:teacherID', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        const db = dbUtility.connect4(req.tenant.name);
+        const db = mongoist(req.db);
         const doc = await db.classes.findOne({ teacher: mongoist.ObjectId(req.params.teacherID) }, { 'name': 1 });
         if (doc) {
             // set the teacher's status as 'deleted' if any class exists
