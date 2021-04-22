@@ -1,15 +1,21 @@
 var express = require('express');
 var router = express.Router();
 var Account = require('../account');
-var util = require('../util');
+const db_utils = require('../server/databaseManager');
 var mongojs = require('mongojs');
 
 var VERSION = 5; // current tenant version
 var config_db = null;
 // initialize the 'config' database for admin router
-router.use(function(req, res, next) {
-    config_db = config_db || util.connect('config');
-    next();
+router.use(async function(req, res, next) {
+    try {
+        config_db = await db_utils.mongojsDB('config');
+        return next();
+    } catch (error) {
+        let err = new Error("get config database fails");
+        err.innerError = error;
+        return next(err);
+    }
 });
 
 /* GET users listing. */
@@ -174,83 +180,100 @@ router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
 });
 
 // upgrade the tenant
-router.post('/api/upgrade', isAuthenticated, function(req, res, next) {
-    if (!req.body.tenant) {
-        var error = new Error("tenant name is not defined");
+router.post('/api/upgrade', isAuthenticated, getTenantInfo, function(req, res, next) {
+    // get the tenant to be upgraded
+    let doc = req.tenant;
+    if (!doc.version) {
+        upgradeFromZero(req, res, next);
+        doc.version = 1;
+        config_db.collection("tenants").save(doc, function(err, doc) {
+            if (err) {
+                return next(new Error("save tenant version fails"));
+            }
+            //TODO, send the complete message when all data update
+            res.send("Tenant update to 1.0");
+        });
+    } if (doc.version == 1) {
+        upgradeFromOne(req, res, next);
+        doc.version = 2;
+        config_db.collection("tenants").save(doc, function(err, doc) {
+            if (err) {
+                return next(new Error("save tenant version fails"));
+            }
+            //TODO, send the complete message when all data update
+            res.send("Tenant update to 2.0");
+        });
+    } else if (doc.version == 2) {
+        upgradeFromTwo(req, res, next);
+        doc.version = 3;
+        config_db.collection("tenants").save(doc, function(err, doc) {
+            if (err) {
+                return next(new Error("save tenant version fails"));
+            }
+            //TODO, send the complete message when all data update
+            res.send("Tenant update to 3.0");
+        });
+    } else if (doc.version == 3) {
+        upgradeFromThree(req, res, next);
+        doc.version = 4;
+        config_db.collection("tenants").save(doc, function(err, doc) {
+            if (err) {
+                return next(new Error("save tenant version fails"));
+            }
+            //TODO, send the complete message when all data update
+            res.send("Tenant update to 4.0");
+        });
+    } else if (doc.version == 4) {
+        upgradeFromFour(req, res, next);
+        doc.version = 5;
+        config_db.collection("tenants").save(doc, function(err, doc) {
+            if (err) {
+                return next(new Error("save tenant version fails"));
+            }
+            //TODO, send the complete message when all data update
+            res.send("Tenant update to 5.0");
+        });
+    } else if (doc.version == VERSION) {
+        res.send("Tenant is already update to date");
+    } else {
+        var error = new Error("tenant version is not valid");
         error.status = 400;
         return next(error);
     }
-    config_db.collection("tenants").findOne({ name: req.body.tenant }, function(err, doc) {
-        if (err) {
-            var error = new Error("Find tenant fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("Find tenant %j", doc);
-
-        if (!doc.version) {
-            upgradeFromZero(req, res, next, doc.name);
-            doc.version = 1;
-            config_db.collection("tenants").save(doc, function(err, doc) {
-                if (err) {
-                    return next(new Error("save tenant version fails"));
-                }
-                //TODO, send the complete message when all data update
-                res.send("Tenant update to 1.0");
-            });
-        } if (doc.version == 1) {
-            upgradeFromOne(req, res, next, doc.name);
-            doc.version = 2;
-            config_db.collection("tenants").save(doc, function(err, doc) {
-                if (err) {
-                    return next(new Error("save tenant version fails"));
-                }
-                //TODO, send the complete message when all data update
-                res.send("Tenant update to 2.0");
-            });
-        } else if (doc.version == 2) {
-            upgradeFromTwo(req, res, next, doc.name);
-            doc.version = 3;
-            config_db.collection("tenants").save(doc, function(err, doc) {
-                if (err) {
-                    return next(new Error("save tenant version fails"));
-                }
-                //TODO, send the complete message when all data update
-                res.send("Tenant update to 3.0");
-            });
-        } else if (doc.version == 3) {
-            upgradeFromThree(req, res, next, doc.name);
-            doc.version = 4;
-            config_db.collection("tenants").save(doc, function(err, doc) {
-                if (err) {
-                    return next(new Error("save tenant version fails"));
-                }
-                //TODO, send the complete message when all data update
-                res.send("Tenant update to 4.0");
-            });
-        } else if (doc.version == 4) {
-            upgradeFromFour(req, res, next, doc.name);
-            doc.version = 5;
-            config_db.collection("tenants").save(doc, function(err, doc) {
-                if (err) {
-                    return next(new Error("save tenant version fails"));
-                }
-                //TODO, send the complete message when all data update
-                res.send("Tenant update to 5.0");
-            });
-        } else if (doc.version == VERSION) {
-            res.send("Tenant is already update to date");
-        } else {
-            var error = new Error("tenant version is not valid");
-            error.status = 400;
-            return next(error);
-        }
-    });
 });
 
-function upgradeFromZero(req, res, next, tenant_name) {
+async function getTenantInfo(req, res, next) {
+    try {
+        if (req.body.hasOwnProperty('tenant')) {
+            let tenantName = req.body.tenant;
+            let config_datebase = await db_utils.connect('config');
+            let tenant = await config_datebase.collection('tenants').findOne({
+                name: tenantName
+            });
+            if (!tenant) {
+                let error = new Error(`tenant ${tenantName} doesn't exist`);
+                error.status = 400;
+                return next(error);
+            }
+            console.log("Find tenant %j", tenant);
+            req.tenant = tenant;
+            req.db = await db_utils.mongojsDB(tenantName);
+            return next();
+        } else {
+            var err = new Error("Missing param 'tenant'");
+            err.status = 400;
+            return next(err);
+        }
+    } catch (error) {
+        let err = new Error("get tenant fails");
+        err.innerError = error;
+        return next(err);
+    }
+}
+
+function upgradeFromZero(req, res, next) {
     //TODO, close the connection when all data update done
-    var tenant_db = util.connect(tenant_name);
+    let tenant_db = req.db;
 
     var members = tenant_db.collection('members');
     members.find({}).forEach(function(err, doc) {
@@ -308,9 +331,9 @@ function upgradeFromZero(req, res, next, tenant_name) {
     */
 }
 
-function upgradeFromOne(req, res, next, tenant_name) {
+function upgradeFromOne(req, res, next) {
     //TODO, close the connection when all data update done
-    var tenant_db = util.connect(tenant_name);
+    let tenant_db = req.db;
 
     var members = tenant_db.collection('members');
     members.find({}).forEach(function(err, doc) {
@@ -337,10 +360,9 @@ function upgradeFromOne(req, res, next, tenant_name) {
  * @param {Object} req
  * @param {Object} res 
  * @param {Function} next 
- * @param {String} tenant_name 
  */
-function upgradeFromTwo(req, res, next, tenant_name) {
-    var tenant_db = util.connect(tenant_name);
+function upgradeFromTwo(req, res, next) {
+    let tenant_db = req.db;
 
     var members = tenant_db.collection('members');
     // query matches documents that either contain the status field whose value is null or that do not contain the status field.
@@ -356,8 +378,8 @@ function upgradeFromTwo(req, res, next, tenant_name) {
     });
 }
 
-function upgradeFromThree(req, res, next, tenant_name) {
-    var tenant_db = util.connect(tenant_name);
+function upgradeFromThree(req, res, next) {
+    let tenant_db = req.db;
 
     // Fix the reference field "courseID" and "booking.member" in collection("classes")
     var classes = tenant_db.collection('classes');
@@ -418,8 +440,8 @@ function upgradeFromThree(req, res, next, tenant_name) {
     });
 }
 
-function upgradeFromFour(req, res, next, tenant_name) {
-    var tenant_db = util.connect(tenant_name);
+function upgradeFromFour(req, res, next) {
+    let tenant_db = req.db;
 
     // Set all the classes in history with booking status as 'checkin'
     var classes = tenant_db.collection('classes');
