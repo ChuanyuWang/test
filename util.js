@@ -1,14 +1,11 @@
-var mongojs = require('mongojs');
 var util = require('util');
 var config = require('./config.db');
 var mongoose = require('mongoose');
-const mongoist = require('mongoist');
 
 // Use native promises, more refer to http://mongoosejs.com/docs/promises.html
 mongoose.Promise = global.Promise;
 
 // Store all connected connections.
-var connections = [];
 var connections2 = {};
 
 // export helper functions
@@ -22,44 +19,6 @@ function connectionURI(database) {
         return util.format("mongodb://%s/%s", config.host, database);
     }
 }
-
-/**
- * Return the database instance created by mongojs
- * @param {String} database 
- * @returns 
- */
-helpers.connect = function(database) {
-    if (typeof database != "string" || database.length == 0) {
-        throw new Error("parameter database is not string or empty");
-    }
-    //  If a connection pool was found, return with it.
-    var db = findConnection(database, connections);
-    if (db) {
-        return db;
-    }
-
-    var options = {
-        authSource: 'admin',
-        poolSize: 5
-        /* keepAlive : 120 */
-    };
-    var db = mongojs(connectionURI(database), [], options);
-
-    // Store the connection in the connections array.
-    connections.push({
-        name: database,
-        db: db
-    });
-
-    db.on('error', function(err) {
-        console.error('[mongojs] connect database "%s" with error', db.toString(), err);
-        // TODO, remove error db from connection pool
-    })
-    db.on('connect', function() {
-        console.log('[mongojs] database "%s" is connected', db.toString());
-    })
-    return db;
-};
 
 /**
  * 
@@ -98,27 +57,5 @@ helpers.connect2 = function(database) {
     connections2[database] = conn;
     return conn;
 };
-
-/**
- * Create a mongodb connection using mongoist
- * @param {string | object} database database name or `mongojs` instance
- */
-helpers.connect4 = function(database) {
-    if (typeof database === 'string') {
-        const connection = helpers.connect(database);
-        return mongoist(connection);
-    }
-    // get the mongoist database from exiting mongojs db
-    return mongoist(database);
-};
-
-function findConnection(databaseName, connections) {
-    for (var i = 0; i < connections.length; i++) {
-        if (databaseName == connections[i].name) {
-            return connections[i].db;
-        }
-    }
-    return null;
-}
 
 module.exports = helpers;

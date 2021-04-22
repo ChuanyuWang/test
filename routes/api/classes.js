@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var util = require('../../util');
+const mongoist = require('mongoist');
+const db_utils = require('../../server/databaseManager');
 var helper = require('../../helper');
 
 var NORMAL_FIELDS = {
@@ -17,18 +18,8 @@ var NORMAL_FIELDS = {
     books: 1
 };
 
-router.get('/', function(req, res, next) {
-    var tenantDB = null;
-    if (req.query.hasOwnProperty('tenant')) {
-        tenantDB = util.connect4(req.query.tenant);
-    } else if (req.tenant.name) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = util.connect4(req.tenant.name);
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
-    }
+router.get('/', getTenantInfo, function(req, res, next) {
+    let tenantDB = mongoist(req.db);
 
     var query = {};
     if (req.query.hasOwnProperty('from') && req.query.hasOwnProperty('to')) {
@@ -39,15 +30,15 @@ router.get('/', function(req, res, next) {
     }
     // query specific course
     if (req.query.hasOwnProperty('courseID')) {
-        query['courseID'] = req.query.courseID ? mongojs.ObjectId(req.query.courseID) : null;
+        query['courseID'] = req.query.courseID ? mongoist.ObjectId(req.query.courseID) : null;
     }
     // query classes by specific teacher
     if (req.query.hasOwnProperty('teacher')) {
-        query['teacher'] = req.query.teacher ? mongojs.ObjectId(req.query.teacher) : null;
+        query['teacher'] = req.query.teacher ? mongoist.ObjectId(req.query.teacher) : null;
     }
     // get all classes booked by this member
     if (req.query.hasOwnProperty('memberid')) {
-        query['booking.member'] = mongojs.ObjectId(req.query.memberid);
+        query['booking.member'] = mongoist.ObjectId(req.query.memberid);
     }
 
     // check if there is at least one filter, it's not supposed to return all classes
@@ -87,6 +78,9 @@ router.get('/', function(req, res, next) {
     });
 });
 
+/// Below APIs are visible to authenticated users only
+router.use(helper.isAuthenticated);
+
 /**
  * Get the checkin status of all classes, pagination is supported.
  * Query string contains RESTFul type pagination params, "limit", "offset", "search", "sort" and "order"
@@ -97,7 +91,7 @@ router.get('/', function(req, res, next) {
  *   "rows": []
  * }
  */
-router.get('/checkin', helper.isAuthenticated, function(req, res, next) {
+router.get('/checkin', function(req, res, next) {
     var query = {
         "booking.0": { // array size >= 1
             $exists: true
@@ -231,9 +225,6 @@ router.get('/:classID', function(req, res, next) {
         res.json(doc);
     });
 });
-
-/// Below APIs are visible to authenticated users only
-router.use(helper.isAuthenticated);
 
 router.post('/', function(req, res, next) {
     var classes = req.db.collection("classes");
@@ -546,6 +537,36 @@ router.put('/:classID/comment', function(req, res, next) {
         }
     });
 });
+
+async function getTenantInfo(req, res, next) {
+    try {
+        if (req.query.hasOwnProperty('tenant')) {
+            let tenantName = req.query.tenant;
+            let config_datebase = await db_utils.connect('config');
+            let tenant = await config_datebase.collection('tenants').findOne({
+                name: tenantName
+            });
+            if (!tenant) {
+                let error = new Error(`tenant ${tenantName} doesn't exist`);
+                error.status = 400;
+                return next(error);
+            }
+            req.tenant = tenant;
+            req.db = await db_utils.mongojsDB(tenantName);
+            return next();
+        } else if (req.db) {
+            return next();
+        } else {
+            var err = new Error("Missing param 'tenant'");
+            err.status = 400;
+            return next(err);
+        }
+    } catch (error) {
+        let err = new Error("get tenant fails");
+        err.innerError = error;
+        return next(err);
+    }
+}
 
 /**
  * make sure the datetime object is stored as ISODate
