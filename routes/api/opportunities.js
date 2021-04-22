@@ -148,7 +148,7 @@ async function getTenantInfo(req, res, next) {
             }
             req.db = await db_utils.mongojsDB(tenantName);
             return next();
-        } else if (req.db) {
+        } else {
             var err = new Error("Missing param 'tenant'");
             err.status = 400;
             return next(err);
