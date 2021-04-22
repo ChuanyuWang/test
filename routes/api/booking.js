@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var util = require('../../util');
+const db_utils = require('../../server/databaseManager');
 var reservation = require('./lib/reservation');
 var helper = require('../../helper');
 
@@ -9,33 +9,22 @@ var helper = require('../../helper');
  * Get the member list who booked the class
  */
 router.get('/', helper.isAuthenticated, function(req, res, next) {
-    var tenantDB = null;
-    if (req.query.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.query.tenant);
-    } else if (req.db) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = req.db;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
-    }
-
     if (!req.query.classid) {
-        res.status(400).send("Missing param 'classid'");
-        return;
+        let error = new Error("Missing param 'classid'");
+        error.status = 400;
+        return next(error);
     }
 
+    const tenantDB = req.db;
     //TODO, use aggregate to query
     var classes = tenantDB.collection("classes");
     classes.findOne({
         _id: mongojs.ObjectId(req.query.classid)
     }, { booking: 1 }, function(err, doc) {
         if (err) {
-            res.status(500).json({
-                'err': err
-            })
-            return;
+            let error = new Error("get tenant fails");
+            error.innerError = err;
+            return next(error);
         }
 
         if (!doc) {
@@ -101,23 +90,13 @@ contact : "13500000000",
 classID : "5716630aa012576d0371e888"
 }
  */
-router.post('/', function(req, res, next) {
-    var tenantDB = null;
-    if (req.body.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.body.tenant);
-    } else if (req.db) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = req.db;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
-    }
-
+router.post('/', getTenantInfo, function(req, res, next) {
     if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
         res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
         return;
     }
+
+    let tenantDB = req.db;
     var members = tenantDB.collection("members");
     var user_query = {
         name: req.body.name,
@@ -168,23 +147,13 @@ router.post('/', function(req, res, next) {
 });
 
 // remove specfic user's booking info
-router.delete('/:classID', function(req, res, next) {
-    var tenantDB = null;
-    if (req.body.hasOwnProperty('tenant')) {
-        tenantDB = util.connect(req.body.tenant);
-    } else if (req.db) {
-        // initialize the tenant db if it's authenticated user
-        tenantDB = req.db;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
-    }
-
+router.delete('/:classID', getTenantInfo, function(req, res, next) {
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");
         return;
     }
+
+    let tenantDB = req.db;
     var classes = tenantDB.collection("classes");
     classes.findOne({
         _id: mongojs.ObjectId(req.params.classID),
@@ -285,6 +254,36 @@ router.delete('/:classID', function(req, res, next) {
         });
     });
 });
+
+
+async function getTenantInfo(req, res, next) {
+    try {
+        if (req.body.hasOwnProperty('tenant')) {
+            let tenantName = req.body.tenant;
+            let config_db = await db_utils.connect('config');
+            let tenant = await config_db.collection('tenants').findOne({
+                name: tenantName
+            });
+            if (!tenant) {
+                let error = new Error(`tenant ${tenantName} doesn't exist`);
+                error.status = 400;
+                return next(error);
+            }
+            req.db = await db_utils.mongojsDB(tenantName);
+            return next();
+        } else if (req.db) {
+            return next();
+        } else {
+            var err = new Error("tenant is not defined");
+            err.status = 400;
+            return next(err);
+        }
+    } catch (error) {
+        let err = new Error("get tenant fails");
+        err.innerError = error;
+        return next(err);
+    }
+}
 
 /**
  * 
