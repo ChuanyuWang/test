@@ -39,6 +39,7 @@ module.exports = {
      * 3. https://docs.microsoft.com/en-us/aspnet/ajax/cdn/overview
      * 4. http://www.bootcdn.cn/ (reject .cc .top)
      * 5. https://unpkg.com/
+     * 6. https://www.jsdelivr.com/
      */
     cdnlibs: {
         jquery: 'https://cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js',
@@ -66,7 +67,7 @@ module.exports = {
         bootstrap_datetimepicker: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
         bootstrap_datetimepicker_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
         bootbox: 'https://cdn.bootcdn.net/ajax/libs/bootbox.js/4.4.0/bootbox.min.js',
-        echarts: 'https://cdn.bootcdn.net/ajax/libs/echarts/3.8.5/echarts.min.js',
-        echarts_dev: 'https://cdn.bootcdn.net/ajax/libs/echarts/3.8.5/echarts.js'
+        echarts: 'https://cdn.jsdelivr.net/npm/echarts@3.8.5/dist/echarts.min.js',
+        echarts_dev: 'https://cdn.jsdelivr.net/npm/echarts@3.8.5/dist/echarts.js'
     }
 };
