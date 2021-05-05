@@ -12,23 +12,25 @@ module.exports = {
     target: "web",
     // Avoid inline-*** and eval-*** use in production as they can increase bundle size and reduce the overall performance.
     devtool: '',
+    // The base directory, an absolute path, for resolving entry points and loaders
+    context: path.resolve(__dirname, 'src'),
     entry: {
         // dummy style entry to compile less file to css file
-        style: './src/js/style.js',
+        style: './js/style.js',
         // Multi Page Application
-        main: './src/js/main.js',
-        class_view: './src/js/class_view.js',
-        member: './src/js/member.js',
-        member_view: './src/js/member_view.js',
-        booking: './src/js/booking.js',
-        mybooking: './src/js/mybooking.js',
-        myreadbooks: './src/js/mybooks.js',
-        trial: './src/js/trial.js',
-        course: './src/js/course.js',
-        course_view: './src/js/course_view.js',
-        setting: './src/js/setting.js',
-        statistics: './src/js/statistics.js',
-        admin: './src/js/admin.js'
+        main: './js/main.js',
+        class_view: './js/class_view.js',
+        member: './js/member.js',
+        member_view: './js/member_view.js',
+        booking: './js/booking.js',
+        mybooking: './js/mybooking.js',
+        myreadbooks: './js/mybooks.js',
+        trial: './js/trial.js',
+        course: './js/course.js',
+        course_view: './js/course_view.js',
+        setting: './js/setting.js',
+        statistics: './js/statistics.js',
+        admin: './js/admin.js'
     },
 
     output: {

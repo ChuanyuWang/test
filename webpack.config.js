@@ -10,27 +10,29 @@ module.exports = {
     mode: process.env.NODE_ENV || 'development',
     target: "web",
     devtool: "eval-source-map",
+    // The base directory, an absolute path, for resolving entry points and loaders
+    context: path.resolve(__dirname, 'src'),
     entry: {
         // Multi Page Application
-        main: ['./src/js/main.js', hotMiddlewareScript],
-        class_view: ['./src/js/class_view.js', hotMiddlewareScript],
-        member: ['./src/js/member.js', hotMiddlewareScript],
-        member_view: ['./src/js/member_view.js', hotMiddlewareScript],
-        booking: ['./src/js/booking.js', hotMiddlewareScript],
-        mybooking: ['./src/js/mybooking.js', hotMiddlewareScript],
-        myreadbooks: ['./src/js/mybooks.js', hotMiddlewareScript],
-        trial: ['./src/js/trial.js', hotMiddlewareScript],
-        course: ['./src/js/course.js', hotMiddlewareScript],
-        course_view: ['./src/js/course_view.js', hotMiddlewareScript],
-        setting: ['./src/js/setting.js', hotMiddlewareScript],
-        statistics: ['./src/js/statistics.js', hotMiddlewareScript],
-        admin: ['./src/js/admin.js', hotMiddlewareScript]
+        main: ['./js/main.js', hotMiddlewareScript],
+        class_view: ['./js/class_view.js', hotMiddlewareScript],
+        member: ['./js/member.js', hotMiddlewareScript],
+        member_view: ['./js/member_view.js', hotMiddlewareScript],
+        booking: ['./js/booking.js', hotMiddlewareScript],
+        mybooking: ['./js/mybooking.js', hotMiddlewareScript],
+        myreadbooks: ['./js/mybooks.js', hotMiddlewareScript],
+        trial: ['./js/trial.js', hotMiddlewareScript],
+        course: ['./js/course.js', hotMiddlewareScript],
+        course_view: ['./js/course_view.js', hotMiddlewareScript],
+        setting: ['./js/setting.js', hotMiddlewareScript],
+        statistics: ['./js/statistics.js', hotMiddlewareScript],
+        admin: ['./js/admin.js', hotMiddlewareScript]
     },
 
     output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'public/js'),
-        publicPath: '/js/'
+        filename: 'js/[name].js',
+        path: path.resolve(__dirname, 'public'),
+        publicPath: '/'
     },
     resolve: {
         extensions: ['.js', '.vue', '.json'],
