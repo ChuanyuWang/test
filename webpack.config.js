@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // timeout: The time to wait after a disconnection before attempting to reconnect
 const hotMiddlewareScript = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=2000&reload=true';
@@ -13,6 +14,8 @@ module.exports = {
     // The base directory, an absolute path, for resolving entry points and loaders
     context: path.resolve(__dirname, 'src'),
     entry: {
+        // dummy style entry to compile less file to css file
+        style: './js/style.js',
         // Multi Page Application
         main: ['./js/main.js', hotMiddlewareScript],
         class_view: ['./js/class_view.js', hotMiddlewareScript],
@@ -97,10 +100,25 @@ module.exports = {
                 test: /\.pug$/,
                 loader: 'pug-plain-loader'
             },
+            // this will apply to the global `style.less` file
+            {
+                test: /\.less$/,
+                include: [
+                    path.resolve(__dirname, "src/css")
+                ],
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'less-loader'
+                ]
+            },
             // this will apply to both plain `.less` files
             // AND `<style lang="less">` blocks in `.vue` files
             {
                 test: /\.less$/,
+                include: [
+                    path.resolve(__dirname, "src/js")
+                ],
                 use: [
                     'vue-style-loader',
                     {
@@ -122,6 +140,9 @@ module.exports = {
         // make jquery available for all modules
         new webpack.ProvidePlugin({
             $: 'jquery'
+        }),
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].css'
         })
     ],
     performance: {
