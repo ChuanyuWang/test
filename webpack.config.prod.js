@@ -4,6 +4,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const pkg = require('./package.json');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
 module.exports = {
@@ -12,6 +13,8 @@ module.exports = {
     // Avoid inline-*** and eval-*** use in production as they can increase bundle size and reduce the overall performance.
     devtool: '',
     entry: {
+        // dummy style entry to compile less file to css file
+        style: './src/js/style.js',
         // Multi Page Application
         main: './src/js/main.js',
         class_view: './src/js/class_view.js',
@@ -29,9 +32,9 @@ module.exports = {
     },
 
     output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'public/js'),
-        publicPath: '/js/'
+        filename: 'js/[name].js',
+        path: path.resolve(__dirname, 'public'),
+        publicPath: '/'
     },
     resolve: {
         extensions: ['.js', '.vue', '.json'],
@@ -94,15 +97,32 @@ module.exports = {
                 test: /\.pug$/,
                 loader: 'pug-plain-loader'
             },
+            // this will apply to the global `style.less` file
+            {
+                test: /\.less$/,
+                include: [
+                    path.resolve(__dirname, "src/css")
+                ],
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'less-loader'
+                ]
+            },
             // this will apply to both plain `.less` files
             // AND `<style lang="less">` blocks in `.vue` files
             {
                 test: /\.less$/,
+                include: [
+                    path.resolve(__dirname, "src/js")
+                ],
                 use: [
                     'vue-style-loader',
                     {
                         loader: 'css-loader',
                         options: {
+                            // disable exporting css module as esModule, 
+                            // because vue-style-loader load css module as commonjs
                             esModule: false,
                             sourceMap: false
                         },
@@ -120,7 +140,10 @@ module.exports = {
         new webpack.ProvidePlugin({
             $: 'jquery'
         }),
-        new ESLintPlugin()
+        new ESLintPlugin(),
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].css'
+        })
     ],
     optimization: {
         minimize: true,
