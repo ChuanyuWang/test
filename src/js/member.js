@@ -45,16 +45,18 @@ function init() {
 
     $('#member_table').bootstrapTable({
         locale: 'zh-CN',
-        rowStyle: highlightExpire,
+        //rowStyle: highlightExpire,
         queryParams: customQuery,
         columns: [{
             formatter: viewFormatter
         }, {}, {}, {
             formatter: common.dateFormatter
         }, {
-            formatter: remainingFormatter
+            formatter: remainingFormatter,
+            cellStyle: remainingStyle
         }, {
-            formatter: expireFormatter
+            formatter: expireFormatter,
+            cellStyle: expireStyle
         }, {
             formatter: creditFormatter
         }, {}, {}
@@ -154,48 +156,70 @@ function handleFilterStatus(event) {
     $('#member_table').bootstrapTable('refresh');
 }
 
-function getCredit(member) {
-    var credit = member && member.membership && member.membership[0] && member.membership[0].credit || 0;
-    var n = Math.round(credit * 10) / 10;
-    return n === 0 ? 0 : n; // handle the "-0" case
-}
-
-function creditFormatter(value, row, index) {
-    var membership = row.membership;
-    if (membership && membership[0]) {
-        // A better way of 'toFixed(1)'
-        if (typeof (membership[0].credit) == 'number') {
-            var n = Math.round(membership[0].credit * 10) / 10;
-            return n === 0 ? 0 : n; // handle the "-0" case
-        } else {
-            return membership[0].credit;
-        }
+function getCredit(memberships) {
+    var card = memberships && memberships[0];
+    if (card) {
+        var credit = card.credit || 0;
+        var n = Math.round(credit * 10) / 10;
+        return n === 0 ? 0 : n; // handle the "-0" case
     } else {
         return undefined;
     }
 }
 
+function creditFormatter(value, row, index) {
+    return getCredit(row && row.membership);
+}
+
 function remainingFormatter(value, row, index) {
     return [
         '<b>',
+        // A better way of 'toFixed(1)'
         Math.round(value * 10) / 10,
         '</b> <small>(<i>',
-        getCredit(row),
+        getCredit(row.membership) || 0,
         ', ',
         row.unStartedClassCount,
         '节</i>)</small>'
     ].join('');
 }
 
+function remainingStyle(value, row, index, field) {
+    if (row.membership && row.membership[0]) {
+        // highlight the cell if remaining credit or classes is zero
+        if (value <= 0) {
+            return {
+                classes: 'danger'
+            };
+        }
+    }
+    return {};
+}
+
 function expireFormatter(value, row, index) {
     var membership = row.membership;
     if (membership && membership[0]) {
-        // A better way of 'toFixed(1)'
         var expire = membership[0].expire;
         return expire ? moment(expire).format('ll') : null;
     } else {
         return undefined;
     }
+}
+
+function expireStyle(value, row, index, field) {
+    var card = row.membership && row.membership[0];
+    if (card) {
+        var expire = moment(card.expire);
+        // skip is expire is not set
+        if (!expire.isValid()) return {};
+        // highlight the row if member is expired
+        if (expire.isBefore(moment())) {
+            return {
+                classes: 'danger'
+            };
+        }
+    }
+    return {};
 }
 
 function highlightExpire(row, index) {
@@ -211,7 +235,7 @@ function highlightExpire(row, index) {
             };
         }
         // highlight the row if member has no credit
-        if (card.hasOwnProperty('credit') && card.credit < 0) {
+        if (card.hasOwnProperty('credit') && card.credit <= 0) {
             return {
                 classes: 'danger'
             };
