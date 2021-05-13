@@ -222,28 +222,6 @@ function expireStyle(value, row, index, field) {
     return {};
 }
 
-function highlightExpire(row, index) {
-    var card = row.membership && row.membership[0];
-    if (card) {
-        var expire = moment(card.expire);
-        // skip is expire is not set
-        if (!expire.isValid()) return {};
-        // highlight the row if member is expired
-        if (expire.isBefore(moment())) {
-            return {
-                classes: 'danger'
-            };
-        }
-        // highlight the row if member has no credit
-        if (card.hasOwnProperty('credit') && card.credit <= 0) {
-            return {
-                classes: 'danger'
-            };
-        }
-    }
-    return {};
-}
-
 function viewFormatter(value, row, index) {
     var url = window.location.pathname + '/' + row._id;
     return [
