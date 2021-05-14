@@ -75,8 +75,9 @@ router.get('/', getMemberLeftClasses, function(req, res, next) {
             })
         };
     }
+    let sort = req.query.order == 'asc' ? 1 : -1;
     members.find(query, NORMAL_FIELDS).sort({
-        since: -1
+        since: sort
     }, function(err, docs) {
         if (err) {
             res.status(500).json({
