@@ -97,14 +97,25 @@ router.get('/checkin', function(req, res, next) {
             $exists: true
         },
     };
-    var query2 = {};
     if (req.query.hasOwnProperty('from') && req.query.hasOwnProperty('to')) {
         query.date = {
             $gte: new Date(req.query.from),
             $lt: new Date(req.query.to)
         };
     }
+    // query specific classroom
+    if (req.query.hasOwnProperty('classroom')) {
+        query['classroom'] = req.query.classroom ? req.query.classroom : null;
+    }
+    // get all classes booked by this member
+    if (req.query.hasOwnProperty('hasBooks')) {
+        query['books.0'] = { // array size >= 1
+            $exists: true
+        };
+    }
+
     // query checkin status
+    var query2 = {};
     if (req.query.hasOwnProperty('status')) {
         //query2['booking.status'] = req.query.status ? {$in: req.query.status.split(',')} : null;
         query2['booking.status'] = {
@@ -129,85 +140,71 @@ router.get('/checkin', function(req, res, next) {
 
     // be defaul the sort is 'desc'
     var sort = req.query.order == 'asc' ? 1 : -1;
-    // query specific classroom
-    if (req.query.hasOwnProperty('classroom')) {
-        query['classroom'] = req.query.classroom ? req.query.classroom : null;
-    }
-    // get all classes booked by this member
-    if (req.query.hasOwnProperty('hasBooks')) {
-        query['books.0'] = { // array size >= 1
-            $exists: true
-        };
-    }
 
     var classes = req.db.collection("classes");
+    // support paginzation
+    let skip = parseInt(req.query.offset) || 0;
+    if (skip < 0) {
+        console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);
+        skip = 0;
+    }
+    let pageSize = parseInt(req.query.limit) || 100;
+    if (pageSize > 100 || pageSize < 0) {
+        console.warn(`page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
+        pageSize = 100;
+    }
+
     classes.aggregate([
         {
             $match: query
+        }, {
+            $sort: { date: sort }
         }, {
             $unwind: "$booking"
         }, {
             $match: query2
         }, {
-            $group: {
-                _id: null,
-                total: { $sum: 1 }
+            $lookup: {
+                from: "members",
+                localField: "booking.member",
+                foreignField: "_id",
+                as: "member"
+            }
+        }, {
+            $project: { // only return necessary value
+                name: 1,
+                date: 1,
+                booking: 1,
+                books: 1,
+                'member._id': 1,
+                'member.name': 1,
+                'member.contact': 1
+            }
+        }, {
+            $facet: {
+                metadata: [{ $count: "total" }],
+                rows: [{ $skip: skip }, { $limit: pageSize }]
             }
         }
-    ], function(err, totalDoc) {
+    ], function(err, docs) {
         if (err) {
-            var error = new Error("Get class checkin status total fails");
+            var error = new Error("Get class checkin status fails");
             error.innerError = err;
-            next(error);
-            return;
+            return next(error);
         }
-        var total = totalDoc && totalDoc.length ? totalDoc[0].total : 0;
-        console.log(`get classes checkin total: ${total}`);
 
-        classes.aggregate([
-            {
-                $match: query
-            }, {
-                $sort: { date: sort }
-            }, {
-                $unwind: "$booking"
-            }, {
-                $match: query2
-            }, {
-                $skip: parseInt(req.query.offset) || 0
-            }, {
-                $limit: parseInt(req.query.limit) || 100 // return 100 checkin status if limit is not defined
-            }, {
-                $lookup: {
-                    from: "members",
-                    localField: "booking.member",
-                    foreignField: "_id",
-                    as: "member"
-                }
-            }, {
-                $project: { // only return necessary value
-                    name: 1,
-                    date: 1,
-                    booking: 1,
-                    books: 1,
-                    'member._id': 1,
-                    'member.name': 1,
-                    'member.contact': 1
-                }
-            }
-        ], function(err, docs) {
-            if (err) {
-                var error = new Error("Get class checkin status fails");
-                error.innerError = err;
-                next(error);
-                return;
-            }
-            console.log("get classes checkin status: %s", docs ? docs.length : 0);
+        if (docs && docs.length > 0) {
+            let results = docs[0];
+            results.total = results.metadata.length > 0 ? results.metadata[0].total : 0;
+            console.log(`get classes checkin status ${results.rows.length} from ${results.total} in total`);
+            res.json(results);
+        } else {
+            console.log("Doesn't find checkin status");
             res.json({
-                total: total,
-                rows: docs
+                total: 0,
+                rows: []
             });
-        });
+        }
     });
 });
 
