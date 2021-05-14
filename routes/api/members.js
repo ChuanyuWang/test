@@ -75,7 +75,6 @@ router.get('/', function(req, res, next) {
             })
         };
     }
-    let sort = req.query.order == 'asc' ? 1 : -1;
 
     let pipelines = [{
         $match: query
@@ -83,6 +82,7 @@ router.get('/', function(req, res, next) {
         $project: NORMAL_FIELDS
     }]
 
+    // append additional fields to include remaining classes
     if (req.query.hasOwnProperty('appendLeft')) {
         pipelines.push({
             $lookup: {
@@ -116,25 +116,42 @@ router.get('/', function(req, res, next) {
         });
     }
 
+    // support sort
+    let sort = {};
+    let field = req.query.sort || "since";
+    sort[field] = req.query.order == 'asc' ? 1 : -1;
+    // support paginzation
+    let skip = parseInt(req.query.offset) || 0;
+    let pageSize = parseInt(req.query.limit) || 100;
+
     pipelines.push({
-        $sort: {
-            since: sort
+        $sort: sort
+    }, {
+        $facet: {
+            metadata: [{ $count: "total" }],
+            rows: [{ $skip: skip }, { $limit: pageSize }]
         }
     });
 
     members.aggregate(pipelines, function(err, docs) {
-
-        //members.find(query, NORMAL_FIELDS).sort({
-        //    since: sort
-        //}, function(err, docs) {
         if (err) {
             var error = new Error("Get member list fails");
             error.innerError = err;
             return next(error);
         }
 
-        console.log("find members: ", docs ? docs.length : 0);
-        res.json(docs);
+        if (docs && docs.length > 0) {
+            let results = docs[0];
+            results.total = results.metadata[0].total;
+            console.log(`find ${results.rows.length} members from ${results.total} in total`);
+            res.json(results);
+        } else {
+            console.log("Doesn't find members");
+            res.json({
+                total: 0,
+                rows: []
+            });
+        }
     });
 });
 

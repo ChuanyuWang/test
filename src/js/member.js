@@ -45,6 +45,7 @@ function init() {
 
     $('#member_table').bootstrapTable({
         locale: 'zh-CN',
+        sidePagination: "server",
         //rowStyle: highlightExpire,
         queryParams: customQuery,
         columns: [{
