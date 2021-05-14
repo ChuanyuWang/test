@@ -88,6 +88,7 @@ module.exports = {
   mounted: function() {
     var vm = this;
     $(vm.$el).find('table.member-table').bootstrapTable({
+      sidePagination: "server",
       url: '/api/members?status=active', // only display active members
       locale: 'zh-CN',
       columns: [{}, {}, {}, {
