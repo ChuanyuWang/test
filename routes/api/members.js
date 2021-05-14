@@ -101,6 +101,7 @@ router.get('/', function(req, res, next) {
                 pipeline: [{
                     $match: {
                         date: { $gte: new Date() },
+                        "booking.0": { $exists: true },
                         $expr: { $in: ["$$memberID", "$booking.member"] }
                     }
                 }, {
@@ -160,7 +161,7 @@ router.get('/', function(req, res, next) {
 
         if (docs && docs.length > 0) {
             let results = docs[0];
-            results.total = results.metadata[0].total;
+            results.total = results.metadata.length > 0 ? results.metadata[0].total : 0;
             console.log(`find ${results.rows.length} members from ${results.total} in total`);
             res.json(results);
         } else {
