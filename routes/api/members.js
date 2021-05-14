@@ -132,7 +132,15 @@ router.get('/', function(req, res, next) {
     sort[field] = req.query.order == 'asc' ? 1 : -1;
     // support paginzation
     let skip = parseInt(req.query.offset) || 0;
+    if (skip < 0) {
+        console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);
+        skip = 0;
+    }
     let pageSize = parseInt(req.query.limit) || 100;
+    if (pageSize > 100 || pageSize < 0) {
+        console.warn(`page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
+        pageSize = 100;
+    }
 
     pipelines.push({
         $sort: sort
