@@ -51,7 +51,7 @@ router.post('/validate', async function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', getMemberLeftClasses, function(req, res, next) {
+router.get('/', function(req, res, next) {
     var members = req.db.collection("members");
     var query = {};
     if (req.query.name) {
@@ -76,23 +76,63 @@ router.get('/', getMemberLeftClasses, function(req, res, next) {
         };
     }
     let sort = req.query.order == 'asc' ? 1 : -1;
-    members.find(query, NORMAL_FIELDS).sort({
-        since: sort
-    }, function(err, docs) {
+
+    let pipelines = [{
+        $match: query
+    }, {
+        $project: NORMAL_FIELDS
+    }]
+
+    if (req.query.hasOwnProperty('appendLeft')) {
+        pipelines.push({
+            $lookup: {
+                from: 'classes',
+                let: { memberID: "$_id" },
+                pipeline: [{
+                    $match: {
+                        date: { $gte: new Date() },
+                        $expr: { $in: ["$$memberID", "$booking.member"] }
+                    }
+                }, {
+                    $project: { name: 1, date: 1, _id: 0 }
+                }],
+                as: 'unStartedClass'
+            }
+        }, {
+            $addFields: {
+                unStartedClassCount: {
+                    $size: "$unStartedClass"
+                },
+                credit: {
+                    $sum: "$membership.credit"
+                }
+            }
+        }, {
+            $addFields: {
+                allRemaining: {
+                    $add: ["$unStartedClassCount", "$credit"]
+                }
+            }
+        });
+    }
+
+    pipelines.push({
+        $sort: {
+            since: sort
+        }
+    });
+
+    members.aggregate(pipelines, function(err, docs) {
+
+        //members.find(query, NORMAL_FIELDS).sort({
+        //    since: sort
+        //}, function(err, docs) {
         if (err) {
-            res.status(500).json({
-                'err': err
-            });
-            return;
+            var error = new Error("Get member list fails");
+            error.innerError = err;
+            return next(error);
         }
-        // append the field 'unStartedClassCount' and 'allRemaining' to each member, default is 0
-        if (req.query.hasOwnProperty('appendLeft') && req.memberLeftClasses) {
-            docs.forEach(function(value, index, array) {
-                value.unStartedClassCount = req.memberLeftClasses[value._id.toString()] || 0;
-                var credit = value.membership && value.membership[0] && value.membership[0].credit || 0;
-                value.allRemaining = value.unStartedClassCount + credit;
-            });
-        }
+
         console.log("find members: ", docs ? docs.length : 0);
         res.json(docs);
     });
@@ -675,49 +715,6 @@ function isEqual(a, b) {
     return a == b;
 }
 
-function getMemberLeftClasses(req, res, next) {
-    // check whether to fetch the remaining classes for each member
-    if (!req.query.hasOwnProperty('appendLeft')) return next();
-
-    var classes_col = req.db.collection("classes");
-    classes_col.aggregate([{
-        $match: {
-            "date": { $gte: new Date() }
-        }
-    }, {
-        $project: {
-            'booking': 1
-        }
-    }, {
-        $unwind: "$booking"
-    }, {
-        $group: {
-            _id: "$booking.member", // group the data according to member
-            total: {
-                $sum: 1
-            }
-        }
-    }], function(err, docs) {
-        if (err) {
-            var error = new Error("get member remaining classes fails");
-            error.innerError = err;
-            return next(error);
-        }
-        if (!docs || docs.length === 0) {
-            req.memberLeftClasses = {}; // append am empty object
-            return next();
-        }
-
-        // generate the left classes for each member
-        var memberLeftClasses = {};
-        docs.forEach(function(value, index, array) {
-            memberLeftClasses[value._id] = value.total || 0;
-        });
-        req.memberLeftClasses = memberLeftClasses;
-        console.log("Append remaining info to members");
-        return next();
-    });
-}
 /*
 function getMemberBookQuantity(class_doc, member_id) {
     if (!class_doc || !class_doc.booking) {

@@ -38,7 +38,7 @@ block page
           th(data-field='allRemaining',data-sortable='true') 剩余课时+课节
           th(data-sortable='true',data-sort-name='membership.0.expire') 有效期
           //th(data-field='since',data-sortable='true') 登记时间
-          th(data-sortable='true',data-sort-name='membership.0.credit',data-visible='false') 剩余课时
+          th(data-field='credit',data-sortable='true',data-visible='false') 剩余课时
           th(data-field='unStartedClassCount',data-sortable='true',data-visible='false') 剩余课程
           th(data-field='note',data-visible='false') 描述
     p.small 有效会员: <strong>#{statistics.count}</strong>人<br>剩余课时: <b>#{statistics.total}</b>
