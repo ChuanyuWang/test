@@ -76,6 +76,16 @@ router.get('/', function(req, res, next) {
         };
     }
 
+    // query members by keyword, search 'name' or 'contact'
+    let search = req.query.search || "";
+    if (search) {
+        // search both name and contact
+        query['$or'] = [
+            { 'name': new RegExp(search, 'i') },
+            { 'contact': new RegExp(search, 'i') }
+        ];
+    }
+
     let pipelines = [{
         $match: query
     }, {
