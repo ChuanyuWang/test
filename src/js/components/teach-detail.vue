@@ -69,7 +69,8 @@ module.exports = {
   },
   data: function() {
     return {
-      item: jQuery.extend(true, {}, this.data || {})
+      item: jQuery.extend(true, {}, this.data || {}),
+      setting: common.getTenantSetting()
     };
   },
   components: {
@@ -204,6 +205,7 @@ module.exports = {
             formatter: common.dateFormatter
           },
           {
+            visible: this.setting.feature == 'book',
             formatter: this.booksFormatter
           }
         ]
