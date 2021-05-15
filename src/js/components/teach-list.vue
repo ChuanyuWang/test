@@ -20,7 +20,15 @@
 
 <template lang="pug">
 div
-  template(v-for='(teacher, index) in data')
+  div.row
+    label.col-xs-4(style='padding:7px 3px 0px 3px;text-align:right') 显示:
+    div.col-xs-8
+      select.form-control(v-model='filter')
+        option(value='active') 激活
+        option(value='inactive') 未激活
+        option(value='deleted') 已删除
+        option(value='all') 全部
+  template(v-for='(teacher, index) in teacherList')
     div.media.teacher-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-teacher" : ""]')
       div.media-left
         a(href='#')
@@ -47,10 +55,19 @@ module.exports = {
   },
   data: function() {
     return {
+      filter: "active",
       selectedIndex: -1
     };
   },
-  computed: {},
+  computed: {
+    teacherList: function() {
+      if (this.filter === "all") return this.data;
+      var vm = this;
+      return (this.data || []).filter(function(value, index, array) {
+        return value.status === vm.filter;
+      });
+    }
+  },
   filters: {},
   methods: {
     setSelectedIndex: function(newIndex) {
