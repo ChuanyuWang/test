@@ -51,8 +51,7 @@ router.post('/validate', async function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', function(req, res, next) {
-    var members = req.db.collection("members");
+router.get('/', async function(req, res, next) {
     var query = {};
     if (req.query.name) {
         query['name'] = req.query.name;
@@ -86,51 +85,11 @@ router.get('/', function(req, res, next) {
         ];
     }
 
-    let pipelines = [{
-        $match: query
-    }, {
-        $project: NORMAL_FIELDS
-    }]
-
-    // append additional fields to include remaining classes
-    if (req.query.hasOwnProperty('appendLeft')) {
-        pipelines.push({
-            $lookup: {
-                from: 'classes',
-                let: { memberID: "$_id" },
-                pipeline: [{
-                    $match: {
-                        date: { $gte: new Date() },
-                        "booking.0": { $exists: true },
-                        $expr: { $in: ["$$memberID", "$booking.member"] }
-                    }
-                }, {
-                    $project: { name: 1, date: 1, _id: 0 }
-                }],
-                as: 'unStartedClass'
-            }
-        }, {
-            $addFields: {
-                unStartedClassCount: {
-                    $size: "$unStartedClass"
-                },
-                credit: {
-                    $sum: "$membership.credit"
-                }
-            }
-        }, {
-            $addFields: {
-                allRemaining: {
-                    $add: ["$unStartedClassCount", "$credit"]
-                }
-            }
-        });
-    }
-
-    // support sort
+    // support sorting
     let sort = {};
-    let field = req.query.sort || "since";
+    let field = req.query.sort || "since"; // sort by "since" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
+
     // support paginzation
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
@@ -143,35 +102,99 @@ router.get('/', function(req, res, next) {
         pageSize = 100;
     }
 
-    pipelines.push({
-        $sort: sort
-    }, {
-        $facet: {
-            metadata: [{ $count: "total" }],
-            rows: [{ $skip: skip }, { $limit: pageSize }]
-        }
-    });
+    // TODO, handle exception from `connect`
+    let tenantDB = await db_utils.connect(req.tenant.name);
+    let members = tenantDB.collection("members");
 
-    members.aggregate(pipelines, function(err, docs) {
-        if (err) {
-            var error = new Error("Get member list fails");
+    // get the total of all matched members
+    let cursor = members.find(query, { projection: NORMAL_FIELDS });
+    let total = await cursor.count();
+
+    // use find() instead of aggregate()
+    if (!req.query.hasOwnProperty('appendLeft')) {
+        try {
+            let docs = await cursor.sort(sort).skip(skip).limit(pageSize).toArray();
+            console.log(`find ${docs.length} members from ${total} in total`);
+            return res.json({
+                total: total,
+                rows: docs
+            });
+        } catch (err) {
+            let error = new Error("Get member list fails");
             error.innerError = err;
             return next(error);
         }
+    }
 
-        if (docs && docs.length > 0) {
-            let results = docs[0];
-            results.total = results.metadata.length > 0 ? results.metadata[0].total : 0;
-            console.log(`find ${results.rows.length} members from ${results.total} in total`);
-            res.json(results);
-        } else {
-            console.log("Doesn't find members");
-            res.json({
-                total: 0,
-                rows: []
-            });
+    // build pipelines for aggregate()
+    let pipelines = [{
+        $match: query
+    }, {
+        $project: NORMAL_FIELDS
+    }, {
+        $lookup: {
+            from: 'classes',
+            let: { memberID: "$_id" },
+            pipeline: [{
+                $match: {
+                    date: { $gte: new Date() },
+                    "booking.0": { $exists: true },
+                    $expr: { $in: ["$$memberID", "$booking.member"] }
+                }
+            }, {
+                $project: { name: 1, date: 1, _id: 0 }
+            }],
+            as: 'unStartedClass'
         }
-    });
+    }, {
+        $addFields: {
+            unStartedClassCount: {
+                $size: "$unStartedClass"
+            },
+            credit: {
+                $sum: "$membership.credit"
+            }
+        }
+    }, {
+        $addFields: {
+            allRemaining: {
+                $add: ["$unStartedClassCount", "$credit"]
+            }
+        }
+    }];
+
+    if (['unStartedClassCount', 'credit', 'allRemaining'].indexOf(field) > -1) {
+        // user sort on calculated field
+        pipelines.push({
+            $sort: sort
+        }, {
+            $skip: skip
+        }, {
+            $limit: pageSize
+        });
+    } else {
+        // put the $sort at the beginning for better performance
+        pipelines.splice(1, 0, {
+            $sort: sort
+        }, {
+            $skip: skip
+        }, {
+            $limit: pageSize
+        });
+    }
+
+    try {
+        let docs = await members.aggregate(pipelines).toArray();
+        console.log(`find ${docs.length} members with remaining classes from ${total} in total`);
+        return res.json({
+            total: total,
+            rows: docs
+        });
+    } catch (error) {
+        let err = new Error("Get member list fails");
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 router.get('/:memberID', function(req, res, next) {
