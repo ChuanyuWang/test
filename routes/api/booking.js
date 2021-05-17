@@ -15,70 +15,69 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
         return next(error);
     }
 
+    let pipelines = [{
+        $match: { _id: mongojs.ObjectId(req.query.classid) }
+    }, {
+        $project: { booking: 1 }
+    }, {
+        $lookup: {
+            from: 'members',
+            let: {
+                memberList: '$booking.member'
+            },
+            pipeline: [{
+                $match: {
+                    $expr: {
+                        $in: ["$_id", "$$memberList"]
+                    }
+                }
+            }, {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    contact: 1
+                }
+            }],
+            as: 'users'
+        }
+    }];
+
     const tenantDB = req.db;
-    //TODO, use aggregate to query
     var classes = tenantDB.collection("classes");
-    classes.findOne({
-        _id: mongojs.ObjectId(req.query.classid)
-    }, { booking: 1 }, function(err, doc) {
+    classes.aggregate(pipelines, function(err, docs) {
         if (err) {
-            let error = new Error("get tenant fails");
+            let error = new Error("get booking fails");
             error.innerError = err;
             return next(error);
         }
 
-        if (!doc) {
-            res.status(400).json({
+        if (!docs || docs.length !== 1) {
+            // docs === [] when the classid is invalid
+            return res.status(400).json({
                 'code': 2002,
                 'message': "没有找到指定课程，请刷新重试",
                 'err': err
             });
-            return;
         }
 
-        var booking = doc.booking;
-        // no booking info
-        if (!booking || booking.length == 0) {
-            res.json([]);
-            return;
-        }
-
+        let booking = docs[0].booking;
+        let users = docs[0].users;
         console.log("find booking of class %s: %j", req.query.classid, booking);
+        console.log("find %s members who book class %s", users.length, req.query.classid);
 
-        var query_member = [];
+        // Find all the valid booking which member exists
+        var book_items = [];
         for (var i = 0; i < booking.length; i++) {
-            var memberid = mongojs.ObjectId(booking[i].member);
-            query_member.push(memberid);
-        }
-
-        // query all the members who books this class
-        var members = tenantDB.collection("members");
-        members.find({
-            _id: {
-                "$in": query_member
-            }
-        }, { name: 1, contact: 1 }, function(err, users) {
-            if (err) {
-                return res.status(500).json({
-                    'err': err
-                })
-            }
-            console.log("find %s members who book class %s", users.length, req.query.classid);
-
-            // Find all the valid booking which member exists
-            var book_items = [];
-            for (var i = 0; i < booking.length; i++) {
-                for (var j = 0; j < users.length; j++) {
-                    if (booking[i].member == users[j]._id.toString()) {
-                        booking[i].userName = users[j].name;
-                        booking[i].contact = users[j].contact;
-                        book_items.push(booking[i]);
-                        break;
-                    }
+            for (var j = 0; j < users.length; j++) {
+                if (booking[i].member == users[j]._id.toString()) {
+                    booking[i].userName = users[j].name;
+                    booking[i].contact = users[j].contact;
+                    book_items.push(booking[i]);
+                    break;
                 }
             }
-            res.json(book_items);
-        });
+        }
+        res.json(book_items);
     });
 });
 /* booking a class by member
