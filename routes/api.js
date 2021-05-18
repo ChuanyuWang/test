@@ -65,12 +65,24 @@ router.post('/sendNotification', async function(req, res, next) {
 });
 
 async function getTenantInfo(req, res, next) {
-    if (req.isUnauthenticated() || req.tenant) {
+    if (req.tenant) {
         return next();
     }
-    try {
-        let tenantName = req.user.tenant;
 
+    // identify the tenant info, it maybe different with authenticated user
+    let tenantName = "";
+    if (req.query.hasOwnProperty("tenant")) {
+        tenantName = req.query.tenant;
+    } else if (req.body.hasOwnProperty("tenant")) {
+        tenantName = req.body.tenant;
+    } else if (req.isAuthenticated()) {
+        tenantName = req.user.tenant;
+    } else {
+        // Not able to get the tenant name, continue
+        return next();
+    }
+
+    try {
         let config_db = await db_utils.connect('config');
         if (!config_db) {
             return next(new Error("database config is not existed"));

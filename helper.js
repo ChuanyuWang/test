@@ -77,8 +77,9 @@ module.exports.hasRole = function(req, role) {
  * @public
  */
 module.exports.isAuthenticated = function(req, res, next) {
-    if (req.isAuthenticated()) {
-        next()
+    // user session is valid in the tenant
+    if (req.isAuthenticated() && req.user.tenant === req.tenant.name) {
+        next();
     } else {
         res.status(401).send('Unauthorized Request');
     }
