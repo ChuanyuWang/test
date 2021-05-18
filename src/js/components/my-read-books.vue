@@ -174,20 +174,8 @@ module.exports = {
     }
   },
   created: function() {
-    var vm = this;
-    var request = $.ajax("api/tenants", {
-      type: "GET",
-      //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
-      dataType: "json",
-      data: {},
-      cache: true // browser cache
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-      //console.error(jqXHR);
-    });
-    request.done(function(data, textStatus, jqXHR) {
-      //vm.tenants = data;
-    });
+    //var vm = this;
+
     // initialize the default value from local storage
     this.name = localStorage._name;
     this.contact = localStorage._contact;
