@@ -15,8 +15,8 @@ var NORMAL_FIELDS = {
 };
 
 router.post('/', getTenantInfo, verifyCode, function(req, res, next) {
-    if (!req.body.name || !req.body.contact) {
-        res.status(400).send("Missing param 'name' or 'contact'");
+    if (!req.body.name || !req.body.contact || !req.body.tenant) {
+        res.status(400).send("Missing param 'name' or 'contact' or 'tenant'");
         return;
     }
 
