@@ -23,7 +23,15 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
         $lookup: {
             from: 'members',
             let: {
-                memberList: '$booking.member'
+                // define the variable "memberList" as empty array when no booking, 
+                // otherwise the "$in" operation will throw error in pipeline
+                memberList: {
+                    $cond: {
+                        if: { $isArray: ['$booking.member'] },
+                        then: '$booking.member',
+                        else: []
+                    }
+                }
             },
             pipeline: [{
                 $match: {
@@ -60,8 +68,8 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
             });
         }
 
-        let booking = docs[0].booking;
-        let users = docs[0].users;
+        let booking = docs[0].booking || []; // booking is undefined when there is no booking
+        let users = docs[0].users; // users will be empty array when there is no matched members
         console.log("find booking of class %s: %j", req.query.classid, booking);
         console.log("find %s members who book class %s", users.length, req.query.classid);
 
