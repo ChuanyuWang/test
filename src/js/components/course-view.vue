@@ -570,11 +570,13 @@ module.exports = {
       vm.classes = data || [];
     });
 
-    var request2 = course_service.getCourseMembers(vm.course._id);
-    request2.done(function(data, textStatus, jqXHR) {
-      // set members property
-      vm.members = data && data.members || [];
-    });
+    if (vm.course.members && vm.course.members.length > 0) {
+      var request2 = course_service.getCourseMembers(vm.course._id);
+      request2.done(function(data, textStatus, jqXHR) {
+        // set members property
+        vm.members = data && data.members || [];
+      });
+    }
 
     // load the setting of tenant
     var setting = util.getTenantSetting();
