@@ -153,13 +153,14 @@ var confirm_delete_modal = require("./confirm-delete-course.vue").default;
 
 module.exports = {
   name: "course-view",
+  inheritAttrs: false,
   props: {
-    data: Object, // course object
+    courseData: Object, // course object
     classrooms: Array // Array of available classroom
   },
   data: function() {
     return {
-      course: this.data || {},
+      course: this.courseData || {},
       members: [],
       classes: [],
       feature: null

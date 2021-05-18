@@ -25,5 +25,5 @@ append js
 
 block page
   div#course_app.container(style='padding-top:69px',data-course-id=courseID)
-    course-view(:data="course",:classrooms="_getClassrooms()")
+    course-view(:course-data="course",:classrooms="_getClassrooms()")
     
