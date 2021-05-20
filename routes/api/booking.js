@@ -154,6 +154,7 @@ router.post('/', getTenantInfo, function(req, res, next) {
 });
 
 // remove specfic user's booking info
+// TODO, the delete operation may sent unwantted.
 router.delete('/:classID', getTenantInfo, function(req, res, next) {
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");

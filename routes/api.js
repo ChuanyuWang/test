@@ -91,7 +91,7 @@ async function getTenantInfo(req, res, next) {
             name: tenantName
         });
         if (!tenant) {
-            let error = new Error(`tenant ${tenantName} doesn't exist`);
+            let error = new Error(`Invalid tenant "${tenantName}"`);
             error.status = 400;
             return next(error);
         }
