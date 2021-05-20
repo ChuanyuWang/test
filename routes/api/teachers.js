@@ -11,11 +11,15 @@ var NORMAL_FIELDS = {
     note: 1
 };
 
-router.use(helper.isAuthenticated);
-
 router.get('/', function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
     const teachers = mongoist(req.db).collection('teachers');
-    var query = {};
+    let query = {};
     if (req.query.hasOwnProperty('name')) {
         query['name'] = req.query.name;
     }
@@ -27,11 +31,13 @@ router.get('/', function(req, res, next) {
         console.log("find teachers: ", docs ? docs.length : 0);
         return res.json(docs);
     }).catch(function(err) {
-        var error = new Error("Get teachers fails");
+        let error = new Error("Get teachers fails");
         error.innerError = err;
         return next(error);
     });
 });
+
+router.use(helper.isAuthenticated);
 
 router.post('/', helper.requireRole("admin"), function(req, res, next) {
     if (!req.body.hasOwnProperty('name')) {
