@@ -90,7 +90,7 @@ div.container
               span.glyphicon.glyphicon-book.text-primary(style='font-size:large;opacity:0.8')
             div.media-body
               h4.media-heading(style='font-size:small') {{item.title}}
-              p.small(style='color:#777') {{item.info}} by {{item.teacher || getTeacherName(cls.teacher)}}
+              p.small(style='color:#777') {{item.info}} by {{getTeacherName(cls.teacher) || item.teacher}}
                 span.badge(style='background-color:#d9534f;cursor:pointer;float:right;margin-right:16px',@click='removeBook(item)') 删除
         small(style='color:#777') 共{{booksCount}}本
   add-book-modal(ref='addBookDlg',@ok='addNewBook')

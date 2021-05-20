@@ -349,8 +349,14 @@ router.delete('/:classID', function(req, res, next) {
 });
 
 router.post('/:classID/books', function(req, res, next) {
-    var classes = req.db.collection("classes");
-    var books = Array.isArray(req.body) ? req.body : [req.body];
+    let classes = req.db.collection("classes");
+    let rawbooks = Array.isArray(req.body) ? req.body : [req.body];
+    let books = rawbooks.map(function(value, index, array) {
+        return {
+            title: value.title,
+            info: value.info || undefined
+        }
+    })
     classes.findAndModify({
         query: {
             _id: mongojs.ObjectId(req.params.classID)

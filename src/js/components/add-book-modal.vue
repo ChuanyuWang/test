@@ -1,5 +1,4 @@
 <style>
-
 </style>
 
 <template lang="pug">
@@ -13,18 +12,13 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
       div.modal-body
         form.form-horizontal
           div.form-group(:class='{"has-error": errors.title}',:title='errors.title')
-            label.control-label.col-sm-2 绘本名称:
+            label.control-label.col-sm-2 名称:
             div.col-sm-10
-              input.form-control(type='text',v-model.trim='title',placeholder='绘本名称')
-          div.form-group(:class='{"has-error": errors.teacher}',:title='errors.teacher')
-            label.control-label.col-sm-2 上课老师:
-            div.col-sm-10
-              input.form-control(type='text',v-model.trim='teacher',placeholder='请输入')
-              span.help-block.bg-danger 请在课程中设置相同老师
+              input.form-control(type='text',v-model.trim='title',placeholder='绘本名称 (必填，请勿附加书名号)')
           div.form-group(:class='{"has-error": errors.info}',:title='errors.info')
             label.control-label.col-sm-2 内容:
             div.col-sm-10
-              input.form-control(type='text',v-model.trim='info',placeholder='请输入')
+              textarea.form-control(row='2',v-model.trim='info',placeholder='绘本内容 (选填，最多250个字)',style='resize:vertical;min-height:70px')
       div.modal-footer
         button.btn.btn-default(type="button",data-dismiss="modal") 取消
         button.btn.btn-success(type="button",@click='handleOk',:disabled='hasError') 添加
@@ -42,7 +36,6 @@ module.exports = {
   data: function() {
     return {
       title: '',
-      teacher: '',
       info: ''
     };
   },
@@ -53,8 +46,6 @@ module.exports = {
       var errors = {};
       if (!this.title || this.title.length == 0)
         errors.title = '绘本名称不能为空';
-      if (!this.teacher || this.teacher.length == 0)
-        errors.teacher = '老师不能为空';
       if (this.info && this.info.length > 256)
         errors.info = '内容不能超过256个字';
       return errors;
@@ -70,12 +61,13 @@ module.exports = {
   },
   methods: {
     show: function() {
+      this.title = '';
+      this.info = '';
       $(this.$el).modal('show');
     },
     handleOk: function() {
       var book = {
         title: this.title,
-        teacher: this.teacher,
         info: this.info
       };
       this.$emit("ok", book);
