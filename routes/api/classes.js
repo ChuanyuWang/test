@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
 const mongoist = require('mongoist');
-const db_utils = require('../../server/databaseManager');
 var helper = require('../../helper');
 
 var NORMAL_FIELDS = {
@@ -18,15 +17,26 @@ var NORMAL_FIELDS = {
     books: 1
 };
 
-router.get('/', getTenantInfo, function(req, res, next) {
+router.get('/', function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
     let tenantDB = mongoist(req.db);
 
-    var query = {};
+    let query = {};
     if (req.query.hasOwnProperty('from') && req.query.hasOwnProperty('to')) {
         query.date = {
             $gte: new Date(req.query.from),
             $lt: new Date(req.query.to)
         };
+
+        if (isNaN(query.date["$gte"].getTime()) || isNaN(query.date["$lt"].getTime())) {
+            let error = new Error("Invalid Date");
+            error.status = 400;
+            return next(error);
+        }
     }
     // query specific course
     if (req.query.hasOwnProperty('courseID')) {
@@ -43,7 +53,7 @@ router.get('/', getTenantInfo, function(req, res, next) {
 
     // check if there is at least one filter, it's not supposed to return all classes
     if (Object.keys(query).length === 0) {
-        return res.status(400).send('Missing param, e.g. "from", "to" or "coureID"');
+        return res.status(400).send(`Provide at least one filter to query classes, e,g. "from", "to"`);
     }
 
     // be defaul the sort is 'asc'
@@ -534,36 +544,6 @@ router.put('/:classID/comment', function(req, res, next) {
         }
     });
 });
-
-async function getTenantInfo(req, res, next) {
-    try {
-        if (req.query.hasOwnProperty('tenant')) {
-            let tenantName = req.query.tenant;
-            let config_datebase = await db_utils.connect('config');
-            let tenant = await config_datebase.collection('tenants').findOne({
-                name: tenantName
-            });
-            if (!tenant) {
-                let error = new Error(`tenant ${tenantName} doesn't exist`);
-                error.status = 400;
-                return next(error);
-            }
-            req.tenant = tenant;
-            req.db = await db_utils.mongojsDB(tenantName);
-            return next();
-        } else if (req.db) {
-            return next();
-        } else {
-            var err = new Error("Missing param 'tenant'");
-            err.status = 400;
-            return next(err);
-        }
-    } catch (error) {
-        let err = new Error("get tenant fails");
-        err.innerError = error;
-        return next(err);
-    }
-}
 
 /**
  * make sure the datetime object is stored as ISODate
