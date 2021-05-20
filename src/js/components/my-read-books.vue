@@ -44,6 +44,7 @@ div.container(style='padding-left:7px;padding-right:7px')
  */
 
 var common = require("../common");
+var teachersService = require("../services/teachers");
 
 module.exports = {
   name: "my-read-books",
@@ -56,7 +57,8 @@ module.exports = {
         _id: null,
         name: ""
       },
-      classes: []
+      classes: [],
+      teachers: {} // Map {"id": "name"}
     };
   },
   watch: {},
@@ -84,6 +86,8 @@ module.exports = {
         for (var j = 0; j < books.length; j++) {
           // append the date field to each book
           books[j].date = this.classes[i].date;
+          // display the teacher of class, fallback 'book.teacher' if not defined
+          books[j].teacher = this.getTeacherName(this.classes[i].teacher) || books[j].teacher;
           allBooks.push(books[j]);
         }
       }
@@ -99,6 +103,9 @@ module.exports = {
     }
   },
   methods: {
+    getTeacherName: function(teacherID) {
+      return this.teachers[teacherID];
+    },
     showMyBooks: function() {
       var vm = this;
       var query = {
@@ -174,7 +181,15 @@ module.exports = {
     }
   },
   created: function() {
-    //var vm = this;
+    var vm = this;
+    var request = teachersService.getAll();
+    request.done(function(data, textStatus, jqXHR) {
+      if (data && data.length > 0) {
+        data.forEach(function(value, index, array) {
+          vm.teachers[value._id] = value.name;
+        });
+      }
+    });
 
     // initialize the default value from local storage
     this.name = localStorage._name;
