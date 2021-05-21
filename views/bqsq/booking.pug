@@ -37,11 +37,7 @@ block content
       div(style='float:right;padding-right:9px')
         a.btn.btn-success.btn-xs(href='mybooking') 我的课程
   div#main.container(style='padding-left:7px;padding-right:7px;overflow-y:auto')
-  div#obj(style='display:none')
-    select#rooms
-      each room in classroom
-        option(value=room.id)= room.name
-      
+
   div#book_dlg.modal(tabindex='-1',data-backdrop='static')
     div.modal-dialog.modal-sm
       div.modal-content

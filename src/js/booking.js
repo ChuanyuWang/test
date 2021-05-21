@@ -115,29 +115,7 @@ function init() {
     document.addEventListener('touchmove', handleMove, true);
     */
 
-    // check the classroom id from URL param
-    var _ALL_CLASSROOM_ = getAllClassroom();
-    var room = common.getParam('classroom');
-    var roomName = '';
-    if (room && _ALL_CLASSROOM_[room]) {
-        classroomID = room;
-        roomName = _ALL_CLASSROOM_[room];
-    }
-    else if (!classroomID) {
-        // find the first classroom as default one
-        var keys = Object.keys(_ALL_CLASSROOM_);
-        if (keys.length > 0) {
-            classroomID = keys[0];
-            roomName = _ALL_CLASSROOM_[classroomID];
-        }
-    }
-    document.title = '会员约课-' + roomName;
-    // select the classroom in droplist if there is filter control
-    var option_ele = $('#chooseRoom option[value=' + classroomID + ']');
-    if (option_ele.length == 1) {
-        option_ele.prop('selected', true);
-    }
-    // handle user change the classroom after set the selected option, if there is filter control
+    // handle user change the classroom after set the selected option
     $('#chooseRoom').change(function(event) {
         var selectedOptions = $(this).find('option:selected');
         if (selectedOptions.length == 1) {
@@ -147,15 +125,26 @@ function init() {
             updateSchedule();
         }
     });
-    updateSchedule();
-}
 
-function getAllClassroom() {
-    var result = {};
-    $('div#obj select#rooms option').each(function(index, elem) {
-        result[elem.value] = elem.text;
-    });
-    return result;
+    // select the first (default) classroom option.
+    // the classroom dropdown list is hidden when there is only one classroom
+    var selectedClassroom = $('#chooseRoom option:selected');
+    var room = common.getParam('classroom');
+    if (room) {
+        // select the classroom in droplist if there is param 'classroom' in the URL
+        var option_ele = $('#chooseRoom option[value=' + room + ']');
+        if (option_ele.length == 1) {
+            selectedClassroom = option_ele;
+        }
+    }
+    if (selectedClassroom.length == 1) {
+        // set the 'selected' property won't fire 'change' event to select control
+        selectedClassroom.prop('selected', true);
+        // update the title
+        document.title = '会员约课-' + selectedClassroom.text();
+        classroomID = selectedClassroom.val();
+    }
+    updateSchedule();
 }
 
 function getMonday(date) {
@@ -374,9 +363,9 @@ function updateSchedule(control) {
         data: {
             from: begin.toISOString(),
             to: end.toISOString(),
-            classroom: classroomID,
+            classroom: classroomID || undefined, // 'undefined' field will not append to the URL
             tenant: common.getTenantName(),
-            minAge: minimumAge
+            minAge: minimumAge || undefined // 'undefined' field will not append to the URL
         },
         success: function(data) {
             for (var i = 0; i < data.length; i++) {
