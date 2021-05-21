@@ -16,6 +16,12 @@ var NORMAL_FIELDS = {
 };
 
 router.post('/validate', async function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
     var query = {};
     if (req.body.hasOwnProperty('name') && req.body.hasOwnProperty('contact')) {
         query['name'] = req.body.name;
@@ -27,15 +33,7 @@ router.post('/validate', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = null;
-        if (req.body.hasOwnProperty('tenant')) {
-            tenantDB = await db_utils.connect(req.body.tenant);
-        } else {
-            var err = new Error("Missing param 'tenant'");
-            err.status = 400;
-            return next(err);
-        }
-
+        let tenantDB = await db_utils.connect(req.tenant.name);
         let members = tenantDB.collection("members");
         let doc = await members.findOne(query, { projection: NORMAL_FIELDS });
         console.log("validate member: %j", doc);
