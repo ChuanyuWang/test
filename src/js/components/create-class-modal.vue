@@ -61,10 +61,10 @@ module.exports = {
       startTime: moment(),
       name: '',
       cost: 1,
-      capacity: 6,
+      capacity: 8,
       age: { // by year
-        min: 2,
-        max: 4
+        min: null,
+        max: null
       },
       classroom: null
     };
