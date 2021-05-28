@@ -447,6 +447,9 @@ function getOpenId(code) {
         success: function(data) {
             _openid = (data || {}).openid;
         },
+        error: function(jqXHR, textStatus, errorThrown) {
+            _openid = false;
+        },
         dataType: "json"
     });
 }
