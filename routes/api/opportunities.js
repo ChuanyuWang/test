@@ -14,9 +14,14 @@ var NORMAL_FIELDS = {
     remark: 1
 };
 
-router.post('/', getTenantInfo, verifyCode, function(req, res, next) {
-    if (!req.body.name || !req.body.contact || !req.body.tenant) {
-        res.status(400).send("Missing param 'name' or 'contact' or 'tenant'");
+router.post('/', verifyCode, function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+    if (!req.body.name || !req.body.contact) {
+        res.status(400).send("Missing param 'name' or 'contact'");
         return;
     }
 
@@ -133,37 +138,16 @@ function initDateField(item) {
     }
 }
 
-async function getTenantInfo(req, res, next) {
-    try {
-        if (req.body.hasOwnProperty('tenant')) {
-            let tenantName = req.body.tenant;
-            let config_db = await db_utils.connect('config');
-            let tenant = await config_db.collection('tenants').findOne({
-                name: tenantName
-            });
-            if (!tenant) {
-                let error = new Error(`tenant ${tenantName} doesn't exist`);
-                error.status = 400;
-                return next(error);
-            }
-            req.db = await db_utils.mongojsDB(tenantName);
-            return next();
-        } else {
-            var err = new Error("Missing param 'tenant'");
-            err.status = 400;
-            return next(err);
-        }
-    } catch (error) {
-        let err = new Error("get tenant fails");
-        err.innerError = error;
-        return next(err);
-    }
-}
-
 function verifyCode(req, res, next) {
     if (req.app.locals.ENV_DEVELOPMENT) {
         // skip code verification if it's development mode
         return next();
+    }
+
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
     }
 
     if (!req.body.code || !req.body.contact) {
