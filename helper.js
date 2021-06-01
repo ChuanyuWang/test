@@ -42,7 +42,7 @@ module.exports.requireRole = function(role) {
             var err = new Error("Unauthorized Request");
             err.status = 401;
             next(err);
-        } else if (req.user.role === role)
+        } else if (req.user.role === role && req.user.tenant === req.tenant.name)
             // success
             next();
         else {
