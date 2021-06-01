@@ -27,35 +27,12 @@ router.use(async function(req, res, next) {
 });
 
 router.get('/classrooms', function(req, res, next) {
-    var tenantName = null;
-    if (req.query.hasOwnProperty('tenant')) {
-        tenantName = req.query.tenant;
-    } else if (req.isAuthenticated()) {
-        // initialize the tenant db if it's authenticated user
-        tenantName = req.user.tenant;
-    } else {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
     }
-
-    config_db.collection('tenants').findOne({
-        name: tenantName
-    }, { classroom: 1 }, function(err, doc) {
-        if (err) {
-            var error = new Error("Get classroom list fails with tenant: " + tenantName);
-            error.status = 400;
-            return next(error);
-        }
-
-        if (!doc) {
-            var error = new Error("Not found classroom with tenant: " + tenantName);
-            error.status = 400;
-            return next(error);
-        }
-
-        res.send(doc.classroom ? doc.classroom : []);
-    });
+    res.send(req.tenant.classroom ? req.tenant.classroom : []);
 });
 
 /// Below APIs are visible to authenticated users only
@@ -107,7 +84,7 @@ router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
 });
 
 router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
-    //var newRoom = {id:'abc', name:''};
+    //var newRoom = {id:'abc', name:'', visibility: 'internal'|null};
     if (!req.body.id) {
         var error = new Error("classroom ID is not defined");
         error.status = 400;

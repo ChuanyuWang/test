@@ -67,13 +67,13 @@ async function generateCode(req, res, next) {
         err.status = 400;
         return next(err);
     }
-    if (!req.body.hasOwnProperty('tenant')) {
-        var err = new Error("Missing param 'tenant'");
-        err.status = 400;
-        return next(err);
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
     }
     // check if already submit phone for trial class
-    const db = await db_utils.connect(req.body.tenant);
+    const db = await db_utils.connect(req.tenant.name);
     const opportunities = db.collection('opportunities');
     const doc = await opportunities.findOne({ contact: req.body.contact });
     if (doc) {
