@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-const db_utils = require('../../server/databaseManager');
 var reservation = require('./lib/reservation');
 var helper = require('../../helper');
 
@@ -97,7 +96,12 @@ contact : "13500000000",
 classID : "5716630aa012576d0371e888"
 }
  */
-router.post('/', getTenantInfo, function(req, res, next) {
+router.post('/', function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
     if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
         res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
         return;
@@ -155,7 +159,12 @@ router.post('/', getTenantInfo, function(req, res, next) {
 
 // remove specfic user's booking info
 // TODO, the delete operation may sent unwantted.
-router.delete('/:classID', getTenantInfo, function(req, res, next) {
+router.delete('/:classID', function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");
         return;
@@ -262,36 +271,6 @@ router.delete('/:classID', getTenantInfo, function(req, res, next) {
         });
     });
 });
-
-
-async function getTenantInfo(req, res, next) {
-    try {
-        if (req.body.hasOwnProperty('tenant')) {
-            let tenantName = req.body.tenant;
-            let config_db = await db_utils.connect('config');
-            let tenant = await config_db.collection('tenants').findOne({
-                name: tenantName
-            });
-            if (!tenant) {
-                let error = new Error(`tenant ${tenantName} doesn't exist`);
-                error.status = 400;
-                return next(error);
-            }
-            req.db = await db_utils.mongojsDB(tenantName);
-            return next();
-        } else if (req.db) {
-            return next();
-        } else {
-            var err = new Error("tenant is not defined");
-            err.status = 400;
-            return next(err);
-        }
-    } catch (error) {
-        let err = new Error("get tenant fails");
-        err.innerError = error;
-        return next(err);
-    }
-}
 
 /**
  * 
