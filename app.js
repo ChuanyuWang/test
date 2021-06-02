@@ -1,7 +1,7 @@
 var express = require('express');
 var compression = require('compression')
 var path = require('path');
-var db_utils = require('./server/databaseManager');
+const mongoose = require('mongoose');
 //var favicon = require('serve-favicon');
 var morgan = require('morgan');
 //var cookieParser = require('cookie-parser');
@@ -107,8 +107,9 @@ app.use(session({
     resave: false, //don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
     store: new MongoStore({
-        url: db_utils.connectionURI('config') + '?authSource=admin&w=1',
-        dbName: 'config',
+        //url: db_utils.connectionURI('config') + '?authSource=admin&w=1',
+        //dbName: 'config',
+        mongooseConnection: mongoose.connection,
         touchAfter: 24 * 3600 // time period in seconds
     }),
     cookie: {

@@ -1,10 +1,6 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var passportLocalMongoose = require('passport-local-mongoose');
-var util = require("./util");
-
-//get mongoose connection of 'config' database
-var conn = util.connect2("config");
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const passportLocalMongoose = require('passport-local-mongoose');
 
 var Account = new Schema({
     username: String,
@@ -16,4 +12,4 @@ var Account = new Schema({
 
 Account.plugin(passportLocalMongoose);
 
-module.exports = conn.model('Account', Account);
+module.exports = mongoose.model('Account', Account);

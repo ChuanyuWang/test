@@ -2,6 +2,7 @@ var util = require('util');
 var config = require('../config.db');
 const mongojs = require('mongojs');
 const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 
 let mongoClient = null;
 
@@ -16,6 +17,34 @@ manager.connectionURI = function(database) {
         return util.format("mongodb://%s:27017/%s", config.host, database);
     }
 }
+
+/**
+ * create mongoose default connection to 'config' database 
+ */
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    //keepAlive: 120,
+    autoIndex: false, // Don't build indexes
+    //autoReconnect: true,
+    //reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+    //reconnectInterval: 500, // Reconnect every 500ms
+    poolSize: 3, // Maintain up to 3 socket connections for each database
+    // If not connected, return errors immediately rather than waiting for reconnect
+    bufferMaxEntries: 0,
+    authSource: 'admin'
+};
+mongoose.connect(manager.connectionURI("config"), options).then(function(params) {
+    console.log('[mongoose] database "config" is connected');
+}, function(err) {
+    // handle initial connection error
+    console.error('[mongoose] connect database "config" with error', database, err);
+});
+
+mongoose.connection.on('error', err => {
+    // handle errors after initial connection was established
+    console.error('[mongoose] connection with error', err);
+});
 
 manager.connect = async function(database) {
     if (typeof database !== 'string' || !database)
