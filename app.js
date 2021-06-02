@@ -97,8 +97,11 @@ if (app.locals.ENV_DEVELOPMENT && process.env.HOTRELOAD === "true") {
     }));
 }
 
-//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+/**
+ * Since express-session version 1.5.0, the cookie-parser middleware no longer needs to be used.
+ */
+//app.use(cookieParser());
 app.use(session({
     secret: 'keyboard dog',
     resave: false, //don't save session if unmodified
@@ -133,7 +136,7 @@ app.use(i18n.init);
 // Initialize Passport and restore authentication state, if any, from the session.
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
+app.use(flash()); //flash() requires sessions
 
 // add router
 var routes = require('./routes/index');
