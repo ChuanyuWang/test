@@ -9,8 +9,7 @@
     "lint": "eslint . --ext .js,.vue",
     "build": "webpack --config webpack.config.prod.js",
     "start": "node ./bin/www",
-    "test": "mocha",
-    "mongo-express": "env ME_CONFIG_MONGODB_ENABLE_ADMIN=true ME_CONFIG_MONGODB_ADMINUSERNAME=admin ME_CONFIG_MONGODB_ADMINPASSWORD=pass mongo-express"
+    "test": "mocha"
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.7",
@@ -55,7 +54,6 @@
     "less-loader": "^7.0.1",
     "mini-css-extract-plugin": "^1.6.0",
     "mocha": "^8.4.0",
-    "mongo-express": "^1.0.0-alpha.2",
     "nodemon": "^2.0.4",
     "pug-plain-loader": "^1.0.0",
     "vue-loader": "^15.9.5",
