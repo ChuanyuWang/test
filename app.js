@@ -2,6 +2,7 @@ var express = require('express');
 var compression = require('compression')
 var path = require('path');
 const mongoose = require('mongoose');
+const connectionManager = require('./server/databaseManager');
 //var favicon = require('serve-favicon');
 var morgan = require('morgan');
 //var cookieParser = require('cookie-parser');
@@ -200,5 +201,9 @@ app.use(function(err, req, res, next) {
         title: 'error'
     });
 });
+
+app.stop = function() {
+    connectionManager.close();
+}
 
 module.exports = app;

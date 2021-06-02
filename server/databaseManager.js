@@ -29,7 +29,7 @@ const options = {
     //autoReconnect: true,
     //reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
     //reconnectInterval: 500, // Reconnect every 500ms
-    poolSize: 3, // Maintain up to 3 socket connections for each database
+    poolSize: 3, // Maintain up to 3 socket connections
     // If not connected, return errors immediately rather than waiting for reconnect
     bufferMaxEntries: 0,
     authSource: 'admin'
@@ -55,7 +55,7 @@ manager.connect = async function(database) {
             authSource: 'admin',
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            poolSize: 20
+            poolSize: 20 // Maintain up to 20 socket connections for tenant database
         });
     } else if (!mongoClient.isConnected()) {
         await mongoClient.connect();
@@ -84,6 +84,17 @@ manager.mongojsDB = async function(database) {
     });
     // return the mongojs db wrapper
     return dbCache.get(database);
+}
+
+manager.close = function() {
+    if (mongoClient) {
+        mongoClient.close().catch(err => {
+            console.error(err);
+        })
+    }
+    mongoose.disconnect().catch(err => {
+        console.error(err);
+    });
 }
 
 module.exports = manager;
