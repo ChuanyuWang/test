@@ -11,9 +11,9 @@ const manager = {};
 manager.connectionURI = function(database) {
     //https://docs.mongodb.com/manual/reference/connection-string/#standard-connection-string-format
     if (config.user) {
-        return util.format("mongodb://%s:%s@%s/%s", config.user, config.pass, config.host, database);
+        return util.format("mongodb://%s:%s@%s:27017/%s", config.user, config.pass, config.host, database);
     } else {
-        return util.format("mongodb://%s/%s", config.host, database);
+        return util.format("mongodb://%s:27017/%s", config.host, database);
     }
 }
 

@@ -108,6 +108,7 @@ app.use(session({
     saveUninitialized: false, // don't create session until something stored
     store: new MongoStore({
         url: db_utils.connectionURI('config') + '?authSource=admin&w=1',
+        dbName: 'config',
         touchAfter: 24 * 3600 // time period in seconds
     }),
     cookie: {
