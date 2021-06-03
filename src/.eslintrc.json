@@ -33,6 +33,10 @@
                 "args": "none",
                 "ignoreRestSiblings": false
             }
+        ],
+        "vue/component-definition-name-casing": [
+            "error",
+            "kebab-case"
         ]
     }
 }
