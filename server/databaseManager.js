@@ -38,7 +38,7 @@ mongoose.connect(manager.connectionURI("config"), options).then(function(params)
     console.log('[mongoose] database "config" is connected');
 }, function(err) {
     // handle initial connection error
-    console.error('[mongoose] connect database "config" with error', database, err);
+    console.error('[mongoose] connect database "config" with error', err);
 });
 
 mongoose.connection.on('error', err => {
