@@ -3,11 +3,6 @@
  * view-member-course-modal.js modal dailog for view member's classes of one course
  * --------------------------------------------------------------------------
  */
-
-<style>
-
-</style>
-
 <template lang="pug">
 div.modal.fade(tabindex='-1',data-backdrop='static')
   div.modal-dialog
@@ -44,49 +39,52 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
 <script>
 
 module.exports = {
-    props: {
+  props: {
+  },
+  data: function() {
+    return {
+      result: {} // the result of adding members/classes into course
+    };
+  },
+  watch: {
+  },
+  computed: {
+    newBookingCount: function() {
+      var count = 0;
+      var classSummary = this.result.classSummary || {};
+      Object.keys(classSummary).forEach(function(classID) {
+        var res = classSummary[classID];
+        count += res.newbookings.length;
+      });
+      return count;
     },
-    data: function() {
-        return {
-            result: {} // the result of adding members/classes into course
-        };
-    },
-    watch: {
-    },
-    computed: {
-        newBookingCount: function() {
-            var count = 0;
-            var classSummary = this.result.classSummary || {};
-            Object.keys(classSummary).forEach(function(classID) {
-                var res = classSummary[classID];
-                count += res.newbookings.length;
-            });
-            return count;
-        },
-        failBookingCount: function() {
-            var count = 0;
-            var memberSummary = this.result.memberSummary || {};
-            Object.keys(memberSummary).forEach(function(memberID) {
-                var res = memberSummary[memberID];
-                count += res.errors.length;
-            });
-            return count;
-        }
-    },
-    filters: {
-        getMemberName: function(value, result) {
-            var memberSummary = result.memberSummary || {};
-            if (!value) return ''
-            return memberSummary[value].name;
-        }
-    },
-    methods: {
-        show: function(result) {
-            this.result = result || {};
-            $(this.$el).modal('show');
-        }
-    },
-    mounted: function() {
+    failBookingCount: function() {
+      var count = 0;
+      var memberSummary = this.result.memberSummary || {};
+      Object.keys(memberSummary).forEach(function(memberID) {
+        var res = memberSummary[memberID];
+        count += res.errors.length;
+      });
+      return count;
     }
+  },
+  filters: {
+    getMemberName: function(value, result) {
+      var memberSummary = result.memberSummary || {};
+      if (!value) return ''
+      return memberSummary[value].name;
+    }
+  },
+  methods: {
+    show: function(result) {
+      this.result = result || {};
+      $(this.$el).modal('show');
+    }
+  },
+  mounted: function() {
+  }
 };
 </script>
+
+<style lang='less'>
+</style>

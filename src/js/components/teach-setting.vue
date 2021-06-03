@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div.row
   teach-list.panel.col-sm-3(:data='data',style='padding-top:15px',@selectedChange='selectionChangedListener',@add='addUnsaveOne',ref='teachList')
@@ -89,3 +86,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

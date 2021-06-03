@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 form.form-horizontal
   div.form-group
@@ -127,3 +124,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

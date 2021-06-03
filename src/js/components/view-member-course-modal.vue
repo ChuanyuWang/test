@@ -3,11 +3,6 @@
  * view-member-course-modal.js modal dailog for view member's classes of one course
  * --------------------------------------------------------------------------
  */
-
-<style>
-
-</style>
-
 <template lang="pug">
 div.modal.fade(tabindex='-1',data-backdrop='static')
   div.modal-dialog
@@ -81,3 +76,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

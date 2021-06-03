@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div
   ul.nav.nav-tabs(role='tablist')
@@ -67,3 +64,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

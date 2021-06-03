@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
   div.modal-dialog(role="document")
@@ -136,3 +133,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

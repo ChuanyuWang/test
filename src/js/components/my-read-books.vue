@@ -1,6 +1,3 @@
-<style lang='less'>
-</style>
-
 <template lang="pug">
 div.container(style='padding-left:7px;padding-right:7px')
   form.form-horizontal(style='margin-top:15px;padding-left:8px;padding-right:8px',v-show='!user._id')
@@ -200,3 +197,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

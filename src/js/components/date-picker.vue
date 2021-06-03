@@ -1,7 +1,3 @@
-<style>
-
-</style>
-
 <template lang="pug">
 div.input-group.date(:id="id",:class="inputClass")
   input.form-control(type="text",
@@ -33,7 +29,7 @@ module.exports = {
     // http://eonasdan.github.io/bootstrap-datetimepicker/Options/
     config: {
       type: Object,
-      default: function (){ return {"format": "ll", "locale": "zh-CN"}}
+      default: function() { return { "format": "ll", "locale": "zh-CN" } }
     },
     placeholder: {
       type: String,
@@ -124,3 +120,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div(style='padding:7px')
   form.form-horizontal
@@ -120,11 +117,14 @@ module.exports = {
     var vm = this;
     var request = $.getJSON("/api/setting");
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取综合设置失败", jqXHR);
+      util.showAlert("获取综合设置失败", jqXHR);
     });
     request.done(function(data, textStatus, jqXHR) {
-        vm.update(data || {});
+      vm.update(data || {});
     });
   }
 };
 </script>
+
+<style lang='less'>
+</style>

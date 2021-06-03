@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div
   div.row(style="margin-top:7px")
@@ -355,3 +352,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

@@ -1,7 +1,3 @@
-<style>
-
-</style>
-
 <template lang="pug">
 div.modal.fade(tabindex='-1',data-backdrop='static')
   div.modal-dialog
@@ -29,7 +25,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  * comment-modal.vue component for create and edit comment
  * --------------------------------------------------------------------------
  */
-var noop = function () {};
+var noop = function() { };
 
 module.exports = {
   props: {},
@@ -62,10 +58,10 @@ module.exports = {
   },
   methods: {
     show: function(memo, callback) {
-      if (typeof(memo) === 'function') return this.show(null, memo);
-      if (typeof(callback) === 'function') this.callback = callback;
+      if (typeof (memo) === 'function') return this.show(null, memo);
+      if (typeof (callback) === 'function') this.callback = callback;
       else this.callback = noop;
-      if (typeof(memo) === 'string' && memo.length > 0) {
+      if (typeof (memo) === 'string' && memo.length > 0) {
         this.memo = memo;
         this.edit = true;
       } else {
@@ -81,3 +77,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>

@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div(style='padding:7px')
   table.table.table-striped.table-bordered.table-hover
@@ -89,6 +86,9 @@ module.exports = {
   computed: {},
   filters: {},
   methods: {},
-  created: function() {}
+  created: function() { }
 };
 </script>
+
+<style lang='less'>
+</style>

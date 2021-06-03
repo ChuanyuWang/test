@@ -1,6 +1,3 @@
-<style>
-</style>
-
 <template lang="pug">
 div.container
   form.col-sm-12.col-md-6.col-md-offset-3
@@ -228,3 +225,6 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+</style>
