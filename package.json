@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .js,.vue",
     "build": "webpack --config webpack.config.prod.js",
     "start": "node ./bin/www",
-    "test": "mocha"
+    "test": "mocha --recursive"
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.7",
