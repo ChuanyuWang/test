@@ -28,8 +28,8 @@ div
         option(value='inactive') 未激活
         option(value='deleted') 已删除
         option(value='all') 全部
-  template(v-for='(teacher, index) in teacherList')
-    div.media.teacher-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-teacher" : ""]')
+  template(v-for='(teacher, index) in data')
+    div.media.teacher-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-teacher" : ""]', v-show='teacher.status === filter || filter === "all"')
       div.media-left
         a(href='#')
           //img.media-object(src='/img/user.png')
@@ -59,15 +59,7 @@ module.exports = {
       selectedIndex: -1
     };
   },
-  computed: {
-    teacherList: function() {
-      if (this.filter === "all") return this.data;
-      var vm = this;
-      return (this.data || []).filter(function(value, index, array) {
-        return value.status === vm.filter;
-      });
-    }
-  },
+  computed: {},
   filters: {},
   methods: {
     setSelectedIndex: function(newIndex) {
