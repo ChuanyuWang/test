@@ -1,34 +1,3 @@
-<style lang='less'>
-.container .page-header {
-  margin: 15px 0;
-  padding-bottom: 3px;
-}
-.participation-status div:hover {
-  border-color: black;
-  border-width: 1px;
-  border-style: solid;
-}
-.participation-status-legend .progress {
-  margin-bottom: 5px;
-  width: 70px;
-  .progress-bar {
-    width: 100%;
-  }
-}
-.list-item {
-  display: inline-block;
-  margin-right: 10px;
-}
-.list-enter-active,
-.list-leave-active {
-  transition: all 1s;
-}
-.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>
-
 <template lang="pug">
 div.container
   ol.breadcrumb
@@ -584,3 +553,34 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+.container .page-header {
+  margin: 15px 0;
+  padding-bottom: 3px;
+}
+.participation-status div:hover {
+  border-color: black;
+  border-width: 1px;
+  border-style: solid;
+}
+.participation-status-legend .progress {
+  margin-bottom: 5px;
+  width: 70px;
+  .progress-bar {
+    width: 100%;
+  }
+}
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateX(30px);
+}
+</style>

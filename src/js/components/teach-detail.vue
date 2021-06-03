@@ -1,14 +1,3 @@
-<style lang='less'>
-.detail-teacher-border {
-  border-left: 2px solid #eee;
-}
-
-.detail-separator {
-  border-top: 2px solid #eee;
-  margin: 15px 0px;
-}
-</style>
-
 <template lang="pug">
 div.detail-teacher-border(style='min-height:300px')
   form.form-horizontal(v-show='hasData')
@@ -213,3 +202,14 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+.detail-teacher-border {
+  border-left: 2px solid #eee;
+}
+
+.detail-separator {
+  border-top: 2px solid #eee;
+  margin: 15px 0px;
+}
+</style>

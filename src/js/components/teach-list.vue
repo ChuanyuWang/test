@@ -1,23 +1,3 @@
-<style lang='less'>
-.selected-teacher {
-  border-right: 2px solid #337ab7;
-  color: #337ab7;
-}
-.teacher-list-item:hover {
-  background-color: aliceblue;
-  cursor: pointer;
-}
-
-.teacher-list-item {
-  margin-top: 0px;
-  padding: 7px 0px;
-}
-
-.deleted-teacher {
-  color: #777;
-}
-</style>
-
 <template lang="pug">
 div
   div.row
@@ -70,3 +50,23 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+.selected-teacher {
+  border-right: 2px solid #337ab7;
+  color: #337ab7;
+}
+.teacher-list-item:hover {
+  background-color: aliceblue;
+  cursor: pointer;
+}
+
+.teacher-list-item {
+  margin-top: 0px;
+  padding: 7px 0px;
+}
+
+.deleted-teacher {
+  color: #777;
+}
+</style>

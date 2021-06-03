@@ -1,27 +1,3 @@
-<style lang='less'>
-.selected-tenant {
-  border-right: 2px solid #337ab7;
-  color: #337ab7;
-}
-.tenant-list-item:hover {
-  background-color: aliceblue;
-  cursor: pointer;
-}
-
-.tenant-list-item {
-  margin-top: 0px;
-  padding: 7px 0px;
-}
-
-.deleted-tenant {
-  color: #777;
-}
-
-.detail-tenant-border {
-  border-left: 2px solid #eee;
-}
-</style>
-
 <template lang="pug">
 div
   div.panel.col-sm-3(style='padding-top:15px',@add='addUnsaveOne')
@@ -324,3 +300,27 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+.selected-tenant {
+  border-right: 2px solid #337ab7;
+  color: #337ab7;
+}
+.tenant-list-item:hover {
+  background-color: aliceblue;
+  cursor: pointer;
+}
+
+.tenant-list-item {
+  margin-top: 0px;
+  padding: 7px 0px;
+}
+
+.deleted-tenant {
+  color: #777;
+}
+
+.detail-tenant-border {
+  border-left: 2px solid #eee;
+}
+</style>

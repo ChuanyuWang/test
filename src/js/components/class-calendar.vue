@@ -1,18 +1,3 @@
-<style lang='less'>
-.class-table {
-  table-layout: fixed;
-  tbody td p {
-    display: inline-block;
-    height: 100%;
-    padding-bottom: 16px;
-    margin-bottom: -6px;
-  }
-  tbody tr td {
-    overflow: hidden;
-  }
-}
-</style>
-
 <template lang="pug">
 div
   div.row(style='margin-top:15px;margin-bottom:15px')
@@ -284,3 +269,18 @@ module.exports = {
   }
 };
 </script>
+
+<style lang='less'>
+.class-table {
+  table-layout: fixed;
+  tbody td p {
+    display: inline-block;
+    height: 100%;
+    padding-bottom: 16px;
+    margin-bottom: -6px;
+  }
+  tbody tr td {
+    overflow: hidden;
+  }
+}
+</style>

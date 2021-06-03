@@ -1,17 +1,3 @@
-<style>
-.bb-alert {
-  position: fixed;
-  text-align: center;
-  bottom: 10%;
-  left: 10%;
-  right: 10%;
-  font-size: 1.2em;
-  padding: 1em 1.3em;
-  z-index: 2000;
-  opacity: 0.8;
-}
-</style>
-
 <template lang="pug">
 div.bb-alert.alert(style='display:none',:class='[isError?"alert-danger":"alert-success"]')
   span {{message}}
@@ -54,3 +40,17 @@ module.exports = {
   }
 };
 </script>
+
+<style>
+.bb-alert {
+  position: fixed;
+  text-align: center;
+  bottom: 10%;
+  left: 10%;
+  right: 10%;
+  font-size: 1.2em;
+  padding: 1em 1.3em;
+  z-index: 2000;
+  opacity: 0.8;
+}
+</style>

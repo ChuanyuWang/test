@@ -1,9 +1,3 @@
-<style lang='less'>
-.flag {
-  font-size: larger;
-}
-</style>
-
 <template lang="pug">
 div
   div#checkin_toolbar(style='line-height:1.5;display:inline-block')
@@ -260,3 +254,9 @@ module.exports = {
   mounted: function() { }
 };
 </script>
+
+<style lang='less'>
+.flag {
+  font-size: larger;
+}
+</style>
