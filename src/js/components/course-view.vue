@@ -99,10 +99,11 @@ div.container
   show-booking-result-modal(ref='summaryDlg')
   confirm-delete-modal(ref='confirmDlg', @ok='deleteCourse')
   member-select-modal(ref='memberSelectDlg',@ok='addMembers',:multi-selection='true')
-    div.checkbox(slot='toolbar',style='position:absolute;top:25px;left:20px')
-      label
-        input(type='checkbox',checked,disabled)
-        |仅参加尚未开始的课程
+    template(v-slot:toolbar)
+      div.checkbox(style='position:absolute;top:25px;left:20px')
+        label
+          input(type='checkbox',checked,disabled)
+          |仅参加尚未开始的课程
 </template>
 
 <script>

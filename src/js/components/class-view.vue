@@ -88,9 +88,10 @@ div.container
         small(style='color:#777') 共{{booksCount}}本
   add-book-modal(ref='addBookDlg',@ok='addNewBook')
   member-select-modal(ref='memberSelectDlg',@ok='addReservation')
-    div.btn-group(slot='toolbar',style='display:inline-flex;position:absolute;top:25px;left:20px')
-      label(style='margin-right:4px;line-height:34px') 人数:
-      input.form-control(type='number',min='1',step='1',style='width:90px',v-model.number='quantity')
+    template(v-slot:toolbar)
+      div.btn-group(style='display:inline-flex;position:absolute;top:25px;left:20px')
+        label(style='margin-right:4px;line-height:34px') 人数:
+        input.form-control(type='number',min='1',step='1',style='width:90px',v-model.number='quantity')
 </template>
 
 <script>
