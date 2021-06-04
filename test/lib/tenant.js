@@ -3,7 +3,7 @@ const testData = require("./data");
 const testDB = "dummy";
 
 module.exports = {
-    init: async function(params) {
+    init: async function(insertTestData) {
         let configDB = await connectionManager.connect("config");
         await configDB.collection("tenants").updateOne({ name: testDB }, {
             $set: testData.testTenant
@@ -16,16 +16,22 @@ module.exports = {
         await configDB.collection("accounts").updateOne({ tenant: testDB, username: "2" }, {
             $set: testData.user
         }, { upsert: true });
+        if (insertTestData) {
+            let db = await connectionManager.connect(testDB);
+            await db.collection("classes").insert(testData.classes);
+        }
     },
-    addClasses: async function(params) {
+    addClasses: async function(data) {
         let db = await connectionManager.connect(testDB);
-        await db.collection("classes").insert(testData.classes);
+        await db.collection("classes").insert(data);
     },
-    addCourses: async function(params) {
-
+    addCourses: async function(data) {
+        let db = await connectionManager.connect(testDB);
+        await db.collection("courses").insert(data);
     },
-    addMembers: async function(params) {
-
+    addMembers: async function(data) {
+        let db = await connectionManager.connect(testDB);
+        await db.collection("members").insert(data);
     },
     clean: async function(cleanConfig) {
         try {

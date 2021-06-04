@@ -8,12 +8,11 @@ chai.should(); //actually enable should style assertions
 describe('GET /api/classes', function() {
     before(async function() {
         // runs once before the first test in this block
-        await tenant.init();
-        return tenant.addClasses([]);
+        await tenant.init(true);
     });
 
     after(async function() {
-        await tenant.clean(false);
+        await tenant.clean(true);
         app.stop();
     });
 
