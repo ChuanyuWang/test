@@ -27,29 +27,14 @@ div.container
   div.row.col-12
   button.btn.btn-primary(:disabled='hasError' style="display:block;margin:0 auto" @click="handleSubmit") 提交
 
-  div#ncDialog.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 发送验证码
-        div.modal-body
-          div#__nc(style='margin-left:auto;margin-right:auto;width:100%;height:100%')
-            div#nc
-        div.modal-footer
-          button.btn.btn-danger(type="button",data-dismiss="modal") 取消
-  div#errMsg.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 出错啦
-        div.modal-body
-          p {{errorMessage}}
-        div.modal-footer
-          button.btn.btn-danger(type="button",data-dismiss="modal") 确定
+  modal-dialog(ref='errMsg',size="small") 出错啦
+    template(v-slot:body)
+      p {{errorMessage}}
+
+  modal-dialog(ref='ncDialog',size="small",buttons="cancel") 发送验证码
+    template(v-slot:body)
+      div#__nc(style='margin-left:auto;margin-right:auto;width:100%;height:100%')
+        div#nc
 </template>
 
 <script>
@@ -60,6 +45,7 @@ div.container
  */
 
 var common = require("../common");
+var modalDialog = require("./modal-dialog.vue").default;
 
 module.exports = {
   name: "users-setting",
@@ -83,7 +69,9 @@ module.exports = {
       errorMessage: ""
     };
   },
-  components: {},
+  components: {
+    "modal-dialog": modalDialog
+  },
   computed: {
     errors: function() {
       var errors = {};
@@ -143,11 +131,11 @@ module.exports = {
       // Check phone number is valid
       if (this.errors.contact) {
         this.errorMessage = "请输入手机号码";
-        return $("#errMsg").modal("show");
+        return this.$refs.errMsg.show();
       }
       // 阿里云盾人机验证收取最低10元/天的费用，所以取消调用，直接发送手机验证码
       //this.nc.reset(); //请务必确保这里调用一次reset()方法
-      //$("#ncDialog").modal("show");
+      //this.$refs.ncDialog.show();
       this.sendVerifyCode({ sig: "", csessionid: "" });
     },
     sendVerifyCode: function(data) {
@@ -173,14 +161,14 @@ module.exports = {
         dataType: "json"
       });
       request.done(function(data, textStatus, jqXHR) {
-        $("#ncDialog").modal("hide");
+        vue.$refs.ncDialog.hide();
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        $("#ncDialog").modal("hide");
+        vue.$refs.ncDialog.hide();
         vue.errorMessage = jqXHR.responseJSON
           ? jqXHR.responseJSON.message
           : jqXHR.responseText;
-        $("#errMsg").modal("show");
+        vue.$refs.errMsg.show();
       });
     }
   },
