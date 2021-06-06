@@ -57,7 +57,6 @@ router.get('/member', helper.checkTenantUser, function(req, res) {
             title: '会员',
             user: req.user,
             currentUrl: 'member',
-            classroom: req.tenant.classroom || [],
             statistics: {
                 count: doc.count,
                 total: Math.round(doc.total * 10) / 10
