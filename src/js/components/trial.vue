@@ -35,6 +35,24 @@ div.container
     template(v-slot:body)
       div#__nc(style='margin-left:auto;margin-right:auto;width:100%;height:100%')
         div#nc
+  modal-dialog(ref='errorDlg',size="small",buttonStyle="danger") 提交失败
+    template(v-slot:body)
+      p {{errorMessage}}
+      p(style='color:#808080')
+        small 客服电话: 
+          a(:href='tenantConfig.contact | tel') {{tenantConfig.contact}}
+        br
+        small 门店地址: 
+          a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
+  modal-dialog(ref='successDlg',size="small",buttonStyle="success") 提交成功
+    template(v-slot:body)
+      p 您的信息已经成功提交，我们的客服人员会在第一时间联系您
+      p(style='color:#808080')
+        small 客服电话: 
+          a(:href='tenantConfig.contact | tel') {{tenantConfig.contact}}
+        br
+        small 门店地址: 
+          a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
 </template>
 
 <script>
@@ -53,6 +71,7 @@ module.exports = {
   data: function() {
     return {
       tenantName: common.getTenantName(),
+      tenantConfig: {},
       name: "",
       contact: "",
       verifyCode: "",
@@ -91,9 +110,16 @@ module.exports = {
       });
     }
   },
-  filters: {},
+  filters: {
+    tel: function(contact) {
+      // Remove the non-digit character from tel string, e.g. 136-6166-6616 -> 13664666616
+      // And append prefix "tel:"
+      return "tel:" + (contact && contact.replace(/\D/g, ''));
+    }
+  },
   methods: {
     handleSubmit: function(event) {
+      var vue = this;
       var opportunity = {
         status: "open",
         tenant: common.getTenantName(),
@@ -111,18 +137,14 @@ module.exports = {
         data: JSON.stringify(opportunity),
         success: function(data) {
           //show successful message
-          $("#success_dlg").modal("show");
+          vue.$refs.successDlg.show();
         },
         error: function(jqXHR, status, err) {
-          $("#error_dlg")
-            .find("p#message")
-            .text(
-              jqXHR.responseJSON
-                ? jqXHR.responseJSON.message
-                : jqXHR.responseText
-            );
-          $("#error_dlg").modal("show");
           //console.error(jqXHR);
+          vue.errorMessage = jqXHR.responseJSON
+            ? jqXHR.responseJSON.message
+            : jqXHR.responseText;
+          vue.$refs.errorDlg.show();
         },
         dataType: "json"
       });
@@ -172,7 +194,9 @@ module.exports = {
       });
     }
   },
-  created: function() { },
+  created: function() {
+    this.tenantConfig = _getTenantConfig();
+  },
   mounted: function() {
     this.nc = NoCaptcha.init({
       renderTo: "#nc",

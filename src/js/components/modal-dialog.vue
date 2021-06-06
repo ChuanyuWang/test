@@ -12,12 +12,12 @@ div.modal(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-l
       div.modal-footer
         slot(name="footer")
           template(v-if='buttons === "ok"')
-            button.btn.btn-primary(type="button",@click='hide(true)') 好的
+            button.btn(type="button",@click='hide(true)',:class='btnStyle') 好的
           template(v-if='buttons === "cancel"')
             button.btn.btn-default(type="button",data-dismiss="modal") 取消
           template(v-if='buttons === "confirm"')
             button.btn.btn-default(type="button",data-dismiss="modal") 取消
-            button.btn.btn-primary(type="button",:disabled='hasError',@click='hide(true)') 确定
+            button.btn(type="button",:disabled='hasError',@click='hide(true)',:class='btnStyle') 确定
 </template>
 
 <script>
@@ -44,7 +44,15 @@ module.exports = {
         return ['small', 'medium', 'large'].indexOf(value) !== -1
       }
     },
-    hasError: Boolean
+    hasError: Boolean,
+    buttonStyle: {
+      type: String,
+      default: "primary", // primary, success, danger
+      validator: function(value) {
+        // must be one of below values
+        return ['primary', 'success', 'danger'].indexOf(value) !== -1
+      }
+    }
   },
   data: function() {
     return {};
@@ -54,6 +62,13 @@ module.exports = {
       return {
         "modal-sm": this.size === "small",
         "modal-lg": this.size === "large"
+      }
+    },
+    btnStyle: function() {
+      return {
+        "btn-primary": this.buttonStyle === "primary",
+        "btn-success": this.buttonStyle === "success",
+        "btn-danger": this.buttonStyle === "danger"
       }
     }
   },

@@ -16,39 +16,3 @@ block content
     div.row
       img.center-block(src=logoPath,style="width:200px")
   div#app
-
-  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 提交失败
-        div.modal-body
-          p#message
-          p(style='color:#808080')
-            small 客服电话: 
-              a(href='tel:#{tel}')= contact
-            br
-            small 门店地址: 
-              a(href='#{addressLink}')= address
-        div.modal-footer
-          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
-
-  div#success_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 提交成功
-        div.modal-body
-          p#message 您的信息已经成功提交，我们的客服人员会在第一时间联系您
-          p(style='color:#808080')
-            small 客服电话: 
-              a(href='tel:' + tel)= contact
-            br
-            small 门店地址: 
-              a(href=addressLink)= address
-        div.modal-footer
-          button#success_ok.btn.btn-success(type="button",data-dismiss="modal") 确定

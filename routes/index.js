@@ -3,7 +3,6 @@ var passport = require('passport');
 var router = express.Router();
 var db_utils = require('../server/databaseManager');
 var RateLimit = require('express-rate-limit');
-const helper = require('../helper');
 
 var loginLimiter = new RateLimit({
     windowMs: 1000 * 60, // 1 minutes
@@ -123,7 +122,7 @@ async function getTenantInfo(req, res, next) {
         res.locals.tenant_feature = tenant.feature || "common"; // default is common
         res.locals.tenant_address = tenant.address || "";
         res.locals.tenant_addressLink = tenant.addressLink || '#';
-        res.locals.tenant_contact = helper.getTel(tenant.contact) || "";
+        res.locals.tenant_contact = tenant.contact || "";
         return next();
     } catch (err) {
         let error = new Error("get tenant fails");
