@@ -1,1 +1,10 @@
 tenant-setting(style='display:none' feature=tenant_feature)
+script.
+    function _getTenantConfig() {
+        return {
+            contact: "#{tenant_contact}",
+            address: "#{tenant_address}",
+            addressLink: "#{tenant_addressLink}",
+            classrooms: !{JSON.stringify(classrooms)}
+        };
+    };
