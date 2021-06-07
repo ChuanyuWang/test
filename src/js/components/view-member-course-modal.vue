@@ -30,7 +30,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
               p 456
       div.modal-footer
         button.btn.btn-default(type="button",data-dismiss="modal") {{$t('dialog_cancel')}}
-        button.btn.btn-success(type="button",@click='handleOK') {{$t('dialog_ok')}}
+        button.btn.btn-success(type="button",@click='handleOK') {{$t('dialog_confirm')}}
 </template>
 
 <script>

@@ -12,12 +12,12 @@ div.modal(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-l
       div.modal-footer
         slot(name="footer")
           template(v-if='buttons === "ok"')
-            button.btn(type="button",@click='hide(true)',:class='btnStyle') 好的
+            button.btn(type="button",@click='hide(true)',:class='btnStyle') {{ $t('dialog_ok') }}
           template(v-if='buttons === "cancel"')
-            button.btn.btn-default(type="button",data-dismiss="modal") 取消
+            button.btn.btn-default(type="button",data-dismiss="modal") {{ $t('dialog_cancel') }}
           template(v-if='buttons === "confirm"')
-            button.btn.btn-default(type="button",data-dismiss="modal") 取消
-            button.btn(type="button",:disabled='hasError',@click='hide(true)',:class='btnStyle') 确定
+            button.btn.btn-default(type="button",data-dismiss="modal") {{ $t('dialog_cancel') }}
+            button.btn(type="button",:disabled='hasError',@click='hide(true)',:class='btnStyle') {{ $t('dialog_confirm') }}
 </template>
 
 <script>

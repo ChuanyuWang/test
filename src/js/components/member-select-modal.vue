@@ -20,7 +20,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
       div.modal-footer
         p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
         button.btn.btn-default(type="button",data-dismiss="modal") {{$t('dialog_cancel')}}
-        button.btn.btn-success(type="button",@click='handleOK') {{$t('dialog_ok')}}
+        button.btn.btn-success(type="button",@click='handleOK') {{$t('dialog_confirm')}}
 </template>
 
 <script>
