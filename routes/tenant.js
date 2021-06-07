@@ -16,7 +16,6 @@ router.get('/booking', function(req, res, next) {
 
     res.render('bqsq/booking', {
         title: '会员约课',
-        logoPath: helper.getTenantLogo(req.tenant),
         contact: req.tenant.contact,
         tel: helper.getTel(req.tenant.contact),
         address: req.tenant.address,

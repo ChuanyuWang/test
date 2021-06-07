@@ -3,6 +3,7 @@ var passport = require('passport');
 var router = express.Router();
 var db_utils = require('../server/databaseManager');
 var RateLimit = require('express-rate-limit');
+const helper = require('../helper');
 
 var loginLimiter = new RateLimit({
     windowMs: 1000 * 60, // 1 minutes
@@ -119,6 +120,7 @@ async function getTenantInfo(req, res, next) {
         // navTitle is the title on the navigation bar
         res.locals.navTitle = tenant.displayName || "";
         res.locals.classrooms = tenant.classroom || [];
+        res.locals.logoPath = helper.getTenantLogo(tenant);
         res.locals.tenant_feature = tenant.feature || "common"; // default is common
         res.locals.tenant_address = tenant.address || "";
         res.locals.tenant_addressLink = tenant.addressLink || '#';
