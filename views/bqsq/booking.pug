@@ -2,101 +2,13 @@ extends ../mlayout
 
 block append js
   script(src=CDN_FILES.momentjs)
+  if ENV_DEVELOPMENT
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
+  else
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
   script(src='/js/booking.js')
 
 block content
-  div#topbar.container(style='padding-left:7px;padding-right:7px')
-    div.row(style='margin-left:-7px;margin-right:-7px')
-      if classroom.length > 1
-        img.col-xs-9.center-block(src=logoPath,style="padding:0px;width:200px")
-        div.col-xs-3.pull-right(style="padding:9px")
-          select#chooseRoom.form-control.text-primary.input-sm(style='float:right;width:90px;padding:0 0 0 5px;border-color:#2e6da4')
-            each room in classroom
-              option(value=room.id)= room.name
-      else
-        img.center-block(src=logoPath,style="padding:0px;width:200px")
-    div#weekbtns.row(style='margin:7px -7px 3px -7px')
-      div.btn-group(style='float:left;padding-left:9px')
-        button#previous_week.btn.btn-default.btn-xs 上一周
-        button#current_week.btn.btn-default.btn-xs 本周
-        button#next_week.btn.btn-default.btn-xs 下一周
-      div.age-filter.btn-group(style='float:left;padding-left:3px')
-        button.btn.btn-default.btn-xs.dropdown-toggle(type="button",data-toggle="dropdown")= __('age_filter_all')
-          span.caret
-        ul.dropdown-menu
-          li
-            a(data-years="0")= __('age_filter_all')
-          li
-            a(data-years="2")= __('age_filter_2_years')
-          li
-            a(data-years="2.5")= __('age_filter_25_years')
-          li
-            a(data-years="3")= __('age_filter_3_years')
-          li
-            a(data-years="4")= __('age_filter_4_years')
-      div(style='float:right;padding-right:9px')
-        a.btn.btn-success.btn-xs(href='mybooking') 我的课程
-  div#main.container(style='padding-left:7px;padding-right:7px;overflow-y:auto')
-
-  div#book_dlg.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 预约课程
-        div.modal-body
-          form.form-horizontal
-            div.form-group.form-group-sm(style='margin-bottom:9px')
-              label.control-label-sm.col-xs-3 时间:
-              div.col-xs-9
-                p#time.form-control-static
-            div.form-group.form-group-sm
-              label.control-label-sm.col-xs-3 内容:
-              div.col-xs-9
-                p#content.form-control-static(style='height:auto')
-            div.form-group.form-group-sm
-              label.control-label-sm.col-xs-3(for='name') 宝宝姓名:
-              div.col-xs-9
-                input#name.form-control(type='text',placeholder='宝宝注册时用的名称')
-            div.form-group.form-group-sm
-              label.control-label-sm.col-xs-3(for='contact') 联系方式:
-              div.col-xs-9
-                input#contact.form-control(type='tel',placeholder='135xxx')
-            div.form-group.form-group-sm
-              label.control-label-sm.col-xs-3(for='quantity') 人数:
-              div.col-xs-4
-                input#quantity.form-control(type='number',name='quantity',min='1',step='1')
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#book_ok.btn.btn-success(type="button") 预约
-          
-  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 预约失败
-        div.modal-body
-          p#message
-          p
-            small 客服电话: 
-              a(href='tel:' + tel)= contact
-            br
-            small 门店地址: 
-              a(href=addressLink)= address
-        div.modal-footer
-          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
-
-  div#success_dlg.modal.fade(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 预约成功
-        div.modal-body
-          p#message
-        div.modal-footer
-          button#success_ok.btn.btn-success(type="button",data-dismiss="modal") 确定
+  div#app
