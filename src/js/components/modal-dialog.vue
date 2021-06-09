@@ -17,7 +17,8 @@ div.modal(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-l
             button.btn.btn-default(type="button",data-dismiss="modal") {{ $t('dialog_cancel') }}
           template(v-if='buttons === "confirm"')
             button.btn.btn-default(type="button",data-dismiss="modal") {{ $t('dialog_cancel') }}
-            button.btn(type="button",:disabled='hasError',@click='hide(true)',:class='btnStyle') {{ $t('dialog_confirm') }}
+            button.btn(type="button",:disabled='hasError',@click='hide(true)',:class='btnStyle')
+              slot(name="action") {{ $t('dialog_confirm') }}
 </template>
 
 <script>
