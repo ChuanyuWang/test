@@ -257,7 +257,7 @@ module.exports = {
         to: end.toISOString(),
         classroom: vm.classroom,
         tenant: common.getTenantName()
-      });
+      }, true);
 
       request.done(function(data, textStatus, jqXHR) {
         vm.classes = data || [];

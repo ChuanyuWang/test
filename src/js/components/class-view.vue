@@ -332,7 +332,7 @@ module.exports = {
           };
         });
         // add one member's reservation
-        var request = class_service.addReservation(result[0]);
+        var request = class_service.addReservation(result[0], true);
         request.done(function(data, textStatus, jqXHR) {
           vm.bookedMembers.push({
             member: data["member"]._id,

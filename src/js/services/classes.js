@@ -27,16 +27,18 @@ service.getClass = function(classID) {
     return request;
 };
 
-service.getClasses = function(fields) {
+service.getClasses = function(fields, showError) {
     var request = $.ajax('/api/classes', {
         type: "GET",
         //contentType : "application/x-www-form-urlencoded; charset=UTF-8",
         dataType: "json",
         data: fields
     });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert('获取课程失败', jqXHR);
-    });
+    if (showError === true) {
+        request.fail(function(jqXHR, textStatus, errorThrown) {
+            util.showAlert('获取课程失败', jqXHR);
+        });
+    }
     return request;
 };
 
@@ -53,16 +55,18 @@ service.updateClass = function(coureID, fields) {
     return request;
 };
 
-service.addReservation = function(fields) {
+service.addReservation = function(fields, showError) {
     var request = $.ajax("/api/booking", {
         type: "POST",
         contentType: "application/json; charset=utf-8",
         data: JSON.stringify(fields),
         dataType: "json"
     });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("预约失败", jqXHR);
-    });
+    if (showError === true) {
+        request.fail(function(jqXHR, textStatus, errorThrown) {
+            util.showAlert("预约失败", jqXHR);
+        });
+    }
     return request;
 };
 
@@ -136,7 +140,7 @@ service.flag = function(classID, memberID, flag) {
     var request = $.ajax("/api/classes/" + classID + "/flag", {
         type: "PUT",
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({"memberid": memberID, "flag": flag}),
+        data: JSON.stringify({ "memberid": memberID, "flag": flag }),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
@@ -149,7 +153,7 @@ service.comment = function(classID, memberID, comment) {
     var request = $.ajax("/api/classes/" + classID + "/comment", {
         type: "PUT",
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({"memberid": memberID, "comment": comment}),
+        data: JSON.stringify({ "memberid": memberID, "comment": comment }),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
@@ -162,7 +166,7 @@ function putCheckinStatus(classID, memberID, status) {
     var request = $.ajax("/api/classes/" + classID + "/checkin", {
         type: "PUT",
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({"memberid": memberID, "status": status || "checkin"}),
+        data: JSON.stringify({ "memberid": memberID, "status": status || "checkin" }),
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
