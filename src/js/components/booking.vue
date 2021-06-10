@@ -251,7 +251,8 @@ module.exports = {
         // update booking data
         vue.items.some(function(value, index, array) {
           if (value._id === classInfo._id) {
-            value.booking = classInfo.booking;
+            // class object doesn't have "booking" property at the beginning
+            Vue.set(value, "booking", classInfo.booking);
             return true;
           }
         });
