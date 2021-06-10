@@ -212,7 +212,7 @@ module.exports = {
       var request = class_service.getClasses({
         from: begin.toISOString(),
         to: end.toISOString(),
-        classroom: this.classroomID || undefined, // 'undefined' field will not append to the URL
+        classroom: this.publicClassrooms() || undefined, // 'undefined' field will not append to the URL
         tenant: common.getTenantName(),
         minAge: this.minimumAge || undefined // 'undefined' field will not append to the URL
       });
@@ -334,6 +334,17 @@ module.exports = {
     },
     remainingClass(cls) {
       return common.classRemaining(cls);
+    },
+    publicClassrooms() {
+      if (this.tenantConfig && this.tenantConfig.classrooms) {
+        var publicRooms = [];
+        this.tenantConfig.classrooms.forEach(function(value) {
+          if (value.visibility !== "internal") {
+            publicRooms.push(value.id);
+          }
+        })
+        return publicRooms.join(",");
+      }
     }
   },
   created: function() {
