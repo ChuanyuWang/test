@@ -64,23 +64,6 @@ function init() {
     document.addEventListener('touchmove', handleMove, true);
     */
 }
-// eslint-disable-next-line
-function scrollToToday() {
-    var btns = $('div.class-row button[disabled!=disabled]');
-    if (btns.length > 0) {
-        var container = $('#main');
-        var h = btns.height();
-        var coordinate = btns.offset();
-        if (coordinate.top - container.offset().top < h) {
-            // it's the first element in the list, no need scroll
-            return;
-        }
-        var position = coordinate.top - 7 - container.offset().top + container.scrollTop();
-        container.animate({
-            scrollTop: position
-        }, 1000);
-    }
-}
 
 function getOpenId(code) {
     var tenant = common.getTenantName();

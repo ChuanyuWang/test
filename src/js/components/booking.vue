@@ -17,7 +17,7 @@ div
         strong 提示：
         | 本周没有课程，请查看下一周
     template(v-for="day in classesByDay")
-      div.class-separator
+      div.class-separator(:class='{notStartedDay: day.notStarted}')
       div.row.class-row
         div.col-xs-2.date-col {{day.date | dateFormatter}}
           br
@@ -124,6 +124,7 @@ module.exports = {
   },
   computed: {
     classesByDay() {
+      var today = moment(0, "HH"); // today, 00:00:00.000
       var results = [];
       this.items.forEach(function(value, index, array) {
         //var date = moment(value.date).format('M/D');
@@ -134,10 +135,14 @@ module.exports = {
             return;
           }
         }
-        results.push({
+        var dayClasses = {
           date: value.date,
           classes: [value]
-        })
+        };
+        if (today.isBefore(moment(value.date))) {
+          dayClasses.notStarted = true;
+        }
+        results.push(dayClasses);
       });
       return results;
     },
@@ -214,6 +219,12 @@ module.exports = {
       request.done(function(data, textStatus, jqXHR) {
         vue.items = data || [];
         //scrollToToday();
+        vue.$nextTick(function() {
+          var divs = $("#main div.notStartedDay");
+          if (divs.length > 0) {
+            divs[0].scrollIntoView({ behavior: "smooth" });
+          }
+        });
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
         console.error(jqXHR.responseText);
