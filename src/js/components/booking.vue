@@ -2,7 +2,7 @@
 div
   div#topbar.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
-      img.center-block(:src='tenantConfig.logoPath',style="padding:0px;width:200px")
+      img.center-block.img-responsive(:src='tenantConfig.logoPath',style="padding:0px;width:200px",@load="updateHeight")
     div.row(style='margin:7px -7px 3px -7px')
       div.btn-group(style='float:left;padding-left:9px')
         button.btn.btn-default.btn-xs(:disabled='loading',@click='updateSchedule(-7)') 上一周
@@ -218,13 +218,7 @@ module.exports = {
       });
       request.done(function(data, textStatus, jqXHR) {
         vue.items = data || [];
-        //scrollToToday();
-        vue.$nextTick(function() {
-          var divs = $("#main div.notStartedDay");
-          if (divs.length > 0) {
-            divs[0].scrollIntoView({ behavior: "smooth" });
-          }
-        });
+        vue.scrollToToday();
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
         console.error(jqXHR.responseText);
@@ -345,6 +339,19 @@ module.exports = {
         })
         return publicRooms.join(",");
       }
+    },
+    scrollToToday() {
+      this.$nextTick(function() {
+        var divs = $("#main div.notStartedDay");
+        if (divs.length > 0) {
+          divs[0].scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    },
+    updateHeight() {
+      // set the height of #main div to enable div scroll bar instead of body scroll bar
+      $('#main').height(window.innerHeight - $('#topbar').height() - 2);
+      this.scrollToToday();
     }
   },
   created: function() {
@@ -352,10 +359,6 @@ module.exports = {
   },
   mounted: function() {
     this.updateSchedule("today");
-  },
-  updated: function() {
-    // set the height of #main div to enable div scroll bar instead of body scroll bar
-    $('#main').height(window.innerHeight - $('#topbar').height() - 2);
   }
 };
 </script>
