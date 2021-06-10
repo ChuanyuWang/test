@@ -9,6 +9,7 @@ var i18nextplugin = require('./locales/i18nextplugin');
 var booking_app = require('./components/booking.vue').default;
 
 // open id of Weichat user
+// eslint-disable-next-line
 var _openid = undefined;
 
 var ua = navigator.userAgent.toLowerCase();
@@ -45,9 +46,6 @@ function init() {
     moment.locale('zh-CN');
     //bootbox.setLocale('zh_CN');
 
-    // set the height of #main div to enable div scroll bar instead of body scroll bar
-    $('#main').height(window.innerHeight - $('#topbar').height() - 2);
-
     /* fix topbar at the top of screen when scroll down
     $(window).scroll(this, function (event) {
         //console.log(event);
@@ -66,7 +64,7 @@ function init() {
     document.addEventListener('touchmove', handleMove, true);
     */
 }
-
+// eslint-disable-next-line
 function scrollToToday() {
     var btns = $('div.class-row button[disabled!=disabled]');
     if (btns.length > 0) {

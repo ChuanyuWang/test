@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  div.container(style='padding-left:7px;padding-right:7px')
+  div#topbar.container(style='padding-left:7px;padding-right:7px')
     div.row(style='margin-left:-7px;margin-right:-7px')
       img.center-block(:src='tenantConfig.logoPath',style="padding:0px;width:200px")
     div.row(style='margin:7px -7px 3px -7px')
@@ -10,7 +10,7 @@ div
         button.btn.btn-default.btn-xs(:disabled='loading',@click='updateSchedule(7)') 下一周
       div(style='float:right;padding-right:9px')
         a.btn.btn-success.btn-xs(href='mybooking') 我的课程
-  div.container(style='padding-left:7px;padding-right:7px;overflow-y:auto')
+  div#main.container(style='padding-left:7px;padding-right:7px;overflow-y:auto;height:100%')
     template(v-if='classesByDay.length === 0')
       div.class-separator
       div.alert.alert-warning(role='alert',style='margin-top:7px')
@@ -330,6 +330,10 @@ module.exports = {
   },
   mounted: function() {
     this.updateSchedule("today");
+  },
+  updated: function() {
+    // set the height of #main div to enable div scroll bar instead of body scroll bar
+    $('#main').height(window.innerHeight - $('#topbar').height() - 2);
   }
 };
 </script>
