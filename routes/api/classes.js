@@ -60,7 +60,11 @@ router.get('/', function(req, res, next) {
     var sort = req.query.order == 'desc' ? -1 : 1;
     // query specific classroom
     if (req.query.hasOwnProperty('classroom')) {
-        query['classroom'] = req.query.classroom ? req.query.classroom : null;
+        query['classroom'] = {
+            $in: req.query.classroom.split(',').map(function(value) {
+                return value ? value : null;
+            })
+        };
     }
     // get all classes booked by this member
     if (req.query.hasOwnProperty('hasBooks')) {
