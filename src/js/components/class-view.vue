@@ -112,7 +112,7 @@ module.exports = {
   name: "class-view",
   props: {
     data: Object, // class object
-    classrooms: Array // Array of available classroom
+    classrooms: Array // Array of available classrooms
   },
   data: function() {
     // clone the pass in data, because class-view component will

@@ -126,7 +126,7 @@ module.exports = {
   inheritAttrs: false,
   props: {
     courseData: Object, // course object
-    classrooms: Array // Array of available classroom
+    classrooms: Array // Array of available classrooms
   },
   data: function() {
     return {

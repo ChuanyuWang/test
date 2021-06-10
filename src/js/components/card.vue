@@ -58,7 +58,7 @@ module.exports = {
   props: {
     index: Number, // index of membership card
     item: Object, // object of membership card object
-    classrooms: Array // Array of available classroom
+    classrooms: Array // Array of available classrooms
   },
   data: function() {
     return {
