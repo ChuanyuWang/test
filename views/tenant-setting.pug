@@ -6,6 +6,6 @@ script.
             contact: "#{tenant_contact}",
             address: "#{tenant_address}",
             addressLink: "#{tenant_addressLink}",
-            classrooms: !{JSON.stringify(classrooms)}
+            classrooms: !{JSON.stringify(classrooms || [])}
         };
     };
