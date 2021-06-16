@@ -35,10 +35,10 @@ div.container(style='padding-left:7px;padding-right:7px')
     template(v-slot:body)
       p {{errorMessage}}
       p(style='color:#808080')
-        small 客服电话: 
+        small {{$t('support_contact')}}:
           a(:href='tenantConfig.contact | tel') {{tenantConfig.contact}}
         br
-        small 门店地址: 
+        small {{$t('org_address')}}:
           a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
 </template>
 

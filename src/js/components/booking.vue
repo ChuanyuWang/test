@@ -67,19 +67,19 @@ div
     template(v-slot:body)
       p {{errorMessage}}
       p(style='color:#808080')
-        small 客服电话: 
+        small {{$t('support_contact')}}:
           a(:href='tenantConfig.contact | tel') {{tenantConfig.contact}}
         br
-        small 门店地址: 
+        small {{$t('org_address')}}:
           a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
   modal-dialog(ref='successDlg',size="small",buttonStyle="success") 预约成功
     template(v-slot:body)
       p(v-html='successMessage')
       p(style='color:#808080')
-        small 客服电话: 
+        small {{$t('support_contact')}}:
           a(:href='tenantConfig.contact | tel') {{tenantConfig.contact}}
         br
-        small 门店地址: 
+        small {{$t('org_address')}}:
           a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
 </template>
 
