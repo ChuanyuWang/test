@@ -3,6 +3,7 @@
  * mybooks.js
  * --------------------------------------------------------------------------
  */
+var i18nextplugin = require('./locales/i18nextplugin');
 var books_app = require('./components/my-read-books.vue').default;
 // open id of Weichat user
 //var _openid = undefined;
@@ -10,9 +11,9 @@ var books_app = require('./components/my-read-books.vue').default;
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
-    // register the root component globally
-    Vue.component('my-read-books', books_app);
-    new Vue({ el: '#app' });
+    // load the i18next plugin to Vue
+    Vue.use(i18nextplugin);
+    new Vue({ el: '#app', extends: books_app });
 });
 
 // Functions =============================================================
