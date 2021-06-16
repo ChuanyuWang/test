@@ -98,9 +98,9 @@ async function getTenantInfo(req, res, next) {
         });
 
         if (!tenant) {
-            let error = new Error(`tenant ${req.params.tenantName} doesn't exist`);
-            error.status = 400;
-            return next(error);
+            console.warn(`tenant ${req.params.tenantName} doesn't exist`);
+            // return next('route'); //  bypass the remaining route callbacks.
+            return next('router'); // jump out of the current router.
         }
 
         if (tenant.status === 'inactive') {
