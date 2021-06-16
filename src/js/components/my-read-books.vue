@@ -31,6 +31,15 @@ div.container(style='padding-left:7px;padding-right:7px')
           td {{item.teacher}}
     p.small 阅读绘本共: <strong>{{books.length}}</strong>册
   div.alert.alert-warning(role='alert',style='margin-top:7px',v-show='user._id && books.length === 0') <strong>提示: </strong>没有找到绘本
+  modal-dialog(ref='errorDlg',size="small",buttonStyle="danger") 登录失败
+    template(v-slot:body)
+      p {{errorMessage}}
+      p(style='color:#808080')
+        small 客服电话: 
+          a(:href='tenantConfig.contact | tel') {{tenantConfig.contact}}
+        br
+        small 门店地址: 
+          a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
 </template>
 
 <script>
@@ -42,24 +51,29 @@ div.container(style='padding-left:7px;padding-right:7px')
 
 var common = require("../common");
 var teachersService = require("../services/teachers");
+var modalDialog = require("./modal-dialog.vue").default;
 
 module.exports = {
   name: "my-read-books",
   props: {},
   data: function() {
     return {
+      tenantConfig: {},
       name: "",
       contact: "",
       user: {
         _id: null,
         name: ""
       },
+      errorMessage: "",
       classes: [],
       teachers: {} // Map {"id": "name"}
     };
   },
   watch: {},
-  components: {},
+  components: {
+    "modal-dialog": modalDialog
+  },
   computed: {
     hasData: function() {
       return !jQuery.isEmptyObject(this.selectedTenant);
@@ -93,9 +107,13 @@ module.exports = {
     }
   },
   filters: {
+    tel(contact) {
+      // Remove the non-digit character from tel string, e.g. 136-6166-6616 -> 13664666616
+      // And append prefix "tel:"
+      return "tel:" + (contact && contact.replace(/\D/g, ''));
+    },
     dateFilter: function(value) {
       if (!value) return "";
-
       return moment(value).format('l');
     }
   },
@@ -167,15 +185,17 @@ module.exports = {
           vm.showMyBooks();
         } else {
           // handle login fail, show error dialog
-          $('#error_dlg').find("h4").text('登录失败');
-          $('#error_dlg').find("p#message").text('没有找到会员信息，请核对您的姓名和联系方式，如有问题请联系客服');
-          $('#error_dlg').modal('show');
+          vm.errorMessage = '没有找到会员信息，请核对您的姓名和联系方式，如有问题请联系客服';
+          vm.$refs.errorDlg.show();
         }
       });
     }
   },
   created: function() {
     var vm = this;
+
+    this.tenantConfig = _getTenantConfig();
+
     var request = teachersService.getAll();
     request.done(function(data, textStatus, jqXHR) {
       if (data && data.length > 0) {
