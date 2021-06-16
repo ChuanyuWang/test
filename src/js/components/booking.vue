@@ -35,10 +35,12 @@ div
                 span.cls-free(v-else) 公益活动
                 |  {{item.age | ageFormatter}}
             div.book-col
-              button.btn.btn-danger.book-btn(v-if='remainingClass(item) === 0') 已满
-              button.btn.btn-primary.book-btn(v-else,@click='showBookDlg(item, $event)') 预约
-              button.btn.btn-primary.remain-btn(disabled) 剩余
-                span.badge.remain-span {{remainingClass(item)}}
+              button.btn.btn-default.finish-btn(v-if='isCompletedClass(item)',disabled) 结束
+              template(v-else)
+                button.btn.btn-danger.book-btn(v-if='remainingClass(item) === 0') 已满
+                button.btn.btn-primary.book-btn(v-else,@click='showBookDlg(item, $event)') 预约
+                button.btn.btn-primary.remain-btn(disabled) 剩余
+                  span.badge.remain-span {{remainingClass(item)}}
   modal-dialog(ref='bookDlg',size="small",buttonStyle="success",buttons="confirm",:hasError="hasError",@ok="addNewBook(bookItem)") 预约课程
     template(v-slot:body)
       form.form-horizontal
@@ -326,6 +328,9 @@ module.exports = {
       //set the time to the very beginning of day
       _date.hours(0).minutes(0).seconds(0).milliseconds(0);
       return _date;
+    },
+    isCompletedClass(cls) {
+      return moment().isAfter(moment(cls.date).subtract(1, 'hours'));
     },
     remainingClass(cls) {
       return common.classRemaining(cls);
