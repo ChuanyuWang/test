@@ -13,7 +13,7 @@ div.container(style='padding-left:7px;padding-right:7px')
         input.form-control(type='tel',placeholder='135xxx',name='contact',v-model='contact')
     div.form-group
       div.col-xs-offset-3.col-xs-9
-        button.btn.btn-primary(@click='handleLoginOK',:disabled='hasError') 登录
+        button.btn.btn-primary(type='button',@click='handleLoginOK',:disabled='hasError') 登录
   div#user_info.row(style='margin:7px -7px 3px -7px',v-show='user.name')
     p.pull-left.col-xs-10 <b>{{user.name}}</b>小朋友
 
@@ -129,9 +129,6 @@ module.exports = {
       });
     },
     handleLoginOK: function(event) {
-      // prevent from submitting the form
-      event.preventDefault();
-
       // validate the input
       var userInfo = {
         tenant: common.getTenantName(),
