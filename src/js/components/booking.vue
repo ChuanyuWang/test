@@ -242,6 +242,7 @@ module.exports = {
         }
       }
       var request = class_service.addReservation({
+        tenant: common.getTenantName(),
         classid: bookInfo.classid,
         name: bookInfo.name,
         contact: bookInfo.contact,
