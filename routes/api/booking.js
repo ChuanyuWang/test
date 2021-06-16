@@ -135,9 +135,9 @@ router.post('/', function(req, res, next) {
             _id: mongojs.ObjectId(req.body.classid)
         }, function(err, cls) {
             if (err) {
-                return res.status(500).json({
-                    'err': err
-                });
+                var error = new Error('Find class fails');
+                error.innerError = err;
+                return next(error);
             }
 
             if (!cls) {
@@ -148,6 +148,17 @@ router.post('/', function(req, res, next) {
                 });
             }
             console.log("class is found %j", cls);
+
+
+            // member can only book the class 1 hour before started
+            if (req.isUnauthenticated()) {
+                if (Date.now() > cls.date.getTime() - 3600000) {
+                    // 1 hours = 3600000 (1*60*60*1000)
+                    var error = new Error("课程已经开始或即将开始(不足1小时)");
+                    error.status = 400;
+                    return next(error);
+                }
+            }
 
             reservation.addOne(doc, cls, req.body.quantity, function(error, result) {
                 if (error) return next(error);
