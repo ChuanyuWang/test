@@ -54,8 +54,8 @@ module.exports = {
          * 1. Update vue CDN version
          * 2. Update vue-template-compiler version, the same as vue
          */
-        vue: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.min.js',
-        vue_dev: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.12/vue.js',
+        vue: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js',
+        vue_dev: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.js',
         i18next: 'https://cdn.bootcdn.net/ajax/libs/i18next/20.2.1/i18next.min.js',
         i18next_dev: 'https://cdn.bootcdn.net/ajax/libs/i18next/20.2.1/i18next.js',
         bootstrap_table_css: 'https://cdn.jsdelivr.net/npm/bootstrap-table@1.15.5/dist/bootstrap-table.min.css',
