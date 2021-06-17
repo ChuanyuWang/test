@@ -2,9 +2,18 @@ const connectionManager = require('../../server/databaseManager');
 const testData = require("./data");
 const testDB = "dummy";
 
+let buildInfo = null;
+
 module.exports = {
     init: async function(insertTestData) {
         let configDB = await connectionManager.connect("config");
+        // print the version of Mongodb
+        if (!buildInfo) {
+            let adminDB = configDB.admin();
+            buildInfo = await adminDB.buildInfo();
+            console.log(`Mongodb version: ${buildInfo.version}`);
+        }
+
         await configDB.collection("tenants").updateOne({ name: testDB }, {
             $set: testData.testTenant
         }, { upsert: true });
@@ -18,20 +27,20 @@ module.exports = {
         }, { upsert: true });
         if (insertTestData) {
             let db = await connectionManager.connect(testDB);
-            await db.collection("classes").insert(testData.classes);
+            await db.collection("classes").insertMany(testData.classes);
         }
     },
     addClasses: async function(data) {
         let db = await connectionManager.connect(testDB);
-        await db.collection("classes").insert(data);
+        await db.collection("classes").insertMany(data);
     },
     addCourses: async function(data) {
         let db = await connectionManager.connect(testDB);
-        await db.collection("courses").insert(data);
+        await db.collection("courses").insertMany(data);
     },
     addMembers: async function(data) {
         let db = await connectionManager.connect(testDB);
-        await db.collection("members").insert(data);
+        await db.collection("members").insertMany(data);
     },
     clean: async function(cleanConfig) {
         try {
@@ -43,8 +52,8 @@ module.exports = {
             }
             if (cleanConfig) {
                 let configDB = await connectionManager.connect("config");
-                await configDB.collection("accounts").remove({ tenant: testDB });
-                await configDB.collection("tenants").remove({ name: testDB });
+                await configDB.collection("accounts").deleteMany({ tenant: testDB });
+                await configDB.collection("tenants").deleteMany({ name: testDB });
             }
         } catch (error) {
             console.error(error);
