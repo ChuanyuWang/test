@@ -56,7 +56,9 @@ module.exports = {
     }
   },
   data: function() {
-    return {};
+    return {
+      param: {}
+    };
   },
   computed: {
     dialogSize: function() {
@@ -74,13 +76,14 @@ module.exports = {
     }
   },
   methods: {
-    show: function() {
+    show: function(data) {
+      this.param = data;
       $(this.$el).modal('show');
     },
     hide: function(emitOKEvent) {
       $(this.$el).modal('hide');
       if (emitOKEvent) {
-        this.$emit('ok');
+        this.$emit('ok', this.param || undefined);
       }
     }
   },
