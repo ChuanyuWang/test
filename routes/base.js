@@ -93,12 +93,7 @@ router.get('/setting', helper.checkTenantUser, function(req, res) {
 
 router.get('/mybooking', function(req, res) {
     res.render('bqsq/mybooking', {
-        title: '我的课程',
-        logoPath: helper.getTenantLogo(req.tenant),
-        contact: req.tenant.contact,
-        tel: helper.getTel(req.tenant.contact),
-        address: req.tenant.address,
-        addressLink: req.tenant.addressLink || '#'
+        title: '我的课程'
     });
 });
 

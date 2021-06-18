@@ -2,77 +2,13 @@ extends ../mlayout
 
 block append js
   script(src=CDN_FILES.momentjs)
+  if ENV_DEVELOPMENT
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
+  else
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
   script(src='/js/mybooking.js')
 
 block content
-  script(type='text/javascript').
-    function getClassroomList() {
-        return !{JSON.stringify(classrooms)};
-    };
-  div#main.container(style='padding-left:7px;padding-right:7px')
-    div.row(style='margin-left:-7px;margin-right:-7px')
-      img.center-block(src=logoPath,style="padding:0px;width:200px")
-    form#login.form-horizontal(style='margin-top:15px;display:none;padding-left:8px;padding-right:8px',role='form')
-        div.form-group.form-group-sm
-          div.col-xs-12(style='color:#808080;text-align:center') 请输入宝宝姓名和联系方式查看已预约课程
-        div.form-group.form-group-sm
-          label.control-label-sm.col-xs-3(for='cls_name') 宝宝姓名:
-          div.col-xs-9
-            input.form-control(type='text',placeholder='宝宝注册时用的姓名',name='name')
-        div.form-group.form-group-sm
-          label.control-label-sm.col-xs-3(for='cls_name') 联系方式:
-          div.col-xs-9
-            input.form-control(type='tel',placeholder='135xxx',name='contact')
-        div.form-group
-          div.col-xs-offset-3.col-xs-9
-            button.btn.btn-primary 查看预约
-    div#user_info.row(style='display:none;margin:7px -7px 3px -7px')
-      p.pull-left.col-xs-10 你好, 
-        b
-        |小朋友<br>
-        small(style='color:#808080') 已预约课程共 
-          span.booked-total -
-          |课时, 还有
-          span.remain-total -
-          |课时可用
-      div.col-xs-2(style='padding-right:9px')
-        button.btn.btn-danger.btn-xs.pull-right 注销
-    ul.nav.nav-tabs(role='tablist',style='display:none')
-      li.active(role='presentation')
-        a.btn-xs(href="#future",role='tab',data-toggle='tab',style='padding:3px 7px') 预约课程
-      li(role='presentation')
-        a.btn-xs(href="#history",role='tab',data-toggle='tab',style='padding:3px 7px') 历史课程
-    div.tab-content(style='display:none')
-      div.tab-pane.active(role="tabpanel",id="future")
-      div.tab-pane(role="tabpanel",id="history")
-
-  div#error_dlg.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 登录失败
-        div.modal-body
-          p#message
-          p
-            small 客服电话: 
-              a(href='tel:' + tel)= contact
-            br
-            small 门店地址: 
-              a(href=addressLink)= address
-        div.modal-footer
-          button#error_ok.btn.btn-danger(type="button",data-dismiss="modal") 确定
-
-  div#confirm_dlg.modal(tabindex='-1',data-backdrop='static')
-    div.modal-dialog.modal-sm
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 取消预约
-        div.modal-body
-          p#message 确定取消选中的课程吗？
-        div.modal-footer
-          button#cancel_ok.btn.btn-danger(type="button") 确定
-          button.btn.btn-default(type="button",data-dismiss="modal") 关闭
+  div#app
