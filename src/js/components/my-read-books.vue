@@ -119,7 +119,8 @@ module.exports = {
   },
   methods: {
     getTeacherName: function(teacherID) {
-      return this.teachers[teacherID];
+      if (!teacherID) return "";
+      else return this.teachers[teacherID] || "未找到";
     },
     showMyBooks: function() {
       var vm = this;
@@ -196,7 +197,9 @@ module.exports = {
 
     this.tenantConfig = _getTenantConfig();
 
-    var request = teachersService.getAll();
+    var request = teachersService.getAll({
+      tenant: common.getTenantName()
+    });
     request.done(function(data, textStatus, jqXHR) {
       if (data && data.length > 0) {
         data.forEach(function(value, index, array) {

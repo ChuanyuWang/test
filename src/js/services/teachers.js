@@ -8,11 +8,13 @@ var util = require('./util');
 
 var service = {};
 
+/**
+ * 
+ * @param {Object} fields include 'tenant' if not authenticated
+ * @returns 
+ */
 service.getAll = function(fields) {
     var request = $.getJSON("/api/teachers", fields);
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取老师失败", jqXHR);
-    });
     return request;
 }
 
