@@ -9,8 +9,7 @@ var i18nextplugin = require('./locales/i18nextplugin');
 var booking_app = require('./components/booking.vue').default;
 
 // open id of Weichat user
-// eslint-disable-next-line
-var _openid = undefined;
+var _openid = undefined; // eslint-disable-line
 
 var ua = navigator.userAgent.toLowerCase();
 if (ua.indexOf('micromessenger') > -1) { // we are within wechat
@@ -74,10 +73,10 @@ function getOpenId(code) {
             "tenant": tenant
         },
         success: function(data) {
-            _openid = (data || {}).openid;
+            window._openid = (data || {}).openid;
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            _openid = false;
+            window._openid = false;
         },
         dataType: "json"
     });
