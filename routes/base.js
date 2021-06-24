@@ -111,4 +111,11 @@ router.get('/trial', function(req, res) {
     });
 });
 
+router.get('/app', function(req, res) {
+    res.render('bqsq/mobile/portal', {
+        title: 'Mobile Portal'
+    });
+});
+
+
 module.exports = router;
