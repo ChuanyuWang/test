@@ -10,14 +10,15 @@ block prepend css
     //link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
 block append js
   if ENV_DEVELOPMENT
-    //script(src=CDN_FILES.jquery_dev)
+    script(src=CDN_FILES.jquery_dev)
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
     script(src="https://cdn.jsdelivr.net/npm/vuetify@2.5.5/dist/vuetify.js")
   else
+    script(src=CDN_FILES.jquery)
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
+  script(src='/js/portal.js')
 
 block content
   div#app
-  script(src='/js/portal.js')
