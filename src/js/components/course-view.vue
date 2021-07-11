@@ -28,7 +28,7 @@ div.container
         option(v-for='r in classrooms',:value='r.id') {{r.name}}
     div.form-group
       label.control-label.col-sm-2 简介:
-      div.col-sm-10
+      div.col-sm-8
         textarea.form-control(rows='3', v-model.trim='course.remark',style='resize:vertical;min-height:70px')
     div.form-group
       div.col-sm-offset-2.col-sm-10
