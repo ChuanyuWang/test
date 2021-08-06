@@ -19,7 +19,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
           div.form-group(:class='{"has-error": errors.password}',:title='errors.password')
             label.control-label.col-sm-4 Password:
             div.col-sm-5
-              input.form-control(type='password',v-model.trim='password',autoComplete='new-password')
+              input.form-control(type='password',v-model.trim='password',autoComplete='off')
           div.form-group(:class='{"has-error": errors.display}',:title='errors.display')
             label.control-label.col-sm-4 Display Name:
             div.col-sm-5
@@ -80,6 +80,10 @@ module.exports = {
   methods: {
     show: function(tenant) {
       this.tenant = tenant;
+      this.user = '';
+      this.password = '';
+      this.display = '';
+      this.role = 'admin';
       $(this.$el).modal('show');
     },
     handleOk: function() {
