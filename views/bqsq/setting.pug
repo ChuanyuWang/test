@@ -16,6 +16,7 @@ append js
   else
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
+  script(src=CDN_FILES.bootstrap_table_vue)
   script(src='/js/setting.js')
 
 block page
@@ -39,17 +40,7 @@ block page
       div.tab-pane(role="tabpanel",id="teacher")
         div#teacher-setting
       div.tab-pane.active(role="tabpanel",id="classroom")
-        div#toolbar.btn-group(role='group')
-          button.btn.btn-success(type='button',data-toggle='modal',data-target='#clsroom_dlg', data-action='add') 添加
-        table#classroom_table(data-checkbox-header='false',data-striped='true',data-unique-id="id",data-show-refresh='true',data-toolbar='#toolbar')
-          thead
-            tr
-              th(data-field='id',data-sortable='true') 教室ID
-              th(data-field='name') 教室名字
-              th(data-field='visibility') 内部教室*
-              th(data-title='操作',data-align='center')
-        p.small(style='margin-top:14px') 
-          |*内部教室不对外开放，会员在自助预约时无法选择内部教室
+        div#classroom-setting
       div.tab-pane(role="tabpanel",id="entry")
         div.page-header(style='margin-top:0')
           h3 微信入口Url
@@ -77,30 +68,3 @@ block page
             div.col-sm-10
               p.form-control-static= baseUrl + '/myReadBooks'
               span.help-block 我的阅读入口，访问用户可以根据注册信息查看所有历史课程中使用的绘本，包括书名和授课老师。
-  div#clsroom_dlg.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
-    div.modal-dialog(role="document")
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4.modal-title 添加教室
-        div.modal-body
-          form.form-horizontal
-            div.form-group
-              label.control-label.col-sm-2(for='classroom_id') 教室ID:
-              div.col-sm-10
-                input#classroom_id.form-control(type='text',name='id',placeholder='英文字母或数字')
-            div.form-group
-              label.control-label.col-sm-2(for='classroom_name') 教室名字:
-              div.col-sm-10
-                input#classroom_name.form-control(type='text',name='name',placeholder='教室名字')
-              div.col-sm-offset-2.col-sm-10
-                div.checkbox
-                  label
-                    input(type='checkbox',name='visibility',value='internal')
-                    |内部教室*
-        div.modal-footer
-          p.small(style='color:#777;float:left;margin-top:7px') *内部教室不对外开放，会员在自助预约时无法选择内部教室
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_room.btn.btn-success(type="button") 添加
-          button#edit_room.btn.btn-primary(type="button") 修改
