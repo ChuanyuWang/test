@@ -241,9 +241,6 @@ router.post('/:courseID/classes', function(req, res, next) {
     });
 });
 
-/// Below APIs are only visible to authenticated users with 'admin' role
-router.use(helper.requireRole("admin"));
-
 router.post('/', function(req, res, next) {
     if (!req.body.hasOwnProperty('name')) {
         var error = new Error("Missing param 'name'");
@@ -265,6 +262,9 @@ router.post('/', function(req, res, next) {
         }
     });
 });
+
+/// Below APIs are only visible to authenticated users with 'admin' role
+router.use(helper.requireRole("admin"));
 
 router.patch('/:courseID', function(req, res, next) {
     var courses = req.db.collection("courses");

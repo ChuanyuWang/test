@@ -68,7 +68,7 @@ module.exports = {
         { name: "修改会员卡", role: "admin" },
 
         { name: "查看班级", role: "user" },
-        { name: "添加班级", role: "admin" },
+        { name: "添加班级", role: "user" },
         { name: "删除班级", role: "admin" },
         { name: "修改班级", role: "admin" },
         { name: "添加班级成员", role: "user" },
