@@ -31,15 +31,7 @@ div.detail-teacher-border(style='min-height:300px')
     div.form-group
       label.control-label.col-sm-2 {{$t('history_teacher')}}:
       div.col-sm-10
-        table.history(data-striped='true',data-sort-name='date',data-sort-order='desc',data-pagination='true',data-page-size='10',data-unique-id="_id")
-          thead
-            tr
-              //th(data-field='_id',data-visible='false') ID
-              th(data-field='name') 课程名称
-              th(data-field='cost') 课时
-              th(data-field='booking') 人数
-              th(data-field='date',data-sortable='true') 课程日期
-              th(data-field='books') 绘本
+        bootstrap-table(ref='historyTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -57,31 +49,66 @@ module.exports = {
     data: Object // teacher object
   },
   data: function() {
+    var settings = common.getTenantSetting();
     return {
       item: jQuery.extend(true, {}, this.data || {}),
-      setting: common.getTenantSetting()
+      setting: settings,
+      columns: [
+        {
+          field: "name",
+          title: "课程名称",
+          formatter: this.linkNameFormatter
+        },
+        {
+          field: "cost",
+          title: "课时",
+        },
+        {
+          field: "booking",
+          title: "人数",
+          formatter: this.quantityFormatter
+        },
+        {
+          field: "date",
+          title: "课程日期",
+          sortable: true,
+          formatter: common.dateFormatter
+        },
+        {
+          field: "books",
+          title: "绘本",
+          visible: settings.feature == 'book',
+          formatter: this.booksFormatter
+        }
+      ],
+      options: {
+        locale: "zh-CN",
+        striped: true,
+        uniqueId: "_id",
+        sortName: "date",
+        sortOrder: "desc",
+        pagination: true,
+        pageSize: 10
+      }
     };
   },
   components: {
-    "date-picker": date_picker
+    "date-picker": date_picker,
+    "BootstrapTable": BootstrapTable
   },
   watch: {
     data: function(value) {
       this.item = jQuery.extend(true, {}, value || {});
       if (this.item._id) {
-        $(this.$el)
-          .find("table.history")
-          .bootstrapTable("refresh", {
-            url: "/api/classes",
-            query: {
-              teacher: this.item._id,
-              order: "desc"
-            }
-          });
+        this.$refs.historyTable.refresh({
+          url: "/api/classes",
+          query: {
+            teacher: this.item._id,
+            order: "desc"
+          }
+        });
       } else {
-        $(this.$el)
-          .find("table.history")
-          .bootstrapTable("removeAll");
+        this.$refs.historyTable.removeAll();
       }
     }
   },
@@ -177,29 +204,7 @@ module.exports = {
       }
     }
   },
-  mounted: function() {
-    $(this.$el)
-      .find("table.history")
-      .bootstrapTable({
-        locale: "zh-CN",
-        columns: [
-          {
-            formatter: this.linkNameFormatter
-          },
-          {},
-          {
-            formatter: this.quantityFormatter
-          },
-          {
-            formatter: common.dateFormatter
-          },
-          {
-            visible: this.setting.feature == 'book',
-            formatter: this.booksFormatter
-          }
-        ]
-      });
-  }
+  mounted: function() { }
 };
 </script>
 
