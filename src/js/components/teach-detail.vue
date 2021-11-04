@@ -31,6 +31,11 @@ div.detail-teacher-border(style='min-height:300px')
     div.form-group
       label.control-label.col-sm-2 {{$t('history_teacher')}}:
       div.col-sm-10
+        div#history_toolbar
+          select.form-control(v-model='timeFilter',@change='refreshHistory')
+            option(value='this_month') {{$t('this_month')}}
+            option(value='last_month') {{$t('last_month')}}
+            option(value='') {{$t('all')}}
         bootstrap-table(ref='historyTable',:columns='columns',:options='options')
 </template>
 
@@ -53,6 +58,7 @@ module.exports = {
     return {
       item: jQuery.extend(true, {}, this.data || {}),
       setting: settings,
+      timeFilter: "this_month",
       columns: [
         {
           field: "name",
@@ -76,7 +82,7 @@ module.exports = {
         },
         {
           field: "books",
-          title: "绘本",
+          title: this.$t("book"),
           visible: settings.feature == 'book',
           formatter: this.booksFormatter
         }
@@ -84,6 +90,8 @@ module.exports = {
       options: {
         locale: "zh-CN",
         striped: true,
+        toolbar: "#history_toolbar",
+        toolbarAlign: "right",
         uniqueId: "_id",
         sortName: "date",
         sortOrder: "desc",
@@ -100,13 +108,7 @@ module.exports = {
     data: function(value) {
       this.item = jQuery.extend(true, {}, value || {});
       if (this.item._id) {
-        this.$refs.historyTable.refresh({
-          url: "/api/classes",
-          query: {
-            teacher: this.item._id,
-            order: "desc"
-          }
-        });
+        this.refreshHistory();
       } else {
         this.$refs.historyTable.removeAll();
       }
@@ -134,18 +136,38 @@ module.exports = {
         return this.item.status === "deleted";
       }
       return false;
+    },
+    from: function() {
+      switch (this.timeFilter) {
+        case 'this_month':
+          return moment().startOf('month');
+        case 'last_month':
+          return moment().subtract(1, 'months').startOf('month');
+        default:
+          return null;
+      }
     }
   },
   filters: {},
   methods: {
+    refreshHistory: function() {
+      this.$refs.historyTable.refresh({
+        url: "/api/classes",
+        query: {
+          teacher: this.item._id,
+          order: "desc",
+          from: this.from && this.from.toISOString() || undefined,
+          to: this.from && this.from.add(1, "months").toISOString() || undefined
+        }
+      });
+    },
     saveBasicInfo: function() {
       var res = {
         name: this.item.name,
         //gender: this.item.gender,
         status: this.item.status,
         contact: this.item.contact || "",
-        birthday:
-          this.item.birthday && moment(this.item.birthday).toISOString(),
+        birthday: this.item.birthday && moment(this.item.birthday).toISOString(),
         note: this.item.note || ""
       };
       if (this.item._id) {
