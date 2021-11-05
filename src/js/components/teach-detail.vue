@@ -32,11 +32,14 @@ div.detail-teacher-border(style='min-height:300px')
       label.control-label.col-sm-2 {{$t('history_teacher')}}:
       div.col-sm-10
         div#history_toolbar
-          select.form-control(v-model='timeFilter',@change='refreshHistory')
-            option(value='this_month') {{$t('this_month')}}
-            option(value='last_month') {{$t('last_month')}}
-            option(value='') {{$t('all')}}
-        bootstrap-table(ref='historyTable',:columns='columns',:options='options')
+          form.form-inline
+            div.form-group(style='margin-right:0')
+              span(style='margin-right:7px',data-toggle="tooltip",data-placement="right",title="不含缺席学员课时") 共计完成{{totalCost}}课时
+              select.form-control(v-model='timeFilter',@change='refreshHistory')
+                option(value='this_month') {{$t('this_month')}}
+                option(value='last_month') {{$t('last_month')}}
+                option(value='') {{$t('all')}}
+        bootstrap-table(ref='historyTable',:columns='columns',:options='options',@onLoadSuccess="calculateTotal")
 </template>
 
 <script>
@@ -59,6 +62,7 @@ module.exports = {
       item: jQuery.extend(true, {}, this.data || {}),
       setting: settings,
       timeFilter: "this_month",
+      totalCost: 0,
       columns: [
         {
           field: "name",
@@ -160,6 +164,24 @@ module.exports = {
           to: this.from && this.from.add(1, "months").toISOString() || undefined
         }
       });
+    },
+    calculateTotal: function(data, status, jqXHR) {
+      console.log(data);
+      var total = 0;
+      data = data || [];
+      var now = moment();
+      for (var i = 0; i < data.length; i++) {
+        var cls = data[i];
+        // don't include not started classes
+        if (moment(cls.date).isBefore(now)) {
+          var booking = cls.booking || [];
+          booking.forEach(function(member) {
+            // don't include absent members
+            if (member.status !== "absent") total += member.quantity * cls.cost;
+          });
+        }
+      }
+      this.totalCost = total;
     },
     saveBasicInfo: function() {
       var res = {
