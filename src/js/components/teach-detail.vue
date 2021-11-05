@@ -166,7 +166,6 @@ module.exports = {
       });
     },
     calculateTotal: function(data, status, jqXHR) {
-      console.log(data);
       var total = 0;
       data = data || [];
       var now = moment();
