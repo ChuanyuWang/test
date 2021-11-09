@@ -6,6 +6,8 @@ div
     li(role='presentation')
       a(href="#opportunity",role='tab',data-toggle='tab') {{$t('opportunity')}}
     li(role='presentation')
+      a(href="#teacher",role='tab',data-toggle='tab') {{$t('teacher')}}
+    li(role='presentation')
       a(href="#analytics",role='tab',data-toggle='tab') {{$t('consume')}}
     li(role='presentation')
       a(href="#hint",role='tab',data-toggle='tab') {{$t('passive_title')}}
@@ -14,6 +16,8 @@ div
       checkin-tab
     div.tab-pane(role="tabpanel",id="opportunity")
       opportunity-tab
+    div.tab-pane(role="tabpanel",id="teacher")
+      teacher-tab
     div.tab-pane(role="tabpanel",id="analytics")
       consume-tab(ref='consumeChart')
     div.tab-pane(role="tabpanel",id="hint")
@@ -28,6 +32,7 @@ div
  */
 
 var checkinTab = require("./checkin-tab.vue").default;
+var teacherTab = require("./teacher-tab.vue").default;
 var opportunityTab = require("./opportunity-tab.vue").default;
 var consumeTab = require("./consume-tab.vue").default;
 var passiveTab = require("./passive-tab.vue").default;
@@ -41,6 +46,7 @@ module.exports = {
   watch: {},
   components: {
     "checkin-tab": checkinTab,
+    "teacher-tab": teacherTab,
     "opportunity-tab": opportunityTab,
     "consume-tab": consumeTab,
     "passive-tab": passiveTab,

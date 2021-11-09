@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
+const db_utils = require('../../server/databaseManager');
 
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
@@ -45,13 +46,13 @@ router.get('/consumption', function(req, res, next) {
                 $year: "$date"
             },
             totalCost: {
-                '$multiply': [{$ifNull: ["$cost", 0]}, {$ifNull: ["$booking.quantity", 1]}]
+                '$multiply': [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
             }
         }
     }, {
         $group: {
             _id: "$" + unit, // group the data according to unit (month or week or year)
-            
+
             // The only working solution is from below link, it looks like a hack
             // https://stackoverflow.com/questions/25497150/mongodb-aggregate-by-field-exists
             //_id: {unit: "$" + unit, isCourse: {$gt:["$courseID", null]}}, 
@@ -98,7 +99,7 @@ router.get('/deposit', function(req, res, next) {
         $match: {
             "history.date": {
                 $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
-                $lt: unit === 'year' ? new Date(9999, 0) :new Date(year + 1, 0)
+                $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
             },
             "history.target": "membership.0.credit"
         }
@@ -114,7 +115,7 @@ router.get('/deposit', function(req, res, next) {
                 $year: "$history.date"
             },
             delta: {
-                '$subtract': [{ $ifNull: [ '$history.new', 0 ] }, { $ifNull: [ '$history.old', 0 ] }]
+                '$subtract': [{ $ifNull: ['$history.new', 0] }, { $ifNull: ['$history.old', 0] }]
             }
         }
     }, {
@@ -163,54 +164,54 @@ router.get('/passive', function(req, res, next) {
     }
 
     var members = req.db.collection("members");
-    members.find(queryValidMembers, { name: 1, contact: 1, membership: 1 ,since: 1}, 
-      function(err, users) {
-        if (err) {
-            var error = new Error("find members fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("find effective members: ", users ? users.length : 0);
-        var memberList = users.map(function(value, index, array) {
-            return value._id;
-        });
+    members.find(queryValidMembers, { name: 1, contact: 1, membership: 1, since: 1 },
+        function(err, users) {
+            if (err) {
+                var error = new Error("find members fails");
+                error.innerError = err;
+                return next(error);
+            }
+            console.log("find effective members: ", users ? users.length : 0);
+            var memberList = users.map(function(value, index, array) {
+                return value._id;
+            });
 
-        var classes = req.db.collection("classes");
-        classes.aggregate([{
-            $match: {
-                "booking.0": { // array size >= 1
-                    $exists: true
-                },
-                "date": {
-                    $gte: begin
-                },
-                "cost": {
-                    $gte: 0
+            var classes = req.db.collection("classes");
+            classes.aggregate([{
+                $match: {
+                    "booking.0": { // array size >= 1
+                        $exists: true
+                    },
+                    "date": {
+                        $gte: begin
+                    },
+                    "cost": {
+                        $gte: 0
+                    }
                 }
-            }
-        }, {
-            $unwind: "$booking"
-        }, {
-            $match: {
-                "booking.member": {
-                    $in : memberList
-                },
-                "booking.status": {
-                    $eq: "checkin"
+            }, {
+                $unwind: "$booking"
+            }, {
+                $match: {
+                    "booking.member": {
+                        $in: memberList
+                    },
+                    "booking.status": {
+                        $eq: "checkin"
+                    }
                 }
-            }
-        }, {
-            $group: {
-                _id: "$booking.member", // group the data according to unit (month or week)
-                last: {
-                    $max: "$date"
+            }, {
+                $group: {
+                    _id: "$booking.member", // group the data according to unit (month or week)
+                    last: {
+                        $max: "$date"
+                    }
                 }
-            }
-        }, {
-            $sort: {
-                "last": -1 // have to sort the class by its date, from old to new
-            }
-        }/*, {
+            }, {
+                $sort: {
+                    "last": -1 // have to sort the class by its date, from old to new
+                }
+            }/*, {
             $limit : 20
         }, {
             $lookup: {
@@ -220,16 +221,81 @@ router.get('/passive', function(req, res, next) {
                 as: "member"
             }
         }*/], function(err, docs) {
-            if (err) {
-                var error = new Error("analyze passive fails");
-                error.innerError = err;
-                next(error);
-                return;
-            }
-            console.log("analyze passive: ", docs ? docs.length : 0);
-            res.json({lastBook: docs, effectiveMembers: users});
+                if (err) {
+                    var error = new Error("analyze passive fails");
+                    error.innerError = err;
+                    next(error);
+                    return;
+                }
+                console.log("analyze passive: ", docs ? docs.length : 0);
+                res.json({ lastBook: docs, effectiveMembers: users });
+            });
         });
-    });
+});
+
+router.get("/teacherAnalysis", async function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
+    let month, classes;
+    if (req.query.hasOwnProperty("targetMonth")) {
+        month = new Date(req.query.targetMonth);
+    }
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        classes = tenantDB.collection("classes");
+    } catch (error) {
+        return next(error);
+    }
+
+    // build query for match
+    let query = {
+        // query classes within target month
+        date: {
+            $gte: new Date(month),
+            $lt: new Date(month.setMonth(month.getMonth() + 1))
+        }
+    };
+
+    // build pipelines for aggregate()
+    let pipelines = [{
+        $match: query
+    }, {
+        $project: {
+            cost: 1,
+            teacher: 1,
+            booking: 1
+        }
+    }, {
+        $unwind: "$booking"
+    }, {
+        $group: {
+            _id: "$teacher",
+            total: {
+                $sum: {
+                    $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
+                }
+            },
+            absent: {
+                $sum: {
+                    $cond: [{ $eq: ["$booking.status", "absent"] }, { $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }] }, 0]
+                }
+            }
+        }
+    }];
+
+    try {
+        let docs = await classes.aggregate(pipelines).toArray();
+        console.log(`find ${docs.length} teachers with their deliver cost`);
+        return res.json(docs);
+    } catch (error) {
+        let err = new Error("Analysis teacher fails");
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 module.exports = router;
