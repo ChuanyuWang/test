@@ -181,7 +181,7 @@ module.exports = {
         }
       }
       // A better way of 'toFixed(1)'
-      this.totalCost = Math.round(total * 10) / 10;;
+      this.totalCost = Math.round(total * 10) / 10;
     },
     saveBasicInfo: function() {
       var res = {
