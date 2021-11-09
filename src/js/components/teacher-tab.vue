@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  div#teacher_toolbar(style='line-height:1.5;display:inline-block')
+  div#teacher_toolbar
     form.form-inline
       div.form-group(style='margin-right:0')
         label(style='margin:0 3px') {{$t('time')}}:
