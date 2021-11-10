@@ -257,7 +257,8 @@ router.get("/teacherAnalysis", async function(req, res, next) {
         date: {
             $gte: new Date(month),
             $lt: new Date(month.setMonth(month.getMonth() + 1))
-        }
+        },
+        "booking.0": { $exists: true },
     };
 
     // build pipelines for aggregate()
