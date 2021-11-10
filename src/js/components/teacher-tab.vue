@@ -47,6 +47,11 @@ module.exports = {
           sortable: false,
           formatter: this.statusFormatter
         }, {
+          field: "counter",
+          title: "完成课节",
+          sortable: false,
+          formatter: this.counterFormatter
+        }, {
           title: "实际完成课时",
           sortable: false,
           formatter: this.actualFormatter
@@ -101,6 +106,9 @@ module.exports = {
       this.$refs.checkinTable.refresh({
         url: "/api/analytics/teacherAnalysis",
       });
+    },
+    counterFormatter: function(value, row, index) {
+      return (value || []).length;
     },
     nameFormatter: function(value, row, index) {
       return value ? this.teachers[value].name : "<未指定>";

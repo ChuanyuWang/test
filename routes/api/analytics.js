@@ -283,7 +283,8 @@ router.get("/teacherAnalysis", async function(req, res, next) {
                 $sum: {
                     $cond: [{ $eq: ["$booking.status", "absent"] }, { $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }] }, 0]
                 }
-            }
+            },
+            counter: { $addToSet: "$_id" }
         }
     }];
 
