@@ -49,7 +49,7 @@ form.form-horizontal
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('./date-picker.vue').default;
+var date_picker = require('../../components/date-picker.vue').default;
 
 module.exports = {
   components: {

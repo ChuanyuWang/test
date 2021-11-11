@@ -4,12 +4,12 @@
  * --------------------------------------------------------------------------
  */
 
-var cardComp = require('./components/card.vue').default;
-var date_picker = require('./components/date-picker.vue').default;
-var comment_dlg = require('./components/comment-modal.vue').default;
-var common = require('./common');
-var memberService = require('./services/members');
-var class_service = require('./services/classes');
+var cardComp = require('./card.vue').default;
+var date_picker = require('../../components/date-picker.vue').default;
+var comment_dlg = require('./comment-modal.vue').default;
+var common = require('../../common/common');
+var memberService = require('../../services/members');
+var class_service = require('../../services/classes');
 
 var viewData = {
     memberData: {
