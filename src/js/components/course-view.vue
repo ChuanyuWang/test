@@ -118,7 +118,7 @@ var course_service = require("../services/courses");
 var add_multi_class_modal = require("./add-multi-class-modal.vue").default;
 var view_member_course_modal = require("./view-member-course-modal.vue").default;
 var show_booking_result_modal = require("./show-booking-result-modal.vue").default;
-var member_select_modal = require("./member-select-modal.vue").default;
+var member_select_modal = require("../../components/member-select-modal.vue").default;
 var confirm_delete_modal = require("./confirm-delete-course.vue").default;
 
 module.exports = {

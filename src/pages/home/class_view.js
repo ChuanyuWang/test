@@ -5,9 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('./locales/i18nextplugin');
-var class_service = require('./services/classes');
-var classView = require('./components/class-view.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var class_service = require('../../services/classes');
+var classView = require('./class-view.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

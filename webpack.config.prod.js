@@ -19,7 +19,7 @@ module.exports = {
         style: './js/style.js',
         // Multi Page Application
         main: './pages/home/main.js',
-        class_view: './js/class_view.js',
+        class_view: './pages/home/class_view.js',
         member: './pages/members/member.js',
         member_view: './pages/members/member_view.js',
         booking: './js/booking.js',
