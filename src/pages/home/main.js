@@ -3,8 +3,8 @@
  * main.js Home page main entry module
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var calendar = require('./components/class-calendar.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var calendar = require('./class-calendar.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

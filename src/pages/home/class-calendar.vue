@@ -36,8 +36,8 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var class_service = require("../services/classes");
+var common = require("../../common/common");
+var class_service = require("../../services/classes");
 
 // Get the Monday of specific date, each week starts from Monday
 function getMonday(date) {
@@ -63,7 +63,7 @@ module.exports = {
   name: "app",
   components: {
     'notification': require("./notification.vue").default,
-    "date-picker": require("./date-picker.vue").default,
+    "date-picker": require("../../components/date-picker.vue").default,
     "class-list": require("./class-list.vue").default,
     "create-class-modal": require("./create-class-modal.vue").default
   },

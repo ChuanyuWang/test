@@ -45,7 +45,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('./date-picker.vue').default;
+var date_picker = require('../../components/date-picker.vue').default;
 
 module.exports = {
   components: {

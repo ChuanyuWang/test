@@ -18,7 +18,7 @@ module.exports = {
         // dummy style entry to compile less file to css file
         style: './js/style.js',
         // Multi Page Application
-        main: './js/main.js',
+        main: './pages/home/main.js',
         class_view: './js/class_view.js',
         member: './js/member.js',
         member_view: './js/member_view.js',
@@ -117,7 +117,8 @@ module.exports = {
             {
                 test: /\.less$/,
                 include: [
-                    path.resolve(__dirname, "src/js")
+                    path.resolve(__dirname, "src/js"),
+                    path.resolve(__dirname, "src/pages")
                 ],
                 use: [
                     'vue-style-loader',
