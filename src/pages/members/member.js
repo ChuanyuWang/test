@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var common = require('./common');
+var common = require('../../common/common');
 
 // DOM Ready =============================================================
 $(document).ready(function() {

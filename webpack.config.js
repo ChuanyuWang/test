@@ -19,7 +19,7 @@ module.exports = {
         // Multi Page Application
         main: ['./pages/home/main.js', hotMiddlewareScript],
         class_view: ['./js/class_view.js', hotMiddlewareScript],
-        member: ['./js/member.js', hotMiddlewareScript],
+        member: ['./pages/members/member.js', hotMiddlewareScript],
         member_view: ['./js/member_view.js', hotMiddlewareScript],
         booking: ['./js/booking.js', hotMiddlewareScript],
         mybooking: ['./js/mybooking.js', hotMiddlewareScript],
