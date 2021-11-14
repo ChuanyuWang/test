@@ -35,8 +35,8 @@ div
  * --------------------------------------------------------------------------
  */
 
-var util = require('../services/util');
-var modalDialog = require("./modal-dialog.vue").default;
+var util = require('../../services/util');
+var modalDialog = require("../../components/modal-dialog.vue").default;
 
 module.exports = {
   name: "classroom-setting",

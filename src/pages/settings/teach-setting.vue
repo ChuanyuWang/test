@@ -13,7 +13,7 @@ div.row
 
 var teacher_list = require("./teach-list.vue").default;
 var teacher_detail = require("./teach-detail.vue").default;
-var teacher_service = require("../services/teachers");
+var teacher_service = require("../../services/teachers");
 
 module.exports = {
   name: "teacher-setting",

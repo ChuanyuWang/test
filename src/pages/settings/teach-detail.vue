@@ -49,8 +49,8 @@ div.detail-teacher-border(style='min-height:300px')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require("./date-picker.vue").default;
-var common = require("../common");
+var date_picker = require("../../components/date-picker.vue").default;
+var common = require("../../common/common");
 
 module.exports = {
   props: {

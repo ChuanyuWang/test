@@ -3,11 +3,11 @@
  * setting.js setting page main entry module
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var teach_setting = require('./components/teach-setting.vue').default;
-var users_setting = require('./components/users-setting.vue').default;
-var general_setting = require('./components/general-setting.vue').default;
-var classroom_setting = require('./components/classrooms.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var teach_setting = require('./teach-setting.vue').default;
+var users_setting = require('./users-setting.vue').default;
+var general_setting = require('./general-setting.vue').default;
+var classroom_setting = require('./classrooms.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

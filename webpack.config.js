@@ -28,7 +28,7 @@ module.exports = {
         portal: ['./js/mobileportal.js', hotMiddlewareScript],
         course: ['./pages/course/course.js', hotMiddlewareScript],
         course_view: ['./pages/course/course_view.js', hotMiddlewareScript],
-        setting: ['./js/setting.js', hotMiddlewareScript],
+        setting: ['./pages/settings/setting.js', hotMiddlewareScript],
         statistics: ['./js/statistics.js', hotMiddlewareScript],
         admin: ['./pages/admin/admin.js', hotMiddlewareScript]
     },

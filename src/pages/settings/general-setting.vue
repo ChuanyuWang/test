@@ -45,7 +45,7 @@ div(style='padding:7px')
  * --------------------------------------------------------------------------
  */
 
-var util = require("../services/util");
+var util = require("../../services/util");
 
 module.exports = {
   name: "general-setting",

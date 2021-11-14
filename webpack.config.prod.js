@@ -29,7 +29,7 @@ module.exports = {
         portal: './js/mobileportal.js',
         course: './pages/course/course.js',
         course_view: './pages/course/course_view.js',
-        setting: './js/setting.js',
+        setting: './pages/settings/setting.js',
         statistics: './js/statistics.js',
         admin: './pages/admin/admin.js'
     },
