@@ -16,7 +16,7 @@ module.exports = {
     context: path.resolve(__dirname, 'src'),
     entry: {
         // dummy style entry to compile less file to css file
-        style: './js/style.js',
+        style: './pages/style.js',
         // Multi Page Application
         main: './pages/home/main.js',
         class_view: './pages/home/class_view.js',
