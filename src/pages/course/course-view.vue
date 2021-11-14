@@ -113,8 +113,8 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var util = require('../common.js');
-var course_service = require("../services/courses");
+var util = require('../../common/common.js');
+var course_service = require("../../services/courses");
 var add_multi_class_modal = require("./add-multi-class-modal.vue").default;
 var view_member_course_modal = require("./view-member-course-modal.vue").default;
 var show_booking_result_modal = require("./show-booking-result-modal.vue").default;

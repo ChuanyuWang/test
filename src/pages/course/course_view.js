@@ -4,9 +4,9 @@
  * Entry module of view course page
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var course_service = require("./services/courses");
-var courseView = require('./components/course-view.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var course_service = require("../../services/courses");
+var courseView = require('./course-view.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

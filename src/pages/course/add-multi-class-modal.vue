@@ -59,8 +59,8 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('./date-picker.vue').default;
-var teacher_service = require('../services/teachers');
+var date_picker = require('../../components/date-picker.vue').default;
+var teacher_service = require('../../services/teachers');
 
 module.exports = {
   components: {
