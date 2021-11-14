@@ -31,7 +31,7 @@ module.exports = {
         course_view: './js/course_view.js',
         setting: './js/setting.js',
         statistics: './js/statistics.js',
-        admin: './js/admin.js'
+        admin: './pages/admin/admin.js'
     },
 
     output: {

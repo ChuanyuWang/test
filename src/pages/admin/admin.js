@@ -4,8 +4,8 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('./locales/i18nextplugin');
-var adminConsole = require('./components/admin-console.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var adminConsole = require('./admin-console.vue').default;
 
 // DOM Ready =============================================================
 $(function() {
