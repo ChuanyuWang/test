@@ -3,8 +3,8 @@
  * portal.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var portal_app = require('./components/portal.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var portal_app = require('./portal.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

@@ -26,7 +26,7 @@ module.exports = {
         mybooking: './pages/booking/mybooking.js',
         myreadbooks: './pages/mybooks/mybooks.js',
         trial: './pages/trial/trial.js',
-        portal: './js/mobileportal.js',
+        portal: './pages/app/mobileportal.js',
         course: './pages/course/course.js',
         course_view: './pages/course/course_view.js',
         setting: './pages/settings/setting.js',
