@@ -23,7 +23,7 @@ module.exports = {
         member_view: ['./pages/members/member_view.js', hotMiddlewareScript],
         booking: ['./pages/booking/booking.js', hotMiddlewareScript],
         mybooking: ['./pages/booking/mybooking.js', hotMiddlewareScript],
-        myreadbooks: ['./js/mybooks.js', hotMiddlewareScript],
+        myreadbooks: ['./pages/mybooks/mybooks.js', hotMiddlewareScript],
         trial: ['./pages/trial/trial.js', hotMiddlewareScript],
         portal: ['./js/mobileportal.js', hotMiddlewareScript],
         course: ['./pages/course/course.js', hotMiddlewareScript],

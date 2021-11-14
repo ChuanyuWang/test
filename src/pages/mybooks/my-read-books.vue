@@ -49,9 +49,9 @@ div.container(style='padding-left:7px;padding-right:7px')
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var teachersService = require("../services/teachers");
-var modalDialog = require("./modal-dialog.vue").default;
+var common = require("../../common/common");
+var teachersService = require("../../services/teachers");
+var modalDialog = require("../../components/modal-dialog.vue").default;
 
 module.exports = {
   name: "my-read-books",

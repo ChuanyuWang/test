@@ -3,8 +3,8 @@
  * mybooks.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var books_app = require('./components/my-read-books.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var books_app = require('./my-read-books.vue').default;
 // open id of Weichat user
 //var _openid = undefined;
 
