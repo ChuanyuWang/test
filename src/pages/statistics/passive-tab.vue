@@ -14,7 +14,7 @@ div
  * --------------------------------------------------------------------------
  */
 
-var util = require("../services/util");
+var util = require("../../services/util");
 
 module.exports = {
   name: "passive-tab",

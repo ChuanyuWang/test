@@ -24,8 +24,8 @@ div
  * --------------------------------------------------------------------------
  */
 
-var util = require('../services/util');
-var date_picker = require('./date-picker.vue').default;
+var util = require('../../services/util');
+var date_picker = require('../../components/date-picker.vue').default;
 
 module.exports = {
   name: "consume-tab",

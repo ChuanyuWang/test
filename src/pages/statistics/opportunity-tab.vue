@@ -11,7 +11,7 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
+var common = require("../../common/common");
 
 module.exports = {
   name: "opportunity-tab",

@@ -3,8 +3,8 @@
  * statistics.js page main entry module
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var statisticsPage = require('./components/statistics-page.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var statisticsPage = require('./statistics-page.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

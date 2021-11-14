@@ -35,8 +35,8 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var class_service = require("../services/classes");
+var common = require("../../common/common");
+var class_service = require("../../services/classes");
 
 module.exports = {
   name: "checkin-tab",

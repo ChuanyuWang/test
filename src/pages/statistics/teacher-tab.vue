@@ -15,9 +15,9 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var date_picker = require('./date-picker.vue').default;
-var teacher_service = require("../services/teachers");
+var common = require("../../common/common");
+var date_picker = require('../../components/date-picker.vue').default;
+var teacher_service = require("../../services/teachers");
 
 module.exports = {
   name: "teacher-tab",
