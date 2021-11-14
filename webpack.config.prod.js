@@ -23,7 +23,7 @@ module.exports = {
         member: './pages/members/member.js',
         member_view: './pages/members/member_view.js',
         booking: './pages/booking/booking.js',
-        mybooking: './js/mybooking.js',
+        mybooking: './pages/booking/mybooking.js',
         myreadbooks: './js/mybooks.js',
         trial: './pages/trial/trial.js',
         portal: './js/mobileportal.js',

@@ -3,8 +3,8 @@
  * mybooking.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('./locales/i18nextplugin');
-var mybooking_app = require('./components/my-booking.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var mybooking_app = require('./my-booking.vue').default;
 
 // open id of Weichat user
 //var _openid = undefined;
