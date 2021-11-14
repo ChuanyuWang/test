@@ -21,7 +21,8 @@ module.exports.checkTenantUser = function(req, res, next) {
         req.flash('error', '用户未登录或连接超时');
         res.redirect('/');
     } else if (req.user.tenant != req.tenant.name) {
-        res.redirect('/t/' + req.user.tenant + '/home');
+        if (req.user.tenant == 'admin') res.redirect('/admin/home');
+        else res.redirect('/t/' + req.user.tenant + '/home');
     } else {
         next();
     }
