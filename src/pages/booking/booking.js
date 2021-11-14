@@ -4,9 +4,9 @@
  * --------------------------------------------------------------------------
  */
 
-var common = require('./common');
-var i18nextplugin = require('./locales/i18nextplugin');
-var booking_app = require('./components/booking.vue').default;
+var common = require('../../common/common');
+var i18nextplugin = require('../../locales/i18nextplugin');
+var booking_app = require('./booking.vue').default;
 
 // open id of Weichat user
 var _openid = undefined; // eslint-disable-line

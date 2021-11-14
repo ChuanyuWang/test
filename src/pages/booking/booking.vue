@@ -92,9 +92,9 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var class_service = require("../services/classes");
-var modalDialog = require("./modal-dialog.vue").default;
+var common = require("../../common/common");
+var class_service = require("../../services/classes");
+var modalDialog = require("../../components/modal-dialog.vue").default;
 
 module.exports = {
   name: "booking-app",

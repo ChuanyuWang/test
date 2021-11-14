@@ -22,7 +22,7 @@ module.exports = {
         class_view: './pages/home/class_view.js',
         member: './pages/members/member.js',
         member_view: './pages/members/member_view.js',
-        booking: './js/booking.js',
+        booking: './pages/booking/booking.js',
         mybooking: './js/mybooking.js',
         myreadbooks: './js/mybooks.js',
         trial: './js/trial.js',
