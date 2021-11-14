@@ -4,8 +4,8 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('./locales/i18nextplugin');
-var trial_app = require('./components/trial.vue').default;
+var i18nextplugin = require('../../locales/i18nextplugin');
+var trial_app = require('./trial.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

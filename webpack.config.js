@@ -24,7 +24,7 @@ module.exports = {
         booking: ['./pages/booking/booking.js', hotMiddlewareScript],
         mybooking: ['./js/mybooking.js', hotMiddlewareScript],
         myreadbooks: ['./js/mybooks.js', hotMiddlewareScript],
-        trial: ['./js/trial.js', hotMiddlewareScript],
+        trial: ['./pages/trial/trial.js', hotMiddlewareScript],
         portal: ['./js/mobileportal.js', hotMiddlewareScript],
         course: ['./pages/course/course.js', hotMiddlewareScript],
         course_view: ['./pages/course/course_view.js', hotMiddlewareScript],

@@ -62,8 +62,8 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var common = require("../common");
-var modalDialog = require("./modal-dialog.vue").default;
+var common = require("../../common/common");
+var modalDialog = require("../../components/modal-dialog.vue").default;
 
 module.exports = {
   name: "users-setting",
