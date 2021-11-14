@@ -4,9 +4,9 @@
  * --------------------------------------------------------------------------
  */
 
-var common = require('./common');
-var util = require('./services/util');
-var course_service = require('./services/courses');
+var common = require('../../common/common');
+var util = require('../../services/util');
+var course_service = require('../../services/courses');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
