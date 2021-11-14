@@ -117,7 +117,6 @@ module.exports = {
             {
                 test: /\.less$/,
                 include: [
-                    path.resolve(__dirname, "src/js"),
                     path.resolve(__dirname, "src/pages")
                 ],
                 use: [
