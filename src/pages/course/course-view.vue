@@ -11,7 +11,7 @@ div.container
     button.btn.btn-danger(type='button',style='float:right',:disabled='!course._id',@click='$refs.confirmDlg.show()') 删除班级
   form.form-horizontal
     div.form-group
-      label.col-sm-2.control-label 状态:
+      label.col-sm-2.control-label {{$t('status')}}:
       select.col-sm-5.form-control(v-model='course.status',@change='closeAlert',style='margin-left:15px;width:auto')
         option.text-success(value='active') 进行中
         option.text-danger(value='closed') 结束
@@ -32,7 +32,7 @@ div.container
         textarea.form-control(rows='3', v-model.trim='course.remark',style='resize:vertical;min-height:70px')
     div.form-group
       div.col-sm-offset-2.col-sm-10
-        button.btn.btn-success(type='button',:disabled='!course._id || hasError',v-on:click='saveBasicInfo') 保存
+        button.btn.btn-success(type='button',:disabled='!course._id || hasError',v-on:click='saveBasicInfo') {{$t('save')}}
   div.page-header
     h3 成员
   form.form-horizontal
