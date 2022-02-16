@@ -44,20 +44,20 @@ module.exports = {
      * 8. https://www.staticaly.com
      */
     cdnlibs: {
-        jquery: 'https://cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js',
-        jquery_dev: 'https://cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.js',
-        bootstrap: 'https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
-        bootstrap_css: 'https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
-        bootstrap_dev: 'https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.js',
-        momentjs: 'https://cdn.bootcdn.net/ajax/libs/moment.js/2.22.1/moment-with-locales.min.js',
-        momentjs_dev: 'https://cdn.bootcdn.net/ajax/libs/moment.js/2.22.1/moment-with-locales.js',
+        jquery: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.4.1/jquery.min.js',
+        jquery_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.4.1/jquery.js',
+        bootstrap: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
+        bootstrap_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
+        bootstrap_dev: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/js/bootstrap.js',
+        momentjs: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/moment.js/2.22.1/moment-with-locales.min.js',
+        momentjs_dev: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/moment.js/2.22.1/moment-with-locales.js',
         /**
          * Steps of upgrade vue version?
          * 1. Update vue CDN version
          * 2. Update vue-template-compiler version, the same as vue
          */
-        vue: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js',
-        vue_dev: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.js',
+        vue: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.min.js',
+        vue_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.js',
         i18next: 'https://cdn.jsdelivr.net/npm/i18next@20.2.4/i18next.min.js',
         i18next_dev: 'https://cdn.jsdelivr.net/npm/i18next@20.2.4/i18next.js',
         bootstrap_table_css: 'https://cdn.jsdelivr.net/npm/bootstrap-table@1.15.5/dist/bootstrap-table.min.css',
@@ -66,9 +66,9 @@ module.exports = {
         bootstrap_table_vue: 'https://cdn.jsdelivr.net/npm/bootstrap-table@1.15.5/dist/bootstrap-table-vue.min.js',
         bootstrap_table_export: 'https://cdn.jsdelivr.net/npm/bootstrap-table@1.15.5/dist/extensions/export/bootstrap-table-export.min.js',
         bootstrap_table_locale_zh_CN: 'https://cdn.jsdelivr.net/npm/bootstrap-table@1.15.5/dist/locale/bootstrap-table-zh-CN.min.js',
-        bootstrap_datetimepicker: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
-        bootstrap_datetimepicker_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
-        bootbox: 'https://cdn.bootcdn.net/ajax/libs/bootbox.js/4.4.0/bootbox.min.js',
+        bootstrap_datetimepicker: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
+        bootstrap_datetimepicker_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
+        bootbox: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootbox.js/4.4.0/bootbox.min.js',
         echarts: 'https://cdn.jsdelivr.net/npm/echarts@3.8.5/dist/echarts.min.js',
         echarts_dev: 'https://cdn.jsdelivr.net/npm/echarts@3.8.5/dist/echarts.js'
     }
