@@ -37,9 +37,11 @@ module.exports = {
      * 1. https://cdnjs.com/
      * 2. https://www.staticfile.org/
      * 3. https://docs.microsoft.com/en-us/aspnet/ajax/cdn/overview
-     * 4. http://www.bootcdn.cn/ (reject .cc .top)
+     * 4. http://www.bootcdn.cn/ rename to https://cdn.bootcdn.net/
      * 5. https://unpkg.com/
      * 6. https://www.jsdelivr.com/
+     * 7. http://cdn.bytedance.com/
+     * 8. https://www.staticaly.com
      */
     cdnlibs: {
         jquery: 'https://cdn.bootcdn.net/ajax/libs/jquery/3.4.1/jquery.min.js',
