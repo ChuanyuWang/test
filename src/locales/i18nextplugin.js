@@ -17,7 +17,7 @@ var i18nextPlugin = {
             // more options refer to https://www.i18next.com/configuration-options.html
             i18next.use(i18nextBrowserLanguageDetector).init({
                 //lng: "zh", // remove this line to enable auto language detection, and also clean key "i18nextLng" from Local Storage
-                fallbackLng: "en",
+                fallbackLng: "zh",
                 resources: resources,
                 detection: { lookupQuerystring: 'lang' } // look for "?lang=LANGUAGE" in URL to change language
             }, function(err, t) {
