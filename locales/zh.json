@@ -18,5 +18,6 @@
     "members": "会员",
     "classes": "班级",
     "statistics": "统计",
-    "settings": "设置"
+    "settings": "设置",
+    "view_session": "查看课程"
 }

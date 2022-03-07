@@ -1,4 +1,5 @@
 var express = require('express');
+const { __ } = require('i18n');
 var router = express.Router();
 var helper = require('../helper');
 
@@ -13,7 +14,7 @@ router.get('/home', helper.checkTenantUser, function(req, res) {
 router.get('/class/:classID', helper.checkTenantUser, function(req, res) {
     res.locals.classID = req.params.classID;
     res.render('bqsq/pages/class_view', {
-        title: '查看课程',
+        title: res.__('view_session'),
         user: req.user
     });
 });
