@@ -5,8 +5,8 @@ if (app.get('env') === 'production') {
     var https = require('https');
     var fs = require('fs');
 
-    var hskey = fs.readFileSync('bin/5417479_www.getbestlesson.com.key');
-    var hscert = fs.readFileSync('bin/5417479_www.getbestlesson.com.pem');
+    var hskey = fs.readFileSync('bin/7373823_www.getbestlesson.com.key');
+    var hscert = fs.readFileSync('bin/7373823_www.getbestlesson.com.pem');
     var options = {
         key: hskey,
         cert: hscert
