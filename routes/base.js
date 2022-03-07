@@ -1,5 +1,4 @@
 var express = require('express');
-const { __ } = require('i18n');
 var router = express.Router();
 var helper = require('../helper');
 
