@@ -125,14 +125,22 @@ app.use(session({
 
 //i18n configuration
 i18n.configure({
+    // setup some locales
     locales: ['zh', 'en'],
+    // fallback from any localized to Chinese
+    fallbacks: { '*': 'zh' },
     // where to store json files
     directory: __dirname + '/locales',
+    // you may alter a site wide default locale
     defaultLocale: 'zh',
+    // will return translation from defaultLocale in case current locale doesn't provide it
+    retryInDefaultLocale: true,
     // query parameter to switch locale (ie. /home?lang=ch)
     queryParameter: 'lang',
     // watch for changes in json files to reload locale on updates
-    autoReload: false // set as false, otherwise may fail git checkout
+    autoReload: false, // set as false, otherwise may fail git checkout
+    // whether to write new locale information to disk - defaults to true
+    updateFiles: true
 });
 app.use(i18n.init);
 
