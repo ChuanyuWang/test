@@ -1,7 +1,9 @@
 {
-    "title": "Education & Training",
-    "age_filter_all": "All",
-    "age_filter_2_years": "More than 2 years",
-    "age_filter_3_years": "More than 3 years",
-    "error_title": "Error"
+	"title": "Education & Training",
+	"age_filter_all": "All",
+	"age_filter_2_years": "More than 2 years",
+	"age_filter_3_years": "More than 3 years",
+	"error_title": "Error",
+	"setting_general": "General",
+	"setting_entry": "Links"
 }
