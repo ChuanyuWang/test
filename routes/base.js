@@ -4,7 +4,7 @@ var helper = require('../helper');
 
 router.get('/home', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/home', {
-        title: '课程表',
+        title: res.__('curriculum'),
         currentUrl: 'home',
         user: req.user
     });
@@ -54,7 +54,7 @@ router.get('/member', helper.checkTenantUser, function(req, res) {
             doc = docs[0];
 
         res.render('bqsq/member', {
-            title: '会员',
+            title: res.__('members'),
             user: req.user,
             currentUrl: 'member',
             statistics: {
@@ -75,7 +75,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function(req, res, next)
 
 router.get('/statistics', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/statistics', {
-        title: '统计',
+        title: res.__('statistics'),
         currentUrl: 'statistics',
         user: req.user
     });
@@ -84,7 +84,7 @@ router.get('/statistics', helper.checkTenantUser, function(req, res) {
 router.get('/setting', helper.checkTenantUser, function(req, res) {
     let port = req.app.locals.ENV_DEVELOPMENT ? `:${req.app.get("port")}` : "";
     res.render('bqsq/setting', {
-        title: '设置',
+        title: res.__('settings'),
         currentUrl: 'setting',
         user: req.user,
         tenantUrl: req.protocol + '://' + req.hostname + port + req.baseUrl,
