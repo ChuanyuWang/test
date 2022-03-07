@@ -58,8 +58,8 @@ module.exports = {
          */
         vue: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.min.js',
         vue_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.js',
-        i18next: 'https://cdn.jsdelivr.net/npm/i18next@20.2.4/i18next.min.js',
-        i18next_dev: 'https://cdn.jsdelivr.net/npm/i18next@20.2.4/i18next.js',
+        i18next: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/i18next/20.2.4/i18next.min.js',
+        i18next_dev: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/i18next/20.2.4/i18next.js',
         bootstrap_table_css: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap-table/1.15.5/bootstrap-table.min.css',
         table_export: 'https://unpkg.com/tableexport.jquery.plugin@1.10.22/tableExport.min.js',
         bootstrap_table: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap-table/1.15.5/bootstrap-table.min.js',
@@ -69,7 +69,7 @@ module.exports = {
         bootstrap_datetimepicker: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js',
         bootstrap_datetimepicker_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
         bootbox: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootbox.js/4.4.0/bootbox.min.js',
-        echarts: 'https://cdn.jsdelivr.net/npm/echarts@3.8.5/dist/echarts.min.js',
-        echarts_dev: 'https://cdn.jsdelivr.net/npm/echarts@3.8.5/dist/echarts.js'
+        echarts: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/3.8.5/echarts.min.js',
+        echarts_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/3.8.5/echarts.js'
     }
 };
