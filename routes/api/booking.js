@@ -91,7 +91,7 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
 
 req.body = {
 openid : "o0uUrv4RGMMiGasPF5bvlggasfGk", (optional)
-name : "宝宝1",
+name : "小朋友1",
 contact : "13500000000",
 classID : "5716630aa012576d0371e888"
 }

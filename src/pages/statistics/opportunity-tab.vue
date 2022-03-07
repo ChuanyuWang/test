@@ -25,14 +25,14 @@ module.exports = {
           events: { "click .phone": this.changePhone }
         }, {
           field: "name",
-          title: "宝宝姓名",
+          title: "小朋友姓名",
           sortable: false
         }, {
           field: "contact",
           title: "联系方式"
         }, {
           field: "birthday",
-          title: "宝宝生日",
+          title: "生日",
           sortable: false,
           formatter: common.dateFormatter
         }, {

@@ -116,7 +116,7 @@ module.exports = {
           type: "value"
         },
         yAxis: {
-          name: "宝宝姓名",
+          name: "小朋友姓名",
           type: "category",
           data: userList
         },
@@ -183,7 +183,7 @@ module.exports = {
           type: "value"
         },
         yAxis: {
-          name: "宝宝姓名",
+          name: "小朋友姓名",
           type: "category",
           data: userList
         },

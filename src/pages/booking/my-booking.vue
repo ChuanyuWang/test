@@ -5,11 +5,11 @@ div
       img.center-block.img-responsive(:src='tenantConfig.logoPath',style="padding:0px;width:200px")
     form.form-horizontal(style='margin-top:15px;display:none;padding-left:8px;padding-right:8px',role='form',v-show='!user._id')
       div.form-group.form-group-sm
-        div.col-xs-12(style='color:#808080;text-align:center') 请输入宝宝姓名和联系方式查看已预约课程
+        div.col-xs-12(style='color:#808080;text-align:center') 请输入小朋友姓名和联系方式查看已预约课程
       div.form-group.form-group-sm(:class='{"has-error": errors.name}')
-        label.control-label-sm.col-xs-3(for='cls_name') 宝宝姓名:
+        label.control-label-sm.col-xs-3(for='cls_name') 小朋友姓名:
         div.col-xs-9
-          input.form-control(type='text',placeholder='宝宝注册时用的姓名',v-model.trim='name')
+          input.form-control(type='text',placeholder='注册时用的小朋友姓名',v-model.trim='name')
       div.form-group.form-group-sm(:class='{"has-error": errors.contact}')
         label.control-label-sm.col-xs-3(for='cls_name') 联系方式:
         div.col-xs-9

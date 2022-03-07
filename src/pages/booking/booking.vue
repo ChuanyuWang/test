@@ -53,9 +53,9 @@ div
           div.col-xs-9
             p.form-control-static(style='height:auto') {{bookItem.content}}
         div.form-group.form-group-sm(:class='{"has-error": errors.name}')
-          label.control-label-sm.col-xs-3 宝宝姓名:
+          label.control-label-sm.col-xs-3 小朋友姓名:
           div.col-xs-9
-            input.form-control(type='text',placeholder='宝宝注册时用的名称',v-model='bookItem.name')
+            input.form-control(type='text',placeholder='小朋友注册时用的名称',v-model='bookItem.name')
         div.form-group.form-group-sm(:class='{"has-error": errors.contact}')
           label.control-label-sm.col-xs-3 联系方式:
           div.col-xs-9
