@@ -127,8 +127,6 @@ app.use(session({
 i18n.configure({
     // setup some locales
     locales: ['zh', 'en'],
-    // fallback from any localized to Chinese
-    fallbacks: { '*': 'zh' },
     // where to store json files
     directory: __dirname + '/locales',
     // you may alter a site wide default locale
@@ -140,7 +138,9 @@ i18n.configure({
     // watch for changes in json files to reload locale on updates
     autoReload: false, // set as false, otherwise may fail git checkout
     // whether to write new locale information to disk - defaults to true
-    updateFiles: true
+    updateFiles: true,
+    // what to use as the indentation unit - defaults to "\t"
+    indent: '    '
 });
 app.use(i18n.init);
 
