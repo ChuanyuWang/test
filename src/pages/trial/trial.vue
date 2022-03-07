@@ -23,7 +23,7 @@ div.container
       input.form-control(type='date',v-model='birthday')
     div.form-group
       label.control-label 感兴趣的内容:
-      textarea.form-control(rows='2',v-model.trim='remark',placeholder='选填')
+      textarea.form-control(rows='2',style='resize:vertical;min-height:70px',v-model.trim='remark',placeholder='选填')
   div.row.col-12
   button.btn.btn-primary(:disabled='hasError' style="display:block;margin:0 auto" @click="handleSubmit") 提交
 
