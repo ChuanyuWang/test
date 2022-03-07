@@ -86,7 +86,7 @@ router.get('/setting', helper.checkTenantUser, function(req, res) {
         title: '设置',
         currentUrl: 'setting',
         user: req.user,
-        baseUrl: req.protocol + '://' + req.hostname + req.baseUrl,
+        tenantUrl: req.protocol + '://' + req.hostname + req.baseUrl,
         hostname: req.hostname
     });
 });

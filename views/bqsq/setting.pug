@@ -51,20 +51,20 @@ block page
           div.form-group
             label.col-sm-2.control-label 在线预约
             div.col-sm-10
-              p.form-control-static= baseUrl + '/booking'
+              p.form-control-static= tenantUrl + '/booking'
               span.help-block 预约入口，访问用户可以查看本周全部课程，并根据注册信息进行课程预约；未开始课程，会员可以提前24小时取消。
           div.form-group
             label.col-sm-2.control-label 我的课程
             div.col-sm-10
-              p.form-control-static= baseUrl + '/mybooking'
+              p.form-control-static= tenantUrl + '/mybooking'
               span.help-block 我的课程入口，访问用户可以根据注册信息查看所有历史课程，包括已经结束的和预约中的。
           div.form-group
             label.col-sm-2.control-label 试听
             div.col-sm-10
-              p.form-control-static= baseUrl + '/trial'
-              span.help-block 试听入口，访问用户可以提交试听申请，包括姓名、联系方式和感兴趣内容，管理员可以在后台查看所有申请并处理。<br>在入口Url后添加 <b>?source=xxx</b> 可以区别统计不同渠道的访问量，比如 #{baseUrl}/trial?source=wechat
+              p.form-control-static= tenantUrl + '/trial'
+              span.help-block 试听入口，访问用户可以提交试听申请，包括姓名、联系方式和感兴趣内容，管理员可以在后台查看所有申请并处理。<br>在入口Url后添加 <b>?source=xxx</b> 可以区别统计不同渠道的访问量，比如 #{tenantUrl}/trial?source=wechat
           div.form-group
             label.col-sm-2.control-label 我的阅读
             div.col-sm-10
-              p.form-control-static= baseUrl + '/myReadBooks'
+              p.form-control-static= tenantUrl + '/myReadBooks'
               span.help-block 我的阅读入口，访问用户可以根据注册信息查看所有历史课程中使用的绘本，包括书名和授课老师。
