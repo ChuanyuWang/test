@@ -82,11 +82,12 @@ router.get('/statistics', helper.checkTenantUser, function(req, res) {
 });
 
 router.get('/setting', helper.checkTenantUser, function(req, res) {
+    let port = req.app.locals.ENV_DEVELOPMENT ? `:${req.app.get("port")}` : "";
     res.render('bqsq/setting', {
         title: '设置',
         currentUrl: 'setting',
         user: req.user,
-        tenantUrl: req.protocol + '://' + req.hostname + req.baseUrl,
+        tenantUrl: req.protocol + '://' + req.hostname + port + req.baseUrl,
         hostname: req.hostname
     });
 });
