@@ -288,42 +288,58 @@ router.get('/:memberID/history', function(req, res, next) {
 });
 
 router.post('/', helper.requireRole("admin"), async function(req, res, next) {
-    if (!req.body.name || !req.body.contact) {
+    try {
+        let doc = await addNewMember(req.tenant.name, req.body || {});
+        return res.json(doc);
+    } catch (err) {
+        return next(err);
+    }
+});
+
+async function addNewMember(tenantName, data) {
+    if (!data.name || !data.contact) {
         var error = new Error("Missing param 'name' or 'contact'");
         error.status = 400;
-        return next(error);
+        throw error;
     }
     // new member default status is 'active'
-    if (!req.body.hasOwnProperty('status')) {
-        req.body.status = 'active';
+    if (!data.hasOwnProperty('status')) {
+        data.status = 'active';
     }
 
     let query = {
-        name: req.body.name,
-        contact: req.body.contact
+        name: data.name,
+        contact: data.contact
     };
 
+    let tenantDB = null, members = null, doc = null;
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let members = tenantDB.collection("members");
-        let doc = await members.findOne(query);
-        if (doc) {
-            let error = new Error("会员已经存在");
-            error.code = 2007;
-            return next(error);
-        }
-
-        convertDateObject(req.body);
-        let result = await members.insertOne(req.body);
-        console.debug("create member successfully with result: %j", result.result);
-        console.log("member is added %j", req.body);
-        return res.json(req.body);
+        tenantDB = await db_utils.connect(tenantName);
+        members = tenantDB.collection("members");
+        doc = await members.findOne(query);
     } catch (err) {
-        let error = new Error("fail to find member");
+        var error = new Error("fail to find member");
         error.innerError = err;
-        return next(error);
+        throw error;
     }
-});
+    if (doc) {
+        let error = new Error("会员已经存在");
+        error.code = 2007;
+        throw error;
+    }
+
+    try {
+        convertDateObject(data);
+        let result = await members.insertOne(data);
+        console.debug("create member successfully with result: %j", result.result);
+        console.log("member is added %j", data);
+        return data;
+    } catch (err) {
+        var error = new Error("fail to add member");
+        error.innerError = err;
+        throw error;
+    }
+};
 /**
  * comments: [
         { posted: ISODateTime(...),
