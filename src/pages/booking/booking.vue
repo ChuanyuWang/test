@@ -32,7 +32,7 @@ div
                 template(v-if='item.cost > 0')
                   span.glyphicon.glyphicon-bell
                   | {{item.cost}}课时
-                span.cls-free(v-else) 公益活动
+                span.cls-free(v-else) 免费课程
                 |  {{item.age | ageFormatter}}
             div.book-col
               button.btn.btn-default.finish-btn(v-if='isCompletedClass(item)',disabled) 结束
