@@ -3,6 +3,8 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var reservation = require('./lib/reservation');
 var helper = require('../../helper');
+const db_utils = require('../../server/databaseManager');
+const { ObjectId } = require('mongodb');
 
 /**
  * Get the member list who booked the class
@@ -96,7 +98,7 @@ contact : "13500000000",
 classID : "5716630aa012576d0371e888"
 }
  */
-router.post('/', function(req, res, next) {
+router.post('/', async function(req, res, next) {
     if (!req.tenant) {
         let error = new Error("tenant is not defined");
         error.status = 400;
@@ -107,22 +109,17 @@ router.post('/', function(req, res, next) {
         return;
     }
 
-    let tenantDB = req.db;
-    var members = tenantDB.collection("members");
-    var user_query = {
+    let tenantDB = await db_utils.connect(req.tenant.name);
+    let members = tenantDB.collection("members");
+    let user_query = {
         name: req.body.name,
         contact: req.body.contact
     };
-    // find the user who want to book a class
-    members.findOne(user_query, { history: 0 }, function(err, doc) {
-        if (err) {
-            var error = new Error('Find member fails');
-            error.innerError = err;
-            return next(error);
-        }
-
+    try {
+        // find the user who want to book a class
+        let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
         if (!doc) {
-            var error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
+            let error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
             error.status = 400;
             error.code = 2001;
             return next(error);
@@ -130,42 +127,41 @@ router.post('/', function(req, res, next) {
         console.log("member is found %j", doc);
 
         // find the class want to book
-        var classes = tenantDB.collection("classes");
-        classes.findOne({
-            _id: mongojs.ObjectId(req.body.classid)
-        }, function(err, cls) {
-            if (err) {
-                var error = new Error('Find class fails');
-                error.innerError = err;
+        let classes = tenantDB.collection("classes");
+        let cls = await classes.findOne({ _id: ObjectId(req.body.classid) });
+        if (!cls) {
+            let error = new Error("没有找到指定课程，请刷新重试");
+            error.status = 400;
+            error.code = 2002;
+            return next(error);
+        }
+        console.log("class is found %j", cls);
+
+        // member can only book the class 1 hour before started
+        if (req.isUnauthenticated()) {
+            // 1 hours = 3600000 (1*60*60*1000)
+            if (Date.now() > cls.date.getTime() - 3600000) {
+                let error = new Error("课程已经开始或即将开始(不足1小时)");
+                error.status = 400;
                 return next(error);
             }
+        }
 
-            if (!cls) {
-                return res.status(400).json({
-                    'code': 2002,
-                    'message': "没有找到指定课程，请刷新重试",
-                    'err': err
-                });
-            }
-            console.log("class is found %j", cls);
-
-
-            // member can only book the class 1 hour before started
-            if (req.isUnauthenticated()) {
-                if (Date.now() > cls.date.getTime() - 3600000) {
-                    // 1 hours = 3600000 (1*60*60*1000)
-                    var error = new Error("课程已经开始或即将开始(不足1小时)");
-                    error.status = 400;
-                    return next(error);
-                }
-            }
-
-            reservation.addOne(doc, cls, req.body.quantity, function(error, result) {
-                if (error) return next(error);
-                createNewBook(tenantDB, res, doc, cls, req.body.quantity);
-            });
+        let error = reservation.check(doc, cls, req.body.quantity);
+        if (error) {
+            return next(error);
+        }
+        let after_cls = await createNewBook(tenantDB, doc, cls, req.body.quantity);
+        //return the status of booking class
+        return res.json({
+            class: after_cls,
+            member: doc
         });
-    });
+    } catch (err) {
+        let error = new Error('Fail to book');
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 // remove specfic user's booking info
@@ -286,68 +282,56 @@ router.delete('/:classID', function(req, res, next) {
 /**
  * 
  * @param {Object} tenantDB 
- * @param {Object} res 
- * @param {Object} user 
+ * @param {Object} doc 
  * @param {Object} cls 
  * @param {Number} quantity 
  */
-function createNewBook(tenantDB, res, user, cls, quantity) {
-    var newbooking = {
-        member: user._id,
+async function createNewBook(tenantDB, doc, cls, quantity) {
+    //TODO, parseInt the 'quantity'
+    let newbooking = {
+        member: doc._id,
         quantity: quantity,
         bookDate: new Date()
     };
-    var classes = tenantDB.collection("classes");
-    classes.findAndModify({
-        query: {
-            _id: cls._id
-        },
-        update: {
+    let classes = tenantDB.collection("classes");
+    let result = await classes.findOneAndUpdate(
+        { _id: cls._id },
+        {
             $push: {
                 booking: newbooking
             }
         },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            return res.status(500).json({
-                'code': 3001,
-                'message': "create booking record fails",
-                'err': err
-            });
-        }
-
-        //TODO, support multi membership card
-        if (user.membership && user.membership.length > 0 && doc.cost > 0) {
+        { returnDocument: "after" }
+    );
+    let after_cls = result.value;
+    //TODO, support multi membership card
+    if (doc.membership && doc.membership.length > 0 && after_cls.cost > 0) {
+        try {
             // update the credit value in membership
-            var members = tenantDB.collection("members");
-            members.findAndModify({
-                query: {
-                    _id: user._id
-                }, update: {
-                    $inc: { "membership.0.credit": -quantity * doc.cost }
-                }, fields: { membership: 1 },
-                new: true
-            }, function(err, m, lastErrorObject) {
-                if (err) console.error(err);
-                if (m) {
-                    console.log("deduct %f credit from member %s (after: %j)", quantity * doc.cost, user._id, m.membership);
-                    user.membership = m.membership;
+            let members = tenantDB.collection("members");
+            let result = await members.findOneAndUpdate(
+                { _id: doc._id },
+                {
+                    $inc: { "membership.0.credit": -quantity * after_cls.cost }
+                },
+                {
+                    projection: { membership: 1 },
+                    returnDocument: "after"
                 }
-                //return the status of booking class
-                return res.json({
-                    class: doc,
-                    member: user
-                });
-            });
-        } else {
-            //return the status of booking class
-            return res.json({
-                class: doc,
-                member: user
-            });
+            );
+            let m = result.value;
+            if (m) {
+                console.log("deduct %f credit from member %s (after: %j)", quantity * after_cls.cost, doc._id, m.membership);
+                // update the parameter 'doc' with updated memberhsip, which is returned to client
+                doc.membership = m.membership;
+            }
+        } catch (err) {
+            //TODO, roll back with transaction feature of MongoDB 4.0 or higher
+            console.error(err);
         }
-    });
+    }
+    //return the updated class
+    return after_cls;
 }
 
 module.exports = router;

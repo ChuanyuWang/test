@@ -173,13 +173,12 @@ reservation.add = function(memberOrMembers, classOrClasses, quantity, skipPastCl
     };
 }
 
-reservation.addOne = function(member, classToBook, quantity, callback) {
+reservation.check = function(member, classToBook, quantity) {
     var error = {};
     if (validate(member, classToBook, quantity, error)) {
-        callback(null, {});
+        return null; // no error found, proceed to book
     } else {
-        error.message = error.cause.message;
-        callback(error.cause, {});
+        return error.cause; // return error in details
     }
 }
 
