@@ -287,7 +287,7 @@ router.get('/:memberID/history', function(req, res, next) {
     });
 });
 
-router.post('/', helper.requireRole("admin"), function(req, res, next) {
+router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     if (!req.body.name || !req.body.contact) {
         var error = new Error("Missing param 'name' or 'contact'");
         error.status = 400;
@@ -298,37 +298,31 @@ router.post('/', helper.requireRole("admin"), function(req, res, next) {
         req.body.status = 'active';
     }
 
-    var members = req.db.collection("members");
-    var query = {
+    let query = {
         name: req.body.name,
         contact: req.body.contact
     };
 
-    members.findOne(query, function(err, doc) {
-        if (err) {
-            var error = new Error("fail to find member");
-            error.innerError = err;
-            return next(error);
-        }
-
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let members = tenantDB.collection("members");
+        let doc = await members.findOne(query);
         if (doc) {
-            var error = new Error("会员已经存在");
+            let error = new Error("会员已经存在");
             error.code = 2007;
             return next(error);
         }
 
         convertDateObject(req.body);
-        members.insert(req.body, function(err, docs) {
-            if (err) {
-                var error = new Error("fail to add member");
-                error.innerError = err;
-                next(error);
-            } else {
-                console.log("member is added %j", docs);
-                res.json(docs);
-            }
-        });
-    });
+        let result = await members.insertOne(req.body);
+        console.debug("create member successfully with result: %j", result.result);
+        console.log("member is added %j", req.body);
+        return res.json(req.body);
+    } catch (err) {
+        let error = new Error("fail to find member");
+        error.innerError = err;
+        return next(error);
+    }
 });
 /**
  * comments: [
