@@ -90,7 +90,8 @@ manager.close = function() {
     if (mongoClient) {
         mongoClient.close().catch(err => {
             console.error(err);
-        })
+        });
+        mongoClient = null;
     }
     mongoose.disconnect().catch(err => {
         console.error(err);
