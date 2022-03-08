@@ -30,9 +30,9 @@ form.form-horizontal
       select.form-control(name="card_type",v-model='type')
         option(value='ALL') 通用卡
         option(value='LIMITED') 限定卡
-  div.form-group(v-show='isLimitedCard')
+  div.form-group(v-show='isLimitedCard',:class='{"has-error": errors.room}')
     label.control-label.col-sm-2 可用教室:
-    div.col-sm-10
+    div.col-sm-10(:title="errors.room")
       div.checkbox(v-for='r in classrooms')
         label
           input(type="checkbox", :value='r.id',v-model='room')
@@ -64,7 +64,7 @@ module.exports = {
     return {
       delta: 0,
       type: this.item.type,
-      // Fix a bug, there is some invalid date which has boolean value
+      // Fix a bug, there is some invalid data which has boolean value
       room: typeof (this.item.room) === 'boolean' ? [] : this.item.room,
       expire: this.item.expire ? moment(this.item.expire) : null
     };
@@ -86,6 +86,8 @@ module.exports = {
         errors.expire = '请指定会员有效期';
       if (!this.type)
         errors.type = '请选择会员卡类型';
+      if (this.isLimitedCard && this.room.length === 0)
+        errors.room = '请选择至少一个教室';
       return errors;
     },
     hasError: function() {
