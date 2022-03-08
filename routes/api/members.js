@@ -292,13 +292,26 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
         let doc = await addNewMember(req.tenant.name, req.body || {});
         return res.json(doc);
     } catch (err) {
-        return next(err);
+        if (err instanceof AddMemberError) {
+            return next(err);
+        } else {
+            let error = new Error("Fail to add member");
+            error.innerError = err;
+            return next(error);
+        }
     }
 });
 
+class AddMemberError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "AddMemberError";
+    }
+}
+
 async function addNewMember(tenantName, data) {
     if (!data.name || !data.contact) {
-        var error = new Error("Missing param 'name' or 'contact'");
+        var error = new AddMemberError("Missing param 'name' or 'contact'");
         error.status = 400;
         throw error;
     }
@@ -312,34 +325,21 @@ async function addNewMember(tenantName, data) {
         contact: data.contact
     };
 
-    let tenantDB = null, members = null, doc = null;
-    try {
-        tenantDB = await db_utils.connect(tenantName);
-        members = tenantDB.collection("members");
-        doc = await members.findOne(query);
-    } catch (err) {
-        var error = new Error("fail to find member");
-        error.innerError = err;
-        throw error;
-    }
+    let tenantDB = await db_utils.connect(tenantName);
+    let members = tenantDB.collection("members");
+    let doc = await members.findOne(query);
     if (doc) {
-        let error = new Error("会员已经存在");
+        let error = new AddMemberError("会员已经存在");
         error.code = 2007;
         throw error;
     }
 
-    try {
-        convertDateObject(data);
-        let result = await members.insertOne(data);
-        console.debug("create member successfully with result: %j", result.result);
-        console.log("member is added %j", data);
-        return data;
-    } catch (err) {
-        var error = new Error("fail to add member");
-        error.innerError = err;
-        throw error;
-    }
-};
+    convertDateObject(data);
+    let result = await members.insertOne(data);
+    console.debug("create member successfully with result: %j", result.result);
+    console.log("member is added %j", data);
+    return data;
+}
 /**
  * comments: [
         { posted: ISODateTime(...),
