@@ -47,6 +47,9 @@ var vueApp = {
             return Object.keys(errors).some(function(key) {
                 return true;
             })
+        },
+        source: function() {
+            return this.memberData.source || "manual"
         }
     },
     filters: {

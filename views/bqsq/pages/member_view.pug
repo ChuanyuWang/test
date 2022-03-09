@@ -48,6 +48,11 @@ block page
         select.col-sm-5.form-control(v-model='memberData.status',@change='deactivateAlert',style='margin-left:15px;width:auto')
           option.text-success(value='active') 激活
           option.text-danger(value='inactive') 未激活
+      div.form-group
+        label.col-sm-2.control-label 来源:
+        select.col-sm-5.form-control(v-model='source',style='margin-left:15px;width:auto',disabled)
+          option(value='manual') 手动添加
+          option(value='book') 扫码预约
       div.form-group(:class='{"has-error": errors.name}')
         label.col-sm-2.control-label 姓名:
         div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")

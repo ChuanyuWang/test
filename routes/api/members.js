@@ -51,6 +51,7 @@ var NORMAL_FIELDS = {
     birthday: 1,
     expire: 1,
     note: 1,
+    source: 1,
     membership: 1
 };
 
