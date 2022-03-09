@@ -41,7 +41,8 @@ block page
         a(href="../member") 会员列表
       li.active 查看会员
     div.page-header
-      h3 基本信息
+      h3(style='margin-top:0;display:inline-block') 基本信息
+      button.btn.btn-danger(type='button',style='float:right',disabled,@click='') 删除学员
     form.form-horizontal
       div.form-group
         label.col-sm-2.control-label 状态:
