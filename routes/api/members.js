@@ -4,6 +4,44 @@ var mongojs = require('mongojs');
 var helper = require('../../helper');
 var db_utils = require('../../server/databaseManager');
 
+/**
+ * {
+ *  name: String,
+ *  contact: String,
+ *  birthday: Date,
+ *  note: String,
+ *  status: "active|inactive",
+ *  since: Date,
+ *  membership: [
+ *      {
+ *          type: "ALL|LIMITED",
+ *          room: [],
+ *          expire: Date,
+ *          credit: Number
+ *      }
+ *  ],
+ *  history: [
+ *      {
+ *          date: Date,
+ *          user: String,
+ *          target: "membership.0.type|credit",
+ *          old: any,
+ *          new: any,
+ *          remark: String
+ *      }
+ *  ],
+ *  comments: [
+ *      {
+ *          posted: Date,
+ *          updated: Date,
+ *          text: String,
+ *          author: String
+ *      }
+ *  ]
+ * }
+ * 
+ */
+
 var NORMAL_FIELDS = {
     status: 1,
     since: 1,
