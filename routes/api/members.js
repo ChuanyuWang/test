@@ -10,6 +10,7 @@ var db_utils = require('../../server/databaseManager');
  *  contact: String,
  *  birthday: Date,
  *  note: String,
+ *  source: "manual|book", // default is "manual"
  *  status: "active|inactive",
  *  since: Date,
  *  membership: [

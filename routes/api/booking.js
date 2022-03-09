@@ -109,13 +109,8 @@ router.post('/', async function(req, res, next) {
         return;
     }
 
-    let tenantDB = await db_utils.connect(req.tenant.name);
-    let members = tenantDB.collection("members");
-    let user_query = {
-        name: req.body.name,
-        contact: req.body.contact
-    };
     try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
         // find the class want to book
         let classes = tenantDB.collection("classes");
         let cls = await classes.findOne({ _id: ObjectId(req.body.classid) });
@@ -137,15 +132,36 @@ router.post('/', async function(req, res, next) {
             }
         }
 
+        let members = tenantDB.collection("members");
+        let user_query = {
+            name: req.body.name,
+            contact: req.body.contact
+        };
         // find the user who want to book a class
         let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
         if (!doc) {
-            let error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
-            error.status = 400;
-            error.code = 2001;
-            return next(error);
+            if (req.tenant.name == "test") {
+                // create new member if not exist
+                doc = {
+                    name: req.body.name,
+                    contact: req.body.contact,
+                    status: "active",
+                    source: "book",
+                    since: new Date(),
+                    membership: []
+                };
+                let result = await members.insertOne(doc);
+                console.debug("create member successfully with result: %j", result.result);
+                console.log("member is created automatically during booking: %j", doc);
+            } else {
+                let error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
+                error.status = 400;
+                error.code = 2001;
+                return next(error);
+            }
+        } else {
+            console.log("member is found %j", doc);
         }
-        console.log("member is found %j", doc);
 
         let error = reservation.check(doc, cls, req.body.quantity);
         if (error) {
