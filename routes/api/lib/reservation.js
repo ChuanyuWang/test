@@ -30,7 +30,7 @@ function validate(member, cls, quantity, error) {
 
     // only members can book non-free classes
     if (cls.cost > 0 && !membership) {
-        error.cause = new Error("您还未办理会员卡，如有问题，欢迎来电或到店咨询");
+        error.cause = new Error("您还未办理会员卡（剩余课时不足），如有问题，欢迎来电或到店咨询");
         return false;
     }
 
