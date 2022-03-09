@@ -116,16 +116,6 @@ router.post('/', async function(req, res, next) {
         contact: req.body.contact
     };
     try {
-        // find the user who want to book a class
-        let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
-        if (!doc) {
-            let error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
-            error.status = 400;
-            error.code = 2001;
-            return next(error);
-        }
-        console.log("member is found %j", doc);
-
         // find the class want to book
         let classes = tenantDB.collection("classes");
         let cls = await classes.findOne({ _id: ObjectId(req.body.classid) });
@@ -146,6 +136,16 @@ router.post('/', async function(req, res, next) {
                 return next(error);
             }
         }
+
+        // find the user who want to book a class
+        let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
+        if (!doc) {
+            let error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
+            error.status = 400;
+            error.code = 2001;
+            return next(error);
+        }
+        console.log("member is found %j", doc);
 
         let error = reservation.check(doc, cls, req.body.quantity);
         if (error) {
