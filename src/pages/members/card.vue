@@ -99,6 +99,7 @@ module.exports = {
   },
   filters: {
     formatCredit: function(value) {
+      // A better way of 'toFixed(1)'
       var n = Math.round(value * 10) / 10;
       return n === 0 ? 0 : n; // handle the "-0" case
     }

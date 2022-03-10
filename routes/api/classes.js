@@ -9,6 +9,7 @@ var helper = require('../../helper');
  *  name: String,
  *  date: String,
  *  cost: Date,
+ *  price: Number,
  *  capacity: Number,
  *  classroom: String,
  *  age: {
@@ -40,6 +41,7 @@ var NORMAL_FIELDS = {
     date: 1,
     courseID: 1,
     cost: 1,
+    price: 1,
     capacity: 1,
     age: 1,
     classroom: 1,

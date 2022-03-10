@@ -30,6 +30,10 @@ div.container
       label.control-label.col-sm-2 所须课时:
       div.col-sm-10
         p.form-control-static {{cls.cost}}
+    div.form-group
+      label.control-label.col-sm-2 价格:
+      div.col-sm-10
+        p.form-control-static {{cls.price | toFixed1}}元
     div.form-group(:class='{"has-error": errors.date}')
       label.control-label.col-sm-2 日期/时间:
       div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.date")
@@ -203,6 +207,11 @@ module.exports = {
     formatDateTime: function(value) {
       if (!value) return "?";
       return moment(value).format("lll");
+    },
+    toFixed1: function(value) {
+      // A better way of 'toFixed(1)'
+      var n = Math.round(value * 10) / 10;
+      return n === 0 ? 0 : n; // handle the "-0" case
     }
   },
   watch: {},

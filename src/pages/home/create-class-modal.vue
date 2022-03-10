@@ -16,6 +16,10 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             label.control-label.col-sm-2(for='cost') 所需课时:
             div.col-sm-2
               input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
+          div.form-group(:class='{"has-error": errors.price}',:title='errors.price')
+            label.control-label.col-sm-2(for='price') 所需费用:
+            div.col-sm-2
+              input.form-control(type='number',name='price',min='0',step='0.1',v-model.number='price')
           div.form-group
             label.control-label.col-sm-2 时间:
             div.col-sm-10
@@ -58,6 +62,7 @@ module.exports = {
       startTime: moment(),
       name: '',
       cost: 1,
+      price: 0,
       capacity: 8,
       age: { // by year
         min: null,
@@ -81,6 +86,10 @@ module.exports = {
         errors.name = '课程名称不能为空';
       if (this.cost === '' || this.cost < 0)
         errors.cost = '所需课时不能为负';
+      if (this.price === '' || this.price < 0)
+        errors.price = '课程价格不能为负';
+      if (this.price > 0 && this.cost <= 0)
+        errors.price = '付费课程的课时不能为0';
       if (isNaN(this.capacity) || this.capacity < 0)
         errors.capacity = '最大人数不能为负';
       if (this.age.min < 0)
@@ -117,6 +126,7 @@ module.exports = {
         // get the date from text control and appending the time
         date: moment(this.startDate).hours(this.startTime.hours()).minutes(this.startTime.minutes()),
         cost: this.cost,
+        price: this.price,
         capacity: this.capacity,
         classroom: this.classroom,
         age: { // age is stored as months
