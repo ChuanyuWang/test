@@ -4,6 +4,37 @@ var mongojs = require('mongojs');
 const mongoist = require('mongoist');
 var helper = require('../../helper');
 
+/**
+ * {
+ *  name: String,
+ *  date: String,
+ *  cost: Date,
+ *  capacity: Number,
+ *  classroom: String,
+ *  age: {
+ *      min: null | Number,
+ *      max: null | Number
+ *  },
+ *  booking: [
+ *      {
+ *          member: ObjectId,
+ *          quantity: Number,
+ *          bookDate: Date,
+ *          status: "checkin|absent|null",
+ *          flag: "null|red|yellow|green"
+ *      }
+ *  ],
+ *  books: [
+ *      {
+ *          title: String,
+ *          info: String,
+ *          teacher: String //deprecated
+ *      }
+ *  ]
+ * }
+ * 
+ */
+
 var NORMAL_FIELDS = {
     name: 1,
     date: 1,
