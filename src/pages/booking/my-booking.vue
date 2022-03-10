@@ -151,10 +151,14 @@ module.exports = {
     },
     errors: function() {
       var errors = {};
+      var phone = /^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$/;
       if (!this.name || this.name.length === 0)
         errors.name = '姓名不能为空';
-      if (!this.contact || this.contact.length === 0)
-        errors.contact = '联系方式不能为空';
+      if (!this.contact || this.contact.length !== 11) {
+        errors.contact = '手机号格式错误';
+      } else if (!phone.test(this.contact)) {
+        errors.contact = '手机号格式错误';
+      }
       return errors;
     },
     hasError: function() {
