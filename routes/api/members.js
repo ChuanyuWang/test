@@ -370,6 +370,7 @@ async function addNewMember(tenantName, data) {
     let doc = await members.findOne(query);
     if (doc) {
         let error = new AddMemberError("会员已经存在");
+        error.status = 400;
         error.code = 2007;
         throw error;
     }
