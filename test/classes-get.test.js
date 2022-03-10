@@ -3,7 +3,10 @@ const request = require("supertest");
 const app = require("../app");
 const tenant = require("./lib/tenant");
 
-chai.should(); //actually enable should style assertions
+//enable assertion styles, include Assert, Expect and Should
+const assert = chai.assert;
+const expect = chai.expect;
+const should = chai.should(); //actually enable should style assertions
 
 describe('GET /api/classes', function() {
     before(async function() {
@@ -13,7 +16,6 @@ describe('GET /api/classes', function() {
 
     after(async function() {
         await tenant.clean(true);
-        app.stop();
     });
 
     it('should query classes', function(done) {
@@ -26,24 +28,4 @@ describe('GET /api/classes', function() {
                 return done();
             });
     });
-    /*
-    it('should GET the users response', (done) => {
-        chai.request(app)
-            .get('/users')
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.text.should.equal('respond with a resource');
-                done();
-            });
-    });
- 
-    it('should respond status 404', (done) => {
-        chai.request(app)
-            .get('/wrongUrl')
-            .end((err, res) => {
-                res.should.have.status(404);
-                done();
-            });
-    });
-    */
 });
