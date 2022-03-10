@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var helper = require('../helper');
+const { ObjectId } = require('mongodb');
 
 router.get('/home', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/home', {
@@ -10,7 +11,9 @@ router.get('/home', helper.checkTenantUser, function(req, res) {
     });
 });
 
-router.get('/class/:classID', helper.checkTenantUser, function(req, res) {
+router.get('/class/:classID', helper.checkTenantUser, function(req, res, next) {
+    // skip to 404 page if class ID is not valid
+    if (!ObjectId.isValid(req.params.classID)) return next();
     res.locals.classID = req.params.classID;
     res.render('bqsq/pages/class_view', {
         title: res.__('view_session'),
@@ -66,6 +69,8 @@ router.get('/member', helper.checkTenantUser, function(req, res) {
 });
 
 router.get('/member/:memberID', helper.checkTenantUser, function(req, res, next) {
+    // skip to 404 page if member ID is not valid
+    if (!ObjectId.isValid(req.params.memberID)) return next();
     res.locals.memberID = req.params.memberID;
     res.render('bqsq/pages/member_view', {
         title: '查看会员',
