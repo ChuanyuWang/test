@@ -9,6 +9,7 @@ append js
   script(src=CDN_FILES.bootbox)
   script(src=CDN_FILES.bootstrap_table)
   script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
+  script(src=CDN_FILES.bootstrap_table_vue)
   script(src=CDN_FILES.bootstrap_datetimepicker)
   if ENV_DEVELOPMENT
     script(src=CDN_FILES.i18next_dev)
@@ -17,156 +18,9 @@ append js
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
   script(src='/js/member_view.js')
-  style.
-    .container .page-header {
-      margin: 15px 0;
-      padding-bottom: 3px;
-    }
-    .container .page-header span{
-    }
-    .container .page-header span:hover{
-      transition: all 0.5s ease-in-out;
-      transform: rotate(360deg);
-    }
-  script(type='text/javascript').
-    function _getClassrooms() {
-        return !{JSON.stringify(classrooms)};
-    };
 block page
-  div#member_app.container(style='padding-top:69px',data-member-id=memberID)
-    ol.breadcrumb
-      li
-        a(href="../home") 主页
-      li
-        a(href="../member") 会员列表
-      li.active 查看会员
-    div.page-header
-      h3(style='margin-top:0;display:inline-block') 基本信息
-      button.btn.btn-danger(type='button',style='float:right',disabled,@click='') 删除学员
-    form.form-horizontal
-      div.form-group
-        label.col-sm-2.control-label 状态:
-        select.col-sm-5.form-control(v-model='memberData.status',@change='deactivateAlert',style='margin-left:15px;width:auto')
-          option.text-success(value='active') 激活
-          option.text-danger(value='inactive') 未激活
-      div.form-group
-        label.col-sm-2.control-label 来源:
-        select.col-sm-5.form-control(v-model='source',style='margin-left:15px;width:auto',disabled)
-          option(value='manual') 手动添加
-          option(value='book') 扫码预约
-      div.form-group(:class='{"has-error": errors.name}')
-        label.col-sm-2.control-label 姓名:
-        div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
-          input.form-control(v-model.trim='memberData.name', placeholder='小朋友姓名')
-        div.col-sm-5
-          p.form-control-static(style='color:#808080')
-            small {{memberData.since | formatDate}}注册会员
-      div.form-group(:class='{"has-error": errors.contact}')
-        label.col-sm-2.control-label 联系方式:
-        div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.contact")
-          input.form-control(v-model.trim='memberData.contact', placeholder='135xxx')
-      div.form-group(:class='{"has-error": errors.birthday}')
-        label.control-label.col-sm-2 生日:
-        div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
-          date-picker(v-model='memberData.birthday')
-      div.form-group
-        label.control-label.col-sm-2 描述:
-        div.col-sm-8
-          textarea.form-control(rows='3', placeholder='添加更多备注信息, 比如昵称', name='note',v-model.trim='memberData.note',style='resize:vertical;min-height:70px')
-      div.form-group
-        div.col-sm-offset-2.col-sm-10
-          button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
-    div.page-header
-      h3 会员卡
-    template(v-if='memberData.membership&&memberData.membership.length')
-      card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='_getClassrooms()')
-    template(v-else)
-      card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1',:classrooms='_getClassrooms()')
-    div.page-header
-      h3= __('course_summary_title')
-    table.table.table-bordered.table-striped.table-striped
-      thead
-        tr
-          th= __('course_name')
-          th= __('finished')
-          th= __('unfinished')
-          th= __('total')
-      tbody(v-if='memberData.summary&&memberData.summary.length')
-        tr(v-for='course in memberData.summary')
-          td(v-if='course._id') {{course.courseName || "#{__('deleted_course')}"}}
-            a.btn.btn-primary.btn-xs(:href='"../course/" + course._id',style='margin-left:3px')= __('view')
-          td(v-else)= __('other_self_booking')
-          td {{course.finished}}
-          td {{course.unfinished}}
-          td {{course.total}}
-      tbody(v-else)
-        tr
-          td(colspan='4',style='text-align:center')= __('no_record')
-    div.page-header
-      h3 备忘
-    comment-modal(ref='commentDlg')
-    form.form-horizontal
-      div.form-group
-        div.col-sm-2
-          button.btn.btn-primary.btn-sm(type="button",:disabled='!memberData._id',@click='addComment')
-            span.glyphicon.glyphicon-plus 新备忘
-        div.col-sm-10
-          template(v-for="(comment, key) in memberData.comments")
-            div.media
-              div.media-left
-                span.glyphicon.glyphicon-comment.text-primary(style='font-size:large;opacity:0.8')
-              div.media-body
-                h4.media-heading(style='font-size:small') {{comment.text}}
-                p.small(style='color:#777;position:relative') by {{comment.author}} at {{comment.posted | formatDateTime}}
-                  button.btn.btn-default.btn-xs.edit(type='button',v-on:click='editComment(key)',style='margin:-3px 3px;position:absolute')
-                    span.glyphicon.glyphicon-pencil
-          small(style='color:#777') 共{{commentCount}}条备忘
-  div.container(data-member-id='#{memberID}')
-    div.page-header
-      h3(style='margin-top:0;display:inline-block') 充值记录
-      a#loadHistoryBtn(href='#',title='点击加载')
-        span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
-    div#loadHistory_mask(style='display:none')
-      table#history_table(data-striped='true',data-pagination='true',data-page-size='10')
-        thead
-          tr
-            th(data-field='date') 日期
-            th(data-field='target') 属性
-            th(data-field='new') 变更
-            th(data-field='remark') 备注
-    div.page-header
-      h3(style='margin-top:0;display:inline-block') 上课记录
-      a#loadClassesBtn(href='#',title='点击加载')
-        span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
-    div#loadClasses_mask(style='display:none')
-      div.filter(style='margin:0 0 7px 3px')
-        label.radio-inline
-          input(type="radio",name="classFilter",value="PAST",checked)
-          |已上课程
-        label.radio-inline
-          input(type="radio",name="classFilter",value="FUTURE")
-          |未上课程
-        label.radio-inline
-          input(type="radio",name="classFilter",value="ALL")
-          |全部
-      table#classes_table(data-striped='true',data-sort-name='date',data-sort-order='desc',data-pagination='true',data-page-size='10',data-unique-id="_id")
-        -var showBookCol = tenant_feature === "book"
-        thead
-          tr
-            //th(data-field='_id',data-visible='false') ID
-            th(data-field='name') 课程名称
-            th(data-field='cost') 课时
-            th(data-field='date',data-sortable='true') 课程日期
-            if showBookCol
-              th(data-field='books') 绘本
-            else
-              th(data-field='books', data-visible='false') 绘本
-            th(data-field='booking') 签到
-            th 旗标
-            th 备注
-    div(style='height:20px')
-
-  div#commentDlg
+  div#memberID.hidden-print(style='padding-top:69px',data-member-id=memberID)
+  div#app.container
   div#historyComment_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content

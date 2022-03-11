@@ -13,6 +13,7 @@
   "create": "创建",
   "create_classroom": "创建教室",
   "delete": "删除",
+  "view": "查看",
   "not_started": "未开始",
   "view_member_course_title": "分配会员在此班级的课程",
   "booking_summary_title": "自动分配课程确认",
@@ -54,5 +55,13 @@
   "green_flag": "绿旗",
   "comment": "备注",
   "support_contact": "客服电话",
-  "org_address": "门店地址"
+  "org_address": "门店地址",
+  "course_name": "班级名称",
+  "finished": "已上",
+  "unfinished": "未上",
+  "total": "总计",
+  "no_record": "没有记录",
+  "other_self_booking": "自助预约课程",
+  "deleted_course": "<班级被删除>",
+  "course_summary_title": "参与的班级"
 }
