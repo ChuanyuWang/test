@@ -11,8 +11,8 @@ var counter = 1;
 
 /* tenant object
 {
-    appid : 'wxe5e454c5dff8c7b2',
-    appsecret : 'f3893474595ddada8e5c2ac5b4e40136',
+    appid : '',
+    appsecret : '',
     token : 'Hibanana',
     encodingAESKey : '',
     name : 'test',
