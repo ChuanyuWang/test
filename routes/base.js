@@ -73,7 +73,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function(req, res, next)
     if (!ObjectId.isValid(req.params.memberID)) return next();
     res.locals.memberID = req.params.memberID;
     res.render('bqsq/pages/member_view', {
-        title: '查看会员',
+        title: res.__('view_member'),
         user: req.user
     });
 });
