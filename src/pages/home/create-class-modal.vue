@@ -16,7 +16,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             label.control-label.col-sm-2(for='cost') 所需课时:
             div.col-sm-2
               input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
-          div.form-group(:class='{"has-error": errors.price}',:title='errors.price')
+          div.form-group(:class='{"has-error": errors.price}',:title='errors.price',style='display:none')
             label.control-label.col-sm-2(for='price') 所需费用:
             div.col-sm-2
               input.form-control(type='number',name='price',min='0',step='0.1',v-model.number='price')
