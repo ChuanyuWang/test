@@ -22,7 +22,7 @@ div.container
     div.form-group(v-if='memberData.openid')
       label.col-sm-2.control-label openID:
       div.col-sm-10
-        p.form-control-static {{memberData.openid}
+        p.form-control-static {{memberData.openid}}
     div.form-group(:class='{"has-error": errors.name}')
       label.col-sm-2.control-label 姓名:
       div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
