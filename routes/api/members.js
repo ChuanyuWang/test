@@ -13,6 +13,7 @@ var db_utils = require('../../server/databaseManager');
  *  source: "manual|book", // default is "manual"
  *  status: "active|inactive",
  *  since: Date,
+ *  openid: String,
  *  membership: [
  *      {
  *          type: "ALL|LIMITED",
@@ -52,7 +53,8 @@ var NORMAL_FIELDS = {
     expire: 1,
     note: 1,
     source: 1,
-    membership: 1
+    membership: 1,
+    openid: 1
 };
 
 router.post('/validate', async function(req, res, next) {

@@ -149,7 +149,8 @@ router.post('/', async function(req, res, next) {
                     status: "active",
                     source: "book",
                     since: new Date(),
-                    membership: []
+                    membership: [],
+                    openid: req.body.openid || undefined
                 };
                 let result = await members.insertOne(doc);
                 console.debug("create member successfully with result: %j", result.result);
@@ -162,7 +163,16 @@ router.post('/', async function(req, res, next) {
             }
         } else {
             console.log("member is found %j", doc);
+            // update openid if not the same
+            if (req.body.openid && req.body.openid !== doc.openid) {
+                await members.findOneAndUpdate(
+                    { _id: doc._id },
+                    { $set: { "openid": req.body.openid } }
+                );
+                doc.openid = req.body.openid;
+            }
         }
+
 
         let error = reservation.check(doc, cls, req.body.quantity);
         if (error) {

@@ -8,12 +8,10 @@ var common = require('../../common/common');
 var i18nextplugin = require('../../locales/i18nextplugin');
 var booking_app = require('./booking.vue').default;
 
-// open id of Weichat user
-var _openid = undefined; // eslint-disable-line
-
 var ua = navigator.userAgent.toLowerCase();
 if (ua.indexOf('micromessenger') > -1) { // we are within wechat
     var tenant = common.getTenantName();
+    //TODO, remove test tenant
     if (tenant === "test") {
         var code = common.getParam("code");
         if (!code) {
@@ -74,12 +72,10 @@ function getOpenId(code) {
             "tenant": tenant
         },
         success: function(data) {
-            window._openid = (data || {}).openid;
             app.openID = data.openid;
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert(JSON.stringify(jqXHR.responseJSON));
-            window._openid = false;
         },
         dataType: "json"
     });

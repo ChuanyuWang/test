@@ -240,7 +240,7 @@ module.exports = {
       });
     },
     addNewBook(bookInfo) {
-      var vue = this;
+      var vm = this;
       try {
         localStorage._name = bookInfo.name;
         localStorage._contact = bookInfo.contact;
@@ -256,29 +256,29 @@ module.exports = {
         classid: bookInfo.classid,
         name: bookInfo.name,
         contact: bookInfo.contact,
-        quantity: parseInt(bookInfo.quantity)
+        quantity: parseInt(bookInfo.quantity),
+        openid: vm.openID || undefined
       });
 
       request.done(function(data, textStatus, jqXHR) {
         var classInfo = data['class'];
         // update booking data
-        vue.items.some(function(value, index, array) {
+        vm.items.some(function(value, index, array) {
           if (value._id === classInfo._id) {
             // class object doesn't have "booking" property at the beginning
-            Vue.set(value, "booking", classInfo.booking);
+            vm.set(value, "booking", classInfo.booking);
             return true;
           }
         });
-        vue.updateSuccessMessage(data['member'], classInfo);
-        vue.$refs.successDlg.show();
-        // send a message to user through weixin
-        if (window._openid) {
-          var tenant = common.getTenantName();
+        vm.updateSuccessMessage(data['member'], classInfo);
+        vm.$refs.successDlg.show();
+        // send a message to user through wechat
+        if (vm.openID) {
           var msg = {
-            openid: _openid,
+            openid: vm.openID,
             message: "您已预约" + moment(classInfo.date).format('MMMDoah:mm')
               + "的课程，请准时参加。\n您还剩余" + credit + "课时",
-            tenant: tenant
+            tenant: common.getTenantName()
           };
           $.ajax("/api/sendNotification", {
             type: "POST",
@@ -296,8 +296,8 @@ module.exports = {
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
         //console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
-        vue.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
-        vue.$refs.errorDlg.show();
+        vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        vm.$refs.errorDlg.show();
       });
     },
     updateSuccessMessage(member, classInfo) {
