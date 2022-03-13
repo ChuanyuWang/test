@@ -83,7 +83,7 @@ module.exports = {
     hide: function(emitOKEvent) {
       $(this.$el).modal('hide');
       if (emitOKEvent) {
-        this.$emit('ok', this.param || undefined);
+        this.$emit('ok', this.param);
       }
     }
   },
