@@ -29,13 +29,14 @@ if (ua.indexOf('micromessenger') > -1) { // we are within wechat
 
 //getOpenId("071wHvFa1DEwVz00lsIa1XQYSn0wHvF6"); // testing only
 
+var app = null;
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
 
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
-    new Vue({ el: '#app', extends: booking_app });
+    app = new Vue({ el: '#app', extends: booking_app });
 });
 
 // Functions =============================================================
@@ -74,8 +75,10 @@ function getOpenId(code) {
         },
         success: function(data) {
             window._openid = (data || {}).openid;
+            app.openID = data.openid;
         },
         error: function(jqXHR, textStatus, errorThrown) {
+            alert(JSON.stringify(jqXHR.responseJSON));
             window._openid = false;
         },
         dataType: "json"
