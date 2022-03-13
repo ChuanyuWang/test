@@ -266,7 +266,7 @@ module.exports = {
         vm.items.some(function(value, index, array) {
           if (value._id === classInfo._id) {
             // class object doesn't have "booking" property at the beginning
-            vm.set(value, "booking", classInfo.booking);
+            Vue.set(value, "booking", classInfo.booking);
             return true;
           }
         });
