@@ -109,6 +109,14 @@ div.container
     bootstrap-table(ref='classesTable',:columns='classRecord.columns',:options='classRecord.options')
   div(style='height:20px')
   comment-modal(ref='commentDlg')
+  modal-dialog(ref='historyCommentDlg',buttonStyle="success",buttons="confirm",@ok="updateMembership") 确认并保存
+    template(v-slot:body)
+      form
+        div.form-group
+          label.control-label 备注:
+          textarea.form-control(rows='3', name='comment',placeholder='备注修改会员卡的原因（选填）',v-model='toBeSavedMemo')
+          small(style='color:#777;float:right;margin-top:2px') 不超过256个字，添加到备忘和充值记录备注中
+    template(v-slot:action) 保存
 </template>
 
 <script>
@@ -119,6 +127,7 @@ div.container
  */
 var cardComp = require('./card.vue').default;
 var date_picker = require('../../components/date-picker.vue').default;
+var modalDialog = require("../../components/modal-dialog.vue").default;
 var comment_dlg = require('./comment-modal.vue').default;
 var common = require('../../common/common');
 var memberService = require('../../services/members');
@@ -133,6 +142,7 @@ module.exports = {
     "BootstrapTable": BootstrapTable,
     "card": cardComp,
     "date-picker": date_picker,
+    "modal-dialog": modalDialog,
     "comment-modal": comment_dlg
   },
   data: function() {
@@ -149,6 +159,9 @@ module.exports = {
         note: "",
         membership: [],
       },
+      toBeSavedMemo: "",
+      toBeSavedMembership: {},
+      toBeSavedMembershipIndex: -1,
       summary: [],
       comments: [],
       changeHistory: {
@@ -277,33 +290,29 @@ module.exports = {
       });
     },
     saveCardInfo: function(card, index) {
+      this.toBeSavedMembership = card;
+      this.toBeSavedMembershipIndex = index;
+      // open the confirm dialog with comment
+      this.toBeSavedMemo = "";
+      this.$refs.historyCommentDlg.show(this.toBeSavedMembershipIndex);
+    },
+    updateMembership: function(index) {
       var vm = this;
-      var confirmDlg = $('#historyComment_dlg');
-      // remove previous OK button's click listener
-      confirmDlg.find('button.btn-success').off('click');
-      confirmDlg.find('button.btn-success').one('click', function(event) {
-        var modal = $(this).closest('.modal');
-        var memo = modal.find('textarea[name=comment]').val().trim();
-        card.memo = memo; // append the memo for this change if there is any
-        // handle the click OK button
-        if (index > -1) {
-          var request = memberService.updateCard(vm.memberData._id, index, card);
-          request.done(function(data, textStatus, jqXHR) {
-            bootbox.alert('会员卡更新成功');
-            Vue.set(vm.memberData.membership, index, data.membership[index]);
-          });
-        } else {
-          var request = memberService.createCard(vm.memberData._id, card);
-          request.done(function(data, textStatus, jqXHR) {
-            bootbox.alert('会员卡创建成功');
-            vm.memberData.membership = data.membership;
-          });
-        }
-        // hide the confirm dialog in the end
-        confirmDlg.modal('hide');
-      });
-      // pop up the confirm dialog with extra memo input
-      confirmDlg.modal('show');
+      // append the memo for this change if there is any
+      this.toBeSavedMembership.memo = this.toBeSavedMemo.trim();
+      if (index > -1) {
+        var request = memberService.updateCard(this.memberData._id, index, this.toBeSavedMembership);
+        request.done(function(data, textStatus, jqXHR) {
+          bootbox.alert('会员卡更新成功');
+          Vue.set(vm.memberData.membership, index, data.membership[index]);
+        });
+      } else {
+        var request = memberService.createCard(this.memberData._id, this.toBeSavedMembership);
+        request.done(function(data, textStatus, jqXHR) {
+          bootbox.alert('会员卡创建成功');
+          vm.memberData.membership = data.membership;
+        });
+      }
     },
     deactivateAlert: function(e) {
       if (this.memberData.status == 'inactive') {
