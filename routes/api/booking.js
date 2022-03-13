@@ -140,6 +140,7 @@ router.post('/', async function(req, res, next) {
         // find the user who want to book a class
         let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
         if (!doc) {
+            //TODO, remove the tenant check
             if (req.tenant.name == "test") {
                 // create new member if not exist
                 doc = {
