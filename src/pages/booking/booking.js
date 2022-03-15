@@ -35,6 +35,8 @@ $(document).ready(function() {
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
     app = new Vue({ el: '#app', extends: booking_app });
+    // Test only
+    //app.openID = "o9lk5w_d08t3gW6KY9VkdWU5rnnU";
 });
 
 // Functions =============================================================
