@@ -70,6 +70,7 @@ module.exports = {
         bootstrap_datetimepicker_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/eonasdan-bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css',
         bootbox: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootbox.js/4.4.0/bootbox.min.js',
         echarts: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/3.8.5/echarts.min.js',
-        echarts_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/3.8.5/echarts.js'
+        echarts_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/3.8.5/echarts.js',
+        blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js'
     }
 };
