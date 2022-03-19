@@ -198,6 +198,7 @@ module.exports = {
     this.tenantConfig = _getTenantConfig();
   },
   mounted: function() {
+    // refer to https://help.aliyun.com/document_detail/193141.html?spm=a2c4g.11186623.6.554.1b9229ea8MPmvr
     this.nc = NoCaptcha.init({
       renderTo: "#nc",
       appkey: this.nc_appKey,
