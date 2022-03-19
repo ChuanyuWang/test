@@ -22,7 +22,8 @@ var helper = require('../../helper');
  *          quantity: Number,
  *          bookDate: Date,
  *          status: "checkin|absent|null",
- *          flag: "null|red|yellow|green"
+ *          flag: "null|red|yellow|green",
+ *          comment: String
  *      }
  *  ],
  *  books: [
