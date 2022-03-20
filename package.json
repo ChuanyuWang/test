@@ -36,7 +36,8 @@
     "pug": "^2.0.4",
     "serve-favicon": "^2.5.0",
     "wechat": "^2.0.3",
-    "wechat-api": "^1.27.1"
+    "wechat-api": "^1.27.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
