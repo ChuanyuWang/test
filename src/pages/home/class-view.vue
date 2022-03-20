@@ -30,7 +30,7 @@ div.container
       label.control-label.col-sm-2 所须课时:
       div.col-sm-10
         p.form-control-static {{cls.cost}}
-    div.form-group(style='display:none')
+    div.form-group(v-if="cls.price")
       label.control-label.col-sm-2 价格:
       div.col-sm-10
         p.form-control-static {{cls.price | toFixed1}}元
