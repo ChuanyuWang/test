@@ -5,6 +5,8 @@ const credentials = require('../config.db');
 const bent = require('bent');
 const getAccessToken = bent('https://api.weixin.qq.com/sns/oauth2/access_token', 'GET', 'json', 200);
 
+//TODO, add RateLimit
+
 // API routers ===========================================================
 
 router.use(getTenantInfo);
