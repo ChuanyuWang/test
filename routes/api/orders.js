@@ -10,11 +10,12 @@ const xml2js = require('xml2js');
 
 /**
  * {
+ *  tradeno: Number
  *  name: String,
  *  contact: String,
  *  memberid: ObjectId,
  *  classid: ObjectId,
- *  status: "open|notpay|payerror|success|closed|refund",
+ *  status: "open|notpay|success|closed|refund",
  *  quantity: Int,
  *  body: String,
  *  detail: String,
@@ -26,7 +27,9 @@ const xml2js = require('xml2js');
  *  timeexpire: Date,
  *  tradetype: "JSAPI|NATIVE|APP",
  *  prepayid: String,
- *  codeurl: String
+ *  codeurl: String,
+ *  transactionid: String, // define by WxPay callback
+ *  querycount: 0,
  *  errorcode: String,
  *  errormessage: String
  * }
@@ -36,7 +39,6 @@ const xml2js = require('xml2js');
 const wxpay = bent('https://api.mch.weixin.qq.com/pay', 'POST', 200);
 
 router.post('/', validateCreateOrderRequest, findMember, findClass, async function(req, res, next) {
-    let tenantDB = await db_utils.connect(req.tenant.name);
 
     //TODO, find existing notpay order
     let order = {
@@ -59,7 +61,9 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
         tradetype: req.body.tradeType
     };
     try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
         let orders = tenantDB.collection("orders");
+        order.tradeno = await generateTradeNo(orders);
         let result = await orders.insertOne(order);
         console.debug("create order successfully with result: %j", result.result);
 
@@ -78,7 +82,7 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
             { returnDocument: "after" }
         );
 
-        return res.json(result.value);
+        return res.json(generateWxPayParams(result.value));
     } catch (error) {
         if (error instanceof UnifiedOrderError) {
             return next(error);
@@ -87,6 +91,55 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
             err.innerError = error;
             return next(err);
         }
+    }
+});
+
+router.post('/confirmPay', async function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
+    if (!req.body.hasOwnProperty("prepayid")) {
+        let error = new Error("prepayid is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let orders = tenantDB.collection("orders");
+        let query = { prepayid: req.body.prepayid };
+        let doc = await orders.findOne(query);
+        if (doc.status === "notpay") {
+            // TODO, check query count
+            //query payment status
+            let payResult = await queryOrder(doc);
+            let result = await orders.findOneAndUpdate({
+                _id: doc._id,
+                status: "notpay"
+            }, {
+                $set: {
+                    status: payResult.error_type ? "notpay" : "success", // notpay ==> success
+                    transactionid: payResult.transaction_id,
+                    errorcode: payResult.error_type,
+                    errormessage: payResult.error_msg
+                },
+                $inc: {
+                    querycount: 1 // add query count
+                }
+            }, {
+                returnDocument: "after"
+            });
+            return res.json(result.value);
+        } else {
+            return res.json(doc);
+        }
+    } catch (error) {
+        let err = new Error("Cofirm payment fails");
+        err.innerError = error;
+        return next(err);
     }
 });
 
@@ -228,6 +281,57 @@ async function findClass(req, res, next) {
     }
 }
 
+async function queryOrder(order) {
+    let params = {
+        appid: credentials.AppID,
+        mch_id: credentials.mch_id,
+        nonce_str: util.generateNonceString(),
+        out_trade_no: order.tradeno
+    }
+    let signCode = util.sign(params, credentials.apiKey);
+    params.sign = signCode;
+    const builder = new xml2js.Builder();
+
+    console.debug("Query order with below params:");
+    console.debug(params);
+    let response = await wxpay("/orderquery", builder.buildObject(params));
+    let responseText = await response.text();
+    let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
+    let result = await parser.parseStringPromise(responseText);
+    console.debug("receiving response from wechat pay:")
+    console.debug(result);
+
+    if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS" && result.trade_state === "SUCCESS") {
+        // TODO update order status and append transaction_id
+        return {
+            error_msg: "",
+            error_type: "",
+            transaction_id: result.transaction_id
+        }
+    } else if (result.return_code !== "SUCCESS") {
+        // check the communication result
+        return {
+            error_msg: result.return_msg,
+            error_type: "return_code",
+            transaction_id: result.transaction_id
+        }
+    } else if (result.result_code !== "SUCCESS") {
+        // chcek the business result
+        return {
+            error_msg: `[${result.err_code}]${result.err_code_des}`,
+            error_type: "result_code",
+            transaction_id: result.transaction_id
+        }
+    } else if (result.trade_state !== "SUCCESS") {
+        // check the trade status
+        return {
+            error_msg: `[${result.trade_state}]${result.trade_state_desc}`,
+            error_type: "trade_state",
+            transaction_id: result.transaction_id
+        }
+    }
+}
+
 class UnifiedOrderError extends Error {
     constructor(message) {
         super(message);
@@ -241,7 +345,8 @@ async function createUnifiedOrder(order) {
         mch_id: credentials.mch_id,
         nonce_str: util.generateNonceString(),
         body: order.body,
-        out_trade_no: order._id.toHexString(),
+        out_trade_no: order.tradeno,
+        attach: order._id.toHexString(), // pass the order _id as additional data
         fee_type: order.feetype,
         total_fee: Number.parseInt(order.totalfee * 100),
         spbill_create_ip: order.clientip,
@@ -278,6 +383,43 @@ async function createUnifiedOrder(order) {
     } else if (result.result_code !== "SUCCESS") {
         // chcek the business result
         throw new UnifiedOrderError(`[${result.err_code}]${result.err_code_des}`);
+    }
+}
+
+function generateWxPayParams(order) {
+    let params = {
+        appid: credentials.AppID,
+        timeStamp: parseInt(new Date().getTime() / 1000),
+        nonceStr: util.generateNonceString(),
+        package: order.prepayid,
+        signType: "MD5"
+    };
+    let signCode = util.sign(params, credentials.apiKey);
+    params.paySign = signCode;
+    return params;
+}
+/**
+ * YYYYMMDD + 6-digit seq No. e.g. 20220321000055
+ * @param {ObjectId} id 
+ * @returns 
+ */
+async function generateTradeNo(orders) {
+    try {
+        let d = new Date();
+        let result = await orders.findOneAndUpdate({
+            _id: ObjectId("--order-id--")
+        }, {
+            $inc: { seq: 1 }
+        }, {
+            upsert: true, returnDocument: "after"
+        });
+        let seq = parseInt(result.value.seq % 1000000); // get 6 digits seq number
+        let datePart = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+        return datePart * 1000000 + seq;
+    } catch (error) {
+        let err = new UnifiedOrderError("Fail to generate trade No.");
+        err.innerError = error;
+        return error;
     }
 }
 
