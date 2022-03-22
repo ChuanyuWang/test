@@ -45,7 +45,7 @@ div
   modal-dialog(ref='bookDlg',size="small",buttonStyle="success",buttons="confirm",:hasError="hasError",@ok="addNewBook(bookItem)") 预约课程
     template(v-slot:body)
       form.form-horizontal
-        div.form-group.form-group-sm(style='margin-bottom:9px')
+        div.form-group.form-group-sm
           label.control-label-sm.col-xs-3 时间:
           div.col-xs-9
             p.form-control-static {{bookItem.date | dateTimeFormatter}}
@@ -84,6 +84,7 @@ div
         br
         small {{$t('org_address')}}:
           a(:href='tenantConfig.addressLink') {{tenantConfig.address}}
+  pay-dialog(ref='payDlg',:bookItem='bookItem',:openid='openID')
 </template>
 
 <script>
@@ -96,6 +97,7 @@ div
 var common = require("../../common/common");
 var class_service = require("../../services/classes");
 var modalDialog = require("../../components/modal-dialog.vue").default;
+var payDialog = require("./pay-modal.vue").default;
 
 module.exports = {
   name: "booking-app",
@@ -122,13 +124,16 @@ module.exports = {
         date: null,
         content: "",
         name: "",
+        teacher: "",
+        price: 0,
         contact: "",
         classid: null
       }
     };
   },
   components: {
-    "modal-dialog": modalDialog
+    "modal-dialog": modalDialog,
+    "pay-dialog": payDialog
   },
   computed: {
     classesByDay() {
@@ -297,7 +302,12 @@ module.exports = {
       request.fail(function(jqXHR, textStatus, errorThrown) {
         //console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
         vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
-        vm.$refs.errorDlg.show();
+        var errorCode = jqXHR.responseJSON && jqXHR.responseJSON.code;
+        if ((errorCode == 7001 || errorCode == 7002) && bookInfo.price > 0) {
+          vm.$refs.payDlg.show("剩余课时不足，请直接购买。");
+        } else {
+          vm.$refs.errorDlg.show();
+        }
       });
     },
     updateSuccessMessage(member, classInfo) {
@@ -323,9 +333,11 @@ module.exports = {
       this.bookItem.classid = item._id;
       this.bookItem.date = item.date;
       this.bookItem.content = item.name;
+      this.bookItem.price = item.price || 0;
+      this.bookItem.teacher = item.teacher;
       this.bookItem.name = localStorage._name;
       this.bookItem.contact = localStorage._contact;
-      this.$refs.bookDlg.show();
+      this.$refs.bookDlg.show(item);
     },
     getMonday(date) {
       var _date = moment(date);
