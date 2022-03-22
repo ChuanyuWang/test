@@ -67,7 +67,7 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
         let result = await orders.insertOne(order);
         console.debug("create order successfully with result: %j", result.result);
 
-        let prepay_id = await createUnifiedOrder(order);
+        let prepay_id = await createUnifiedOrder(order, req.tenant.name);
         result = await orders.findOneAndUpdate(
             {
                 _id: order._id,
@@ -298,6 +298,7 @@ async function queryOrder(order) {
     let responseText = await response.text();
     let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
     let result = await parser.parseStringPromise(responseText);
+    //TODO, validate sign
     console.debug("receiving response from wechat pay:")
     console.debug(result);
 
@@ -339,7 +340,7 @@ class UnifiedOrderError extends Error {
     }
 }
 
-async function createUnifiedOrder(order) {
+async function createUnifiedOrder(order, tenantName) {
     let params = {
         appid: credentials.AppID,
         mch_id: credentials.mch_id,
@@ -352,7 +353,7 @@ async function createUnifiedOrder(order) {
         spbill_create_ip: order.clientip,
         time_start: formatTimeStamp(order.timestart),
         time_expire: formatTimeStamp(order.timeexpire),
-        notify_url: "https://www.getbestlesson.com/api/wxpay/notify", //TODO, hardcode
+        notify_url: "https://www.getbestlesson.com/api/wxpay/notify/" + tenantName, //TODO, hardcode
         trade_type: order.tradetype,
         product_id: order.classid.toHexString(),
         openid: order.openid
