@@ -4,6 +4,8 @@ const db_utils = require('../server/databaseManager');
 const credentials = require('../config.db');
 const bent = require('bent');
 const getAccessToken = bent('https://api.weixin.qq.com/sns/oauth2/access_token', 'GET', 'json', 200);
+const xml2js = require('xml2js');
+const util = require('./api/lib/util');
 
 //TODO, add RateLimit
 
@@ -55,8 +57,74 @@ router.get('/getOpenID', async function(req, res, next) {
     }
 });
 
-router.post('/wxpay/notify', function(req, res, next) {
+router.post('/wxpay/notify/:tenant', async function(req, res, next) {
+    let result = {};
+    let response = {
+        return_code: "SUCCESS",
+        return_msg: "OK"
+    };
+    console.log("receiving notification from wechat pay");
+    console.debug(req.body);
+    const builder = new xml2js.Builder();
+    try {
+        let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
+        result = await parser.parseStringPromise(req.body);
 
+        //validate sign in case someone fake the payment
+        if (!validateSign(result)) {
+            response.return_code = "FAIL";
+            response.return_msg = "签名失败";
+            console.warn("WxPay notify sign is invalid");
+            console.warn(result);
+            return res.send(builder.buildObject(response));
+        }
+    } catch (error) {
+        console.error(error);
+        response.return_code = "FAIL";
+        response.return_msg = error.message;
+        return res.send(builder.buildObject(response));
+    }
+    try {
+        let error = "", message = "", status = "notpay";
+        if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS") {
+            // update the order as success
+            status = "success";
+        } else if (result.return_code !== "SUCCESS") {
+            // check the communication result
+            error = "return_code";
+            message = result.return_msg;
+        } else if (result.result_code !== "SUCCESS") {
+            // chcek the business result
+            error = "result_code";
+            message = `[${result.err_code}]${result.err_code_des}`;
+        }
+        if (error) {
+            console.log(`receive fail payment notification, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}, error code: ${error}, message: ${message}`);
+        } else {
+            console.log(`receive success payment notification, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}`);
+        }
+
+        let tenantDB = await db_utils.connect(req.params.tenant);
+        let orders = tenantDB.collection("orders");
+        await orders.findOneAndUpdate(
+            { tradeno: result.out_trade_no, status: "notpay" },
+            {
+                $set: {
+                    status: status,
+                    transactionid: result.transaction_id,
+                    errorcode: error,
+                    errormessage: message
+                }
+            }
+        );
+
+        return res.send(builder.buildObject(response));
+    } catch (error) {
+        console.error(error);
+        response.return_code = "FAIL";
+        response.return_msg = error.message;
+        return res.send(builder.buildObject(response));
+    }
 });
 
 router.post('/sendNotification', async function(req, res, next) {
@@ -72,6 +140,16 @@ router.post('/sendNotification', async function(req, res, next) {
         return next(error);
     }
 });
+
+function validateSign(params) {
+    let sign = params.sign;
+    delete params.sign;
+    if (params.sign_type == "HMAC-SHA256") {
+        return sign === util.sign2(params, credentials.apiKey);
+    } else {
+        return sign === util.sign(params, credentials.apiKey);
+    }
+}
 
 async function getTenantInfo(req, res, next) {
     if (req.tenant) {
