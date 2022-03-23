@@ -391,9 +391,9 @@ async function createUnifiedOrder(order, tenantName) {
 function generateWxPayParams(order) {
     let params = {
         appId: credentials.AppID,
-        timeStamp: parseInt(new Date().getTime() / 1000),
+        timeStamp: parseInt(new Date().getTime() / 1000).toString(),
         nonceStr: util.generateNonceString(),
-        package: order.prepayid,
+        package: `prepay_id=${order.prepayid}`,
         signType: "MD5"
     };
     let signCode = util.sign(params, credentials.apiKey);
