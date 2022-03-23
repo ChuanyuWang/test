@@ -13,11 +13,11 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             div.col-sm-10
               input#cls_name.form-control(type='text',placeholder='课程描述',autofocus,v-model='name')
           div.form-group(:class='{"has-error": errors.cost}',:title='errors.cost')
-            label.control-label.col-sm-2(for='cost') 所需课时:
+            label.control-label.col-sm-2(for='cost') 课时:
             div.col-sm-2
               input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
           div.form-group(:class='{"has-error": errors.price}',:title='errors.price',style='display:none')
-            label.control-label.col-sm-2(for='price') 所需费用:
+            label.control-label.col-sm-2(for='price') 价格:
             div.col-sm-2
               input.form-control(type='number',name='price',min='0',step='0.1',v-model.number='price')
           div.form-group
