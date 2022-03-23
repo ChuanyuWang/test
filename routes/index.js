@@ -7,7 +7,7 @@ const helper = require('../helper');
 
 var loginLimiter = new RateLimit({
     windowMs: 1000 * 60, // 1 minutes
-    max: 5, // limit each IP to 10 requests per windowMs
+    max: 10, // limit each IP to 10 requests per windowMs
     delayMs: 0, // disable delaying - full speed until the max limit is reached
     // Error message returned when max is exceeded.
     message: "Too many login requests, please try again later."
