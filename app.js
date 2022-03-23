@@ -68,7 +68,7 @@ app.locals.pretty = true; // output the pretty html for consistency
 if (app.locals.ENV_DEVELOPMENT) {
     app.use(morgan('dev'));
 } else {
-    app.use(morgan('[:date[iso]] :remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length]'));
+    app.use(morgan('[:date[iso]] :remote-addr - :remote-user :method :url :status :res[content-length] - :response-time ms'));
 }
 
 // Use gzip compression
