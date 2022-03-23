@@ -118,12 +118,13 @@ router.post('/confirmPay', async function(req, res, next) {
         if (doc.status === "notpay") {
             //query payment status
             let payResult = await queryOrder(doc);
+            let status = payResult.error_type ? "notpay" : "success";
             let result = await orders.findOneAndUpdate({
                 _id: doc._id,
                 status: "notpay"
             }, {
                 $set: {
-                    status: payResult.error_type ? "notpay" : "success", // notpay ==> success
+                    status: status, // notpay ==> success
                     transactionid: payResult.transaction_id,
                     errorcode: payResult.error_type,
                     errormessage: payResult.error_msg
@@ -134,10 +135,13 @@ router.post('/confirmPay', async function(req, res, next) {
             }, {
                 returnDocument: "after"
             });
+            console.log(`Update order ${doc.tradeno} status from "notpay" to "${status}"`);
+
             return res.json(result.value);
         } else {
             return res.json(doc);
         }
+        // TODO, add booking !!!
     } catch (error) {
         let err = new Error("Cofirm payment fails");
         err.innerError = error;
@@ -307,7 +311,7 @@ async function queryOrder(order) {
     if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS" && result.trade_state === "SUCCESS") {
         // TODO update order status and append transaction_id
         return {
-            error_msg: "",
+            error_msg: result.trade_state_desc,
             error_type: "",
             transaction_id: result.transaction_id
         }
@@ -404,7 +408,7 @@ function generateWxPayParams(order) {
 /**
  * YYYYMMDD + 6-digit seq No. e.g. 20220321000055
  * @param {ObjectId} id 
- * @returns 
+ * @returns Number
  */
 async function generateTradeNo(orders) {
     try {
