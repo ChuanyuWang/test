@@ -163,7 +163,7 @@ module.exports = {
     },
     confirmPay(params) {
       var vm = this;
-      orders_service.confirmPay({
+      var request = orders_service.confirmPay({
         "tenant": common.getTenantName(),
         // package is like "prepay_id=wx23114615719969d4a38d1115ef7a390000"
         prepayid: params.package.split("=")[1]
@@ -180,7 +180,7 @@ module.exports = {
         }
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        //TODO
+        //TODO, handle error case, retry??
         vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
         vm.status = "error";
       });
