@@ -15,6 +15,7 @@ exports.generateNonceString = function(length) {
 
 /**
  * Sign params with key as MD5
+ * Testing tool: https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=20_1
  * @param {*} params 
  * @param {*} key 
  * @returns 

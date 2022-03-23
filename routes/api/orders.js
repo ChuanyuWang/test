@@ -40,7 +40,6 @@ const moment = require('moment');
 const wxpay = bent('https://api.mch.weixin.qq.com/pay', 'POST', 200);
 
 router.post('/', validateCreateOrderRequest, findMember, findClass, async function(req, res, next) {
-
     //TODO, find existing notpay order
     let order = {
         name: req.body.name,
@@ -66,7 +65,7 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
         let orders = tenantDB.collection("orders");
         order.tradeno = await generateTradeNo(orders);
         let result = await orders.insertOne(order);
-        console.debug("create order successfully with result: %j", result.result);
+        // result.result is {"n":1,"ok":1}
 
         let prepay_id = await createUnifiedOrder(order, req.tenant.name);
         result = await orders.findOneAndUpdate(
@@ -82,7 +81,8 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
             },
             { returnDocument: "after" }
         );
-
+        // result.ok is 1
+        console.log(`Create order ${order.tradeno} successfully`);
         return res.json(generateWxPayParams(result.value));
     } catch (error) {
         if (error instanceof UnifiedOrderError) {
@@ -135,15 +135,15 @@ router.post('/confirmPay', async function(req, res, next) {
             }, {
                 returnDocument: "after"
             });
+            doc = result.value;
             console.log(`Update order ${doc.tradeno} status from "notpay" to "${status}"`);
-
-            return res.json(result.value);
         } else {
-            return res.json(doc);
+            console.log(`Confirm order ${doc.tradeno} status as "${doc.status}"`);
         }
         // TODO, add booking !!!
+        return res.json(doc);
     } catch (error) {
-        let err = new Error("Cofirm payment fails");
+        let err = new Error("Confirm payment fails");
         err.innerError = error;
         return next(err);
     }
@@ -287,6 +287,11 @@ async function findClass(req, res, next) {
     }
 }
 
+/**
+ * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_2
+ * @param {String} order 
+ * @returns 
+ */
 async function queryOrder(order) {
     let params = {
         appid: credentials.AppID,
@@ -305,7 +310,7 @@ async function queryOrder(order) {
     let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
     let result = await parser.parseStringPromise(responseText);
     //TODO, validate sign
-    console.debug("receiving response from wechat pay:")
+    console.debug("Receiving response from wechat pay:")
     console.debug(result);
 
     if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS" && result.trade_state === "SUCCESS") {
@@ -346,6 +351,12 @@ class UnifiedOrderError extends Error {
     }
 }
 
+/**
+ * Refer to https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
+ * @param {Object} order 
+ * @param {String} tenantName 
+ * @returns 
+ */
 async function createUnifiedOrder(order, tenantName) {
     let params = {
         appid: credentials.AppID,
@@ -368,7 +379,7 @@ async function createUnifiedOrder(order, tenantName) {
     params.sign = signCode;
     const builder = new xml2js.Builder();
 
-    console.debug("creating unified order with below params:");
+    console.debug("Creating unified order with below params:");
     console.debug(params);
     let response = await wxpay("/unifiedorder", builder.buildObject(params));
     let responseText = await response.text();
@@ -378,7 +389,7 @@ async function createUnifiedOrder(order, tenantName) {
     // trim (default: false): Trim the whitespace at the beginning and end of text nodes.
     let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
     let result = await parser.parseStringPromise(responseText);
-    console.debug("receiving response from wechat pay:")
+    console.debug("Receiving response from wechat pay:")
     console.debug(result);
 
     if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS") {
@@ -393,13 +404,18 @@ async function createUnifiedOrder(order, tenantName) {
     }
 }
 
+/**
+ * Refer to https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7
+ * @param {Object} order 
+ * @returns 
+ */
 function generateWxPayParams(order) {
     let params = {
         appId: credentials.AppID,
         timeStamp: parseInt(new Date().getTime() / 1000).toString(),
         nonceStr: util.generateNonceString(),
         package: `prepay_id=${order.prepayid}`,
-        signType: "MD5"
+        signType: "MD5" // should be the same sign type with creating unified order
     };
     let signCode = util.sign(params, credentials.apiKey);
     params.paySign = signCode;
@@ -410,10 +426,13 @@ function generateWxPayParams(order) {
  * @param {ObjectId} id 
  * @returns Number
  */
-async function generateTradeNo(orders) {
+async function generateTradeNo() {
     try {
         let d = new Date();
-        let result = await orders.findOneAndUpdate({
+        // The trade No has to be unique across all tenants
+        let configDB = await db_utils.connect("config");
+        let settings = configDB.collection("settings");
+        let result = await settings.findOneAndUpdate({
             _id: ObjectId("--order-id--")
         }, {
             $inc: { seq: 1 }
@@ -436,7 +455,7 @@ function formatTimeStamp(date) {
         // let res = date.toLocaleString('zh', { hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Shanghai' });
         // '2022/03/20 13:07:51' ==> '20220320130751'
         //return res.match(/\d/g).join("");
-        return moment(date).format("YYYYMMDDHHmmss");
+        return moment(date).format("YYYYMMDDHHmmss"); //"20220320130751" Beijing timezone
     }
     return "";
 }

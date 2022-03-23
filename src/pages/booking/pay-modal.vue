@@ -34,7 +34,7 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
             div.col-xs-10
               p.form-control-static
                 strong {{bookItem.price}}元
-    div.panel.panel-default(style='margin:-7px -7px 7px -7px')
+    div.panel.panel-default(style='margin:-7px -7px 0px -7px')
       div.panel-body(style='padding:7px 7px 7px 20px')
         label 退课须知:
         p 距离开课时间大于6小时取消预约, 支持全额退款;<br>
@@ -50,9 +50,9 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
         div.btn-group.btn-group-lg(role="group")
           button.btn.btn-success(type="button",@click="pay",:disabled="disablePayButton") 微信支付
       template(v-else)
-        div.btn 支付成功
+        div.btn.btn-success 支付成功
         div.btn(style="text-align:right",data-dismiss="modal")
-          small 返回继续预约
+          small 返回
         div.btn-group.btn-group-lg(role="group")
           button.btn.btn-primary(type="button",@click="openMyBooking") 我的预约
 </template>
@@ -126,7 +126,7 @@ module.exports = {
       var request = orders_service.add({
         "tenant": common.getTenantName(),
         "timeStart": moment().toISOString(),
-        "timeExpire": moment().add(15, 'minutes').toISOString(),
+        "timeExpire": moment().add(15, 'minutes').toISOString(), // expire in 15 mins
         "tradeType": "JSAPI",
         "classid": this.bookItem.classid,
         "name": this.bookItem.name,
@@ -183,6 +183,9 @@ module.exports = {
         //TODO, handle error case, retry??
         vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
         vm.status = "error";
+      });
+      request.always(function(data, textStatus, jqXHR) {
+        vm.warningMessage = "";
       });
     },
     openMyBooking() {
