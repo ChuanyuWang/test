@@ -390,7 +390,7 @@ async function createUnifiedOrder(order, tenantName) {
 
 function generateWxPayParams(order) {
     let params = {
-        appid: credentials.AppID,
+        appId: credentials.AppID,
         timeStamp: parseInt(new Date().getTime() / 1000),
         nonceStr: util.generateNonceString(),
         package: order.prepayid,
