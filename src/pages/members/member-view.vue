@@ -19,7 +19,7 @@ div.container
       label.col-sm-2.control-label 来源:
       div.col-sm-10
         p.form-control-static {{source|sourceFormatter}}
-    div.form-group(v-if='memberData.openid')
+    div.form-group(style='display:none')
       label.col-sm-2.control-label openID:
       div.col-sm-10
         p.form-control-static {{memberData.openid}}
