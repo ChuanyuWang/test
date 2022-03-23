@@ -63,15 +63,12 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
         return_code: "SUCCESS",
         return_msg: "OK"
     };
+    // Content-Type is "text/xml"
     console.log("receiving notification from wechat pay");
-    let contentType = req.get('Content-Type');
-    console.debug("request Content-Type is " + contentType);
     console.debug(req.body);
     const builder = new xml2js.Builder();
     try {
-        let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
-        result = await parser.parseStringPromise(req.body);
-
+        result = req.body;
         //validate sign in case someone fake the payment
         if (!validateSign(result)) {
             response.return_code = "FAIL";

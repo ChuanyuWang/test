@@ -1,4 +1,6 @@
 var express = require('express');
+const bodyParser = require('body-parser');
+require('body-parser-xml')(bodyParser);
 var compression = require('compression')
 var path = require('path');
 const mongoose = require('mongoose');
@@ -74,6 +76,13 @@ app.use(compression())
 
 app.use(express.json());
 app.use(express.text());
+app.use(bodyParser.xml({
+    xmlParseOptions: {
+        trim: true, // Trim the whitespace at the beginning and end of text nodes.
+        explicitRoot: false, // remove root node
+        explicitArray: false // Only put nodes in array if >1
+    }
+}));
 app.use(express.urlencoded({
     extended: true
 }));
