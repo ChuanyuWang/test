@@ -7,6 +7,7 @@ const bent = require('bent');
 const credentials = require('../../config.db');
 const { ObjectId } = require('mongodb');
 const xml2js = require('xml2js');
+const moment = require('moment');
 
 /**
  * {
@@ -426,10 +427,11 @@ async function generateTradeNo(orders) {
 
 function formatTimeStamp(date) {
     if (date instanceof Date) {
-        // format DateTime as '2022/03/20 13:07:51'
-        let res = date.toLocaleString('zh', { hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Shanghai' });
+        // format DateTime as '2022/03/20 13:07:51', caution: centOS runtime only return en-US locale string, which is "03/02/2022"
+        // let res = date.toLocaleString('zh', { hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Shanghai' });
         // '2022/03/20 13:07:51' ==> '20220320130751'
-        return res.match(/\d/g).join("");
+        //return res.match(/\d/g).join("");
+        return moment(date).format("YYYYMMDDHHmmss");
     }
     return "";
 }
