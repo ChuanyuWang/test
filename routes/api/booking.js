@@ -122,15 +122,16 @@ router.post('/', async function(req, res, next) {
         }
         console.log("class is found %j", cls);
 
-        // member can only book the class 1 hour before started
-        if (req.isUnauthenticated()) {
-            // 1 hours = 3600000 (1*60*60*1000)
-            if (Date.now() > cls.date.getTime() - 3600000) {
+        // 1 hours = 3600000 (1*60*60*1000)
+        if (Date.now() > cls.date.getTime() - 3600000) {
+            if (req.isUnauthenticated() || req.user.tenant != req.tenant.name) {
+                // member can only book the class 1 hour before started
                 let error = new Error("课程已经开始或即将开始(不足1小时)");
                 error.status = 400;
                 return next(error);
             }
         }
+
 
         let members = tenantDB.collection("members");
         let user_query = {
