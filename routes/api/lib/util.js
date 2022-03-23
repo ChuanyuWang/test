@@ -1,5 +1,5 @@
 
-const md5 = require('MD5');
+const md5 = require('md5');
 const HmacSHA256 = require("crypto-js/hmac-sha256");
 const Hex = require('crypto-js/enc-hex');
 
