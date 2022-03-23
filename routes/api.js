@@ -6,14 +6,14 @@ const bent = require('bent');
 const getAccessToken = bent('https://api.weixin.qq.com/sns/oauth2/access_token', 'GET', 'json', 200);
 const xml2js = require('xml2js');
 const util = require('./api/lib/util');
-const RateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
 
 
 //add RateLimit
-const limiter = new RateLimit({
+const limiter = rateLimit({
     windowMs: 1000 * 60, // 1 minutes
     max: 100, // limit each IP to 100 requests per windowMs
-    delayMs: 0, // disable delaying - full speed until the max limit is reached
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     // Error message returned when max is exceeded.
     message: "Too many API requests, please try again later."
 });

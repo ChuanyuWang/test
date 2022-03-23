@@ -2,13 +2,13 @@ var express = require('express');
 var passport = require('passport');
 var router = express.Router();
 var db_utils = require('../server/databaseManager');
-var RateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
 const helper = require('../helper');
 
-var loginLimiter = new RateLimit({
+const loginLimiter = rateLimit({
     windowMs: 1000 * 60, // 1 minutes
     max: 10, // limit each IP to 10 requests per windowMs
-    delayMs: 0, // disable delaying - full speed until the max limit is reached
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     // Error message returned when max is exceeded.
     message: "Too many login requests, please try again later."
 });
