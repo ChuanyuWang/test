@@ -165,7 +165,8 @@ module.exports = {
       var vm = this;
       orders_service.confirmPay({
         "tenant": common.getTenantName(),
-        prepayid: params.prepay_id
+        // package is like "prepay_id=wx23114615719969d4a38d1115ef7a390000"
+        prepayid: params.package.split("=")[1]
       });
 
       request.done(function(data, textStatus, jqXHR) {
