@@ -64,6 +64,8 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
         return_msg: "OK"
     };
     console.log("receiving notification from wechat pay");
+    let contentType = req.get('Content-Type');
+    console.debug("request Content-Type is " + contentType);
     console.debug(req.body);
     const builder = new xml2js.Builder();
     try {

@@ -113,8 +113,9 @@ router.post('/confirmPay', async function(req, res, next) {
         let orders = tenantDB.collection("orders");
         let query = { prepayid: req.body.prepayid };
         let doc = await orders.findOne(query);
+        // TODO, check query count
+        // if (doc.querycount > 10) // skip
         if (doc.status === "notpay") {
-            // TODO, check query count
             //query payment status
             let payResult = await queryOrder(doc);
             let result = await orders.findOneAndUpdate({
