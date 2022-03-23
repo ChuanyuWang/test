@@ -29,7 +29,7 @@ module.exports = {
         },
         categories: {
             default: { appenders: ['dev'], level: 'trace', enableCallStack: true },
-            production: { appenders: ['out'], level: 'info', enableCallStack: false }
+            production: { appenders: ['out'], level: 'debug', enableCallStack: false }
         }
     },
     /**
