@@ -64,7 +64,7 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
         return_msg: "OK"
     };
     // Content-Type is "text/xml"
-    console.log("receiving notification from wechat pay");
+    console.debug("receiving notification from wechat pay");
     console.debug(req.body);
     const builder = new xml2js.Builder();
     try {
@@ -98,9 +98,9 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
             message = `[${result.err_code}]${result.err_code_des}`;
         }
         if (error) {
-            console.log(`receive fail payment notification, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}, error code: ${error}, message: ${message}`);
+            console.log(`Notify fail pay, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}, error code: ${error}, message: ${message}`);
         } else {
-            console.log(`receive success payment notification, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}`);
+            console.log(`Notify success pa, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}`);
         }
 
         let tenantDB = await db_utils.connect(req.params.tenant);
