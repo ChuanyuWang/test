@@ -477,7 +477,7 @@ router.put('/:classID/checkin', function(req, res, next) {
 
         now.setHours(now.getHours() - 72);
         if (doc.date < now && req.user.role !== "admin") {
-            var error = new Error("不能在课程开始72小时后签到");
+            var error = new Error("不能在课程开始72小时后签到，请使用管理员进行签到");
             error.status = 400;
             return next(error);
         }
