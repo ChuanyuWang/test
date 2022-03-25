@@ -110,7 +110,7 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
         if (error) {
             console.log(`Notify fail pay, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}, error code: ${error}, message: ${message}`);
         } else {
-            console.log(`Notify success pa, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}`);
+            console.log(`Notify success pay, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}`);
         }
 
         let tenantDB = await db_utils.connect(req.params.tenant);
