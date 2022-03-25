@@ -1,7 +1,4 @@
-//var mongojs = require('mongojs');
-
-var reservation = {};
-var EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
+const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
 
 function validate(member, cls, quantity, error) {
     error.class = cls.name;
@@ -125,7 +122,7 @@ function generateBooking(member, cls, quantity) {
     return newbooking;
 }
 
-reservation.add = function(memberOrMembers, classOrClasses, quantity, skipPastClass) {
+exports.add = function(memberOrMembers, classOrClasses, quantity, skipPastClass) {
     var members = Array.isArray(memberOrMembers) ? memberOrMembers : [memberOrMembers];
     var classes = Array.isArray(classOrClasses) ? classOrClasses : [classOrClasses];
     var quantity = quantity || 1;
@@ -175,7 +172,7 @@ reservation.add = function(memberOrMembers, classOrClasses, quantity, skipPastCl
     };
 }
 
-reservation.check = function(member, classToBook, quantity) {
+exports.check = function(member, classToBook, quantity) {
     var error = {};
     if (validate(member, classToBook, quantity, error)) {
         return null; // no error found, proceed to book
@@ -184,8 +181,7 @@ reservation.check = function(member, classToBook, quantity) {
     }
 }
 
-reservation.remove = function(memberOrMembers, classOrClasses) {
+exports.remove = function(memberOrMembers, classOrClasses) {
 
 }
 
-module.exports = reservation;
