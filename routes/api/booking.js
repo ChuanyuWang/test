@@ -322,6 +322,8 @@ async function createNewBook(tenantDB, doc, cls, quantity) {
         bookDate: new Date()
     };
     let classes = tenantDB.collection("classes");
+    // TODO, check member is not bookded
+    // "booking.member": {$ne: ObjectId('5788fa45a62991e02aaf04c0')}
     let result = await classes.findOneAndUpdate(
         { _id: cls._id },
         {

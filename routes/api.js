@@ -7,6 +7,7 @@ const getAccessToken = bent('https://api.weixin.qq.com/sns/oauth2/access_token',
 const xml2js = require('xml2js');
 const util = require('./api/lib/util');
 const rateLimit = require('express-rate-limit');
+const orderHelper = require('./api/lib/orderHelper');
 
 
 //add RateLimit
@@ -124,10 +125,14 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
                     errorcode: error,
                     errormessage: message
                 }
-            }
+            },
+            { returnDocument: "after" }
         );
         console.log(`Update order ${result.out_trade_no} status from "notpay" to "${status}"`);
-
+        if (status === "success") {
+            // add reservation
+            await orderHelper.addReservationByOrderID(parseInt(result.out_trade_no), req.params.tenant);
+        }
         return res.send(builder.buildObject(response));
     } catch (error) {
         console.error(error);

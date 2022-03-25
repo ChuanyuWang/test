@@ -23,7 +23,8 @@ var helper = require('../../helper');
  *          bookDate: Date,
  *          status: "checkin|absent|null",
  *          flag: "null|red|yellow|green",
- *          comment: String
+ *          comment: String,
+ *          order: ObjectId
  *      }
  *  ],
  *  books: [

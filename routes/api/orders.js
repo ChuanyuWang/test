@@ -8,6 +8,7 @@ const credentials = require('../../config.db');
 const { ObjectId } = require('mongodb');
 const xml2js = require('xml2js');
 const moment = require('moment');
+const orderHelper = require('./lib/orderHelper');
 
 /**
  * {
@@ -140,7 +141,10 @@ router.post('/confirmPay', async function(req, res, next) {
         } else {
             console.log(`Confirm order ${doc.tradeno} status as "${doc.status}"`);
         }
-        // TODO, add booking !!!
+        if (doc.status === "success") {
+            // add reservation
+            await orderHelper.addReservationByOrder(doc, req.tenant.name);
+        }
         return res.json(doc);
     } catch (error) {
         let err = new Error("Confirm payment fails");
@@ -314,7 +318,6 @@ async function queryOrder(order) {
     console.debug(result);
 
     if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS" && result.trade_state === "SUCCESS") {
-        // TODO update order status and append transaction_id
         return {
             error_msg: result.trade_state_desc,
             error_type: "",
