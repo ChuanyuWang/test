@@ -48,6 +48,7 @@ exports.addReservationByOrder = async function(order, tenantName) {
             console.warn(`member ${order.memberid} reserved class ${session._id}!!?`);
             return false;
         }
+        console.log(`member ${order.name} reserved successfully via order ${order.tradeno}`);
         return true;
     } catch (error) {
         console.error(error);
