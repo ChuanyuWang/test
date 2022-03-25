@@ -19,13 +19,25 @@ function validate(member, cls, quantity, error) {
         return false;
     }
 
+    // calculate the remaining
+    var booking = cls.booking || [];
+    var reservation = 0, remaining = 0;
+    booking.forEach(function(val, index, array) {
+        reservation += (val.quantity || 0);
+    })
+    remaining = cls.capacity - reservation;
+    if (remaining < quantity) {
+        error.cause = new Error("名额不足，剩余 " + (remaining < 0 ? 0 : remaining) + " 人");
+        return false;
+    }
+
     //TODO, support multi membership card
     var membership = null;
     if (member.membership && member.membership.length > 0) {
         membership = member.membership[0];
     }
 
-    // only members can book non-free classes
+    // unregister user wants to book non-free session
     if (cls.cost > 0 && !membership) {
         error.cause = new Error("您还未办理会员卡（剩余课时不足），如有问题，欢迎来电或到店咨询");
         error.cause.code = 7002;
@@ -55,18 +67,6 @@ function validate(member, cls, quantity, error) {
             error.cause = new Error("小朋友年龄不到指定要求，无法预约，如有问题，欢迎来电或到店咨询");
             return false;
         }
-    }
-
-    // calculate the remaining
-    var booking = cls.booking || [];
-    var reservation = 0, remaining = 0;
-    booking.forEach(function(val, index, array) {
-        reservation += (val.quantity || 0);
-    })
-    remaining = cls.capacity - reservation;
-    if (remaining < quantity) {
-        error.cause = new Error("名额不足，剩余 " + (remaining < 0 ? 0 : remaining) + " 人");
-        return false;
     }
 
     // if it's a free course, then it's open for all kinds of membership
@@ -184,4 +184,3 @@ exports.check = function(member, classToBook, quantity) {
 exports.remove = function(memberOrMembers, classOrClasses) {
 
 }
-
