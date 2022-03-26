@@ -33,7 +33,7 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
             label.control-label-sm.col-xs-2 价格:
             div.col-xs-10
               p.form-control-static
-                strong {{bookItem.price}}元
+                strong {{bookItem.price/100}}元
     div.panel.panel-default(style='margin:-7px -7px 0px -7px')
       div.panel-body(style='padding:7px 7px 7px 20px')
         label 退课须知:

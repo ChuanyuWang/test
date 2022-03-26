@@ -16,10 +16,12 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             label.control-label.col-sm-2(for='cost') 课时:
             div.col-sm-2
               input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
-          div.form-group(:class='{"has-error": errors.price}',:title='errors.price',style='display:none')
+          div.form-group(:class='{"has-error": errors.price}',:title='errors.price')
             label.control-label.col-sm-2(for='price') 价格:
-            div.col-sm-2
-              input.form-control(type='number',name='price',min='0',step='0.1',v-model.number='price')
+            div.col-sm-3
+              div.input-group
+                input.form-control(type='number',name='price',min='0',step='1',v-model.number='price')
+                label.input-group-addon 元
           div.form-group
             label.control-label.col-sm-2 时间:
             div.col-sm-10
@@ -27,15 +29,18 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
               date-picker(style="width:150px;float:left",v-model='startTime',:config='{locale: "zh-CN", format: "LT"}')
           div.form-group(:class='{"has-error": errors.age}',:title='errors.age')
             label.control-label.col-sm-2 年龄:
-            div.col-sm-10(style="display:inline-flex")
-              input.form-control(type='number',min='0',style={'width':'60px'},v-model.number='age.min')
-              p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
-              input.form-control(type='number',min='0',style={'width':'60px','margin-left':'3px'},v-model.number='age.max')
-              p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 岁
+            div.col-sm-5
+              div.input-group
+                input.form-control(type='number',min='0',v-model.number='age.min')
+                div.input-group-addon 至
+                input.form-control(type='number',min='0',v-model.number='age.max')
+                div.input-group-addon 岁
           div.form-group(:class='{"has-error": errors.capacity}',:title='errors.capacity')
-            label.control-label.col-sm-2(for='cls_capacity') 最大人数:
-            div.col-sm-2
-              input#cls_capacity.form-control(type='number',min='0',v-model.number='capacity')
+            label.control-label.col-sm-2 最大人数:
+            div.col-sm-3
+              div.input-group
+                input.form-control(type='number',min='0',v-model.number='capacity')
+                div.input-group-addon 人
       div.modal-footer
         p.small(style='color:#777;float:left;margin-top:7px') *如果需要添加课程到指定班级，请到班级设置中添加
         button.btn.btn-default(type="button",data-dismiss="modal") {{$t('dialog_cancel')}}
@@ -80,15 +85,21 @@ module.exports = {
     classDate: function() {
       return this.startDate.format('ll');
     },
+    finalPrice: function() {
+      // change unit to fen
+      return parseInt(this.price * 100) || 0;
+    },
     errors: function() {
       var errors = {};
       if (!this.name || this.name.length == 0)
         errors.name = '课程名称不能为空';
       if (this.cost === '' || this.cost < 0)
         errors.cost = '所需课时不能为负';
-      if (this.price === '' || this.price < 0)
+      if (this.finalPrice === 0 && this.price > 0)
+        errors.price = '课程价格不能小于1分钱';
+      if (this.finalPrice < 0)
         errors.price = '课程价格不能为负';
-      if (this.price > 0 && this.cost <= 0)
+      if (this.finalPrice > 0 && this.cost <= 0)
         errors.price = '付费课程的课时不能为0';
       if (isNaN(this.capacity) || this.capacity < 0)
         errors.capacity = '最大人数不能为负';
@@ -126,7 +137,7 @@ module.exports = {
         // get the date from text control and appending the time
         date: moment(this.startDate).hours(this.startTime.hours()).minutes(this.startTime.minutes()),
         cost: this.cost,
-        price: this.price,
+        price: this.finalPrice,
         capacity: this.capacity,
         classroom: this.classroom,
         age: { // age is stored as months

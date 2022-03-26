@@ -53,7 +53,7 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
         body: `大Q小q-绘本阅读`,
         detail: { goods_detail: [{ goods_name: res.locals.class.name }] },
         feetype: "CNY",
-        totalfee: req.body.totalfee, //TODO
+        totalfee: parseInt(req.body.totalfee),
         openid: req.body.openid,
         //clientip: req.ip.match(/\d+\.\d+\.\d+\.\d+/),
         clientip: req.ip,
@@ -369,7 +369,7 @@ async function createUnifiedOrder(order, tenantName) {
         out_trade_no: order.tradeno,
         attach: order._id.toHexString(), // pass the order _id as additional data
         fee_type: order.feetype,
-        total_fee: Number.parseInt(order.totalfee * 100),
+        total_fee: order.totalfee,
         spbill_create_ip: order.clientip,
         time_start: formatTimeStamp(order.timestart),
         time_expire: formatTimeStamp(order.timeexpire),
