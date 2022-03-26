@@ -1,7 +1,7 @@
 <template lang="pug">
 div
   div#opps_toolbar(style='line-height:1.5;display:inline-block')
-  bootstrap-table(ref='oppTable',:columns='columns',:options='options')
+  bootstrap-table.table-striped(ref='oppTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -61,7 +61,6 @@ module.exports = {
         pageSize: 15,
         pageList: [10, 15, 20, 50, 100],
         search: true,
-        striped: true,
         showColumns: true,
         uniqueId: "_id"
       }

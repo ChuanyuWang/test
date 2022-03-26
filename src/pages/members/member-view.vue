@@ -53,7 +53,7 @@ div.container
     card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1',:classrooms='tenantConfig.classrooms')
   div.page-header
     h3 {{$t('course_summary_title')}}
-  table.table.table-bordered.table-striped.table-striped
+  table.table.table-bordered.table-striped
     thead
       tr
         th {{$t('course_name')}}
@@ -94,7 +94,7 @@ div.container
     a(href='#',title='点击加载',@click='loadHistory')
       span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
   div#loadHistory_mask(style='display:none')
-    bootstrap-table(ref='historyTable',:columns='changeHistory.columns',:options='changeHistory.options')
+    bootstrap-table.table-striped(ref='historyTable',:columns='changeHistory.columns',:options='changeHistory.options')
   div.page-header
     h3(style='margin-top:0;display:inline-block') 上课记录
     a(href='#',title='点击加载',@click='loadClasses')
@@ -110,7 +110,7 @@ div.container
       label.radio-inline
         input(type="radio",name="classFilter",value="ALL",v-model='classRecord.filter')
         |全部
-    bootstrap-table(ref='classesTable',:columns='classRecord.columns',:options='classRecord.options')
+    bootstrap-table.table-striped(ref='classesTable',:columns='classRecord.columns',:options='classRecord.options')
   div(style='height:20px')
   comment-modal(ref='commentDlg')
   modal-dialog(ref='historyCommentDlg',buttonStyle="success",buttons="confirm",@ok="updateMembership") 确认并保存
@@ -191,7 +191,6 @@ module.exports = {
           locale: "zh-CN",
           pageSize: 10,
           showRefresh: false,
-          striped: true,
           pagination: true
         }
       },
@@ -230,7 +229,6 @@ module.exports = {
         options: {
           uniqueId: "_id",
           locale: "zh-CN",
-          striped: true,
           showRefresh: false,
           sortName: "date",
           sortOrder: "desc",

@@ -2,7 +2,7 @@
 div
   div#toolbar.btn-group(role='group')
     button.btn.btn-success(type='button',@click='addClassroom()') 添加
-  bootstrap-table(ref='classroomTable',:columns='columns',:options='options')
+  bootstrap-table.table-striped(ref='classroomTable',:columns='columns',:options='options')
   p.small(style='margin-top:14px') 
     |*内部教室不对外开放，会员在自助预约时无法选择内部教室
   modal-dialog(ref='classroomEditDlg',buttonStyle="success") {{newClassroom ? "添加教室" : "修改教室"}}
@@ -74,7 +74,6 @@ module.exports = {
         toolbar: '#toolbar',
         url: "/api/setting/classrooms",
         showRefresh: true,
-        striped: true,
         uniqueId: "id"
       }
     };

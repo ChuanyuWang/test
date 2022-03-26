@@ -25,7 +25,7 @@ div
       input(type="checkbox",value='',@click='refreshCheckinStatus',checked)
       | {{$t('uncheckin')}}
       span.glyphicon.glyphicon-question-sign(style='margin-left:3px;color:#777')
-  bootstrap-table(ref='checkinTable',:columns='columns',:options='options')
+  bootstrap-table.table-striped(ref='checkinTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -101,7 +101,6 @@ module.exports = {
         pagination: true,
         pageSize: 15,
         pageList: [10, 15, 20, 50, 100],
-        striped: true,
         showColumns: true,
         uniqueId: "_id"
       }

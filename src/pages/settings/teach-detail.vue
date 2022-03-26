@@ -39,7 +39,7 @@ div.detail-teacher-border(style='min-height:300px')
                 option(value='this_month') {{$t('this_month')}}
                 option(value='last_month') {{$t('last_month')}}
                 option(value='') {{$t('all')}}
-        bootstrap-table(ref='historyTable',:columns='columns',:options='options',@onLoadSuccess="calculateTotal")
+        bootstrap-table.table-striped(ref='historyTable',:columns='columns',:options='options',@onLoadSuccess="calculateTotal")
 </template>
 
 <script>
@@ -93,7 +93,6 @@ module.exports = {
       ],
       options: {
         locale: "zh-CN",
-        striped: true,
         toolbar: "#history_toolbar",
         toolbarAlign: "right",
         uniqueId: "_id",

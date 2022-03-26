@@ -5,7 +5,7 @@ div
       div.form-group(style='margin-right:0')
         label(style='margin:0 3px') {{$t('time')}}:
         date-picker(v-model='targetMonth', :config='datePickerConfig', @input="refresh")
-  bootstrap-table(ref='checkinTable',:columns='columns',:options='options')
+  bootstrap-table.table-striped(ref='checkinTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -79,7 +79,6 @@ module.exports = {
         pagination: true,
         pageSize: 15,
         pageList: [10, 15, 20, 50, 100],
-        striped: true,
         showColumns: true,
         uniqueId: "_id"
       }
