@@ -117,6 +117,13 @@ router.get('/trial', function(req, res) {
     });
 });
 
+router.get('/orders', function(req, res) {
+    res.render('bqsq/orders', {
+        title: res.__('orders'),
+        logoPath: helper.getTenantLogo(req.tenant)
+    });
+});
+
 router.get('/app', function(req, res) {
     res.render('bqsq/mobile/portal', {
         title: 'Mobile Portal'

@@ -30,7 +30,8 @@ module.exports = {
         course_view: ['./pages/course/course_view.js', hotMiddlewareScript],
         setting: ['./pages/settings/setting.js', hotMiddlewareScript],
         statistics: ['./pages/statistics/statistics.js', hotMiddlewareScript],
-        admin: ['./pages/admin/admin.js', hotMiddlewareScript]
+        admin: ['./pages/admin/admin.js', hotMiddlewareScript],
+        orders: ['./pages/orders/orders.js', hotMiddlewareScript]
     },
 
     output: {
