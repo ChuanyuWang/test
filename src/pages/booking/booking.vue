@@ -11,7 +11,6 @@ div
       div(style='float:right;padding-right:9px')
         a.btn.btn-success.btn-xs(href='mybooking') 我的课程
   div#main.container(style='padding-left:7px;padding-right:7px;overflow-y:auto')
-    div(v-if='openID') {{openID}}
     template(v-if='classesByDay.length === 0')
       div.class-separator
       div.alert.alert-warning(role='alert',style='margin-top:7px')
