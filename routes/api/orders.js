@@ -12,7 +12,7 @@ const orderHelper = require('./lib/orderHelper');
 
 /**
  * {
- *  tradeno: Number
+ *  tradeno: String
  *  name: String,
  *  contact: String,
  *  memberid: ObjectId,
@@ -161,10 +161,23 @@ router.get('/', async function(req, res, next) {
         error.status = 400;
         return next(error);
     }
+    let query = {};
+
     // support sorting
     let sort = {};
     let field = req.query.sort || "timestart"; // sort by "since" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
+
+    // query orders by keyword, search 'tradeno', 'name' or 'contact'
+    let search = req.query.search || "";
+    if (search) {
+        // search both name and contact
+        query['$or'] = [
+            { 'tradeno': new RegExp(search, 'i') },
+            { 'name': new RegExp(search, 'i') },
+            { 'contact': new RegExp(search, 'i') }
+        ];
+    }
 
     // support paginzation
     let skip = parseInt(req.query.offset) || 0;
@@ -181,7 +194,6 @@ router.get('/', async function(req, res, next) {
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let orders = tenantDB.collection("orders");
-        let query = {};
 
         // get the total of all matched members
         let cursor = orders.find(query);
@@ -427,7 +439,7 @@ function generateWxPayParams(order) {
 /**
  * YYYYMMDD + 6-digit seq No. e.g. 20220321000055
  * @param {ObjectId} id 
- * @returns Number
+ * @returns String
  */
 async function generateTradeNo() {
     try {
@@ -444,7 +456,7 @@ async function generateTradeNo() {
         });
         let seq = parseInt(result.value.seq % 1000000); // get 6 digits seq number
         let datePart = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-        return datePart * 1000000 + seq;
+        return datePart * 1000000 + seq + "";
     } catch (error) {
         let err = new UnifiedOrderError("Fail to generate trade No.");
         err.innerError = error;

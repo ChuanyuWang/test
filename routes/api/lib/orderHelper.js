@@ -58,13 +58,13 @@ exports.addReservationByOrder = async function(order, tenantName) {
 
 /**
  * The error will be returned instead of thrown.
- * @param {Number} tradeNo 
+ * @param {String} tradeNo 
  * @param {String} tenantName 
  */
 exports.addReservationByTradeNo = async function(tradeNo, tenantName) {
     try {
-        if (typeof tradeNo !== "number") {
-            throw new Error(`tradeNo "${tradeNo}" is not number type`);
+        if (!tradeNo) {
+            throw new Error(`tradeNo "${tradeNo}" is not defined`);
         }
         let tenantDB = await db_utils.connect(tenantName);
         let orders = tenantDB.collection("orders");
