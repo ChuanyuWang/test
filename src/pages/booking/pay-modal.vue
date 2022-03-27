@@ -82,7 +82,7 @@ module.exports = {
   },
   computed: {
     total() {
-      return this.bookItem.price * this.bookItem.quantity;
+      return this.bookItem.price / 100 * this.bookItem.quantity;
     },
     disablePayButton() {
       return !this.WeixinJSBridgeReady || this.status == "paying" || !this.openid;
