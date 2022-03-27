@@ -2,8 +2,8 @@
 div
   div#toolbar
     div.form-inline(role="role")
-      div.form-group
-        label {{$t("status")}}: 
+      div.input-group
+        span.input-group-addon {{$t("status")}}: 
         select.form-control(v-model="filter",@change="refresh")
           option(value="") {{$t("all")}}
           option(value="open") {{$t("order_open")}}
