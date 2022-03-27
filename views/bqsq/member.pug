@@ -14,18 +14,22 @@ append js
 
 block page
   div.container(style={'padding-top': '58px'})
-    div#toolbar(role='group',style='line-height:1.5;display:inline-block')
-      div.btn-group(role='group')
-        button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
-        button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
-          span.glyphicon.glyphicon-filter
-      label(style='margin-left:7px;margin-right:7px') 状态:
-      label.text-success.checkbox-inline
-        input(type="checkbox",value='active',checked)
-        | 正常
-      label.text-danger.checkbox-inline
-        input(type="checkbox" value='inactive')
-        | 停用
+    div#toolbar
+      div.form-inline(role='group')
+        div.btn-group(role='group')
+          button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
+          button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
+            span.glyphicon.glyphicon-filter
+        div.input-group
+          span.input-group-addon 状态:
+          select.form-control
+            option(value="active") 正常
+            option(value="inactive") 停用
+            option(value="") 全部
+        div.input-group
+          input.form-control(type="number",style="width:70px",placeholder="页码")
+          span.input-group-btn
+            button#jumpToButton.btn.btn-default(type="button") 跳转
     table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[15,25,50,100]',data-search='true',data-url='/api/members',data-show-columns='true',data-sort-order='desc',data-sort-name='since',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
       thead
         tr

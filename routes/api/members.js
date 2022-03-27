@@ -106,8 +106,8 @@ router.get('/', async function(req, res, next) {
         query["membership.type"] = "LIMITED";
         query["membership.room"] = [req.query.filter];
     }
-    // query members by status
-    if (req.query.hasOwnProperty('status')) {
+    // query members by status, the status could be empty string, e.g. status=
+    if (req.query.status) {
         query['status'] = {
             $in: req.query.status.split(',').map(function(value) {
                 return value ? value : null;

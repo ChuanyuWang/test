@@ -29,7 +29,8 @@ $(document).ready(function() {
     });
 
     $('#add_member').click(handleAddNewMember);
-    $('#toolbar input[type=checkbox]').click(handleFilterStatus);
+    $('#toolbar select').change(handleFilterStatus);
+    $('#toolbar #jumpToButton').click(jumpToPage);
 });
 
 // Functions =============================================================
@@ -139,7 +140,7 @@ function customQuery(params) {
     var filter = $("#filter_dlg input:checked").val();
     params.filter = filter;
 
-    var statusEl = $('#toolbar input[type=checkbox]:checked');
+    var statusEl = $('#toolbar option:selected');
     if (statusEl.length > 0) {
         var statusQuery = '';
         for (var i = 0; i < statusEl.length; i++) {
@@ -147,6 +148,7 @@ function customQuery(params) {
         }
         params.status = statusQuery.substring(0, statusQuery.length - 1);
     }
+
     // Append the field 'unStartedClassCount' to returned members
     params.appendLeft = true;
     return params;
@@ -155,6 +157,15 @@ function customQuery(params) {
 function handleFilterStatus(event) {
     // refresh the table when user changes the status filter
     $('#member_table').bootstrapTable('refresh');
+}
+
+function jumpToPage(event) {
+    // jump to the specified page number
+    var pageNumber = parseInt($('#toolbar input[type=number]').val());
+    if (pageNumber !== NaN && pageNumber > 0) {
+        $('#member_table').bootstrapTable('refresh', { pageNumber: pageNumber });
+        $('#toolbar input[type=number]').val("");
+    }
 }
 
 function getCredit(memberships) {
