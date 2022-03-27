@@ -32,7 +32,7 @@ module.exports = {
         setting: './pages/settings/setting.js',
         statistics: './pages/statistics/statistics.js',
         admin: './pages/admin/admin.js',
-        orders: './pages/admin/orders.js'
+        orders: './pages/orders/orders.js'
     },
 
     output: {
