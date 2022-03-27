@@ -38,6 +38,20 @@ const orderHelper = require('./lib/orderHelper');
  * 
  */
 
+var NORMAL_FIELDS = {
+    tradeno: 1,
+    name: 1,
+    contact: 1,
+    status: 1,
+    detail: 1,
+    memberid: 1,
+    classid: 1,
+    totalfee: 1,
+    timestart: 1,
+    errorcode: 1,
+    errormessage: 1
+};
+
 const wxpay = bent('https://api.mch.weixin.qq.com/pay', 'POST', 200);
 
 router.post('/', validateCreateOrderRequest, findMember, findClass, async function(req, res, next) {
@@ -165,7 +179,7 @@ router.get('/', async function(req, res, next) {
 
     // support sorting
     let sort = {};
-    let field = req.query.sort || "timestart"; // sort by "since" by default
+    let field = req.query.sort || "timestart"; // sort by "timestart" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
 
     // query orders by keyword, search 'tradeno', 'name' or 'contact'
@@ -177,6 +191,12 @@ router.get('/', async function(req, res, next) {
             { 'name': new RegExp(search, 'i') },
             { 'contact': new RegExp(search, 'i') }
         ];
+    }
+
+    // query orders by status
+    let status = req.query.status || "";
+    if (status) {
+        query['status'] = status;
     }
 
     // support paginzation
@@ -196,7 +216,7 @@ router.get('/', async function(req, res, next) {
         let orders = tenantDB.collection("orders");
 
         // get the total of all matched members
-        let cursor = orders.find(query);
+        let cursor = orders.find(query, { projection: NORMAL_FIELDS });
         let total = await cursor.count();
 
         // use find() instead of aggregate()
