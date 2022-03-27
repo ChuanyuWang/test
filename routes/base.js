@@ -120,7 +120,8 @@ router.get('/trial', function(req, res) {
 router.get('/orders', function(req, res) {
     res.render('bqsq/orders', {
         title: res.__('orders'),
-        logoPath: helper.getTenantLogo(req.tenant)
+        logoPath: helper.getTenantLogo(req.tenant),
+        user: req.user
     });
 });
 
