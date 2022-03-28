@@ -57,10 +57,8 @@ manager.connect = async function(database) {
             useUnifiedTopology: true,
             poolSize: 20 // Maintain up to 20 socket connections for tenant database
         });
-    } else if (!mongoClient.isConnected()) {
-        await mongoClient.connect();
     }
-    //TODO, add 'error' listner to returned db instance
+    //TODO, add 'error' listner to MongoClient when upgrade to mongodb 4.0+
     return mongoClient.db(database);
 }
 
@@ -70,6 +68,9 @@ manager.mongojsDB = async function(database) {
     }
     let db = await manager.connect(database);
     dbCache.set(database, mongojs(db));
+    /* 
+    // https://mongodb.github.io/node-mongodb-native/3.6/reference/unified-topology/
+    // some MongoDB events and options are deprecated, e.g isConnected()
     db.once("error", err => {
         console.error(err);
         dbCache.delete(database);
@@ -78,10 +79,12 @@ manager.mongojsDB = async function(database) {
         console.error(err);
         dbCache.delete(database);
     });
+    
     db.once("close", err => {
         console.error(err);
         dbCache.delete(database);
     });
+    */
     // return the mongojs db wrapper
     return dbCache.get(database);
 }

@@ -91,6 +91,7 @@
     "watch": [
       "routes/",
       "locales/",
+      "server/",
       "./*.js"
     ],
     "env": {
