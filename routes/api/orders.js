@@ -78,7 +78,7 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let orders = tenantDB.collection("orders");
-        order.tradeno = await generateTradeNo(orders);
+        order.tradeno = await generateTradeNo(req.app.locals.ENV_DEVELOPMENT);
         let result = await orders.insertOne(order);
         // result.result is {"n":1,"ok":1}
 
@@ -461,7 +461,7 @@ function generateWxPayParams(order) {
  * @param {ObjectId} id 
  * @returns String
  */
-async function generateTradeNo() {
+async function generateTradeNo(developmentMode) {
     try {
         let d = new Date();
         // The trade No has to be unique across all tenants
@@ -476,7 +476,7 @@ async function generateTradeNo() {
         });
         let seq = parseInt(result.value.seq % 1000000); // get 6 digits seq number
         let datePart = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-        return datePart * 1000000 + seq + "";
+        return datePart * 1000000 + seq + (developmentMode ? "t" : "");
     } catch (error) {
         let err = new UnifiedOrderError("Fail to generate trade No.");
         err.innerError = error;
