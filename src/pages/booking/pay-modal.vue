@@ -133,7 +133,7 @@ module.exports = {
         "contact": this.bookItem.contact,
         "quantity": this.bookItem.quantity,
         "openid": this.openid,
-        "totalfee": this.total
+        "totalfee": parseInt(this.total * 100)
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.payParams = data;
