@@ -251,6 +251,44 @@ router.delete('/:orderID', helper.requireRole("admin"), async function(req, res,
     }
 });
 
+router.post('/:orderID/close', helper.requireRole("admin"), async function(req, res, next) {
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let orders = tenantDB.collection("orders");
+        // only open status could be deleted
+        let query = { _id: ObjectId(req.params.orderID), status: "notpay" };
+        let doc = await orders.findOne(query, { projection: NORMAL_FIELDS });
+        if (!doc) {
+            let error = new Error(`Order doesn't exist or status is not "notpay"`);
+            error.status = 400;
+            return next(error);
+        }
+
+        //query payment status
+        let closeResult = await closeOrder(doc);
+        if (!closeResult.error_type) {
+            let result = await orders.findOneAndUpdate({
+                _id: doc._id,
+                status: "notpay"
+            }, {
+                // status: notpay ==> closed
+                $set: { status: "closed" }
+            }, {
+                returnDocument: "after",
+                projection: NORMAL_FIELDS
+            });
+            console.log(`Order ${doc.tradeno} is closed successfully`);
+            return res.json(result.value);
+        } else {
+            return next(new Error(`Fail to close order ${doc.tradeno}: ${closeResult.error_msg}`));
+        }
+    } catch (error) {
+        let err = new Error("Close order fails");
+        err.innerError = error;
+        return next(err);
+    }
+});
+
 function validateCreateOrderRequest(req, res, next) {
     let body = req.body, errorMsg = null;
     let requireFields = ['tenant', 'timeStart', 'timeExpire', 'tradeType', 'classid', 'name', 'contact', 'quantity', 'openid', 'totalfee'];
@@ -441,6 +479,52 @@ async function createUnifiedOrder(order, tenantName) {
     } else if (result.result_code !== "SUCCESS") {
         // chcek the business result
         throw new UnifiedOrderError(`[${result.err_code}]${result.err_code_des}`);
+    }
+}
+
+/**
+ * Refer to https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_3
+ * @param {String} order 
+ * @returns 
+ */
+async function closeOrder(order) {
+    let params = {
+        appid: credentials.AppID,
+        mch_id: credentials.mch_id,
+        out_trade_no: order.tradeno,
+        nonce_str: util.generateNonceString()
+    }
+    let signCode = util.sign(params, credentials.apiKey);
+    params.sign = signCode;
+    const builder = new xml2js.Builder();
+
+    console.debug("Close order with below params:");
+    console.debug(params);
+    let response = await wxpay("/closeorder", builder.buildObject(params));
+    let responseText = await response.text();
+    let parser = new xml2js.Parser({ trim: true, explicitArray: false, explicitRoot: false });
+    let result = await parser.parseStringPromise(responseText);
+    //TODO, validate sign
+    console.debug("Receiving response from wechat pay:")
+    console.debug(result);
+
+    if (result.return_code === "SUCCESS" && result.result_code === "SUCCESS") {
+        return {
+            error_msg: "",
+            error_type: ""
+        }
+    } else if (result.return_code !== "SUCCESS") {
+        // check the communication result
+        return {
+            error_msg: result.return_msg,
+            error_type: "return_code"
+        }
+    } else if (result.result_code !== "SUCCESS") {
+        // chcek the business result
+        return {
+            error_msg: `[${result.err_code}]${result.err_code_des}`,
+            error_type: "result_code"
+        }
     }
 }
 

@@ -46,6 +46,16 @@ service.update = function(orderID, fields) {
     return request;
 }
 
+service.close = function(orderID, fields) {
+    var request = $.ajax("/api/orders/" + orderID + "/close", {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(fields),
+        dataType: "json"
+    });
+    return request;
+}
+
 service.delete = function(orderID, fields) {
     var request = $.ajax("/api/orders/" + orderID, {
         type: "DELETE",

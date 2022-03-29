@@ -19,14 +19,19 @@ div
         date-picker(v-model='to',style="width:120px")
       //button#jumpToButton.btn.btn-default(type="button") 查询
   bootstrap-table.table-striped(ref='orderTable',:columns='columns',:options='options')
-  modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 确认删除
+  modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 删除订单
     template(v-slot:body)
       p 确认删除订单<strong>{{actionOrder}}</strong>吗？
       p.small (无法撤销)
+  modal-dialog(ref='confirmClose',buttons="confirm",@ok="closeOrder") 关闭订单
+    template(v-slot:body)
+      p 确认关闭订单<strong>{{actionOrder}}</strong>吗？
+      p.small (关闭后用户无法再通过此订单支付)
+  modal-dialog(ref='errorDialog',buttonStyle="danger") 出错了
+    template(v-slot:body)
+      p {{errorMessage}}
 </template>
 <script>
-//var order_service = require('../../services/orders');
-//var common = require('../../common/common');
 var orders_service = require("../../services/orders");
 
 module.exports = {
@@ -41,6 +46,7 @@ module.exports = {
     return {
       tenantConfig: {},
       actionOrder: "",
+      errorMessage: "",
       filter: "",
       from: null,
       to: null,
@@ -100,9 +106,7 @@ module.exports = {
     }
   },
   computed: {},
-  filters: {
-
-  },
+  filters: {},
   methods: {
     dateTimeFormatter(value, row, index) {
       if (!value) return '?';
@@ -172,9 +176,20 @@ module.exports = {
     },
     closingOrder(e, value, row, index) {
       if (row.status === "notpay") {
-        //TODO
-        alert("不支持关闭订单");
+        this.actionOrder = row.tradeno;
+        this.$refs.confirmClose.show(row._id);
       }
+    },
+    closeOrder(orderID) {
+      var vm = this;
+      var request = orders_service.close(orderID);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.$refs.orderTable.updateByUniqueId({ id: orderID, row: data });
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        vm.$refs.errorDialog.show();
+      });
     },
     deletingOrder(e, value, row, index) {
       if (row.status === "open") {
@@ -189,15 +204,15 @@ module.exports = {
         vm.$refs.orderTable.removeByUniqueId(orderID);
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+        vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        vm.$refs.errorDialog.show();
       });
     }
   },
   created() {
     this.tenantConfig = _getTenantConfig();
   },
-  mounted() {
-  }
+  mounted() { }
 }
 </script>
 <style lang="less">
