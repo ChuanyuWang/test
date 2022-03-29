@@ -1,7 +1,7 @@
 <template lang="pug">
 div
   div#toolbar
-    div.form-inline(role="role")
+    div.form-inline(role="group")
       div.input-group
         span.input-group-addon {{$t("status")}}: 
         select.form-control(v-model="filter",@change="refresh")
@@ -11,22 +11,39 @@ div
           option(value="success") {{$t("order_success")}}
           option(value="closed") {{$t("order_closed")}}
           option(value="refund") {{$t("order_refund")}}
+      //div.input-group(style="margin-left:4px")
+        div.input-group-addon 开始:
+        date-picker(v-model='from',style="width:120px")
+      //div.input-group(style="margin-left:4px")
+        div.input-group-addon 结束:
+        date-picker(v-model='to',style="width:120px")
+      //button#jumpToButton.btn.btn-default(type="button") 查询
   bootstrap-table.table-striped(ref='orderTable',:columns='columns',:options='options')
+  modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 确认删除
+    template(v-slot:body)
+      p 确认删除订单<strong>{{actionOrder}}</strong>吗？
+      p.small (无法撤销)
 </template>
 <script>
 //var order_service = require('../../services/orders');
 //var common = require('../../common/common');
+var orders_service = require("../../services/orders");
 
 module.exports = {
   name: "order-app",
   props: {},
   components: {
-    "BootstrapTable": BootstrapTable
+    "BootstrapTable": BootstrapTable,
+    "date-picker": require("../../components/date-picker.vue").default,
+    "modal-dialog": require("../../components/modal-dialog.vue").default
   },
   data() {
     return {
       tenantConfig: {},
+      actionOrder: "",
       filter: "",
+      from: null,
+      to: null,
       columns: [
         {
           field: "tradeno",
@@ -59,9 +76,9 @@ module.exports = {
           title: "操作",
           formatter: this.actionFormatter,
           events: {
-            'click .delete-order': this.deleteOrder,
-            'click .close-order': this.closeOrder,
-            'click .refund-order': this.refundOrder
+            'click .delete-order': this.deletingOrder,
+            'click .close-order': this.closingOrder,
+            'click .refund-order': this.refundingOrder
           }
         }
       ],
@@ -147,23 +164,33 @@ module.exports = {
     refresh() {
       this.$refs.orderTable.refresh();
     },
-    refundOrder(e, value, row, index) {
+    refundingOrder(e, value, row, index) {
       if (row.status === "success") {
         //TODO
         alert("不支持退款");
       }
     },
-    closeOrder(e, value, row, index) {
+    closingOrder(e, value, row, index) {
       if (row.status === "notpay") {
         //TODO
         alert("不支持关闭订单");
       }
     },
-    deleteOrder(e, value, row, index) {
+    deletingOrder(e, value, row, index) {
       if (row.status === "open") {
-        //TODO
-        alert("不支持删除订单");
+        this.actionOrder = row.tradeno;
+        this.$refs.confirmDelete.show(row._id);
       }
+    },
+    deleteOrder(orderID) {
+      var vm = this;
+      var request = orders_service.delete(orderID);
+      request.done(function(data, textStatus, jqXHR) {
+        vm.$refs.orderTable.removeByUniqueId(orderID);
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+      });
     }
   },
   created() {

@@ -228,8 +228,27 @@ router.patch('/:orderID', helper.requireRole("admin"), function(req, res, next) 
     return next(new Error("Not Implemented"));
 });
 
-router.delete('/:orderID', helper.requireRole("admin"), function(req, res, next) {
-    return next(new Error("Not Implemented"));
+router.delete('/:orderID', helper.requireRole("admin"), async function(req, res, next) {
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let orders = tenantDB.collection("orders");
+        // only open status could be deleted
+        let query = { _id: ObjectId(req.params.orderID), status: "open" };
+        let doc = await orders.findOne(query);
+        if (!doc) {
+            let error = new Error(`Order doesn't exist or status is not "open"`);
+            error.status = 400;
+            return next(error);
+        }
+        let result = await orders.deleteOne(query);
+        // result.result is {"n":1,"ok":1}
+        console.log(`order ${doc.tradeno} is deleted with result: %j`, result.result);
+        return res.json(result.result);
+    } catch (error) {
+        let err = new Error("Delete order fails");
+        err.innerError = error;
+        return next(err);
+    }
 });
 
 function validateCreateOrderRequest(req, res, next) {
