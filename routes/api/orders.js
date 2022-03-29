@@ -54,6 +54,8 @@ var NORMAL_FIELDS = {
 
 const wxpay = bent('https://api.mch.weixin.qq.com/pay', 'POST', 200);
 
+router.use(helper.checkTenant);
+
 router.post('/', validateCreateOrderRequest, findMember, findClass, async function(req, res, next) {
     //TODO, find existing notpay order
     let order = {
@@ -111,12 +113,6 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
 });
 
 router.post('/confirmPay', async function(req, res, next) {
-    if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
-    }
-
     if (!req.body.hasOwnProperty("prepayid")) {
         let error = new Error("prepayid is not defined");
         error.status = 400;
@@ -170,11 +166,6 @@ router.post('/confirmPay', async function(req, res, next) {
 router.use(helper.isAuthenticated);
 
 router.get('/', async function(req, res, next) {
-    if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
-    }
     let query = {};
 
     // support sorting
@@ -242,11 +233,6 @@ router.delete('/:orderID', helper.requireRole("admin"), function(req, res, next)
 });
 
 function validateCreateOrderRequest(req, res, next) {
-    if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
-    }
     let body = req.body, errorMsg = null;
     let requireFields = ['tenant', 'timeStart', 'timeExpire', 'tradeType', 'classid', 'name', 'contact', 'quantity', 'openid', 'totalfee'];
     let ok = requireFields.every(function(value, index, array) {

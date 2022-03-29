@@ -28,6 +28,16 @@ module.exports.checkTenantUser = function(req, res, next) {
     }
 };
 
+exports.checkTenant = function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    } else {
+        return next();
+    }
+};
+
 /**
  * Return an Express middleware to check user is authenticated with sepcific role. 
  * Continue to next middleware if user is authenticated with sepcific role;
@@ -68,7 +78,7 @@ module.exports.hasRole = function(req, role) {
 };
 
 /**
- * An Express middleware to check user is authenticated. 
+ * An Express middleware to check user is authenticated to the target tenant. 
  * Continue to next middleware if user is authenticated;
  * Otherwise respond with error message and status 401.
  * 
