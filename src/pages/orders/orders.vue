@@ -11,13 +11,11 @@ div
           option(value="success") {{$t("order_success")}}
           option(value="closed") {{$t("order_closed")}}
           option(value="refund") {{$t("order_refund")}}
-      //div.input-group(style="margin-left:4px")
-        div.input-group-addon 开始:
-        date-picker(v-model='from',style="width:120px")
-      //div.input-group(style="margin-left:4px")
-        div.input-group-addon 结束:
-        date-picker(v-model='to',style="width:120px")
-      //button#jumpToButton.btn.btn-default(type="button") 查询
+      date-picker(v-model='from',placeholder="开始",style="width:160px;margin-left:4px")
+      i.glyphicon.glyphicon-minus
+      date-picker(v-model='to',placeholder="结束",style="width:160px",:class='{"has-error": errors.to}')
+      button.btn.btn-default(type="button",style="margin-left:4px",@click="refresh") 查询
+      button.btn.btn-default(type="button",style="margin-left:4px",@click="clear") 清空
   bootstrap-table.table-striped(ref='orderTable',:columns='columns',:options='options')
   modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 删除订单
     template(v-slot:body)
@@ -50,46 +48,44 @@ module.exports = {
       filter: "",
       from: null,
       to: null,
-      columns: [
-        {
-          field: "tradeno",
-          title: "订单号",
-          sortable: true
-        }, {
-          field: "status",
-          title: this.$t("status"),
-          formatter: this.statusFormatter
-        }, {
-          field: "name",
-          title: "会员",
-          formatter: this.memberFormatter
-        }, {
-          field: "contact",
-          title: this.$t("member_contact")
-        }, {
-          field: "timestart",
-          title: "日期/时间",
-          sortable: true,
-          formatter: this.dateTimeFormatter
-        }, {
-          field: "detail",
-          title: "课程",
-          formatter: this.detailFormatter
-        }, {
-          field: "totalfee",
-          title: "金额(元)",
-          formatter: this.totalFormatter
-        }, {
-          //field: "status", // the events will not work when adding duplicate field
-          title: "操作",
-          formatter: this.actionFormatter,
-          events: {
-            'click .delete-order': this.deletingOrder,
-            'click .close-order': this.closingOrder,
-            'click .refund-order': this.refundingOrder
-          }
+      columns: [{
+        field: "tradeno",
+        title: "订单号",
+        sortable: true
+      }, {
+        field: "status",
+        title: this.$t("status"),
+        formatter: this.statusFormatter
+      }, {
+        field: "name",
+        title: "会员",
+        formatter: this.memberFormatter
+      }, {
+        field: "contact",
+        title: this.$t("member_contact")
+      }, {
+        field: "timestart",
+        title: "日期/时间",
+        sortable: true,
+        formatter: this.dateTimeFormatter
+      }, {
+        field: "detail",
+        title: "课程",
+        formatter: this.detailFormatter
+      }, {
+        field: "totalfee",
+        title: "金额(元)",
+        formatter: this.totalFormatter
+      }, {
+        //field: "status", // the events will not work when adding duplicate field
+        title: "操作",
+        formatter: this.actionFormatter,
+        events: {
+          'click .delete-order': this.deletingOrder,
+          'click .close-order': this.closingOrder,
+          'click .refund-order': this.refundingOrder
         }
-      ],
+      }],
       options: {
         toolbar: "#toolbar",
         locale: 'zh-CN',
@@ -99,15 +95,27 @@ module.exports = {
         url: "/api/orders",
         uniqueId: "_id",
         sidePagination: "server",
-        showRefresh: true,
         search: true,
         sortName: "tradeno",
         sortOrder: "desc",
-        queryParams: this.customQuery,
+        queryParams: this.customQuery
       }
     }
   },
-  computed: {},
+  computed: {
+    errors: function() {
+      var errors = {};
+      if (this.from && this.to && this.to.isBefore(this.from))
+        errors.to = '结束日期不能小于开始日期';
+      return errors;
+    },
+    hasError: function() {
+      var errors = this.errors
+      return Object.keys(errors).some(function(key) {
+        return true;
+      })
+    }
+  },
   filters: {},
   methods: {
     dateTimeFormatter(value, row, index) {
@@ -168,7 +176,13 @@ module.exports = {
     customQuery(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
       params.status = this.filter; // add the status filter
+      params.from = this.from && this.from.startOf('day').toISOString();
+      params.to = this.to && this.to.endOf('day').toISOString();
       return params;
+    },
+    clear() {
+      this.from = null;
+      this.to = null;
     },
     refresh() {
       this.$refs.orderTable.refresh();

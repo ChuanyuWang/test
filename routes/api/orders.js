@@ -184,6 +184,18 @@ router.get('/', async function(req, res, next) {
         ];
     }
 
+    // query with date filter 'from' and 'to'
+    if (moment(req.query.from).isValid() && moment(req.query.to).isValid()) {
+        query.timestart = {
+            $gte: new Date(req.query.from),
+            $lt: new Date(req.query.to)
+        };
+    } else if (moment(req.query.from).isValid()) {
+        query.timestart = { $gte: new Date(req.query.from) };
+    } else if (moment(req.query.to).isValid()) {
+        query.timestart = { $lt: new Date(req.query.to) };
+    }
+
     // query orders by status
     let status = req.query.status || "";
     if (status) {
