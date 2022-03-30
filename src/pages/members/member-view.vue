@@ -50,7 +50,7 @@ div.container
   template(v-if='memberData.membership&&memberData.membership.length')
     card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='tenantConfig.classrooms')
   template(v-else)
-    card(@save="saveCardInfo",:item='{credit:0,room:[],type:"LIMITED"}',:index=-1,key='-1',:classrooms='tenantConfig.classrooms')
+    card(@save="saveCardInfo",:item='{credit:0,room:[],type:"ALL"}',:index=-1,key='-1',:classrooms='tenantConfig.classrooms')
   div.page-header
     h3 {{$t('course_summary_title')}}
   table.table.table-bordered.table-striped
