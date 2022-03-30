@@ -61,7 +61,8 @@ module.exports = {
           formatter: this.statusFormatter
         }, {
           field: "name",
-          title: "会员"
+          title: "会员",
+          formatter: this.memberFormatter
         }, {
           field: "contact",
           title: this.$t("member_contact")
@@ -128,24 +129,24 @@ module.exports = {
           return null;
       }
     },
-    detailFormatter(value, row, index) {
-      var goods = value && value.goods_detail || [];
-      return goods[0] && goods[0].goods_name;
-    },
-    actionFormatter(value, row, index) {
-      /*
+    memberFormatter(value, row, index) {
       return [
-        '<a class="delete-order" href="javascript:void(0)" title="删除订单">',
-        '<i class="text-danger glyphicon glyphicon-trash"></i>',
-        '</a>  ',
-        '<a class="close-order" href="javascript:void(0)" title="关闭订单">',
-        '<i class="text-primary glyphicon glyphicon-ban-circle"></i>',
-        '</a>',
-        '<a class="refund-order" href="javascript:void(0)" title="退款">',
-        '<i class="text-muted glyphicon glyphicon-yen"></i>',
+        value,
+        ' <a href="./member/' + row.memberid + '" target="_blank">',
+        '<i class="glyphicon glyphicon-share-alt"></i>',
         '</a>'
       ].join('');
-      */
+    },
+    detailFormatter(value, row, index) {
+      var goods = value && value.goods_detail || [];
+      return [
+        goods[0] && goods[0].goods_name,
+        ' <a href="./class/' + row.classid + '" target="_blank">',
+        '<i class="glyphicon glyphicon-share-alt"></i>',
+        '</a>'
+      ].join('');
+    },
+    actionFormatter(value, row, index) {
       return [
         '<div class="btn-group btn-group-xs" role="group">',
         row.status === "open" ? ['<button type="button" class="btn btn-danger delete-order" title="删除订单">',
