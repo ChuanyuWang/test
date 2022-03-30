@@ -30,7 +30,7 @@ block page
           input.form-control(type="number",style="width:70px",placeholder="页码")
           span.input-group-btn
             button#jumpToButton.btn.btn-default(type="button") 跳转
-    table#member_table(data-show-refresh='true',data-checkbox-header='false',data-pagination='true',data-page-size='15',data-page-list='[15,25,50,100]',data-search='true',data-url='/api/members',data-show-columns='true',data-sort-order='desc',data-sort-name='since',data-toolbar='#toolbar',data-unique-id="_id",data-click-to-select="true")
+    table#member_table(data-show-refresh='true',data-pagination='true',data-page-size='15',data-page-list='[15,25,50,100]',data-search='true',data-url='/api/members',data-show-columns='true',data-sort-order='desc',data-sort-name='since',data-toolbar='#toolbar',data-unique-id="_id")
       thead
         tr
           //th(data-radio='true')
