@@ -165,6 +165,8 @@ function jumpToPage(event) {
     if (pageNumber !== NaN && pageNumber > 0) {
         $('#member_table').bootstrapTable('refresh', { pageNumber: pageNumber });
         $('#toolbar input[type=number]').val("");
+    } else {
+        $('#member_table').bootstrapTable('refresh');
     }
 }
 
