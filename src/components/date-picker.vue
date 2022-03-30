@@ -1,11 +1,14 @@
 <template lang="pug">
+// add class 'date' to change the cursor as hand
 div.input-group.date(:id="id",:class="inputClass")
+  span.input-group-addon(v-if="label") {{label}}
   input.form-control(type="text",
         :name="name",
         :placeholder="placeholder",
         :required="required",
         :readOnly="readOnly",
-        :disabled="disabled")
+        :disabled="disabled",
+        autocomplete="off")
   span.input-group-addon
     span.glyphicon.glyphicon-calendar
 </template>
@@ -19,6 +22,10 @@ div.input-group.date(:id="id",:class="inputClass")
 
 module.exports = {
   props: {
+    label: {
+      default: "",
+      required: false
+    },
     value: {
       default: null,
       required: true,
