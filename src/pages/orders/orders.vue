@@ -77,7 +77,8 @@ module.exports = {
           formatter: this.detailFormatter
         }, {
           field: "totalfee",
-          title: "金额(元)"
+          title: "金额(元)",
+          formatter: this.totalFormatter
         }, {
           //field: "status", // the events will not work when adding duplicate field
           title: "操作",
@@ -145,6 +146,9 @@ module.exports = {
         '<i class="glyphicon glyphicon-share-alt"></i>',
         '</a>'
       ].join('');
+    },
+    totalFormatter(value, row, index) {
+      return value / 100 + "元";
     },
     actionFormatter(value, row, index) {
       return [
