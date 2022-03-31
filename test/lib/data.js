@@ -1,4 +1,5 @@
 const testDB = "dummy";
+const { ObjectId } = require('mongodb');
 
 module.exports = {
     testTenant: {
@@ -31,9 +32,13 @@ module.exports = {
         role: "user"
     },
     classes: [
-        { "name": "456", "date": new Date("2021-05-23T10:00:00.000Z"), "cost": 1, "capacity": 6, "classroom": "room1", "age": { "min": 24, "max": null }, "booking": [] }
+        { "name": "456", "date": new Date("2021-05-23T10:00:00.000Z"), "cost": 1, "capacity": 6, "classroom": "room1", "age": { "min": 24, "max": null }, "booking": [] },
+        { _id: ObjectId("6241c5ac95fbe9165c55f5b1"), "name": "money", "date": new Date("2021-05-25T10:00:00.000Z"), "cost": 1, "capacity": 6, "classroom": "room1", "age": { "min": 24, "max": null }, "booking": [] }
     ],
     members: [
-        { "name": "John", "contact": "123456789", "status": "active", "membership": [], "since": new Date("2021-05-23T10:00:00.000Z") }
+        { _id: ObjectId("623a8e1c802f1e687c080477"), "name": "John", "contact": "123456789", "status": "active", "membership": [], "since": new Date("2021-05-23T10:00:00.000Z") }
+    ],
+    orders: [
+        { "name": "John", "contact": "123456789", "status": "success", "classid": ObjectId("6241c5ac95fbe9165c55f5b1"), "memberid": ObjectId("623a8e1c802f1e687c080477"), "prepayid": "prepayid1", "tradeno": "20220331000011t" }
     ]
 }

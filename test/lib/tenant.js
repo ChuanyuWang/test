@@ -29,6 +29,7 @@ module.exports = {
             let db = await connectionManager.connect(testDB);
             await db.collection("classes").insertMany(testData.classes);
             await db.collection("members").insertMany(testData.members);
+            await db.collection("orders").insertMany(testData.orders);
         }
     },
     addClasses: async function(data) {
