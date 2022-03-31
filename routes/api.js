@@ -180,7 +180,7 @@ async function getTenantInfo(req, res, next) {
     } else if (req.isAuthenticated()) {
         tenantName = req.user.tenant;
     } else {
-        // Not able to get the tenant name, continue
+        // Not able to get the tenant name, continue, e.g. /sendSMS
         return next();
     }
 

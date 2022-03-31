@@ -6,6 +6,9 @@ var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 
+
+router.use(helper.checkTenant);
+
 /**
  * Get the member list who booked the class
  */
@@ -99,11 +102,6 @@ classID : "5716630aa012576d0371e888"
 }
  */
 router.post('/', async function(req, res, next) {
-    if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
-    }
     if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
         res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
         return;
@@ -195,11 +193,6 @@ router.post('/', async function(req, res, next) {
 // remove specfic user's booking info
 // TODO, the delete operation may sent unwantted.
 router.delete('/:classID', function(req, res, next) {
-    if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
-    }
     if (!req.body.memberid) {
         res.status(400).send("Missing param 'memberid'");
         return;
