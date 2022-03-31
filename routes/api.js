@@ -131,7 +131,7 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
         console.log(`Update order ${result.out_trade_no} status from "notpay" to "${status}"`);
         if (status === "success") {
             // add reservation
-            await orderHelper.addReservationByOrderID(result.out_trade_no, req.params.tenant);
+            await orderHelper.addReservationByTradeNo(result.out_trade_no, req.params.tenant);
         }
         return res.send(builder.buildObject(response));
     } catch (error) {
