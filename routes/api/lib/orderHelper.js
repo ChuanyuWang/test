@@ -8,20 +8,20 @@ const db_utils = require('../../../server/databaseManager');
 exports.addReservationByOrder = async function(order, tenantName) {
     try {
         if (order.status !== "success") {
-            throw new Error(`order status "${order.status}" is not succcess`);
+            throw new Error(`Order status "${order.status}" is not succcess`);
         }
         let tenantDB = await db_utils.connect(tenantName);
         let classes = tenantDB.collection("classes");
         let session = await classes.findOne({ _id: order.classid, "booking.member": { $ne: order.memberid } });
         if (!session) {
             // the reservation has been added or the class been deleted :(
-            console.log(`member ${order.name} has already reserved session by order ${order.tradeno}`);
+            console.log(`Member ${order.name} has already reserved session by order ${order.tradeno}`);
             return false;
         }
         let remaining = getRemaining(session);
         if (order.quantity > remaining) {
             // here is not enough seat to reserve. It should not happen ever.
-            console.warn(`order ${order.tradeno} doesn't have enough seat, will reserve anyway`);
+            console.warn(`Order ${order.tradeno} doesn't have enough seat, will reserve anyway`);
         }
 
         // Will not check the expire date or member status because it's been paid.
@@ -46,10 +46,10 @@ exports.addReservationByOrder = async function(order, tenantName) {
         if (!result.value) {
             // the reservation has been added or the class been deleted :(
             // It should not happen ever
-            console.warn(`member ${order.memberid} reserved class ${session._id}!!?`);
+            console.warn(`Member ${order.memberid} reserved class ${session._id}!!?`);
             return false;
         }
-        console.log(`member ${order.name} reserved successfully via order ${order.tradeno}`);
+        console.log(`Member ${order.name} reserved successfully via order ${order.tradeno}`);
         return true;
     } catch (error) {
         console.error(error);

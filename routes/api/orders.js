@@ -206,12 +206,12 @@ router.get('/', async function(req, res, next) {
     // support paginzation
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
-        console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);
+        console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);
         skip = 0;
     }
     let pageSize = parseInt(req.query.limit) || 100;
     if (pageSize > 100 || pageSize < 0) {
-        console.warn(`page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
+        console.warn(`Page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
         pageSize = 100;
     }
 
@@ -225,7 +225,7 @@ router.get('/', async function(req, res, next) {
 
         // use find() instead of aggregate()
         let docs = await cursor.sort(sort).skip(skip).limit(pageSize).toArray();
-        console.log(`find ${docs.length} orders from ${total} in total`);
+        console.log(`Find ${docs.length} orders from ${total} in total`);
         return res.json({
             total: total,
             rows: docs
@@ -255,7 +255,7 @@ router.delete('/:orderID', helper.requireRole("admin"), async function(req, res,
         }
         let result = await orders.deleteOne(query);
         // result.result is {"n":1,"ok":1}
-        console.log(`order ${doc.tradeno} is deleted with result: %j`, result.result);
+        console.log(`Order ${doc.tradeno} is deleted with result: %j`, result.result);
         return res.json(result.result);
     } catch (error) {
         let err = new Error("Delete order fails");
@@ -293,7 +293,7 @@ router.post('/:orderID/close', helper.requireRole("admin"), async function(req, 
             console.log(`Order ${doc.tradeno} is closed successfully`);
             return res.json(result.value);
         } else {
-            return next(new Error(`Fail to close order ${doc.tradeno}: ${closeResult.error_msg}`));
+            return next(new Error(`无法关闭订单${doc.tradeno}: ${closeResult.error_msg}`));
         }
     } catch (error) {
         let err = new Error("Close order fails");
@@ -421,14 +421,14 @@ async function queryOrder(order) {
     } else if (result.result_code !== "SUCCESS") {
         // chcek the business result
         return {
-            error_msg: `[${result.err_code}]${result.err_code_des}`,
+            error_msg: `[${result.err_code}] ${result.err_code_des}`,
             error_type: "result_code",
             transaction_id: result.transaction_id
         }
     } else if (result.trade_state !== "SUCCESS") {
         // check the trade status
         return {
-            error_msg: `[${result.trade_state}]${result.trade_state_desc}`,
+            error_msg: `[${result.trade_state}] ${result.trade_state_desc}`,
             error_type: "trade_state",
             transaction_id: result.transaction_id
         }
@@ -491,7 +491,7 @@ async function createUnifiedOrder(order, tenantName) {
         throw new UnifiedOrderError(result.return_msg);
     } else if (result.result_code !== "SUCCESS") {
         // chcek the business result
-        throw new UnifiedOrderError(`[${result.err_code}]${result.err_code_des}`);
+        throw new UnifiedOrderError(`[${result.err_code}] ${result.err_code_des}`);
     }
 }
 
@@ -535,7 +535,7 @@ async function closeOrder(order) {
     } else if (result.result_code !== "SUCCESS") {
         // chcek the business result
         return {
-            error_msg: `[${result.err_code}]${result.err_code_des}`,
+            error_msg: `[${result.err_code}] ${result.err_code_des}`,
             error_type: "result_code"
         }
     }

@@ -106,7 +106,7 @@ router.post('/wxpay/notify/:tenant', async function(req, res, next) {
         } else if (result.result_code !== "SUCCESS") {
             // chcek the business result
             error = "result_code";
-            message = `[${result.err_code}]${result.err_code_des}`;
+            message = `[${result.err_code}] ${result.err_code_des}`;
         }
         if (error) {
             console.log(`Notify fail pay, tenant: ${req.params.tenant}, tradeno: ${result.out_trade_no}, error code: ${error}, message: ${message}`);
