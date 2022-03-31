@@ -185,14 +185,15 @@ router.get('/', async function(req, res, next) {
     }
 
     // query with date filter 'from' and 'to'
-    if (moment(req.query.from).isValid() && moment(req.query.to).isValid()) {
+    // CAUTION: moment(undefined).isValid() return true
+    if (moment(req.query.from || "").isValid() && moment(req.query.to || "").isValid()) {
         query.timestart = {
             $gte: new Date(req.query.from),
             $lt: new Date(req.query.to)
         };
-    } else if (moment(req.query.from).isValid()) {
+    } else if (moment(req.query.from || "").isValid()) {
         query.timestart = { $gte: new Date(req.query.from) };
-    } else if (moment(req.query.to).isValid()) {
+    } else if (moment(req.query.to || "").isValid()) {
         query.timestart = { $lt: new Date(req.query.to) };
     }
 
