@@ -194,8 +194,9 @@ router.post('/', async function(req, res, next) {
 // TODO, the delete operation may sent unwantted.
 router.delete('/:classID', function(req, res, next) {
     if (!req.body.memberid) {
-        res.status(400).send("Missing param 'memberid'");
-        return;
+        let error = new Error(`Missing param "memberid"`);
+        error.status = 400;
+        return next(error);
     }
 
     let tenantDB = req.db;
@@ -205,22 +206,19 @@ router.delete('/:classID', function(req, res, next) {
         "booking.member": mongojs.ObjectId(req.body.memberid)
     }, function(err, doc) {
         if (err) {
-            res.status(500).json({
-                'err': err
-            });
-            return;
+            let error = new Error(`Fail to find class ${req.params.classID}`);
+            error.innerError = err;
+            return next(error);
         }
 
         if (!doc) {
-            res.status(400).json({
-                'code': 2009,
-                'message': "没有找到指定课程预约，请刷新重试",
-                'err': err
-            });
-            return;
+            let error = new Error("没有找到指定课程预约，请刷新重试");
+            error.status = 400;
+            error.code = 2009;
+            return next(error);
         }
 
-        if (req.isAuthenticated()) {
+        if (req.isAuthenticated() && req.user.tenant === req.tenant.name) {
             if (req.user.role === "admin") {
                 //only admin could delete the booking in any time
                 console.log("Admin %s cancel the booking of %s", req.user.username, req.body.memberid);
