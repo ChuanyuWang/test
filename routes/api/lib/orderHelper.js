@@ -12,7 +12,7 @@ exports.addReservationByOrder = async function(order, tenantName) {
         }
         let tenantDB = await db_utils.connect(tenantName);
         let classes = tenantDB.collection("classes");
-        let session = classes.findOne({ _id: order.classid, "booking.member": { $ne: order.memberid } });
+        let session = await classes.findOne({ _id: order.classid, "booking.member": { $ne: order.memberid } });
         if (!session) {
             // the reservation has been added or the class been deleted :(
             console.log(`member ${order.name} has already reserved session by order ${order.tradeno}`);
@@ -42,6 +42,7 @@ exports.addReservationByOrder = async function(order, tenantName) {
             },
             { returnDocument: "after" }
         );
+        // result.lastErrorObject is { n: 1, updatedExisting: true }
         if (!result.value) {
             // the reservation has been added or the class been deleted :(
             // It should not happen ever
