@@ -22,7 +22,7 @@ describe('POST /api/orders', function() {
     });
 
     it('should not query orders without authentication', async function() {
-        await agent.get('/api/orders?tenant=dummy')
+        await agent.get(`/api/orders?tenant=${tenant.name}`)
             .expect(401);
     });
     /*
@@ -34,8 +34,14 @@ describe('POST /api/orders', function() {
     */
     it('should confirm success order', async function() {
         await agent.post('/api/orders/confirmPay')
-            .send({ tenant: "dummy", prepayid: "prepayid1" })
+            .send({ tenant: tenant.name, prepayid: "prepayid1" })
             .expect(200);
+    });
+
+    it('should not cancel revervation with order paid', async function() {
+        await agent.delete('/api/booking/6241c5ac95fbe9165c55f5b1')
+            .send({ tenant: tenant.name, memberid: "623a8e1c802f1e687c080477" })
+            .expect(400);
     });
 
     it('should query orders with authentication', async function() {

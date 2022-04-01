@@ -192,24 +192,20 @@ router.post('/', async function(req, res, next) {
 
 // remove specfic user's booking info
 // TODO, the delete operation may sent unwantted.
-router.delete('/:classID', function(req, res, next) {
+router.delete('/:classID', async function(req, res, next) {
     if (!req.body.memberid) {
         let error = new Error(`Missing param "memberid"`);
         error.status = 400;
         return next(error);
     }
 
-    let tenantDB = req.db;
-    var classes = tenantDB.collection("classes");
-    classes.findOne({
-        _id: mongojs.ObjectId(req.params.classID),
-        "booking.member": mongojs.ObjectId(req.body.memberid)
-    }, function(err, doc) {
-        if (err) {
-            let error = new Error(`Fail to find class ${req.params.classID}`);
-            error.innerError = err;
-            return next(error);
-        }
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let classes = tenantDB.collection("classes");
+        let doc = await classes.findOne({
+            _id: ObjectId(req.params.classID),
+            "booking.member": ObjectId(req.body.memberid)
+        });
 
         if (!doc) {
             let error = new Error("没有找到指定课程预约，请刷新重试");
@@ -227,75 +223,85 @@ router.delete('/:classID', function(req, res, next) {
                 // 1 hours = 3600000 (1*60*60*1000)
                 console.log("User %s cancel the booking of %s", req.user.username, req.body.memberid);
             } else {
-                var error = new Error("不能在课程开始1小时后取消预约");
+                let error = new Error("不能在课程开始1小时后取消预约");
                 error.status = 400;
                 return next(error);
             }
         } else if (Date.now() + 86400000 > doc.date.getTime()) {
             // be free to cancel the booking if it's less than 24 hours before begin
             // 24 hours = 86400000 ms (24*60*60*1000)
-            var error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
+            let error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
             error.status = 400;
             return next(error);
         }
 
         // find the booking quantity of member
-        for (var i = 0; i < doc.booking.length; i++) {
+        let bookingInfo = null;
+        for (let i = 0; i < doc.booking.length; i++) {
             if (doc.booking[i].member.toString() == req.body.memberid) {
-                var quantity = doc.booking[i].quantity;
+                bookingInfo = doc.booking[i];
                 break;
             }
         }
 
-        classes.findAndModify({
-            query: {
-                _id: mongojs.ObjectId(req.params.classID)
-            },
-            update: {
-                $pull: {
-                    "booking": {
-                        member: mongojs.ObjectId(req.body.memberid)
-                    }
-                }
-            },
-            fields: { cost: 1, booking: 1 },
-            new: true
-        }, function(err, doc, lastErrorObject) {
-            if (err) {
-                var error = new Error("取消会员预约失败");
-                error.innerError = err;
-                return next(error);
-            }
-            if (doc.cost > 0) {
-                //TODO, support multi membership card
-                //TODO, handle the callback when member is inactive.
-                tenantDB.collection("members").findAndModify({
-                    query: {
-                        _id: mongojs.ObjectId(req.body.memberid),
-                        "membership.0": { $exists: true }
-                    },
-                    update: {
-                        $inc: { "membership.0.credit": doc.cost * quantity }
-                    },
-                    fields: { membership: 1 },
-                    new: true
-                }, function(err, m, lastErrorObject) {
-                    if (err) {
-                        // TODO, handle error
-                        console.error(err);
-                    }
-                    if (m) {
-                        console.log(`return ${doc.cost * quantity} credit to member ${req.body.memberid} (after: ${JSON.stringify(m.membership)})`);
-                    } else {
-                        //TODO, handle the callback when member is not existed.
-                        console.error(`Fail to return expense to member ${req.body.memberid}`);
-                    }
-                });
-            }
+        // Can't cancel the booking if order is available
+        // TODO, check refund status and cancel booking
+        if (bookingInfo.order) {
+            let error = new Error("预约订单已经支付，请联系门店取消预约");
+            error.status = 400;
+            return next(error);
+        }
 
-            return res.json(doc);
+        let result = await classes.findOneAndUpdate({
+            _id: ObjectId(req.params.classID)
+        }, {
+            $pull: {
+                "booking": {
+                    member: ObjectId(req.body.memberid)
+                }
+            }
+        }, {
+            projection: { cost: 1, booking: 1 },
+            returnDocument: "after"
         });
-    });
+
+        // lastErrorObject: { n: 1, updatedExisting: true }
+        let lastErrorObject = result.lastErrorObject || {};
+        if (!lastErrorObject.updatedExisting) {
+            // class session is gone, it should never happen
+            console.error(`Can't find the session ${req.params.classID} when canceling booking`);
+            return res.json(doc);
+        }
+        // update the class session with new data
+        doc = result.value;
+        if (doc.cost > 0) {
+            //TODO, support multi membership card
+            //TODO, handle the callback when member is inactive.
+            let members = tenantDB.collection("members");
+            result = await members.findOneAndUpdate({
+                _id: ObjectId(req.body.memberid),
+                "membership.0": { $exists: true }
+            }, {
+                $inc: { "membership.0.credit": doc.cost * bookingInfo.quantity }
+            }, {
+                projection: { membership: 1 },
+                returnDocument: "after"
+            });
+
+            if (result.lastErrorObject.updatedExisting) {
+                console.log(`return ${doc.cost * bookingInfo.quantity} credit to member ${req.body.memberid} (after: ${JSON.stringify(result.value.membership)})`);
+            } else {
+                //TODO, handle the callback when member is not existed.
+                console.error(`Fail to return expense to member ${req.body.memberid}`);
+            }
+        }
+
+        return res.json(doc);
+    } catch (err) {
+        let error = new Error(`Fail to cancel booking from ${req.params.classID}`);
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 /**

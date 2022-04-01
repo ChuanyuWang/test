@@ -752,6 +752,7 @@ function checkDuplicate(collection, id, query, callback) {
             return callback(null, false);
         });
     } else if (query.hasOwnProperty('name') || query.hasOwnProperty('contact')) {
+        // only 'name' or 'contact' been updated, E.g. user onlys modify 'name'
         collection.findOne({
             _id: mongojs.ObjectId(id)
         }, FIELDS, function(err, doc) {

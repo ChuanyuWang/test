@@ -1,6 +1,9 @@
 const testDB = "dummy";
 const { ObjectId } = require('mongodb');
 
+const nextMonth = new Date();
+nextMonth.setDate(45); // some day in next month
+
 module.exports = {
     testTenant: {
         name: testDB,
@@ -33,7 +36,7 @@ module.exports = {
     },
     classes: [
         { "name": "456", "date": new Date("2021-05-23T10:00:00.000Z"), "cost": 1, "capacity": 6, "classroom": "room1", "age": { "min": 24, "max": null }, "booking": [] },
-        { _id: ObjectId("6241c5ac95fbe9165c55f5b1"), "name": "money", "date": new Date("2021-05-25T10:00:00.000Z"), "cost": 1, "capacity": 6, "classroom": "room1", "age": { "min": 24, "max": null }, "booking": [] }
+        { _id: ObjectId("6241c5ac95fbe9165c55f5b1"), "name": "money", "date": nextMonth, "cost": 1, "capacity": 6, "classroom": "room1", "age": { "min": 24, "max": null }, "booking": [] }
     ],
     members: [
         { _id: ObjectId("623a8e1c802f1e687c080477"), "name": "John", "contact": "123456789", "status": "active", "membership": [], "since": new Date("2021-05-23T10:00:00.000Z") }
