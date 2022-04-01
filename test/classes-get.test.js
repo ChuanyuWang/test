@@ -6,7 +6,7 @@ const tenant = require("./lib/tenant");
 //enable assertion styles, include Assert, Expect and Should
 const assert = chai.assert;
 const expect = chai.expect;
-const should = chai.should(); //actually enable should style assertions
+chai.should(); //actually enable should style assertions
 
 describe('GET /api/classes', function() {
     before(async function() {

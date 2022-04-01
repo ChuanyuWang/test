@@ -5,6 +5,7 @@ const testDB = "dummy";
 let buildInfo = null;
 
 module.exports = {
+    name: testDB,
     init: async function(insertTestData) {
         let configDB = await connectionManager.connect("config");
         // print the version of Mongodb
