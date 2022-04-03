@@ -203,7 +203,7 @@ module.exports = {
     ];
     echarts.registerTheme("vintage", {
       color: colorPalette,
-      backgroundColor: "#00000",
+      backgroundColor: "#ffffff",
       graph: {
         color: colorPalette
       }
