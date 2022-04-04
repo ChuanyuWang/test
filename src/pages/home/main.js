@@ -10,9 +10,8 @@ var calendar = require('./class-calendar.vue').default;
 $(document).ready(function() {
     init();
 
-    /* global _getClassrooms */
     // bootstrap the class calendar page
-    var app = new Vue({ el: '#app', extends: calendar, propsData: { classrooms: _getClassrooms() } });
+    var app = new Vue({ el: '#app', extends: calendar });
     app.updateSchedule();
 });
 

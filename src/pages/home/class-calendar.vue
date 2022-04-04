@@ -1,15 +1,16 @@
 <template lang="pug">
 div
-  div.row(style='margin-top:15px;margin-bottom:15px')
-    div.col-lg-4.col-md-5.col-sm-6.col-xs-6.btn-group.hidden-print
-      button.btn.btn-primary.btn-sm(@click='previousWeek') {{$t('previous_week')}}
-      button.btn.btn-primary.btn-sm(@click='thisWeek') {{$t('this_week')}}
-      button.btn.btn-primary.btn-sm(@click='nextWeek') {{$t('next_week')}}
-      date-picker(v-model='date',inputClass='input-group-sm')
-    div.col-sm-2.pull-right
-      select.form-control.input-sm(style='float:right',v-model='classroom')
+  h5.visible-print-block 教室: {{classroomName}}
+  div.form-inline.hidden-print(role="group",style='margin:10px 0')
+    div.btn-group
+      button.btn.btn-primary(@click='previousWeek') {{$t('previous_week')}}
+      button.btn.btn-primary(@click='thisWeek') {{$t('this_week')}}
+      button.btn.btn-primary(@click='nextWeek') {{$t('next_week')}}
+    date-picker(v-model='date',style='margin-left:4px')
+    div.input-group.pull-right
+      span.input-group-addon 教室: 
+      select.form-control(v-model='classroom',@change="updateSchedule")
         option(v-for='r in classrooms',:value='r.id') {{r.name}}
-      //span(style='float:right;line-height:30px') 教室: 
   table.class-table.table.table-bordered(v-if='hasClassroom')
     thead
       tr
@@ -39,26 +40,6 @@ div
 var common = require("../../common/common");
 var class_service = require("../../services/classes");
 
-// Get the Monday of specific date, each week starts from Monday
-function getMonday(date) {
-  var _date = moment(date);
-  var dayofweek = _date.day();
-  // the Monday of this week
-  if (dayofweek == 0) {
-    // today is Sunday
-    _date.day(-6);
-  } else {
-    _date.day(1);
-  }
-  //set the time to the very beginning of day
-  _date
-    .hours(0)
-    .minutes(0)
-    .seconds(0)
-    .milliseconds(0);
-  return _date;
-}
-
 module.exports = {
   name: "app",
   components: {
@@ -67,13 +48,11 @@ module.exports = {
     "class-list": require("./class-list.vue").default,
     "create-class-modal": require("./create-class-modal.vue").default
   },
-  props: {
-    classrooms: Array // Array of available classroom
-  },
+  props: {},
   data: function() {
+    var classrooms = _getTenantConfig().classrooms || [];
     return {
       date: moment(), // moment date object
-      //monday: getMonday(moment()), // moment date object
       // [ "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ]
       columns: moment.weekdays(true),
       sections: [
@@ -82,13 +61,30 @@ module.exports = {
         { name: "晚上", startTime: 18, duration: 6 }
       ],
       classes: [],
+      tenantConfig: {},
+      classrooms,
       // current seelcted classroom id, default is the first available classroom
-      classroom: this.classrooms.length > 0 ? this.classrooms[0].id : null
+      classroom: classrooms.length > 0 ? classrooms[0].id : null
     };
   },
   computed: {
     monday: function name() {
-      return getMonday(this.date);
+      // Get the Monday of specific date, each week starts from Monday
+      var _date = moment(this.date);
+      var dayofweek = _date.day();
+      // the Monday of this week
+      if (dayofweek == 0) {
+        // today is Sunday
+        _date.day(-6);
+      } else {
+        _date.day(1);
+      }
+      //set the time to the very beginning of day
+      _date.hours(0)
+        .minutes(0)
+        .seconds(0)
+        .milliseconds(0);
+      return _date;
     },
     sortedClasses: function() {
       return this.classes.sort(function(a, b) {
@@ -100,6 +96,13 @@ module.exports = {
       if (Array.isArray(this.classrooms) && this.classrooms.length > 0)
         return true;
       else return false;
+    },
+    classroomName: function() {
+      var vm = this;
+      var selectedRoom = this.classrooms.find(function(value, index, array) {
+        return value.id === vm.classroom;
+      });
+      return selectedRoom.name;
     }
   },
   filters: {
@@ -114,9 +117,6 @@ module.exports = {
       // only update the schedule when it's another day
       if (!moment(value).isSame(oldValue, 'day'))
         this.updateSchedule();
-    },
-    classroom: function(value) {
-      this.updateSchedule();
     }
   },
   methods: {
@@ -266,6 +266,9 @@ module.exports = {
         console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
     }
+  },
+  created: function() {
+    this.tenantConfig = _getTenantConfig();
   }
 };
 </script>

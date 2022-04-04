@@ -16,16 +16,10 @@ append js
     script(src=CDN_FILES.vue)
   script(src=CDN_FILES.bootbox)
   script(src=CDN_FILES.bootstrap_datetimepicker)
-  //script(src='/components/requirejs/require.js',data-main="/js/main")
   script(src='/js/main.js')
-  script(type='text/javascript').
-    function _getClassrooms() {
-        return !{JSON.stringify(classrooms)};
-    };
 
 block page
-  div.hidden-print(style={'padding-top': '50px'})
-  div.container
+  div.container(style={'padding-top': '58px'})
     h3.text-center.visible-print-block= navTitle
       small 一周课程表
     div#app
