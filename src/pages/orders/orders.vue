@@ -14,7 +14,7 @@ div
       date-picker(v-model='from',placeholder="开始",style="width:160px;margin-left:4px")
       i.glyphicon.glyphicon-minus
       date-picker(v-model='to',placeholder="结束",style="width:160px",:class='{"has-error": errors.to}')
-      button.btn.btn-default(type="button",style="margin-left:4px",@click="refresh") 查询
+      button.btn.btn-primary(type="button",style="margin-left:4px",@click="refresh") 查询
       button.btn.btn-default(type="button",style="margin-left:4px",@click="clear") 清空
   bootstrap-table.table-striped(ref='orderTable',:columns='columns',:options='options')
   modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 删除订单
