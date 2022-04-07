@@ -98,6 +98,7 @@ module.exports = {
       else return false;
     },
     classroomName: function() {
+      if (!this.classroom) return "";
       var vm = this;
       var selectedRoom = this.classrooms.find(function(value, index, array) {
         return value.id === vm.classroom;
