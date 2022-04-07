@@ -52,6 +52,9 @@ router.post('/api/users', isAuthenticated, function(req, res, next) {
             error.innerError = err;
             return next(error);
         }
+        // mask sensitive data before logging
+        delete account.salt;
+        delete account.hash;
         console.log("Account %j is created successfully", account);
         res.json({
             username: account.username,
