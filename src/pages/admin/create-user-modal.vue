@@ -15,7 +15,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
           div.form-group(:class='{"has-error": errors.user}',:title='errors.user')
             label.control-label.col-sm-4 User Name:
             div.col-sm-5
-              input.form-control(type='text',v-model.trim='user',autoComplete='nope')
+              input.form-control(type='text',v-model.trim='user',autoComplete='off')
           div.form-group(:class='{"has-error": errors.password}',:title='errors.password')
             label.control-label.col-sm-4 Password:
             div.col-sm-5
