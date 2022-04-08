@@ -4,7 +4,7 @@ var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 
 /// Below APIs are visible to authenticated users only
-router.use(helper.isAuthenticated);
+router.use(helper.checkTenant, helper.isAuthenticated);
 
 router.get('/consumption', function(req, res, next) {
     //[Default] get the current year consumption by month
@@ -234,12 +234,6 @@ router.get('/passive', function(req, res, next) {
 });
 
 router.get("/teacherAnalysis", async function(req, res, next) {
-    if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
-    }
-
     let month, classes;
     if (req.query.hasOwnProperty("targetMonth")) {
         month = new Date(req.query.targetMonth);
@@ -295,6 +289,66 @@ router.get("/teacherAnalysis", async function(req, res, next) {
         return res.json(docs);
     } catch (error) {
         let err = new Error("Analysis teacher fails");
+        error.innerError = err;
+        return next(error);
+    }
+});
+
+router.get("/orders", async function(req, res, next) {
+    //[Default] get the current year orders by month
+    let year = (new Date()).getFullYear();
+    var unit = 'month';
+    if (req.query.year) {
+        year = parseInt(req.query.year);
+    }
+    if (req.query.unit) {
+        unit = req.query.unit;
+    }
+
+    let query = {
+        "status": "success",
+        "timestart": {
+            $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
+            $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
+        },
+        "totalfee": {
+            $gt: 0
+        }
+    };
+
+    let orders;
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        orders = tenantDB.collection("orders");
+    } catch (error) {
+        return next(error);
+    }
+
+    // build pipelines for aggregate()
+    let pipelines = [{
+        $match: query
+    }, {
+        $project: {
+            tradeno: 1,
+            status: 1,
+            totalfee: 1,
+            week: { $week: "$timestart" },
+            month: { $month: "$timestart" },
+            year: { $year: "$timestart" }
+        }
+    }, {
+        $group: {
+            _id: "$" + unit, // group the data according to unit (month or week or year)
+            total: { $sum: "$totalfee" }
+        }
+    }];
+
+    try {
+        let docs = await orders.aggregate(pipelines).toArray();
+        console.log(`Analysis orders by ${unit}`);
+        return res.json(docs);
+    } catch (error) {
+        let err = new Error("Analysis orders fails");
         error.innerError = err;
         return next(error);
     }

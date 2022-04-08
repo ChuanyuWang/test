@@ -15,6 +15,8 @@ div
         date-picker(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
   div.row(style="margin-top:15px")
     div#consume_chart(style="height:400px")
+  div.row(style="margin-top:15px")
+    div#orders_chart(style="height:400px")
 </template>
 
 <script>
@@ -33,6 +35,7 @@ module.exports = {
   data: function() {
     return {
       consumeChart: null,
+      orderChart: null,
       yearPickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
       year: moment(new Date().getFullYear(), "YYYY"),
       unit: "month"
@@ -47,13 +50,10 @@ module.exports = {
       switch (this.unit) {
         case "year":
           return "年";
-          break;
         case "month":
           return "月";
-          break;
         case "week":
           return "周";
-          break;
         default:
           return "";
       }
@@ -84,6 +84,13 @@ module.exports = {
         unit: vm.unit,
         year: vm.year.year()
       };
+
+      // Draw orders chart
+      var request = $.get("/api/analytics/orders", filter, "json");
+      request.done(function(data, textStatus, jqXHR) {
+        vm.drawOrdersChart(vm.parseOrdersData(data));
+      });
+      request.fail(errorFunc);
 
       //Execute the function drawChartFunc when both ajax requests are successful, or errorFunc if either one has an error.
       // errorFunc is called only once even if both ajax requests have error
@@ -156,7 +163,9 @@ module.exports = {
         },
         legend: {
           data: ["消费课时", "充值课时"],
-          top: "bottom"
+          top: "10%",
+          left: "auto",
+          orient: "vertical"
         },
         xAxis: {
           name: unitName,
@@ -184,6 +193,80 @@ module.exports = {
 
       // Apply the chart options to create/update chart instance
       this.consumeChart.setOption(option);
+    },
+    parseOrdersData: function(rawData) {
+      var vm = this;
+      var chartData = {
+        xAxis: [],
+        series0: [] // totalfee
+      };
+
+      if (!rawData) {
+        return chartData;
+      }
+
+      var data = [];
+      // parse the totalfee data
+      rawData.forEach(function(value, index, array) {
+        if (!value) return;
+        var i = value._id;
+        if (typeof i !== "number") return;
+
+        data[i] = data[i] || {};
+        data[i].total = value.total;
+      });
+
+      data.forEach(function(value, index, array) {
+        if (!value) return;
+        chartData.xAxis.push(index + vm.unitName);
+        chartData.series0.push((value.total || 0) / 100);
+      });
+      return chartData;
+    },
+    drawOrdersChart: function(data) {
+      // resize the chart according to its parent dom size
+      this.orderChart.resize();
+      // define the options of charts
+      var option = {
+        title: {
+          text: (this.unit === 'year' ? "每" : this.year.year()) + "年销售订单明细",
+          top: "top",
+          left: "center"
+        },
+        tooltip: {
+          trigger: "axis"
+        },
+        toolbox: {
+          feature: {
+            dataView: { readOnly: true }
+          }
+        },
+        legend: {
+          data: ["订单金额"],
+          top: "10%",
+          left: "auto",
+          orient: "vertical"
+        },
+        xAxis: {
+          name: this.unitName,
+          data: data.xAxis
+        },
+        yAxis: {
+          name: "金额(元)"
+        },
+        series: [
+          {
+            name: "订单金额",
+            type: "bar",
+            //stack: "one",
+            //barGap: 0,
+            data: data.series0
+          }
+        ]
+      };
+
+      // Apply the chart options to create/update chart instance
+      this.orderChart.setOption(option);
     }
   },
   created: function() { },
@@ -211,6 +294,11 @@ module.exports = {
 
     this.consumeChart = echarts.init(
       $(this.$el).find("#consume_chart")[0],
+      "vintage"
+    );
+
+    this.orderChart = echarts.init(
+      $(this.$el).find("#orders_chart")[0],
       "vintage"
     );
   }
