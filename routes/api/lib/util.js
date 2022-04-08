@@ -15,9 +15,10 @@ exports.generateNonceString = function(length) {
 
 /**
  * Sign params with key as MD5
+ * Refer to https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
  * Testing tool: https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=20_1
- * @param {*} params 
- * @param {*} key 
+ * @param {Object} params 
+ * @param {String} key 
  * @returns 
  */
 exports.sign = function(params, key) {
@@ -32,8 +33,9 @@ exports.sign = function(params, key) {
 
 /**
  * Sign params with key as HMAC-SHA256
- * @param {*} params 
- * @param {*} key 
+ * Refer to https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
+ * @param {Object} params 
+ * @param {String} key 
  * @returns 
  */
 exports.sign2 = function(params, key) {
