@@ -251,6 +251,7 @@ module.exports = {
         errors.contact = '联系方式不能为空';
       if (this.memberData.birthday && !moment(this.memberData.birthday).isValid())
         errors.birthday = '生日格式不正确';
+      //TODO, limit note to 512 chars
       return errors;
     },
     hasError: function() {

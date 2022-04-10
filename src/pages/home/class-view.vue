@@ -52,7 +52,16 @@ div.container
     div.form-group(:class='{"has-error": errors.mediaUrl}')
       label.control-label.col-sm-2 图片地址:
       div.col-sm-8(data-toggle="tooltip",data-placement="right",:title="errors.mediaUrl")
-        input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='图片的URL, http://或https://开头')
+        div.input-group
+          input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='图片的URL, http://或https://开头')
+          span.input-group-btn
+            button.btn.btn-default(type="button",@click="isPreview=true") 预览
+      div.col-sm-offset-2.col-sm-4(:src="cls.mediaUrl",style="margin-top:3px")
+        img.img-rounded.img-responsive(v-show="isPreview",:src="cls.mediaUrl")
+    div.form-group(:class='{"has-error": errors.description}')
+      label.control-label.col-sm-2 描述:
+      div.col-sm-8(data-toggle="tooltip",data-placement="right",:title="errors.description")
+        textarea.form-control(rows='3', placeholder='(选填) 添加课程描述信息,不超过256字',v-model.trim='cls.description',style='resize:vertical;min-height:70px')
     div.form-group
       div.col-sm-offset-2.col-sm-10
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
@@ -131,6 +140,7 @@ module.exports = {
         books: tmp.books || [],
         booking: tmp.booking || []
       }),
+      isPreview: false,
       quantity: 1,
       teachers: [],
       bookedMembers: [],
@@ -202,6 +212,9 @@ module.exports = {
           errors.mediaUrl = "图片地址格式不对";
         }
       }
+      if (this.cls.description && this.cls.description.length > 256)
+        errors.description = "描述超过256个字";
+
       return errors;
     },
     hasError: function() {
@@ -257,7 +270,8 @@ module.exports = {
           min: this.age.min ? parseInt(this.age.min * 12) : null,
           max: this.age.max ? parseInt(this.age.max * 12) : null
         },
-        mediaUrl: urlObject && urlObject.href || "" // property 'href' is encoded URL
+        mediaUrl: urlObject && urlObject.href || "", // property 'href' is encoded URL
+        description: this.cls.description
       });
       request.done(function(data, textStatus, jqXHR) {
         bootbox.alert("课程基本资料更新成功");
