@@ -140,8 +140,7 @@ var class_service = require('../../services/classes');
 
 module.exports = {
   name: "member-view",
-  props: {
-  },
+  props: {},
   components: {
     "BootstrapTable": BootstrapTable,
     "card": cardComp,
@@ -245,9 +244,9 @@ module.exports = {
     },
     errors: function() {
       var errors = {};
-      if (this.memberData.name.length == 0)
+      if (!this.memberData.name || this.memberData.name.length == 0)
         errors.name = '姓名不能为空';
-      if (this.memberData.contact.length == 0)
+      if (!this.memberData.contact || this.memberData.contact.length == 0)
         errors.contact = '联系方式不能为空';
       if (this.memberData.birthday && !moment(this.memberData.birthday).isValid())
         errors.birthday = '生日格式不正确';
@@ -520,10 +519,21 @@ module.exports = {
     // load member data
     var request = memberService.getMemberInfo(member_id);
     request.done(function(data, textStatus, jqXHR) {
-      vm.memberData = data;
+      if (data) {
+        vm.memberData = data || {};
+      } else {
+        // member not existed
+        bootbox.alert({
+          message: "查看的学员不存在",
+          buttons: {
+            ok: { className: "btn-danger" }
+          }
+        });
+      }
     });
 
     request.done(function(data, textStatus, jqXHR) {
+      if (!data) return; // member not existed
       var commentRequest = memberService.getMemberComments(member_id);
       commentRequest.done(function(data, textStatus, jqXHR) {
         vm.comments = data.comments;
