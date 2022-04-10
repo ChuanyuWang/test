@@ -53,7 +53,7 @@ div.container
       label.control-label.col-sm-2 图片地址:
       div.col-sm-8(data-toggle="tooltip",data-placement="right",:title="errors.mediaUrl")
         div.input-group
-          input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='图片的URL, http://或https://开头')
+          input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='http://或https://开头')
           span.input-group-btn
             button.btn.btn-default(type="button",@click="isPreview=true") 预览
       div.col-sm-offset-2.col-sm-4(:src="cls.mediaUrl",style="margin-top:3px")
