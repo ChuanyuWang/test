@@ -94,7 +94,7 @@ div.container
         div
           small(style='color:#777') 已上{{completedClassesCount}}节/未上{{classesCount - completedClassesCount}}节
   div(style='height:20px')
-  add-multi-class-modal(ref='modal',:classrooms='classrooms',:defaultName='this.courseData.name',@ok='addClass')
+  add-multi-class-modal(ref='modal',:classrooms='classrooms',:defaultName='this.course.name',@ok='addClass')
   view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
   show-booking-result-modal(ref='summaryDlg')
   confirm-delete-modal(ref='confirmDlg', @ok='deleteCourse')
@@ -125,7 +125,7 @@ module.exports = {
   name: "course-view",
   inheritAttrs: false,
   props: {
-    courseData: Object, // course object
+    courseData: Object, // course object, "null" stands for not existed course
     classrooms: Array // Array of available classrooms
   },
   data: function() {
@@ -224,7 +224,7 @@ module.exports = {
     },
     errors: function() {
       var errors = {};
-      if (this.course.name.length == 0) errors.name = "名称不能为空";
+      if (!this.course.name || this.course.name.length == 0) errors.name = "名称不能为空";
       return errors;
     },
     hasError: function() {
@@ -533,6 +533,20 @@ module.exports = {
     }
   },
   mounted: function() {
+    // load the setting of tenant
+    var setting = util.getTenantSetting();
+    this.feature = setting.feature;
+
+    // handle invalid(404) course URL
+    if (!this.course._id) {
+      return bootbox.alert({
+        message: "查看的班级不存在",
+        buttons: {
+          ok: { className: "btn-danger" }
+        }
+      });
+    };
+
     // 'this' is refer to vm instance
     var vm = this;
     var request = course_service.getCourseClasses(vm.course._id);
@@ -548,10 +562,6 @@ module.exports = {
         vm.members = data && data.members || [];
       });
     }
-
-    // load the setting of tenant
-    var setting = util.getTenantSetting();
-    vm.feature = setting.feature;
   }
 };
 </script>

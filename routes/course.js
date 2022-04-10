@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var helper = require('../helper');
+const { ObjectId } = require('mongodb');
+
 
 router.get('/', helper.checkTenantUser, function(req, res, next) {
     res.render('bqsq/course', {
@@ -12,6 +14,7 @@ router.get('/', helper.checkTenantUser, function(req, res, next) {
 });
 
 router.get('/:courseID', helper.checkTenantUser, function(req, res, next) {
+    if (!ObjectId.isValid(req.params.courseID)) return next();
     res.locals.courseID = req.params.courseID;
     res.render('bqsq/pages/course_view', {
         title: '查看班级',
