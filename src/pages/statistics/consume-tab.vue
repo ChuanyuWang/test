@@ -161,10 +161,15 @@ module.exports = {
             dataView: { readOnly: true }
           }
         },
+        grid: {
+          left: '5%',
+          right: '15%',
+          bottom: '10%'
+        },
         legend: {
           data: ["消费课时", "充值课时"],
           top: "10%",
-          left: "auto",
+          right: 10,
           orient: "vertical"
         },
         xAxis: {
@@ -241,10 +246,15 @@ module.exports = {
             dataView: { readOnly: true }
           }
         },
+        grid: {
+          left: '5%',
+          right: '15%',
+          bottom: '10%'
+        },
         legend: {
           data: ["订单金额"],
           top: "10%",
-          left: "auto",
+          right: 10,
           orient: "vertical"
         },
         xAxis: {
