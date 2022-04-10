@@ -12,6 +12,7 @@ var helper = require('../../helper');
  *  price: Number,
  *  capacity: Number,
  *  classroom: String,
+ *  mediaUrl: String,
  *  age: {
  *      min: null | Number,
  *      max: null | Number
@@ -49,7 +50,8 @@ var NORMAL_FIELDS = {
     classroom: 1,
     teacher: 1,
     booking: 1,
-    books: 1
+    books: 1,
+    mediaUrl: 1
 };
 
 router.get('/', function(req, res, next) {
@@ -305,7 +307,8 @@ router.patch('/:classID', function(req, res, next) {
         capacity: 1,
         age: 1,
         classroom: 1,
-        teacher: 1
+        teacher: 1,
+        mediaUrl: 1
     };
 
     //check any invalid field in the body

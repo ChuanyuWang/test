@@ -49,6 +49,10 @@ div.container
       label.control-label.col-sm-2 最大人数:
       div.col-sm-2(data-toggle="tooltip" data-placement="right",:title="errors.capacity")
         input.form-control(type='number',min='0',v-model.number='cls.capacity')
+    div.form-group(:class='{"has-error": errors.mediaUrl}')
+      label.control-label.col-sm-2 图片地址:
+      div.col-sm-8(data-toggle="tooltip",data-placement="right",:title="errors.mediaUrl")
+        input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='图片的URL, http://或https://开头')
     div.form-group
       div.col-sm-offset-2.col-sm-10
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
@@ -190,6 +194,14 @@ module.exports = {
         this.age.max < this.age.min
       )
         errors.age = "最大年龄不能小于最小年龄";
+      if (this.cls.mediaUrl) {
+        try {
+          // /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/.test(this.cls.mediaUrl);
+          new URL(this.cls.mediaUrl);
+        } catch (error) {
+          errors.mediaUrl = "图片地址格式不对";
+        }
+      }
       return errors;
     },
     hasError: function() {
@@ -224,6 +236,15 @@ module.exports = {
     saveBasicInfo: function() {
       if (this.hasError) return false;
 
+      var urlObject;
+      try {
+        if (this.cls.mediaUrl) {
+          urlObject = new URL(this.cls.mediaUrl);
+        }
+      } catch (error) {
+        // igonre the error in Internet Explorer
+      }
+
       var vm = this;
       var request = class_service.updateClass(this.cls._id, {
         name: this.cls.name,
@@ -235,7 +256,8 @@ module.exports = {
           // age is stored as months
           min: this.age.min ? parseInt(this.age.min * 12) : null,
           max: this.age.max ? parseInt(this.age.max * 12) : null
-        }
+        },
+        mediaUrl: urlObject && urlObject.href || "" // property 'href' is encoded URL
       });
       request.done(function(data, textStatus, jqXHR) {
         bootbox.alert("课程基本资料更新成功");
