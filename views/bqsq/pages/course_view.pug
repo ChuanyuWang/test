@@ -21,6 +21,6 @@ append js
     };
 
 block page
-  div#course_app.container(style='padding-top:69px',data-course-id=courseID)
+  div#course_app(style='padding-top:69px',data-course-id=courseID)
     course-view(:course-data="course",:classrooms="_getClassrooms()")
     
