@@ -12,7 +12,7 @@ div.container
   form.form-horizontal
     div.form-group(:class='{"has-error": errors.name}')
       label.control-label.col-sm-2 课程名称:
-      div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
+      div.col-sm-5(:title="errors.name")
         input.form-control(type='text',v-model.trim='cls.name',placeholder='课程描述')
     div.form-group
       label.control-label.col-sm-2 教室:
@@ -36,22 +36,22 @@ div.container
         p.form-control-static {{cls.price/100}}元
     div.form-group(:class='{"has-error": errors.date}')
       label.control-label.col-sm-2 日期/时间:
-      div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.date")
+      div.col-sm-4(:title="errors.date")
         date-picker(v-model='cls.date',:config="{format:'lll',locale:'zh-CN',sideBySide: true}")
     div.form-group(:class='{"has-error": errors.age}')
       label.control-label.col-sm-2 年龄:
-      div.col-sm-10(style="display:inline-flex",data-toggle="tooltip",data-placement="right",:title="errors.age")
+      div.col-sm-10(style="display:inline-flex",:title="errors.age")
         input.form-control(type='number',v-model.number='age.min',min='0',style={'width':'70px'})
         p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
         input.form-control(type='number',v-model.number='age.max',min='0',style={'width':'70px','margin-left':'3px'})
         p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 岁
     div.form-group(:class='{"has-error": errors.capacity}')
       label.control-label.col-sm-2 最大人数:
-      div.col-sm-2(data-toggle="tooltip" data-placement="right",:title="errors.capacity")
+      div.col-sm-2(:title="errors.capacity")
         input.form-control(type='number',min='0',v-model.number='cls.capacity')
     div.form-group(:class='{"has-error": errors.mediaUrl}')
       label.control-label.col-sm-2 图片地址:
-      div.col-sm-8(data-toggle="tooltip",data-placement="right",:title="errors.mediaUrl")
+      div.col-sm-8(:title="errors.mediaUrl")
         div.input-group
           input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='http://或https://开头')
           span.input-group-btn
@@ -60,8 +60,8 @@ div.container
         img.img-rounded.img-responsive(v-show="isPreview",:src="cls.mediaUrl")
     div.form-group(:class='{"has-error": errors.description}')
       label.control-label.col-sm-2 描述:
-      div.col-sm-8(data-toggle="tooltip",data-placement="right",:title="errors.description")
-        textarea.form-control(rows='3', placeholder='(选填) 添加课程描述信息,不超过256字',v-model.trim='cls.description',style='resize:vertical;min-height:70px')
+      div.col-sm-8(:title="errors.description")
+        textarea.form-control(rows='3',placeholder='(选填) 添加课程描述信息,不超过256字',v-model.trim='cls.description',style='resize:vertical;min-height:70px')
     div.form-group
       div.col-sm-offset-2.col-sm-10
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存

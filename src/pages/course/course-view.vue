@@ -94,7 +94,7 @@ div.container
         div
           small(style='color:#777') 已上{{completedClassesCount}}节/未上{{classesCount - completedClassesCount}}节
   div(style='height:20px')
-  add-multi-class-modal(ref='modal',:classrooms='classrooms',@ok='addClass')
+  add-multi-class-modal(ref='modal',:classrooms='classrooms',:defaultName='this.courseData.name',@ok='addClass')
   view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
   show-booking-result-modal(ref='summaryDlg')
   confirm-delete-modal(ref='confirmDlg', @ok='deleteCourse')
