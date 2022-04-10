@@ -333,27 +333,27 @@ module.exports = {
       });
       this.$refs.memberSelectDlg.show(checkedItems);
     },
-    genClassNames: function(count) {
+    genClassNames: function(baseName, count) {
       var count = count || 0;
       var result = [];
       var existed = this.classes || [];
       var suffix = existed.length + 1;
       for (var i = 0; i < count; i++) {
-        var name = this.course.name + "-" + suffix;
+        var name = baseName + "-" + suffix;
         while (
           existed.some(function(val, index, array) {
             return val.name == name;
           })
         ) {
           suffix++;
-          name = this.course.name + "-" + suffix;
+          name = baseName + "-" + suffix;
         }
         result.push(name);
         suffix++;
       }
       return result;
     },
-    genRepeatClass: function(datetime, startdate, enddate, days) {
+    genRepeatClass: function(datetime, startdate, enddate, days, name) {
       var dates = [];
       var current = moment(startdate);
       while (current.isSameOrBefore(enddate)) {
@@ -372,10 +372,11 @@ module.exports = {
         }
         current.add(1, "day");
       }
-      var names = this.genClassNames(dates.length);
+      var names = this.genClassNames(name, dates.length);
       return names.map(function(value, index, array) {
         return {
-          name: value,
+          //name: value, // class name with suffix
+          name: name, // class name without suffix
           date: dates[index].toISOString()
         };
       });
@@ -390,10 +391,10 @@ module.exports = {
         var days = options.weekdays || [];
         if (enddate.diff(startdate, "days") > 180)
           return bootbox.alert("开始和结束日期不能超过180天");
-        result = this.genRepeatClass(datetime, startdate, enddate, days);
+        result = this.genRepeatClass(datetime, startdate, enddate, days, options.name);
       } else {
         result.push({
-          name: this.genClassNames(1)[0],
+          name: options.name,
           date: datetime.toISOString()
         });
       }
