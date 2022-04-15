@@ -11,8 +11,11 @@ $(document).ready(function() {
     init();
 
     // bootstrap the class calendar page
-    var app = new Vue({ el: '#app', extends: calendar });
-    app.updateSchedule();
+    new Vue({
+        el: '#app',
+        components: { calendar },
+        template: '<calendar/>'
+    });
 });
 
 // Functions =============================================================

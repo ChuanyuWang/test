@@ -270,6 +270,9 @@ module.exports = {
   },
   created: function() {
     this.tenantConfig = _getTenantConfig();
+  },
+  mounted: function() {
+    this.updateSchedule();
   }
 };
 </script>

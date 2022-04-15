@@ -11,7 +11,11 @@ var ordersPage = require('./orders.vue').default;
 $(document).ready(function() {
     init();
 
-    new Vue({ el: '#app', extends: ordersPage });
+    new Vue({
+        el: '#app',
+        components: { ordersPage },
+        template: '<orders-page/>'
+    });
 });
 
 // Functions =============================================================

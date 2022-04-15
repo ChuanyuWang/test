@@ -6,7 +6,7 @@
 
 var common = require('../../common/common');
 var i18nextplugin = require('../../locales/i18nextplugin');
-var booking_app = require('./booking.vue').default;
+var bookingApp = require('./booking.vue').default;
 
 var ua = navigator.userAgent.toLowerCase();
 if (ua.indexOf('micromessenger') > -1) { // we are within wechat
@@ -34,7 +34,11 @@ $(document).ready(function() {
 
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
-    app = new Vue({ el: '#app', extends: booking_app });
+    app = new Vue({
+        el: '#app',
+        components: { bookingApp },
+        template: '<booking-app/>'
+    });
     // Test only
     //app.openID = "o9lk5w_d08t3gW6KY9VkdWU5rnnU";
 });
