@@ -28,6 +28,29 @@ module.exports = {
         }
         return settings;
     },
+    getTenantConfig: function() {
+        if (typeof _getTenantConfig === 'function') {
+            return _getTenantConfig();
+        }
+        return {};
+    },
+    /**
+     * Get the string of public classrooms' id
+     * @returns {String} public classrooms' id concat by "," E.g. A,B,C
+     */
+    getPublicClassroom: function() {
+        if (typeof _getTenantConfig === 'function') {
+            var tenantConfig = _getTenantConfig()
+            var publicRooms = [];
+            tenantConfig.classrooms.forEach(function(value) {
+                if (value.visibility !== "internal") {
+                    publicRooms.push(value.id);
+                }
+            })
+            return publicRooms.join(",");
+        }
+        return "";
+    },
     /**
      * Data fomatter function of bootstrap-table to format date localized string by 'll'
      * 
