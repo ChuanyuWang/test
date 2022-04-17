@@ -27,6 +27,7 @@ module.exports = {
         myreadbooks: './pages/mybooks/mybooks.js',
         trial: './pages/trial/trial.js',
         portal: './pages/app/mobileportal.js',
+        poster: './pages/poster/poster.js',
         course: './pages/course/course.js',
         course_view: './pages/course/course_view.js',
         setting: './pages/settings/setting.js',

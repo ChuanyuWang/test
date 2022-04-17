@@ -1,0 +1,30 @@
+extends ../../layout
+
+block prepend css
+  link(href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900",rel="stylesheet")
+  link(href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/MaterialDesign-Webfont/4.9.95/css/materialdesignicons.min.css",rel="stylesheet")
+  if ENV_DEVELOPMENT
+    link(href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vuetify/2.6.3/vuetify.css",rel="stylesheet")
+    //link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+  else
+    //link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+    link(href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/vuetify/2.6.3/vuetify.min.css",rel="stylesheet")
+block append js
+  if ENV_DEVELOPMENT
+    script(src=CDN_FILES.jquery_dev)
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
+    script(src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue-router/3.5.3/vue-router.js")
+    script(src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/vuetify/2.6.3/vuetify.js")
+    script(src=CDN_FILES.momentjs_dev)
+  else
+    script(src=CDN_FILES.jquery)
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
+    script(src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue-router/3.5.3/vue-router.min.js")
+    script(src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/vuetify/2.6.3/vuetify.min.js")
+    script(src=CDN_FILES.momentjs)
+  script(src='/js/poster.js')
+
+block content
+  div#app

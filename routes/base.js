@@ -131,5 +131,10 @@ router.get('/app', function(req, res) {
     });
 });
 
+router.get('/poster', function(req, res) {
+    res.render('bqsq/mobile/poster', {
+        title: '当日课程表展示'
+    });
+});
 
 module.exports = router;
