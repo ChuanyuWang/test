@@ -63,6 +63,6 @@ $(document).ready(function() {
 
 function init() {
     console.log("welcome~~~");
-    //moment.locale('zh-CN');
+    moment.locale('zh-CN');
     //bootbox.setLocale('zh_CN');
 }
