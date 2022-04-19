@@ -10,10 +10,10 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
             label.control-label-sm.col-xs-2 时间:
             div.col-xs-10
               p.form-control-static {{bookItem.date | dateTimeFormatter}}
-          div.form-group.form-group-sm
+          div.form-group.form-group-sm(v-show='address')
             label.control-label-sm.col-xs-2 地点:
             div.col-xs-10
-              p.form-control-static TODO上海市长宁区xxxx
+              p.form-control-static {{address}}
     div.panel.panel-default(style='margin:-7px -7px 15px -7px')
       div.panel-body(style='padding:7px')
         form.form-horizontal.form-condensed
@@ -68,7 +68,9 @@ module.exports = {
     openid: String
   },
   data: function() {
+    var config = common.getTenantConfig();
     return {
+      address: config.address || "",
       warningMessage: "",
       errorMessage: "",
       status: "open", // open|paying|success|error
@@ -189,7 +191,7 @@ module.exports = {
       });
     },
     openMyBooking() {
-      location.href = './mybooking';
+      location.href = './mybooking'; //TODO add "openid" as additional param
     }
   }
 }
