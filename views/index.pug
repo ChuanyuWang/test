@@ -46,12 +46,28 @@ block content
       div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
 
   block page
-    div.jumbotron(style='padding-top:50px')
-      div.container
+    div.container(style='padding-top:51px')
+      div.jumbotron(style='margin-top:20px')
         h1 欢迎访问
-        p 早教平台是面向3-12岁儿童教育机构设计的一站式解决方案，集课程、会员、班级管理于一体，提供移动端课程预约，报名试听，课时结算等特色功能。<br><small>网站相关功能仍在建设中</small>
+        p 教培管理系统是面向教育培训机构的一站式解决方案，集课程、学员、班级管理于一体，提供移动端报名试听，学员自助约课等便捷功能。
+        p <strong>致力于帮助培训机构提升门店经营效率，降低运营成本。</strong>
         p
-          a.btn.btn-primary.btn-lg(role='button') 敬请期待
+          a.btn.btn-primary.btn-lg(role='button',href='mailto:sales@getbestlesson.com',target='_blank') 申请试用
+      div.page-header(style="position:relative;padding:20px 60px")
+        h1.text-center 核心功能
+        div(style="margin-top:60px")
+          h4(style="font-weight:600") 教学教务
+          p 常规排课、课上签到、学员管理、课消统计、出勤统计
+        div(style="margin-top:40px")
+          h4(style="font-weight:600") 家校服务
+          p 学员自助约课、查看剩余课时、上课进度
+        div(style="margin-top:40px")
+          h4(style="font-weight:600") 市场营销
+          p 市场采单、短信验证、线上支付
+        p(style="margin-top:40px")
+          a.btn.btn-default.btn-lg(role='button') 查看更多
+        img(src="/img/home-480x320.png",style="width:480px;height:320px;position:absolute;top:110px;left:550px")
+        img(src="/img/mobile-200x400.png",style="width:130px;height:260px;position:absolute;top:200px;left:510px")
   //keep the content above the footer area
   div.hidden-print(style='height:60px')
   footer.footer.hidden-print
