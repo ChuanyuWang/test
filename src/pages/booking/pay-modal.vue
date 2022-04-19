@@ -40,7 +40,7 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
         p 距离开课时间大于24小时取消预约, 支持全额退款;<br>
           |距离开课时间不满24小时取消预约, 不支持退款。
   template(v-slot:footer)
-    div.alert.alert-danger(v-if="errorMessage",role="alert",style='padding:3px;margin:-7px 0px 3px 0px;text-align:center') {{errorMessage}}
+    div.alert.alert-danger.text-center(v-if="errorMessage",role="alert",style='padding:3px;margin:-7px 0px 3px 0px') {{errorMessage}}
     div.btn-group.btn-group-lg.btn-group-justified(role="group",style="background-color:#eee")
       template(v-if='status!="success"')
         div.btn 待支付  
