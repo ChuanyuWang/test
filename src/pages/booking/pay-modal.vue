@@ -37,8 +37,8 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
     div.panel.panel-default(style='margin:-7px -7px 0px -7px')
       div.panel-body(style='padding:7px 7px 7px 20px')
         label 退课须知:
-        p 距离开课时间大于6小时取消预约, 支持全额退款;<br>
-          |距离开课时间不满6小时取消预约, 不支持退款。
+        p 距离开课时间大于24小时取消预约, 支持全额退款;<br>
+          |距离开课时间不满24小时取消预约, 不支持退款。
   template(v-slot:footer)
     div.alert.alert-danger(v-if="errorMessage",role="alert",style='padding:3px;margin:-7px 0px 3px 0px;text-align:center') {{errorMessage}}
     div.btn-group.btn-group-lg.btn-group-justified(role="group",style="background-color:#eee")
