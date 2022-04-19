@@ -37,7 +37,8 @@ $(document).ready(function() {
     app = new Vue({
         el: '#app',
         components: { bookingApp },
-        template: '<booking-app/>'
+        data: { openID: "" },
+        template: '<booking-app :openID="openID"/>'
     });
     // Test only
     //app.openID = "o9lk5w_d08t3gW6KY9VkdWU5rnnU";
