@@ -214,6 +214,23 @@ router.delete('/:classID', async function(req, res, next) {
             return next(error);
         }
 
+        // find the booking info of member
+        let bookingInfo = null;
+        for (let i = 0; i < doc.booking.length; i++) {
+            if (doc.booking[i].member.toString() == req.body.memberid) {
+                bookingInfo = doc.booking[i];
+                break;
+            }
+        }
+
+        // Can't cancel the booking if order is available
+        // TODO, check refund status and cancel booking
+        if (bookingInfo.order) {
+            let error = new Error("预约订单已经支付，请联系门店取消预约");
+            error.status = 400;
+            return next(error);
+        }
+
         if (req.isAuthenticated() && req.user.tenant === req.tenant.name) {
             if (req.user.role === "admin") {
                 //only admin could delete the booking in any time
@@ -231,23 +248,6 @@ router.delete('/:classID', async function(req, res, next) {
             // be free to cancel the booking if it's less than 24 hours before begin
             // 24 hours = 86400000 ms (24*60*60*1000)
             let error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
-            error.status = 400;
-            return next(error);
-        }
-
-        // find the booking quantity of member
-        let bookingInfo = null;
-        for (let i = 0; i < doc.booking.length; i++) {
-            if (doc.booking[i].member.toString() == req.body.memberid) {
-                bookingInfo = doc.booking[i];
-                break;
-            }
-        }
-
-        // Can't cancel the booking if order is available
-        // TODO, check refund status and cancel booking
-        if (bookingInfo.order) {
-            let error = new Error("预约订单已经支付，请联系门店取消预约");
             error.status = 400;
             return next(error);
         }
