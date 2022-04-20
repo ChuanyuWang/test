@@ -76,6 +76,11 @@ module.exports = {
         { name: "添加班级课程", role: "user" },
         { name: "删除班级课程", role: "admin" },
 
+        { name: "查看订单", role: "user" },
+        { name: "删除订单", role: "admin" },
+        { name: "关闭订单", role: "admin" },
+        { name: "退款", role: "admin" },
+
         { name: "签到*", role: "user" },
         { name: "旗标", role: "user" },
         { name: "备注", role: "user" },
