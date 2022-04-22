@@ -1,5 +1,5 @@
 ul.nav.navbar-nav
-  each val, index in {home:__('curriculum'),member:__('members'),course:__('classes'),statistics:__('statistics'),setting:__('settings')}
+  each val, index in {home:__('curriculum'),member:__('members'),course:__('classes'),orders:__('orders'),statistics:__('statistics'),setting:__('settings')}
     li(class={active: currentUrl === index})
       if currentUrl === index
         a(href='#') #{val}
