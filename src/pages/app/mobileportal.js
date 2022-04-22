@@ -7,19 +7,27 @@ var i18nextplugin = require('../../locales/i18nextplugin');
 var mobilePortal = require('./portal.vue').default;
 var schedule = require('./schedule.vue').default;
 var appointment = require('./myappointments.vue').default;
-var mybooks = require('./mybooks.vue').default;
+var trial = require('./trial.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
 
     var routes = [
-        { path: '/', component: schedule },
-        { path: '/mybooks', component: mybooks },
-        { path: '/appointment', component: appointment }
+        { path: '/', component: schedule, meta: { title: '课程表' } },
+        { path: '/trial', component: trial, meta: { title: '报名试听' } },
+        { path: '/appointment', component: appointment, meta: { title: '我的预约' } }
     ];
     var router = new VueRouter({
         routes // short for `routes: routes`
+    });
+
+    // update the title of document
+    router.beforeEach(function(to, from, next) {
+        if (to.meta.title) {
+            document.title = to.meta.title;
+        }
+        next();
     });
 
     var vuetify = new Vuetify({

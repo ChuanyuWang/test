@@ -19,10 +19,10 @@ v-app
   v-bottom-navigation(app,v-model='value',color='primary',@change="$router.push(value)")
     v-btn(value='/')
       span 查看课表
-      v-icon mdi-history
-    v-btn(value='/mybooks')
-      span 我的绘本
-      v-icon mdi-bookshelf
+      v-icon mdi-calendar-month
+    v-btn(value='/trial')
+      span 报名试听
+      v-icon mdi-seal
     v-btn(value='/appointment')
       span 我的预约
       v-icon mdi-heart
@@ -33,7 +33,9 @@ module.exports = {
   name: "mobile-portal",
   data() {
     return {
-      value: "/"
+      // when open url https://...#/trial
+      // update the bottom navigator status
+      value: this.$route.path
     }
   },
   methods: {

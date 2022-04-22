@@ -1,13 +1,14 @@
 <template lang="pug">
 v-container(fluid)
-  p My Books
+  p Trial
   v-row
-    p(style="height:1000px") Hello World
+    v-col
+      p(style="height:1000px") Hello World
 </template>
 
 <script>
 module.exports = {
-  name: "mybooks",
+  name: "trial",
   data() {
     return {}
   },
