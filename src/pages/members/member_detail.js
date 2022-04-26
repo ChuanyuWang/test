@@ -1,11 +1,11 @@
 /**
  * --------------------------------------------------------------------------
- * member_view.js single member view page main entry module
+ * member_detail.js single member view page main entry module
  * --------------------------------------------------------------------------
  */
 
 var i18nextplugin = require('../../locales/i18nextplugin');
-var memberView = require('./member-view.vue').default;
+var memberDetail = require('./member-detail.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -13,8 +13,8 @@ $(document).ready(function() {
 
     new Vue({
         el: '#app',
-        components: { memberView },
-        template: '<member-view/>'
+        components: { memberDetail },
+        template: '<member-detail/>'
     });
 });
 

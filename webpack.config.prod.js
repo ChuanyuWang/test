@@ -21,7 +21,7 @@ module.exports = {
         main: './pages/home/main.js',
         class_view: './pages/home/class_view.js',
         member: './pages/members/member.js',
-        member_view: './pages/members/member_view.js',
+        member_detail: './pages/members/member_detail.js',
         booking: './pages/booking/booking.js',
         mybooking: './pages/booking/mybooking.js',
         myreadbooks: './pages/mybooks/mybooks.js',

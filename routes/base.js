@@ -72,7 +72,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function(req, res, next)
     // skip to 404 page if member ID is not valid
     if (!ObjectId.isValid(req.params.memberID)) return next();
     res.locals.memberID = req.params.memberID;
-    res.render('bqsq/pages/member_view', {
+    res.render('bqsq/pages/member_detail', {
         title: res.__('view_member'),
         user: req.user
     });

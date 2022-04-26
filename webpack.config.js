@@ -20,7 +20,7 @@ module.exports = {
         main: ['./pages/home/main.js', hotMiddlewareScript],
         class_view: ['./pages/home/class_view.js', hotMiddlewareScript],
         member: ['./pages/members/member.js', hotMiddlewareScript],
-        member_view: ['./pages/members/member_view.js', hotMiddlewareScript],
+        member_detail: ['./pages/members/member_detail.js', hotMiddlewareScript],
         booking: ['./pages/booking/booking.js', hotMiddlewareScript],
         mybooking: ['./pages/booking/mybooking.js', hotMiddlewareScript],
         myreadbooks: ['./pages/mybooks/mybooks.js', hotMiddlewareScript],
