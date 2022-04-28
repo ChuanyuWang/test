@@ -15,12 +15,18 @@ append js
 block page
   div.container(style={'padding-top': '58px'})
     div#toolbar
-      div.form-inline(role='group')
+      div.form-inline
         div.btn-group(role='group')
           button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
-          button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
+          //button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
             span.glyphicon.glyphicon-filter
-        div.input-group
+        div.input-group.source-filter
+          span.input-group-addon 来源:
+          select.form-control
+            option(value="") 全部
+            option(value="manual") 手动添加
+            option(value="book") 扫码预约
+        div.input-group.status-filter
           span.input-group-addon 状态:
           select.form-control
             option(value="active") 正常

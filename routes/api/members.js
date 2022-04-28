@@ -115,6 +115,18 @@ router.get('/', async function(req, res, next) {
         };
     }
 
+    // query members by source, the source could be empty string, e.g. source=
+    if (req.query.source) {
+        // document is considered as "manual" if property "source" not existed
+        if (req.query.source === "manual") {
+            query['source'] = {
+                $in: ["manual", null]
+            };
+        } else {
+            query['source'] = req.query.source;
+        }
+    }
+
     // query members by keyword, search 'name' or 'contact'
     let search = req.query.search || "";
     if (search) {

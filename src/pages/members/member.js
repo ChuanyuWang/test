@@ -140,13 +140,14 @@ function customQuery(params) {
     var filter = $("#filter_dlg input:checked").val();
     params.filter = filter;
 
-    var statusEl = $('#toolbar option:selected');
-    if (statusEl.length > 0) {
-        var statusQuery = '';
-        for (var i = 0; i < statusEl.length; i++) {
-            statusQuery += statusEl[i].value + ',';
-        }
-        params.status = statusQuery.substring(0, statusQuery.length - 1);
+    var statusEl = $('#toolbar div.status-filter option:selected');
+    if (statusEl.val()) {
+        params.status = statusEl.val();
+    }
+
+    var sourceEl = $('#toolbar div.source-filter option:selected');
+    if (sourceEl.val()) {
+        params.source = sourceEl.val();
     }
 
     // Append the field 'unStartedClassCount' to returned members
