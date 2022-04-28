@@ -33,7 +33,8 @@ if (app.get('env') === 'production') {
                 process.exit(1)
             }
 
-            // TODO, close database connection and exit with success (0 code)
+            // close database connection and exit with success (0 code)
+            app.stop();
             process.exit(0)
         })
     })
