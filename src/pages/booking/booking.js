@@ -10,18 +10,14 @@ var bookingApp = require('./booking.vue').default;
 
 var ua = navigator.userAgent.toLowerCase();
 if (ua.indexOf('micromessenger') > -1) { // we are within wechat
-    var tenant = common.getTenantName();
-    //TODO, remove test tenant
-    if (tenant === "test") {
-        var code = common.getParam("code");
-        if (!code) {
-            // TODO, get appID from tenant if wechat integration is enabled
-            var appID = "wxe4283737fc91496e";
-            var localURL = location.href;
-            location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appID + "&redirect_uri=" + encodeURIComponent(localURL) + "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
-        } else {
-            getOpenId(code);
-        }
+    var code = common.getParam("code");
+    if (!code) {
+        // TODO, get appID from tenant if wechat integration is enabled
+        var appID = "wxe4283737fc91496e";
+        var localURL = location.href;
+        location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appID + "&redirect_uri=" + encodeURIComponent(localURL) + "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
+    } else {
+        getOpenId(code);
     }
 }
 

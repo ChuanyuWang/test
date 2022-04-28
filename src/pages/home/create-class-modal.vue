@@ -16,7 +16,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             label.control-label.col-sm-2(for='cost') 课时:
             div.col-sm-2
               input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
-          div.form-group(:class='{"has-error": errors.price}',:title='errors.price',v-show='tenantName==="test"')
+          div.form-group(:class='{"has-error": errors.price}',:title='errors.price')
             label.control-label.col-sm-2(for='price') 价格:
             div.col-sm-3
               div.input-group
@@ -55,7 +55,6 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
  */
 
 var date_picker = require('../../components/date-picker.vue').default;
-var common = require('../../common/common');
 
 module.exports = {
   components: {
@@ -74,8 +73,7 @@ module.exports = {
         min: null,
         max: null
       },
-      classroom: null,
-      tenantName: common.getTenantName()
+      classroom: null
     };
   },
   watch: {

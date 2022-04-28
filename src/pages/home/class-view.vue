@@ -30,10 +30,10 @@ div.container
       label.control-label.col-sm-2 所须课时:
       div.col-sm-10
         p.form-control-static {{cls.cost}}
-    div.form-group(v-if="cls.price")
+    div.form-group
       label.control-label.col-sm-2 价格:
       div.col-sm-5
-        p.form-control-static {{cls.price/100}}元
+        p.form-control-static {{cls.price | formatPrice}}元
     div.form-group(:class='{"has-error": errors.date}')
       label.control-label.col-sm-2 日期/时间:
       div.col-sm-4(:title="errors.date")
@@ -232,6 +232,9 @@ module.exports = {
     formatDateTime: function(value) {
       if (!value) return "?";
       return moment(value).format("lll");
+    },
+    formatPrice: function(value) {
+      return (value / 100) || 0;
     }
   },
   watch: {},
