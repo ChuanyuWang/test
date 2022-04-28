@@ -22,6 +22,7 @@ if (app.get('env') === 'production') {
 
     // intercept the SIGINT signal (emitted by pm2 stop) for Graceful Shutdown
     // By default, pm2 waits 1600ms before sending SIGKILL signal if the applications doesn’t exit itself.
+    // pm2 will try to kill the old process by every 100ms until sending SIGKILL signal
     // Change the default value by option "kill_timeout: 1600"
     process.on('SIGINT', function() {
         console.info('SIGINT signal received.')
