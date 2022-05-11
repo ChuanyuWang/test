@@ -25,8 +25,9 @@ var env = app.get('env');
 app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
-// set the logging
+// set the main logging by log4js
 var log4js = require('log4js');
+// Configuration should take place immediately after requiring log4js for the first time in your application.
 log4js.configure(config.log4js);
 const logger = app.locals.ENV_DEVELOPMENT ? log4js.getLogger() : log4js.getLogger('production');
 // Console replacement
@@ -172,9 +173,7 @@ app.use('/', routes);
 /// catch 404 if no router match
 app.use(function(req, res, next) {
     res.status(404);
-    res.render('error', {
-        message: 'Page Not Found',
-        error: {},
+    res.render('404', {
         title: res.__('error_title')
     });
 });

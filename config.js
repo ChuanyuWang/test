@@ -6,6 +6,11 @@ module.exports = {
          * Be careful if you’re logging to files.
          */
         disableClustering: true,
+        /**
+         * install the pm2-intercom module to PM2 before enable below option
+         * Refer to https://log4js-node.github.io/log4js-node/clustering.html
+         */
+        //pm2: true,
         appenders: {
             dev: {
                 type: 'stdout',

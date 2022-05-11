@@ -1,0 +1,17 @@
+extends layout
+
+block append css
+  link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+
+block content
+  div.jumbotron(style='margin-bottom:0px')
+    div.container
+      div.row
+        div.col-sm-6
+          h1(style='font-size:108px;font-weight:700') Oops!
+          h2 We can't seem to find the page you're looking for.
+          h5 Error code: <strong>404</strong>
+          a(href='/') Take me to the homepage 
+            i.glyphicon.glyphicon-hand-left
+        div.col-sm-6(style='padding-top:48px')
+          img.img-responsive.center-block(src='/img/404.png')
