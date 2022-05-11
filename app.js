@@ -26,7 +26,7 @@ app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
 // set the main logging by log4js
-var log4js = require('log4js');
+const log4js = require('log4js');
 // Configuration should take place immediately after requiring log4js for the first time in your application.
 log4js.configure(config.log4js);
 const logger = app.locals.ENV_DEVELOPMENT ? log4js.getLogger() : log4js.getLogger('production');
@@ -230,6 +230,8 @@ app.use(function(err, req, res, next) {
 
 app.stop = function() {
     connectionManager.close();
+    // make sure all logs are written to files when program exits
+    log4js.shutdown();
 }
 
 module.exports = app;
