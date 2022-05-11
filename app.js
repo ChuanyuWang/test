@@ -169,11 +169,14 @@ app.use(flash()); //flash() requires sessions
 var routes = require('./routes/index');
 app.use('/', routes);
 
-/// catch 404 and forward to error handler
+/// catch 404 if no router match
 app.use(function(req, res, next) {
-    var err = new Error('Page Not Found');
-    err.status = 404;
-    next(err);
+    res.status(404);
+    res.render('error', {
+        message: 'Page Not Found',
+        error: {},
+        title: res.__('error_title')
+    });
 });
 
 /// error handlers
