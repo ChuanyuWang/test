@@ -65,10 +65,16 @@ app.set('view engine', 'pug');
 app.locals.pretty = true; // output the pretty html for consistency 
 
 // app.use(favicon(__dirname + '/public/img/favicon.ico'));
+
+// Log all http requests and responds by morgan
+morgan.token('pid', function getPid(req) {
+    return process.pid;
+});
+
 if (app.locals.ENV_DEVELOPMENT) {
     app.use(morgan('dev'));
 } else {
-    app.use(morgan('[:date[iso]] :remote-addr - :remote-user :method :url :status :res[content-length] - :response-time ms'));
+    app.use(morgan('[:date[iso]] [:pid] :remote-addr - :remote-user :method :url :status :res[content-length] - :response-time ms'));
 }
 
 // Use gzip compression

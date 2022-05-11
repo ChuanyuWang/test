@@ -18,7 +18,7 @@ module.exports = {
                 type: 'stdout',
                 layout: {
                     type: 'pattern',
-                    pattern: '[%x{ISOTime}] [%p] %m',
+                    pattern: '[%x{ISOTime}] [%z] [%p] %m',
                     tokens: {
                         ISOTime: function(logEvent) {
                             return logEvent.startTime.toISOString();
