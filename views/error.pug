@@ -1,6 +1,14 @@
 extends layout
 
+block append css
+  link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  div.container
+    div.row
+      div.col-sm-12
+        h1= message
+        h5 Error code: <strong>#{error.status || 500}</strong>
+        a(href='/') Take me to the homepage 
+          i.glyphicon.glyphicon-hand-left
+        pre #{error.stack}
