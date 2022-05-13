@@ -16,6 +16,9 @@ describe('App', function() {
     });
 
     it('home page status 200', function(done) {
+        // enlarge the timeout to 3s
+        // because the very first test case may take longger time to initialization
+        this.timeout(3000);
         request(app).get('/').expect(200, done);
     });
 });
