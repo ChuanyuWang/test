@@ -7,7 +7,7 @@ const assert = chai.assert;
 const expect = chai.expect;
 const should = chai.should(); //actually enable should style assertions
 
-describe('POST /api/members', function() {
+describe('Signature Utility', function() {
     before(async function() {
         // runs once before the first test in this block
 
