@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextBrowserLanguageDetector = require('./i18nextBrowserLanguageDetector.min');
+var i18nextBrowserLanguageDetector = require('./i18nextBrowserLanguageDetector');
 
 var resources = {
     'en': { translation: require('./en') },
