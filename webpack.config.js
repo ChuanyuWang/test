@@ -75,30 +75,32 @@ module.exports = {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
-                    // disable the Hot Reload explicitly
+                    // enable the Hot Reload for development
                     hotReload: true
                     // other vue-loader options go here
                     // esModules: false // removed from v14.0.0, more information refer to https://github.com/vuejs/vue-loader/releases/tag/v14.0.0
                     // also see https://github.com/webpack/webpack/issues/3929
                 }
             },
+            // this will apply to all `.js` files and template block "<script>" in `.vue` files
+            // convert ECMAScript 2015+ code into a backwards compatible version
             {
-                // don't use babel to parse the js file until "runtime-generator" issue is resolved
-                test: /\.j1s$/,
+                test: /\.js$/,
                 include: path.resolve(__dirname, 'src'),
                 exclude: /(node_modules|bower_components)/,
                 use: {
                     loader: 'babel-loader',
                     options: {
                         presets: [
-                            ['@babel/preset-env',
-                                { "regenerator": true }
-                            ]
-                        ]
+                            // See below for more @babel/preset-env options.
+                            // https://babeljs.io/docs/en/babel-preset-env
+                            ['@babel/preset-env', { "targets": "defaults" }]
+                        ],
+                        plugins: []
                     }
                 }
             },
-            // this will apple to template block `<template lang="pug">` in `.vue` files
+            // this will apply to template block `<template lang="pug">` in `.vue` files
             {
                 test: /\.pug$/,
                 loader: 'pug-plain-loader'
