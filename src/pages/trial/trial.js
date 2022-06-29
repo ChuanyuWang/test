@@ -5,7 +5,7 @@
  */
 
 var i18nextplugin = require('../../locales/i18nextplugin');
-var trial_app = require('./trial.vue').default;
+var trial = require('./trial.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -13,7 +13,11 @@ $(document).ready(function() {
 
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
-    new Vue({ el: '#app', extends: trial_app });
+    new Vue({
+        el: '#app',
+        components: { trial },
+        template: '<trial/>'
+    });
 });
 
 // Functions =============================================================

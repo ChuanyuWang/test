@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('../../locales/i18nextplugin');
-var mybooking_app = require('./my-booking.vue').default;
+var myBooking = require('./my-booking.vue').default;
 
 // open id of Weichat user
 //var _openid = undefined;
@@ -15,7 +15,11 @@ $(document).ready(function() {
 
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
-    new Vue({ el: '#app', extends: mybooking_app });
+    new Vue({
+        el: '#app',
+        components: { myBooking },
+        template: '<my-booking/>'
+    });
 });
 
 // Functions =============================================================

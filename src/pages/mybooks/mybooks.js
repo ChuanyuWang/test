@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('../../locales/i18nextplugin');
-var books_app = require('./my-read-books.vue').default;
+var readBooks = require('./my-read-books.vue').default;
 // open id of Weichat user
 //var _openid = undefined;
 
@@ -13,7 +13,11 @@ $(document).ready(function() {
     init();
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
-    new Vue({ el: '#app', extends: books_app });
+    new Vue({
+        el: '#app',
+        components: { readBooks },
+        template: '<read-books/>'
+    });
 });
 
 // Functions =============================================================
