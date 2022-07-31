@@ -120,11 +120,12 @@ router.post('/', async function(req, res, next) {
         }
         console.log("class is found %j", cls);
 
-        // 1 hours = 3600000 (1*60*60*1000)
-        if (Date.now() > cls.date.getTime() - 3600000) {
+        // 1 hour = 3600000 (1*60*60*1000)
+        // 1 minute = 60000 (1*60*1000)
+        if (Date.now() > cls.date.getTime() - 60000) {
             if (req.isUnauthenticated() || req.user.tenant != req.tenant.name) {
                 // member can only book the class 1 hour before started
-                let error = new Error("课程已经开始或即将开始(不足1小时)");
+                let error = new Error("课程已经开始或即将开始(不足1分钟)");
                 error.status = 400;
                 return next(error);
             }
