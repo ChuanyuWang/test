@@ -139,27 +139,19 @@ router.post('/', async function(req, res, next) {
         // find the user who want to book a class
         let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
         if (!doc) {
-            //TODO, remove the tenant check
-            if (req.tenant.name == "test") {
-                // create new member if not exist
-                doc = {
-                    name: req.body.name,
-                    contact: req.body.contact,
-                    status: "active",
-                    source: "book",
-                    since: new Date(),
-                    membership: [],
-                    openid: req.body.openid || undefined
-                };
-                let result = await members.insertOne(doc);
-                console.debug("create member successfully with result: %j", result.result);
-                console.log("member is created automatically during booking: %j", doc);
-            } else {
-                let error = new Error("未找到您的会员信息，请核实姓名、电话；如果您还不是我们的会员，欢迎来电或到店咨询");
-                error.status = 400;
-                error.code = 2001;
-                return next(error);
-            }
+            // create new member if not exist
+            doc = {
+                name: req.body.name,
+                contact: req.body.contact,
+                status: "active",
+                source: "book",
+                since: new Date(),
+                membership: [],
+                openid: req.body.openid || undefined
+            };
+            let result = await members.insertOne(doc);
+            console.debug("create member successfully with result: %j", result.result);
+            console.log("member is created automatically during booking: %j", doc);
         } else {
             console.log("member is found %j", doc);
             // update openid if not the same
