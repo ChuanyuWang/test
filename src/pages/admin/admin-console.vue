@@ -86,7 +86,7 @@ div
                     a.text-info(@click='setPassword(user.username)')
                       i.glyphicon.glyphicon-edit
                   td
-                    input(type='checkbox', v-model='user.active', style="margin:0")
+                    input(type='checkbox',v-model='user.active',style="margin:0",@change='updateStatus(user)')
         div.form-group
           div.col-sm-offset-3.col-sm-9
             button.btn.btn-primary(type='button',v-if='selectedTenant._id',@click='upgradeTenant(selectedTenant.name)') Upgrade
@@ -240,6 +240,24 @@ module.exports = {
             alert("Set user password successfully");
           });
         }
+      });
+    },
+    updateStatus: function(user) {
+      var request = $.ajax("/admin/api/user/" + user.username, {
+        type: "PATCH",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+          active: user.active
+        }),
+        dataType: "json"
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("set user status fails", jqXHR);
+        alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+      });
+      request.done(function(data, textStatus, jqXHR) {
+        console.log(data);
+        alert("Set user status successfully");
       });
     },
     createTenant: function() {

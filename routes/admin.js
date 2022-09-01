@@ -72,11 +72,11 @@ router.post('/api/users', isAuthenticated, function(req, res, next) {
 
 router.patch('/api/user/:userID', isAuthenticated, async function(req, res, next) {
     try {
-        let sanitizedUser = await Account.findByUsername(req.params.userID);
+        let sanitizedUser = await Account.findOne({ username: req.params.userID }).exec();
         if (!sanitizedUser) {
             return next(new Error(`User ${req.params.userID} doesn't exist`));
         }
-        console.log("Find user successfully", sanitizedUser);
+        console.log(`Find user "${sanitizedUser.username} successfully`);
 
         // set new password
         if (typeof (req.body.newPassword) === "string") {
