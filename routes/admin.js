@@ -70,31 +70,37 @@ router.post('/api/users', isAuthenticated, function(req, res, next) {
     });
 });
 
-router.patch('/api/user/:userID', isAuthenticated, function(req, res, next) {
-    let newPassword = req.body.newPassword;
-
-    if (!newPassword || newPassword.length < 8) {
-        var error = new Error("新密码不能为空或小于8位");
-        error.status = 400;
-        return next(error);
-    }
-    Account.findByUsername(req.params.userID, function(err, sanitizedUser) {
-        if (err) {
-            var error = new Error(`Fail to find user ${req.params.userID}`);
-            error.innerError = err;
-            return next(error);
+router.patch('/api/user/:userID', isAuthenticated, async function(req, res, next) {
+    try {
+        let sanitizedUser = await Account.findByUsername(req.params.userID);
+        if (!sanitizedUser) {
+            return next(new Error(`User ${req.params.userID} doesn't exist`));
         }
         console.log("Find user successfully", sanitizedUser);
 
-        if (sanitizedUser) {
-            sanitizedUser.setPassword(newPassword, function() {
-                sanitizedUser.save();
-                res.status(200).json({ message: 'password set successful' });
-            });
-        } else {
-            return next(new Error(`User ${req.params.userID} doesn't exist`));
+        // set new password
+        if (typeof (req.body.newPassword) === "string") {
+            let newPassword = req.body.newPassword;
+            if (newPassword.length < 8) {
+                let error = new Error("新密码不能为空或小于8位");
+                error.status = 400;
+                return next(error);
+            }
+
+            await sanitizedUser.setPassword(newPassword);
+            await sanitizedUser.save();
+            return res.status(200).json({ message: 'password set successful' });
+        } else if (typeof (req.body.active) === "boolean") {
+            // update new status
+            sanitizedUser.active = req.body.active;
+            await sanitizedUser.save();
+            return res.status(200).json({ message: `active is set to "${req.body.active}" ` });
         }
-    });
+    } catch (err) {
+        let error = new Error(`Fail to update user ${req.params.userID}`);
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 // list the tenant

@@ -73,6 +73,7 @@ div
                   th Role
                   th Delete
                   th Password
+                  th Active
               tbody
                 tr(v-for='user in users')
                   td {{user.username}}
@@ -84,6 +85,8 @@ div
                   td
                     a.text-info(@click='setPassword(user.username)')
                       i.glyphicon.glyphicon-edit
+                  td
+                    input(type='checkbox', v-model='user.active', style="margin:0")
         div.form-group
           div.col-sm-offset-3.col-sm-9
             button.btn.btn-primary(type='button',v-if='selectedTenant._id',@click='upgradeTenant(selectedTenant.name)') Upgrade
@@ -187,7 +190,12 @@ module.exports = {
         console.error("get tenant user fails", jqXHR);
       });
       request.done(function(data, textStatus, jqXHR) {
-        vm.users = data;
+        // update the 'active' field of each user
+        vm.users = (data || []).map(function(element, index, array) {
+          if (typeof (element.active) !== "boolean")
+            element.active = true;
+          return element;
+        });
       });
     },
     createUser: function(user) {
