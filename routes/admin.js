@@ -29,9 +29,10 @@ router.get('/home', checkTenantUser, function(req, res) {
 
 router.get('/api/users', isAuthenticated, function(req, res, next) {
     var tenant = req.query.tenant || null;
+    // find users of selected tenants and only return "username displayName role active" fields
     Account.find({
         tenant: tenant
-    }, 'username displayName role', function(err, users) {
+    }, 'username displayName role active', function(err, users) {
         if (err) {
             var error = new Error("get tenant users fails");
             error.innerError = err;
@@ -45,7 +46,11 @@ router.get('/api/users', isAuthenticated, function(req, res, next) {
 router.post('/api/users', isAuthenticated, function(req, res, next) {
     let userRole = req.body.role === 'admin' ? 'admin' : 'user';
     Account.register(new Account({
-        username: req.body.user, tenant: req.body.tenant, displayName: req.body.display, role: userRole
+        username: req.body.user,
+        tenant: req.body.tenant,
+        displayName: req.body.display,
+        role: userRole,
+        active: true
     }), req.body.password, function(err, account) {
         if (err) {
             var error = new Error("create tenant user fails");
@@ -59,7 +64,8 @@ router.post('/api/users', isAuthenticated, function(req, res, next) {
         res.json({
             username: account.username,
             displayName: account.displayName,
-            role: account.role
+            role: account.role,
+            active: account.active
         });
     });
 });
