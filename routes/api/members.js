@@ -194,7 +194,7 @@ router.get('/', async function(req, res, next) {
                     $expr: { $in: ["$$memberID", "$booking.member"] }
                 }
             }, {
-                $project: { name: 1, date: 1, _id: 0 }
+                $project: { name: 1, date: 1, cost: 1, _id: 0 }
             }],
             as: 'unStartedClass'
         }
@@ -203,6 +203,9 @@ router.get('/', async function(req, res, next) {
             unStartedClassCount: {
                 $size: "$unStartedClass"
             },
+            unStartedClassCost: {
+                $sum: "$unStartedClass.cost"
+            },
             credit: {
                 $sum: "$membership.credit"
             }
@@ -210,7 +213,7 @@ router.get('/', async function(req, res, next) {
     }, {
         $addFields: {
             allRemaining: {
-                $add: ["$unStartedClassCount", "$credit"]
+                $add: ["$unStartedClassCost", "$credit"]
             }
         }
     }];

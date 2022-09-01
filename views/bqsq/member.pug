@@ -45,11 +45,11 @@ block page
           th(data-field='name',data-sortable='true') 小朋友姓名
           th(data-field='contact') 联系方式
           th(data-field='birthday',data-sortable='true') 生日
-          th(data-field='allRemaining',data-sortable='true') 剩余课时+课节
+          th(data-field='allRemaining',data-sortable='true',data-title-tooltip="剩余总课时=剩余未使用课时+已使用但未开始的课时\n例如: 50 (40/10) 剩余40课时未使用/已使用但尚未开始的课程共计10课时，剩余总课时为50") 剩余总课时
           th(data-sortable='true',data-sort-name='membership.0.expire') 有效期
           //th(data-field='since',data-sortable='true') 登记时间
           th(data-field='credit',data-sortable='true',data-visible='false') 剩余课时
-          th(data-field='unStartedClassCount',data-sortable='true',data-visible='false') 剩余课程
+          th(data-field='unStartedClassCount',data-sortable='true',data-visible='false') 剩余课程(节)
           th(data-field='note',data-visible='false') 描述
     p.small 有效会员: <strong>#{statistics.count}</strong>人<br>剩余课时: <b>#{statistics.total}</b>
   div#member_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')

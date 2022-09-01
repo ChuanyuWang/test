@@ -193,9 +193,9 @@ function remainingFormatter(value, row, index) {
         Math.round(value * 10) / 10,
         '</b> <small>(<i>',
         getCredit(row.membership) || 0,
-        ', ',
-        row.unStartedClassCount,
-        '节</i>)</small>'
+        '/',
+        row.unStartedClassCost,
+        '</i>)</small>'
     ].join('');
 }
 
