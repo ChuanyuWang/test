@@ -8,6 +8,7 @@ const { ObjectId } = require('mongodb');
  * {
  *  name: String,
  *  displayName: String,
+ *  logoPath: String,
  *  version: Integer,
  *  classroom: [{id: String, name: String, visibility: "internal|null"}],
  *  status: "active|inactive",
@@ -121,7 +122,7 @@ router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
 });
 
 router.post('/type', helper.requireRole("admin"), async function(req, res, next) {
-    //var newRoom = {id: String, name: String, visible: Boolean};
+    //var newType = {id: String, name: String, visible: Boolean};
     if (!req.body.name) {
         var error = new Error("type name is not defined");
         error.status = 400;
@@ -146,7 +147,7 @@ router.post('/type', helper.requireRole("admin"), async function(req, res, next)
         );
 
         if (result.ok !== 1) {
-            return next(new Error("Fail to add new type"));
+            return next(new Error("Fail to add new class type"));
         }
 
         console.log(`new class type ${req.body.name.trim()} is created`);
@@ -156,6 +157,48 @@ router.post('/type', helper.requireRole("admin"), async function(req, res, next)
         error.innerError = err;
         return next(error);
     }
+});
+
+router.patch('/type/:typeId', helper.requireRole("admin"), async function(req, res, next) {
+    //var newType = {id: String, name: String, visible: Boolean};
+    if (!req.body.name || typeof req.body.visible !== "boolean") {
+        var error = new Error("params of updating type is missing");
+        error.status = 400;
+        return next(error);
+    }
+
+    try {
+        let configDB = await db_utils.connect("config");
+        let tenants = configDB.collection("tenants");
+        let result = await tenants.findOneAndUpdate(
+            {
+                name: req.user.tenant,
+                'types.id': req.params.typeId
+            },
+            {
+                $set: {
+                    'types.$.name': req.body.name.trim(),
+                    'types.$.visible': req.body.visible
+                }
+            },
+            { returnDocument: "after" }
+        );
+
+        if (result.ok !== 1) {
+            return next(new Error(`Fail to update type ${req.params.typeId}`));
+        }
+
+        console.log(`update class type ${req.params.typeId}`);
+        res.send(result.value);
+    } catch (err) {
+        var error = new Error("修改课程类型失败");
+        error.innerError = err;
+        return next(error);
+    }
+});
+
+router.delete('/type/:typeId', helper.requireRole("admin"), async function(req, res, next) {
+    next(new Error('not implemented'));
 });
 
 router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
