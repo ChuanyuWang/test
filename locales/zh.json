@@ -1,8 +1,6 @@
 {
     "title": "教培管理系统",
     "error_title": "出错啦",
-    "setting_general": "综合",
-    "setting_entry": "入口",
     "course_summary_title": "参与的班级",
     "course_name": "班级名称",
     "finished": "已上",
