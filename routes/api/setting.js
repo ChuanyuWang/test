@@ -2,6 +2,23 @@ var express = require('express');
 var router = express.Router();
 var db_utils = require('../../server/databaseManager');
 var helper = require('../../helper');
+const { ObjectId } = require('mongodb');
+
+/**
+ * {
+ *  name: String,
+ *  displayName: String,
+ *  version: Integer,
+ *  classroom: [{id: String, name: String, visibility: "internal|null"}],
+ *  status: "active|inactive",
+ *  address: String,
+ *  contact: String,
+ *  addressLink: String,
+ *  feature: "common|book",
+ *  types: [{id: String, name: String, visible: Boolean}],
+ *  groups: [{id: String, name: String, subTypes: [@type_id]}]
+ * }
+ */
 
 var TENANT_FIELDS = {
     name: 1,
@@ -10,7 +27,9 @@ var TENANT_FIELDS = {
     contact: 1,
     address: 1,
     addressLink: 1,
-    classroom: 1
+    classroom: 1,
+    types: 1,
+    groups: 1
 };
 
 var config_db = null;
@@ -33,6 +52,24 @@ router.get('/classrooms', function(req, res, next) {
         return next(error);
     }
     res.send(req.tenant.classroom ? req.tenant.classroom : []);
+});
+
+router.get('/types', function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+    res.send(req.tenant.types ? req.tenant.types : []);
+});
+
+router.get('/groups', function(req, res, next) {
+    if (!req.tenant) {
+        let error = new Error("tenant is not defined");
+        error.status = 400;
+        return next(error);
+    }
+    res.send(req.tenant.groups ? req.tenant.groups : []);
 });
 
 /// Below APIs are visible to authenticated users only
@@ -81,6 +118,44 @@ router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
         console.log("tenant %s is updated by %j", req.user.tenant, req.body);
         res.json(doc);
     });
+});
+
+router.post('/type', helper.requireRole("admin"), async function(req, res, next) {
+    //var newRoom = {id: String, name: String, visible: Boolean};
+    if (!req.body.name) {
+        var error = new Error("type name is not defined");
+        error.status = 400;
+        return next(error);
+    }
+
+    try {
+        let configDB = await db_utils.connect("config");
+        let tenants = configDB.collection("tenants");
+        let result = await tenants.findOneAndUpdate(
+            { name: req.user.tenant },
+            {
+                $push: {
+                    types: {
+                        id: new ObjectId().toHexString(),
+                        name: req.body.name.trim(),
+                        visible: req.body.visible === false ? false : true
+                    }
+                }
+            },
+            { returnDocument: "after" }
+        );
+
+        if (result.ok !== 1) {
+            return next(new Error("Fail to add new type"));
+        }
+
+        console.log(`new class type ${req.body.name.trim()} is created`);
+        res.send(result.value);
+    } catch (err) {
+        var error = new Error("创建课程类型失败");
+        error.innerError = err;
+        return next(error);
+    }
 });
 
 router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
