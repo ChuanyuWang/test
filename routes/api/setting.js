@@ -16,7 +16,7 @@ const { ObjectId } = require('mongodb');
  *  contact: String,
  *  addressLink: String,
  *  feature: "common|book",
- *  types: [{id: String, name: String, visible: Boolean}],
+ *  types: [{id: String, name: String, status: "open|closed", visible: Boolean}],
  *  groups: [{id: String, name: String, subTypes: [@type_id]}]
  * }
  */
@@ -122,7 +122,7 @@ router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
 });
 
 router.post('/type', helper.requireRole("admin"), async function(req, res, next) {
-    //var newType = {id: String, name: String, visible: Boolean};
+    //var newType = {id: String, name: String, status: "open|closed", visible: Boolean};
     if (!req.body.name) {
         var error = new Error("type name is not defined");
         error.status = 400;
@@ -138,7 +138,8 @@ router.post('/type', helper.requireRole("admin"), async function(req, res, next)
                 $push: {
                     types: {
                         id: new ObjectId().toHexString(),
-                        name: req.body.name.trim(),
+                        name: req.body.name,
+                        status: req.body.status,
                         visible: req.body.visible === false ? false : true
                     }
                 }
@@ -160,7 +161,7 @@ router.post('/type', helper.requireRole("admin"), async function(req, res, next)
 });
 
 router.patch('/type/:typeId', helper.requireRole("admin"), async function(req, res, next) {
-    //var newType = {id: String, name: String, visible: Boolean};
+    //var newType = {id: String, name: String, status: "open|closed", visible: Boolean};
     if (!req.body.name || typeof req.body.visible !== "boolean") {
         var error = new Error("params of updating type is missing");
         error.status = 400;
@@ -177,7 +178,8 @@ router.patch('/type/:typeId', helper.requireRole("admin"), async function(req, r
             },
             {
                 $set: {
-                    'types.$.name': req.body.name.trim(),
+                    'types.$.name': req.body.name,
+                    'types.$.status': req.body.status,
                     'types.$.visible': req.body.visible
                 }
             },
