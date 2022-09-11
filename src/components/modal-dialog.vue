@@ -10,7 +10,7 @@ div.modal(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-l
       div.modal-body
         slot(name="body")
       div.modal-footer
-        slot(name="footer")
+        slot(name="footer",v-bind:param="param")
           template(v-if='buttons === "ok"')
             button.btn(type="button",@click='hide(true)',:class='btnStyle') {{ $t('dialog_ok') }}
           template(v-if='buttons === "cancel"')
