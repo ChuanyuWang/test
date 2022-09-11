@@ -121,7 +121,7 @@ router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
     });
 });
 
-router.post('/type', helper.requireRole("admin"), async function(req, res, next) {
+router.post('/types', helper.requireRole("admin"), async function(req, res, next) {
     //var newType = {id: String, name: String, status: "open|closed", visible: Boolean};
     if (!req.body.name) {
         var error = new Error("type name is not defined");
@@ -160,7 +160,7 @@ router.post('/type', helper.requireRole("admin"), async function(req, res, next)
     }
 });
 
-router.patch('/type/:typeId', helper.requireRole("admin"), async function(req, res, next) {
+router.patch('/types/:typeId', helper.requireRole("admin"), async function(req, res, next) {
     //var newType = {id: String, name: String, status: "open|closed", visible: Boolean};
     if (!req.body.name || typeof req.body.visible !== "boolean") {
         var error = new Error("params of updating type is missing");
@@ -199,7 +199,7 @@ router.patch('/type/:typeId', helper.requireRole("admin"), async function(req, r
     }
 });
 
-router.delete('/type/:typeId', helper.requireRole("admin"), async function(req, res, next) {
+router.delete('/types/:typeId', helper.requireRole("admin"), async function(req, res, next) {
     next(new Error('not implemented'));
 });
 
