@@ -12,7 +12,7 @@ div
     li(role='presentation')
       a(href="#teacher",role='tab',data-toggle='tab') {{$t("teacher")}}
     li(role='presentation')
-      a(href="#types",role='tab',data-toggle='tab') 课程类型
+      a(href="#types",role='tab',data-toggle='tab') 课程
   div.tab-content
     div.tab-pane(role="tabpanel",id="users")
       user-setting
