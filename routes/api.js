@@ -27,6 +27,7 @@ router.use('/classes', require('./api/classes'));
 router.use('/courses', require('./api/courses'));
 router.use('/members', require('./api/members'));
 router.use('/orders', require('./api/orders'));
+router.use('/contracts', require('./api/contracts'));
 router.use('/booking', require('./api/booking'));
 router.use('/setting', require('./api/setting'));
 router.use('/teachers', require('./api/teachers'));
