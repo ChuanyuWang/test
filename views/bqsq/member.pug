@@ -10,85 +10,19 @@ append js
   script(src=CDN_FILES.momentjs)
   script(src=CDN_FILES.bootbox)
   script(src=CDN_FILES.bootstrap_datetimepicker)
+  if ENV_DEVELOPMENT
+    script(src=CDN_FILES.i18next_dev)
+    script(src=CDN_FILES.vue_dev)
+  else
+    script(src=CDN_FILES.i18next)
+    script(src=CDN_FILES.vue)
+  script(src=CDN_FILES.bootstrap_table_vue)
   script(src='/js/member.js')
 
 block page
   div.container(style={'padding-top': '58px'})
-    div#toolbar
-      div.form-inline
-        div.btn-group(role='group')
-          button.btn.btn-success(type='button',data-toggle='modal',data-target='#member_dlg', data-action='add') 添加
-          //button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
-            span.glyphicon.glyphicon-filter
-        div.input-group.source-filter
-          span.input-group-addon 来源:
-          select.form-control
-            option(value="manual") 手动添加
-            option(value="book") 扫码预约
-            option(value="") 全部
-        div.input-group.status-filter
-          span.input-group-addon 状态:
-          select.form-control
-            option(value="active") 正常
-            option(value="inactive") 停用
-            option(value="") 全部
-        div.input-group
-          input.form-control(type="number",style="width:70px",placeholder="页码")
-          span.input-group-btn
-            button#jumpToButton.btn.btn-default(type="button") 跳转
-    table#member_table(data-show-refresh='true',data-pagination='true',data-page-size='15',data-page-list='[15,25,50,100]',data-search='true',data-url='/api/members',data-show-columns='true',data-sort-order='desc',data-sort-name='since',data-toolbar='#toolbar',data-unique-id="_id")
-      thead
-        tr
-          //th(data-radio='true')
-          th(data-align='center')
-          //th(data-field='_id',data-visible='false') ID
-          th(data-field='name',data-sortable='true') 小朋友姓名
-          th(data-field='contact') 联系方式
-          th(data-field='birthday',data-sortable='true') 生日
-          th(data-field='allRemaining',data-sortable='true',data-title-tooltip="剩余总课时=剩余未使用课时+已使用但未开始的课时\n例如: 50 (40/10) 剩余40课时未使用/已使用但尚未开始的课程共计10课时，剩余总课时为50") 剩余总课时
-          th(data-sortable='true',data-sort-name='membership.0.expire') 有效期
-          //th(data-field='since',data-sortable='true') 登记时间
-          th(data-field='credit',data-sortable='true',data-visible='false') 剩余课时
-          th(data-field='unStartedClassCount',data-sortable='true',data-visible='false') 剩余课程(节)
-          th(data-field='note',data-visible='false') 描述
+    div#app
     p.small 有效会员: <strong>#{statistics.count}</strong>人<br>剩余课时: <b>#{statistics.total}</b>
-  div#member_dlg.modal.fade(tabindex='-1',role='dialog',aria-labelledby='myModalLabel',data-backdrop='static')
-    div.modal-dialog(role="document")
-      div.modal-content
-        div.modal-header
-          button.close(type="button",data-dismiss="modal",aria-label="Close")
-            span(aria-hidden="true") &times
-          h4#myModalLabel.modal-title 添加会员
-        div.modal-body
-          form.form-horizontal
-            div.form-group
-              label.control-label.col-sm-2(for='name') 姓名:
-              div.col-sm-4
-                input.form-control(type='text',name='name',placeholder='小朋友的姓名')
-              div.col-sm-4
-                p.form-control-static(style='color:#808080')
-                  small 必填
-            div.form-group
-              label.control-label.col-sm-2(for='contact') 联系方式:
-              div.col-sm-4
-                input.form-control(type='tel',name='contact',placeholder='135xxx')
-              div.col-sm-4
-                p.form-control-static(style='color:#808080')
-                  small 必填
-            div.form-group
-              label.control-label.col-sm-2(for='birth') 生日:
-              div.col-sm-4
-                div#birth_date.input-group.date
-                  input.form-control(type='text',name='brith')
-                  span.input-group-addon
-                    span.glyphicon.glyphicon-calendar
-            div.form-group
-              label.control-label.col-sm-2(for='note') 描述:
-              div.col-sm-10
-                textarea.form-control(rows='3',style='resize:vertical;min-height:70px',name='note',placeholder='添加更多备注信息, 比如昵称')
-        div.modal-footer
-          button.btn.btn-default(type="button",data-dismiss="modal") 取消
-          button#add_member.btn.btn-success(type="button") 添加
   div#filter_dlg.modal.fade(tabindex='-1',data-backdrop='static')
     div.modal-dialog
       div.modal-content
