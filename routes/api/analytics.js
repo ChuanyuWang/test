@@ -414,7 +414,7 @@ router.get('/memberdata', function(req, res, next) {
         $group: {
             "_id": "$_id.member1",
             value: {
-                $push: { total: "$total", month: "$_id.month" }
+                $push: { t: "$total", m: "$_id.month" }
             }
         }
     }], function(err, docs) {

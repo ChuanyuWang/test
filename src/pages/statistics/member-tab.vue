@@ -114,14 +114,20 @@ module.exports = {
       });
     },
     nameFormatter: function(value, row, index) {
-      return value && value[0] && value[0].name;
+      var data = value && value[0];
+
+      return [
+        '<a class="" target="_blank" href="./member/' + data._id + '">',
+        '  <i class="glyphicon glyphicon-user"/> ' + data.name,
+        "</a>"
+      ].join("");
     },
     numberFormatter: function(value, row, index, field) {
       var data = row.value || [];
       console.log(data)
       for (var i = 0; i < data.length; i++) {
-        if (parseInt(field) === data[i].month) {
-          return Math.round(data[i].total * 10) / 10
+        if (parseInt(field) === data[i].m) {
+          return Math.round(data[i].t * 10) / 10
         }
       }
       return null;
