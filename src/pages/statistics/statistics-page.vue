@@ -11,17 +11,21 @@ div
       a(href="#analytics",role='tab',data-toggle='tab') {{$t('consume')}}
     li(role='presentation')
       a(href="#hint",role='tab',data-toggle='tab') {{$t('passive_title')}}
+    li(role='presentation')
+      a(href="#member",role='tab',data-toggle='tab') 消课
   div.tab-content
     div.tab-pane.active(role="tabpanel",id="checkin")
       checkin-tab
     div.tab-pane(role="tabpanel",id="opportunity")
       opportunity-tab
     div.tab-pane(role="tabpanel",id="teacher")
-      teacher-tab
+      teacher-tab(ref='teacherTab')
     div.tab-pane(role="tabpanel",id="analytics")
       consume-tab(ref='consumeChart')
     div.tab-pane(role="tabpanel",id="hint")
       passive-tab(ref='passiveChart')
+    div.tab-pane(role="tabpanel",id="member")
+      member-tab
 </template>
 
 <script>
@@ -36,6 +40,7 @@ var teacherTab = require("./teacher-tab.vue").default;
 var opportunityTab = require("./opportunity-tab.vue").default;
 var consumeTab = require("./consume-tab.vue").default;
 var passiveTab = require("./passive-tab.vue").default;
+var memberTab = require("./member-tab.vue").default;
 
 module.exports = {
   name: "statistics-page",
@@ -50,6 +55,7 @@ module.exports = {
     "opportunity-tab": opportunityTab,
     "consume-tab": consumeTab,
     "passive-tab": passiveTab,
+    "member-tab": memberTab
   },
   computed: {},
   filters: {},
@@ -66,6 +72,11 @@ module.exports = {
     // refresh the chart when user switch to hint tab first time
     $(this.$el).find('a[href="#hint"]').one('shown.bs.tab', function(e) {
       vm.$refs.passiveChart.refreshPassiveChart();
+    });
+
+    // refresh the chart when user switch to teacher tab first time
+    $(this.$el).find('a[href="#teacher"]').one('shown.bs.tab', function(e) {
+      vm.$refs.teacherTab.refresh();
     });
   }
 };
