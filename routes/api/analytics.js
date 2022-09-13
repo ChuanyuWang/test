@@ -354,4 +354,78 @@ router.get("/orders", async function(req, res, next) {
     }
 });
 
+router.get('/memberdata', function(req, res, next) {
+    //[Default] get the current year consumption by month
+    var year = (new Date()).getFullYear();
+    if (req.query.hasOwnProperty("year")) {
+        year = parseInt(req.query.year);
+    }
+
+    var classes = req.db.collection("classes");
+    classes.aggregate([{
+        $match: {
+            "booking.0": { // array size >= 1
+                $exists: true
+            },
+            "date": {
+                $gte: new Date(year, 0),
+                $lt: new Date(year + 1, 0)
+            },
+            "cost": {
+                $gt: 0
+            }
+        }
+    }, {
+        $unwind: "$booking"
+    }, {
+        $lookup: {
+            from: "members",
+            //localField: "booking.member",
+            //foreignField: "_id",
+            let: { memberID: "$booking.member" },
+            pipeline: [{
+                $match: {
+                    $expr: { $eq: ["$_id", "$$memberID"] }
+                }
+            }, {
+                $project: { name: 1, _id: 1 }
+            }],
+            as: "member"
+        }
+    }, {
+        $project: {
+            month: {
+                $month: "$date"
+            },
+            totalCost: {
+                '$multiply': [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
+            },
+            member: 1
+        }
+    }, {
+        $group: {
+            // group the data according to unit (month or week or year)
+            _id: { member1: "$member", month: "$month" },
+            total: {
+                $sum: "$totalCost"
+            }
+        }
+    }, {
+        $group: {
+            "_id": "$_id.member1",
+            value: {
+                $push: { total: "$total", month: "$_id.month" }
+            }
+        }
+    }], function(err, docs) {
+        if (err) {
+            var error = new Error("analyze member fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("analyze member: ", docs ? docs.length : 0);
+        res.json(docs);
+    });
+});
+
 module.exports = router;
