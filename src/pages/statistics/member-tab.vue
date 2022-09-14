@@ -3,6 +3,7 @@ div
   div#member_toolbar
     form.form-inline
       date-picker(v-model='targetYear', :config='datePickerConfig', @input="refresh",:label="$t('time')")
+      div.text-muted(style="display:inline-block;margin-left:1rem") 显示学员每个月消费的课时数（单位：课时）
   bootstrap-table.table-striped(ref='memberTable',:columns='columns',:options='options')
 </template>
 
@@ -90,10 +91,11 @@ module.exports = {
         queryParams: this.customQuery,
         url: "/api/analytics/memberdata",
         //sidePagination: "server",
+        search: true,
         showRefresh: true,
         pagination: true,
         pageSize: 15,
-        pageList: [10, 15, 20, 50, 100],
+        pageList: [15, 20, 50, 100],
         showColumns: false,
         uniqueId: "_id"
       }
@@ -115,7 +117,6 @@ module.exports = {
     },
     nameFormatter: function(value, row, index) {
       var data = value && value[0];
-
       return [
         '<a class="" target="_blank" href="./member/' + data._id + '">',
         '  <i class="glyphicon glyphicon-user"/> ' + data.name,
