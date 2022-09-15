@@ -1,7 +1,7 @@
-ul.nav.navbar-nav
+ul.navbar-nav.me-auto
   each val, index in {home:__('curriculum'),member:__('members'),course:__('classes'),orders:__('orders'),statistics:__('statistics'),setting:__('settings')}
-    li(class={active: currentUrl === index})
+    li.nav-item
       if currentUrl === index
-        a(href='#') #{val}
+        a.nav-link.active(href='#') #{val}
       else
-        a(href=index) #{val}
+        a.nav-link(href=index) #{val}

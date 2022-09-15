@@ -18,28 +18,22 @@ block append js
   script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
 
 block content
-  nav.navbar.navbar-inverse.navbar-fixed-top
-    div.container
-      div.navbar-header
-        button.navbar-toggle.collapsed(type='button', data-toggle='collapse',data-target='#navbar', aria-expanded='false', aria-controls='navbar')
-          span.sr-only Toogle navigation
-          span.icon-bar
-          span.icon-bar
-          span.icon-bar
-        a.navbar-brand(href='/')= navTitle
+  nav.navbar.navbar-dark.bg-primary.navbar-expand-sm
+    div.container-fluid
+      a.navbar-brand(href='/')= navTitle
+      button.navbar-toggler(type='button',data-bs-toggle='collapse',data-bs-target='#navbar', aria-expanded='false', aria-controls='navbar')
+        span.navbar-toggler-icon
       div#navbar.navbar-collapse.collapse
         block navlist
         if !user
-          form.navbar-form.navbar-right(role='form', action='/login',method='post')
-            div.form-group
-              input.form-control(type='text', name='username',placeholder='邮箱')
-            div.form-group
-              input.form-control(type='password',name='password',placeholder='密码')
+          form.d-flex.ms-auto(role='form', action='/login',method='post')
+            input.form-control.me-1(type='text', name='username',placeholder='邮箱',style='width:9rem')
+            input.form-control.me-1(type='password',name='password',placeholder='密码',style='width:9rem')
             button.btn.btn-success(type='submit') 登录
         else
-          form.navbar-form.navbar-right(role='form', action='/logout',method='get')
+          span.navbar-text.me-2= user.displayName
+          form.d-flex(role='form', action='/logout',method='get')
             button.btn.btn-danger(type='submit') 注销
-          p.navbar-text.navbar-right= user.displayName
 
   if errorMsg && errorMsg.length > 0
     div.container
