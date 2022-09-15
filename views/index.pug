@@ -18,7 +18,7 @@ block append js
   script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
 
 block content
-  nav.navbar.navbar-dark.bg-primary.navbar-expand-sm
+  nav.navbar.navbar-dark.bg-primary.navbar-expand-sm.fixed-top
     div.container-fluid
       a.navbar-brand(href='/')= navTitle
       button.navbar-toggler(type='button',data-bs-toggle='collapse',data-bs-target='#navbar', aria-expanded='false', aria-controls='navbar')
@@ -40,11 +40,11 @@ block content
       div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
 
   block page
-    div.container(style='padding-top:51px')
-      div.jumbotron(style='margin-top:20px')
-        h1 欢迎访问
-        p 教培管理系统是面向教育培训机构的一站式解决方案，集课程、学员、班级管理于一体，提供移动端报名试听，学员自助约课等便捷功能。
-        p <strong>致力于帮助培训机构提升门店经营效率，降低运营成本。</strong>
+    div.container(style='padding-top:81px')
+      div.p-5.mb-4.bg-light.rounded-3
+        h1.display-3.fw-bold 欢迎访问
+        p.col-12.fs-5 教培管理系统是面向教育培训机构的一站式解决方案，集课程、学员、班级管理于一体，提供移动端报名试听，学员自助约课等便捷功能。
+        p.col-12.fs-5 <strong>致力于帮助培训机构提升门店经营效率，降低运营成本。</strong>
         p
           a.btn.btn-primary.btn-lg(role='button',href='mailto:sales@getbestlesson.com',target='_blank') 申请试用
       div.page-header(style="position:relative;padding:20px 60px")
