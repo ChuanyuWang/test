@@ -1,13 +1,13 @@
 <template lang="pug">
 div
-  h5.visible-print-block 教室: {{classroomName}}
-  div.form-inline.hidden-print(role="group",style='margin:10px 0')
-    div.btn-group
+  h5.d-none.d-print-block 教室: {{classroomName}}
+  div.row.d-print-none
+    div.btn-group.col-auto(role="group")
       button.btn.btn-primary(@click='previousWeek') {{$t('previous_week')}}
       button.btn.btn-primary(@click='thisWeek') {{$t('this_week')}}
       button.btn.btn-primary(@click='nextWeek') {{$t('next_week')}}
-    date-picker(v-model='date',style='margin-left:4px')
-    div.input-group.pull-right
+    date-picker.col-auto(v-model='date',style='margin-left:4px')
+    div.input-group.col-auto
       span.input-group-addon 教室: 
       select.form-control(v-model='classroom',@change="updateSchedule")
         option(v-for='r in classrooms',:value='r.id') {{r.name}}
@@ -25,7 +25,7 @@ div
   div.row(v-else)
     div.col-sm-12(style='height:200px;background-color:#eee')
       a.btn.btn-success(style='margin:83px auto;display:table',href='setting') {{$t('create_classroom')}}
-  p.small.pull-right.hidden-print *打印课程表时请选择横向，并根据打印机调整缩放比例，效果更佳
+  p.small.pull-right.d-print-none *打印课程表时请选择横向，并根据打印机调整缩放比例，效果更佳
   create-class-modal(ref='createClsDlg',@ok='createClass')
   notification(ref='alertbar')
 </template>

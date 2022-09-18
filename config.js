@@ -53,6 +53,7 @@ module.exports = {
         jquery_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.4.1/jquery.js',
         bootstrap: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js',
         bootstrap_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/5.1.3/css/bootstrap.min.css',
+        bootstrap_icons: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css',
         bootstrap_dev: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/5.1.3/js/bootstrap.bundle.js',
         momentjs: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/moment.js/2.22.1/moment-with-locales.min.js',
         momentjs_dev: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/moment.js/2.22.1/moment-with-locales.js',

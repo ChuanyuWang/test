@@ -1,7 +1,7 @@
 <template lang="pug">
 // add class 'date' to change the cursor as hand
 div.input-group.date(:id="id",:class="inputClass")
-  span.input-group-addon(v-if="label") {{label}}
+  span.input-group-text(v-if="label") {{label}}
   input.form-control(type="text",
         :name="name",
         :placeholder="placeholder",
@@ -9,8 +9,8 @@ div.input-group.date(:id="id",:class="inputClass")
         :readOnly="readOnly",
         :disabled="disabled",
         autocomplete="off")
-  span.input-group-addon
-    span.glyphicon.glyphicon-calendar
+  span.input-group-text
+    i.bi-calendar
 </template>
 
 <script>
