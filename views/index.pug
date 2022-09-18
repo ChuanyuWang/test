@@ -37,10 +37,10 @@ block content
 
   if errorMsg && errorMsg.length > 0
     div.container
-      div.alert.alert-danger(role='alert', style={'margin-top' : '75px'})= errorMsg
+      div.alert.alert-danger(role='alert', style={'margin':'75px 0 -55px 0'})= errorMsg
 
   block page
-    div.container(style='padding-top:81px')
+    div.container(style='padding-top:75px')
       div.p-5.mb-4.bg-light.rounded-3
         h1.display-3.fw-bold 欢迎访问
         p.col-12.fs-5 教培管理系统是面向教育培训机构的一站式解决方案，集课程、学员、班级管理于一体，提供移动端报名试听，学员自助约课等便捷功能。
@@ -65,7 +65,7 @@ block content
   //keep the content above the footer area
   div.hidden-print(style='height:60px')
   footer.footer.hidden-print
-    div.container
+    div.container-md
       span(style='float:left;margin:20px 0px')
         a(href='mailto:sales@getbestlesson.com',target='_blank')
           small 联系邮箱
