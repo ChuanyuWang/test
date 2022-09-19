@@ -32,7 +32,7 @@ module.exports = {
         setting: ['./pages/settings/setting.js', hotMiddlewareScript],
         statistics: ['./pages/statistics/statistics.js', hotMiddlewareScript],
         admin: ['./pages/admin/admin.js', hotMiddlewareScript],
-        orders: ['./pages/orders/orders.js', hotMiddlewareScript]
+        finance: ['./pages/finance/finance.js', hotMiddlewareScript]
     },
 
     output: {

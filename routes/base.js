@@ -117,10 +117,10 @@ router.get('/trial', function(req, res) {
     });
 });
 
-router.get('/orders', function(req, res) {
-    res.render('bqsq/orders', {
-        title: res.__('orders'),
-        currentUrl: 'orders',
+router.get('/finance', function(req, res) {
+    res.render('bqsq/finance', {
+        title: res.__('constracts'),
+        currentUrl: 'finance',
         user: req.user
     });
 });
