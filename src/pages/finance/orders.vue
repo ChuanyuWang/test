@@ -33,7 +33,7 @@ div
 var orders_service = require("../../services/orders");
 
 module.exports = {
-  name: "order-app",
+  name: "order-page",
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,

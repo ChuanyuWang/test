@@ -33,7 +33,7 @@ div
 var orders_service = require("../../services/orders");
 
 module.exports = {
-  name: "order-app",
+  name: "contracts-page",
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,
@@ -43,38 +43,39 @@ module.exports = {
   data() {
     return {
       tenantConfig: {},
+      types: [],
       actionOrder: "",
       errorMessage: "",
       filter: "",
       from: null,
       to: null,
       columns: [{
-        field: "tradeno",
-        title: "订单号",
-        sortable: true
+        field: "signDate",
+        title: "签约日期",
+        sortable: true,
+        formatter: this.dateFormatter
       }, {
-        field: "status",
-        title: this.$t("status"),
-        formatter: this.statusFormatter
+        field: "type",
+        title: "合约类型"
       }, {
-        field: "name",
-        title: "会员",
-        formatter: this.memberFormatter
+        field: "goods",
+        title: "课程",
+        formatter: this.goodsFormatter
       }, {
-        field: "contact",
-        title: this.$t("member_contact")
+        field: "credit",
+        title: "合约课时"
       }, {
-        field: "timestart",
-        title: "日期/时间",
+        field: "effectiveDate",
+        title: "生效日期",
         sortable: true,
         formatter: this.dateTimeFormatter
       }, {
-        field: "detail",
-        title: "课程",
-        formatter: this.detailFormatter
+        field: "receivable",
+        title: "合约金额",
+        formatter: this.totalFormatter
       }, {
-        field: "totalfee",
-        title: "金额(元)",
+        field: "received",
+        title: "欠费金额",
         formatter: this.totalFormatter
       }, {
         //field: "status", // the events will not work when adding duplicate field
@@ -120,7 +121,11 @@ module.exports = {
   methods: {
     dateTimeFormatter(value, row, index) {
       if (!value) return '?';
-      return moment(value).format('L HH:mm');
+      return moment(value).format('YYYY-MM-DD HH:mm');
+    },
+    dateFormatter(value, row, index) {
+      if (!value) return '?';
+      return moment(value).format('YYYY-MM-DD');
     },
     statusFormatter(value, row, index2) {
       switch (value) {
@@ -146,14 +151,15 @@ module.exports = {
         '</a>'
       ].join('');
     },
-    detailFormatter(value, row, index) {
-      var goods = value && value.goods_detail || [];
-      return [
-        goods[0] && goods[0].goods_name,
-        ' <a href="./class/' + row.classid + '" target="_blank">',
-        '<i class="glyphicon glyphicon-share-alt"></i>',
-        '</a>'
-      ].join('');
+    goodsFormatter(value, row, index) {
+      var goods_type = row && row.goods_type || "type";
+      if (goods_type === "type") {
+        for (var i = 0; i < this.types.length; i++) {
+          if (this.types[i].id === value) {
+            return this.types[i].name;
+          }
+        }
+      }
     },
     totalFormatter(value, row, index) {
       return value / 100 + "元";
@@ -229,7 +235,15 @@ module.exports = {
     }
   },
   created() {
+    var vm = this;
     this.tenantConfig = _getTenantConfig();
+    var request = $.getJSON("/api/setting/types");
+    request.done(function(data, textStatus, jqXHR) {
+      vm.types = data || []
+    });
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+      console.log(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+    });
   },
   mounted() { }
 }
