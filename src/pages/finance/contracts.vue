@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  div#toolbar
+  div#contracts_toolbar
     div.form-inline(role="group")
       div.input-group
         span.input-group-addon {{$t("status")}}: 
@@ -87,12 +87,12 @@ module.exports = {
         }
       }],
       options: {
-        toolbar: "#toolbar",
+        toolbar: "#contracts_toolbar",
         locale: 'zh-CN',
         pagination: true,
         pageSize: 15,
         pageList: [15, 25, 50, 110],
-        url: "/api/orders",
+        url: "/api/contracts",
         uniqueId: "_id",
         sidePagination: "server",
         search: true,
