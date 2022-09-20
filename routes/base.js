@@ -125,6 +125,14 @@ router.get('/finance', function(req, res) {
     });
 });
 
+router.get('/contract-create', function(req, res) {
+    res.render('bqsq/contract-create', {
+        title: res.__('constracts_create'),
+        currentUrl: 'contract-create',
+        user: req.user
+    });
+});
+
 router.get('/app', function(req, res) {
     res.render('bqsq/mobile/portal', {
         title: 'Mobile Portal'

@@ -32,7 +32,8 @@ module.exports = {
         setting: ['./pages/settings/setting.js', hotMiddlewareScript],
         statistics: ['./pages/statistics/statistics.js', hotMiddlewareScript],
         admin: ['./pages/admin/admin.js', hotMiddlewareScript],
-        finance: ['./pages/finance/finance.js', hotMiddlewareScript]
+        finance: ['./pages/finance/finance.js', hotMiddlewareScript],
+        contract_create: ['./pages/finance/contract_create.js', hotMiddlewareScript]
     },
 
     output: {

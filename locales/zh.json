@@ -20,5 +20,6 @@
     "view_session": "查看课程",
     "view_member": "查看会员",
     "orders": "订单",
-    "constracts": "合约"
+    "constracts": "合约",
+    "constracts_create": "创建合约"
 }
