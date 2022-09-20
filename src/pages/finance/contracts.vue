@@ -3,34 +3,26 @@ div
   div#contracts_toolbar
     div.form-inline(role="group")
       div.input-group
-        span.input-group-addon {{$t("status")}}: 
+        span.input-group-addon {{$t("status")}}
         select.form-control(v-model="filter",@change="refresh")
+          //"open|outstanding|paid|closed",
           option(value="") {{$t("all")}}
-          option(value="open") {{$t("order_open")}}
-          option(value="notpay") {{$t("order_notpay")}}
-          option(value="success") {{$t("order_success")}}
-          option(value="closed") {{$t("order_closed")}}
-          option(value="refund") {{$t("order_refund")}}
-      date-picker(v-model='from',placeholder="开始",style="width:160px;margin-left:4px")
+          option(value="open") 新建
+          option(value="outstanding") 部分支付
+          option(value="paid") 已支付
+          option(value="closed") 完成
+          option(value="deleted") 作废
+      date-picker(v-model='from',placeholder="签约日期",style="width:160px;margin-left:4px")
       i.glyphicon.glyphicon-minus
       date-picker(v-model='to',placeholder="结束",style="width:160px",:class='{"has-error": errors.to}')
       button.btn.btn-primary(type="button",style="margin-left:4px",@click="refresh") 查询
       button.btn.btn-default(type="button",style="margin-left:4px",@click="clear") 清空
-  bootstrap-table.table-striped(ref='orderTable',:columns='columns',:options='options')
-  modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 删除订单
-    template(v-slot:body)
-      p 确认删除订单<strong>{{actionOrder}}</strong>吗？
-      p.small (无法撤销)
-  modal-dialog(ref='confirmClose',buttons="confirm",@ok="closeOrder") 关闭订单
-    template(v-slot:body)
-      p 确认关闭订单<strong>{{actionOrder}}</strong>吗？
-      p.small (关闭后用户无法再通过此订单支付)
+  bootstrap-table.table-striped(ref='contractTable',:columns='columns',:options='options')
   modal-dialog(ref='errorDialog',buttonStyle="danger") 出错了
     template(v-slot:body)
       p {{errorMessage}}
 </template>
 <script>
-var orders_service = require("../../services/orders");
 
 module.exports = {
   name: "contracts-page",
@@ -55,8 +47,13 @@ module.exports = {
         sortable: true,
         formatter: this.dateFormatter
       }, {
+        field: "memberId",
+        title: "学员",
+        formatter: this.memberFormatter
+      }, {
         field: "type",
-        title: "合约类型"
+        title: "合约类型",
+        formatter: this.typeFormatter
       }, {
         field: "goods",
         title: "课程",
@@ -76,15 +73,13 @@ module.exports = {
       }, {
         field: "received",
         title: "欠费金额",
-        formatter: this.totalFormatter
+        formatter: this.outstandingFormatter
       }, {
         //field: "status", // the events will not work when adding duplicate field
         title: "操作",
         formatter: this.actionFormatter,
         events: {
-          'click .delete-order': this.deletingOrder,
-          'click .close-order': this.closingOrder,
-          'click .refund-order': this.refundingOrder
+          'click .view-contract': this.viewContract
         }
       }],
       options: {
@@ -96,8 +91,9 @@ module.exports = {
         url: "/api/contracts",
         uniqueId: "_id",
         sidePagination: "server",
-        search: true,
-        sortName: "tradeno",
+        search: false,
+        showRefresh: true,
+        sortName: "signDate",
         sortOrder: "desc",
         queryParams: this.customQuery
       }
@@ -120,25 +116,28 @@ module.exports = {
   filters: {},
   methods: {
     dateTimeFormatter(value, row, index) {
-      if (!value) return '?';
+      if (!value) return null;
       return moment(value).format('YYYY-MM-DD HH:mm');
     },
     dateFormatter(value, row, index) {
-      if (!value) return '?';
+      if (!value) return null;
       return moment(value).format('YYYY-MM-DD');
     },
-    statusFormatter(value, row, index2) {
+    typeFormatter(value, row, index2) {
       switch (value) {
-        case "success":
-          return this.$t("order_success"); // + '<i class="text-success glyphicon glyphicon-ok"></i>';
-        case "closed":
-          return this.$t("order_closed");
+        // "new|renewal|donate|import|export"
+        case "new":
+          return "新签"; // + '<i class="text-success glyphicon glyphicon-ok"></i>';
+        case "renewal":
+          return "续费";
+        case "donate":
+          return "赠送";
+        case "import":
+          return "转入";
+        case "export":
+          return "转出";
         case "refund":
-          return this.$t("order_refund");
-        case "open":
-          return this.$t("order_open");
-        case "notpay":
-          return this.$t("order_notpay");
+          return "退费";
         default:
           return null;
       }
@@ -146,7 +145,7 @@ module.exports = {
     memberFormatter(value, row, index) {
       return [
         value,
-        ' <a href="./member/' + row.memberid + '" target="_blank">',
+        ' <a href="./member/' + value + '" target="_blank">',
         '<i class="glyphicon glyphicon-share-alt"></i>',
         '</a>'
       ].join('');
@@ -164,12 +163,15 @@ module.exports = {
     totalFormatter(value, row, index) {
       return value / 100 + "元";
     },
+    outstandingFormatter(value, row, index) {
+      return (value - row.receivable) / 100 + "元";
+    },
     actionFormatter(value, row, index) {
       return [
         '<div class="btn-group btn-group-xs" role="group">',
-        row.status === "open" ? ['<button type="button" class="btn btn-danger delete-order" title="删除订单">',
-          '<span class="glyphicon glyphicon-trash"></span>',
-          '</button>'].join("") : "",
+        ['<button type="button" class="btn btn-primary view-contract" title="查看合约">',
+          '<span class="glyphicon glyphicon-folder-open"></span>',
+          '</button>'].join(""),
         row.status === "notpay" ? ['<button type="button" class="btn btn-primary close-order" title="关闭订单">',
           '<span class="glyphicon glyphicon-ban-circle"></span>',
           '</button>'].join("") : "",
@@ -191,47 +193,10 @@ module.exports = {
       this.to = null;
     },
     refresh() {
-      this.$refs.orderTable.refresh();
+      this.$refs.contractTable.refresh();
     },
-    refundingOrder(e, value, row, index) {
-      if (row.status === "success") {
-        //TODO
-        alert("不支持退款");
-      }
-    },
-    closingOrder(e, value, row, index) {
-      if (row.status === "notpay") {
-        this.actionOrder = row.tradeno;
-        this.$refs.confirmClose.show(row._id);
-      }
-    },
-    closeOrder(orderID) {
-      var vm = this;
-      var request = orders_service.close(orderID);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.$refs.orderTable.updateByUniqueId({ id: orderID, row: data });
-      });
-      request.fail(function(jqXHR, textStatus, errorThrown) {
-        vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
-        vm.$refs.errorDialog.show();
-      });
-    },
-    deletingOrder(e, value, row, index) {
-      if (row.status === "open") {
-        this.actionOrder = row.tradeno;
-        this.$refs.confirmDelete.show(row._id);
-      }
-    },
-    deleteOrder(orderID) {
-      var vm = this;
-      var request = orders_service.delete(orderID);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.$refs.orderTable.removeByUniqueId(orderID);
-      });
-      request.fail(function(jqXHR, textStatus, errorThrown) {
-        vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
-        vm.$refs.errorDialog.show();
-      });
+    viewContract(e, value, row, index) {
+      //TODO
     }
   },
   created() {

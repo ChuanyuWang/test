@@ -6,8 +6,8 @@ const { ObjectId } = require('mongodb');
 
 /**
  * {
- *  status: "open|outstanding|paid|closed",
- *  type: "new|renewal|donate|import|export"
+ *  status: "open|outstanding|paid|closed|deleted",
+ *  type: "new|renewal|donate|import|export|refund"
  *  goods: String,
  *  goods_type: "type|package",
  *  category: "credit|limited|infinite",
@@ -89,10 +89,10 @@ router.get('/', async function(req, res, next) {
 
     // support sorting
     let sort = {};
-    let field = req.query.sort || "createDate"; // sort by "createDate" by default
+    let field = req.query.sort || "signDate"; // sort by "signDate" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
 
-    // query orders by keyword, search 'tradeno', 'name' or 'contact'
+    // query orders by keyword, search 'serialNo', 'name' or 'contact'
     let search = req.query.search || "";
     if (search) {
         // search both name and contact
