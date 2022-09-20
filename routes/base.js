@@ -125,10 +125,9 @@ router.get('/finance', function(req, res) {
     });
 });
 
-router.get('/contract-create', function(req, res) {
-    res.render('bqsq/contract-create', {
+router.get('/contract/create', function(req, res) {
+    res.render('bqsq/pages/contract-create', {
         title: res.__('constracts_create'),
-        currentUrl: 'contract-create',
         user: req.user
     });
 });

@@ -3,7 +3,7 @@ div
   div#contracts_toolbar
     div.form-inline(role="group")
       div.btn-group(role='group',style="margin-right:3px")
-        a.btn.btn-success(type='button',href='contract-create') 创建
+        a.btn.btn-success(type='button',href='contract/create') 创建
       div.input-group
         span.input-group-addon {{$t("status")}}
         select.form-control(v-model="filter",@change="refresh")
