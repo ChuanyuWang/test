@@ -16,13 +16,14 @@ const { ObjectId } = require('mongodb');
  *  expendedCredit: Number,
  *  total: Number,
  *  discount: Number,
- *  receivable: Number,
+ *  //receivable: Number,
  *  received: Number,
  *  createDate: Date,
  *  effectiveDate: Date,
  *  expireDate: Date,
  *  signDate: Date,
  *  lastUpdate: Date,
+ *  clientip: String,
  *  comments: [{
  *      {
  *          posted: Date,
@@ -55,12 +56,13 @@ router.post('/', helper.requireRole("admin"), validateContract, async function(r
         expendedCredit: req.body.expendedCredit || 0,
         total: parseInt(req.body.total),
         discount: parseInt(req.body.discount) || 0,
-        receivable: parseInt(req.body.receivable),
+        //receivable: parseInt(req.body.receivable),
         received: 0,
         createDate: new Date(),
         effectiveDate: new Date(req.body.effectiveDate),
         expireDate: req.body.expireDate ? new Date(req.body.expireDate) : null,
         //clientip: req.ip.match(/\d+\.\d+\.\d+\.\d+/),
+        clientip: req.ip,
         signDate: req.body.signDate ? new Date(req.body.signDate) : new Date(),
         lastUpdate: new Date()
     };
