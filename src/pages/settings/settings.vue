@@ -5,7 +5,7 @@ div
       a(href="#general",role='tab',data-toggle='tab') 综合
     li(role='presentation')
       a(href="#entry",role='tab',data-toggle='tab') 入口
-    li.active(role='presentation')
+    li(role='presentation')
       a(href="#classroom",role='tab',data-toggle='tab') 教室
     li(role='presentation')
       a(href="#users",role='tab',data-toggle='tab') 权限
@@ -22,7 +22,7 @@ div
       teacher-setting
     div.tab-pane(role="tabpanel",id="types")
       type-setting
-    div.tab-pane.active(role="tabpanel",id="classroom")
+    div.tab-pane(role="tabpanel",id="classroom")
       classroom-setting
     div.tab-pane(role="tabpanel",id="entry")
       div.page-header(style='margin-top:0')
@@ -58,6 +58,7 @@ var users_setting = require('./users-setting.vue').default;
 var general_setting = require('./general-setting.vue').default;
 var classroom_setting = require('./classrooms.vue').default;
 var type_setting = require('./type-setting.vue').default;
+var common = require('../../common/common');
 
 module.exports = {
   name: "settings",
@@ -82,6 +83,11 @@ module.exports = {
       this.tenantUrl = el.attr('tenantUrl') || '';
       this.hostname = el.attr('hostname') || '';
     }
+  },
+  mounted() {
+    // default tab is classroom
+    var showTab = common.getParam("activetab") || "classroom";
+    $('a[href="#' + showTab + '"]').tab('show');
   }
 }
 </script>
