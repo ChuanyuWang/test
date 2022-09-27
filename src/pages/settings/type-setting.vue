@@ -21,12 +21,12 @@ div
     template(v-slot:body)
       form.form-horizontal
         div.form-group
-          label.control-label.col-sm-2 课程状态
+          label.control-label.col-sm-2 课程状态:
           div.col-sm-10
             p.form-control-static {{status | statusFilter}}
         div.form-group(:class='{"has-error": errors.name}')
-          label.control-label.col-sm-2 课程名称
-          div.col-sm-10
+          label.control-label.col-sm-2 课程名称:
+          div.col-sm-8
             input.form-control(type='text',placeholder='课程名称',v-model='name')
           div.col-sm-offset-2.col-sm-10
             div.checkbox
@@ -37,12 +37,12 @@ div
     template(v-slot:body)
       form.form-horizontal
         div.form-group
-          label.control-label.col-sm-2 课程状态
+          label.control-label.col-sm-2 课程状态:
           div.col-sm-10
             p.form-control-static {{status | statusFilter}}
         div.form-group(:class='{"has-error": errors.name}')
-          label.control-label.col-sm-2 课程名称
-          div.col-sm-10
+          label.control-label.col-sm-2 课程名称:
+          div.col-sm-8
             input.form-control(type='text',placeholder='课程名称',v-model='name')
           div.col-sm-offset-2.col-sm-10
             div.checkbox
