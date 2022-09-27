@@ -8,7 +8,7 @@ div
     li.active 创建合约
   div.page-header
     h3(style='margin-top:0;display:inline-block') 合约信息
-    button.btn.btn-success(type='button',style='float:right',disabled,@click='') 确定
+    button.btn.btn-success(type='button',style='float:right',:disabled="hasError",@click='') 确定
   div.container
     div.row
       div.col-sm-6
@@ -19,7 +19,7 @@ div
               div.input-group
                 input.form-control(type='text',readonly,v-model="memberData.name")
                 span.input-group-btn
-                  button.btn.btn-primary(type='button') 选择学员
+                  button.btn.btn-primary(type='button',@click="openMemberSelectDialog") 选择学员
           div.form-group
             label.col-sm-3.control-label 联系方式:
             div.col-sm-9
@@ -60,7 +60,7 @@ div
               div.input-group
                 input.form-control(type='text',readonly,v-model="product.name")
                 span.input-group-btn
-                  button.btn.btn-primary(type='button') 选择课程
+                  button.btn.btn-primary(type='button',@click="openTypeSelectDialog") 选择课程
           div.form-group(:class='{"has-error": errors.credit}')
             label.col-sm-3.control-label 课时数:
             div.col-sm-4
@@ -110,7 +110,7 @@ div
               textarea.form-control(rows='3', placeholder='添加合约备注信息, 保存后无法修改', name='note',v-model.trim='memberData.note',style='resize:vertical;min-height:70px')
           div.form-group
             div.col-sm-offset-2.col-sm-10
-              button.btn.btn-success(type='button',v-on:click='test',:disabled='hasError') 保存
+              button.btn.btn-primary(type='button',@click='test',:disabled='true') 保存
   div.page-header
     h3 合约缴费
   div.container
@@ -121,7 +121,7 @@ div
             label.control-label.col-sm-3 应收金额:
             div.col-sm-4
               div.input-group
-                input.form-control(type='number',readonly)
+                input.form-control(type='number',readonly,v-model='receivable')
                 span.input-group-addon 元
           div.form-group
             label.col-sm-3.control-label 支付方式:
@@ -137,13 +137,20 @@ div
             label.col-sm-3.control-label 缴费日期:
             div.col-sm-9
               p.form-control-static 13512341234
+  member-select-modal(ref='memberSelectDlg',@ok='selectMember')
+  type-select-modal(ref='typeSelectDlg',@ok='selectType')
 </template>
 <script>
+
+var member_select_modal = require("../../components/member-select-modal.vue").default;
+var type_select_modal = require("../../components/type-select-modal.vue").default;
 
 module.exports = {
   name: "contract-create",
   props: {},
   components: {
+    "member-select-modal": member_select_modal,
+    "type-select-modal": type_select_modal,
     "date-picker": require('../../components/date-picker.vue').default
   },
   data() {
@@ -243,23 +250,35 @@ module.exports = {
       })
     }
   },
-  watch: {
-  },
-  filters: {
-    creditFilter(value) {
-      var n = Math.round(value * 10) / 10;
-      return n === 0 ? 0 : n; // handle the "-0" case
-    },
-    moneyFilter(value) {
-      return value / 100;
-    }
-  },
+  watch: {},
+  filters: {},
   methods: {
     test() {
       console.log(this.contract.expireDate);
       console.log(this.contract.signDate);
       console.log(moment(this.contract.expireDate).isValid() ? this.contract.expireDate.toISOString() : null);
       console.log(moment(this.contract.signDate).isValid() ? this.contract.signDate.toISOString() : null);
+    },
+    openMemberSelectDialog() {
+      this.$refs.memberSelectDlg.show();
+    },
+    openTypeSelectDialog() {
+      this.$refs.typeSelectDlg.show();
+    },
+    selectMember(items) {
+      if (items && items.length > 0) {
+        var member = items[0];
+        this.memberData.id = member._id;
+        this.memberData.name = member.name;
+        this.memberData.contact = member.contact;
+      }
+    },
+    selectType(item) {
+      if (item && item.id) {
+        this.product.id = item.id;
+        this.product.name = item.name;
+        this.product.visible = item.visible;
+      }
     }
   },
   created() {
