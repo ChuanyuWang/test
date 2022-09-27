@@ -90,7 +90,7 @@ module.exports = {
      */
     getParam: function(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-        var param = window.location.search.substr(1).match(reg);
+        var param = window.location.search.substring(1).match(reg);
         return param ? decodeURI(param[2]) : null;
     }
 };
