@@ -69,13 +69,13 @@ module.exports = {
         sortable: true,
         formatter: this.dateTimeFormatter
       }, {
-        field: "receivable",
         title: "合约金额",
         formatter: this.totalFormatter
       }, {
         field: "received",
         title: "欠费金额",
-        formatter: this.outstandingFormatter
+        formatter: this.outstandingFormatter,
+        cellStyle: this.outstandingStyle
       }, {
         //field: "status", // the events will not work when adding duplicate field
         title: "操作",
@@ -163,10 +163,14 @@ module.exports = {
       }
     },
     totalFormatter(value, row, index) {
-      return value / 100 + "元";
+      return (row.total - row.discount) / 100 + "元";
     },
     outstandingFormatter(value, row, index) {
-      return (value - row.receivable) / 100 + "元";
+      return (row.total - row.discount - value) / 100 + "元";
+    },
+    outstandingStyle(value, row, index, field) {
+      var outstanding = row.total - row.discount - value;
+      return outstanding > 0 ? { classes: "text-danger" } : {};
     },
     actionFormatter(value, row, index) {
       return [
