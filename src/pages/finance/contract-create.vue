@@ -8,7 +8,7 @@ div
     li.active 创建合约
   div.page-header
     h3(style='margin-top:0;display:inline-block') 合约信息
-    button.btn.btn-success(type='button',style='float:right',:disabled="hasError",@click='') 确定
+    button.btn.btn-success(type='button',style='float:right',:disabled="hasError",@click='createContract') 确定
   div.container
     div.row
       div.col-sm-6
@@ -167,8 +167,7 @@ module.exports = {
         type: "type"
       },
       contract: {
-        serialNo: "",
-        status: "open",
+        //status: "open",
         type: "new",
         goods: "",
         goods_type: "type",
@@ -279,6 +278,24 @@ module.exports = {
         this.product.name = item.name;
         this.product.visible = item.visible;
       }
+    },
+    createContract() {
+      this.contract.memberId = this.memberData.id;
+      this.contract.goods = this.product.id;
+      var request = $.ajax("/api/contracts", {
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(this.contract),
+        dataType: "json"
+      });
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        console.error(errorMessage);
+      });
+      request.done(function(data, textStatus, jqXHR) {
+        // data is generated ObjectId for the insert operation
+        window.location.href = window.location.pathname + '/../' + data;
+      });
     }
   },
   created() {

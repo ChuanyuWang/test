@@ -73,9 +73,12 @@ router.post('/', helper.requireRole("admin"), validateContract, async function(r
         contract.serialNo = await generateContractNo(req.app.locals.ENV_DEVELOPMENT);
         let result = await contracts.insertOne(contract);
         // result.result is {"n":1,"ok":1}
+        // result.ops is [{}] All the documents inserted
+        // result.insertedCount is 1
+        // result.insertedId is ObjectId, generated ObjectId for the insert operation
 
         console.log(`Create contract ${contract.serialNo} successfully`);
-        return res.json(result.value);
+        return res.json(result.insertedId);
     } catch (error) {
         if (error instanceof ContractError) {
             return next(error);
