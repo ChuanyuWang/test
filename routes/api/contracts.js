@@ -3,6 +3,7 @@ const router = express.Router();
 const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
+const moment = require('moment');
 
 /**
  * {
@@ -101,6 +102,19 @@ router.get('/', async function(req, res, next) {
         query['$or'] = [
             { 'serialNo': new RegExp(search, 'i') }
         ];
+    }
+
+    // query with date filter 'from' and 'to'
+    // CAUTION: moment(undefined).isValid() return true
+    if (moment(req.query.from || "").isValid() && moment(req.query.to || "").isValid()) {
+        query.signDate = {
+            $gte: new Date(req.query.from),
+            $lt: new Date(req.query.to)
+        };
+    } else if (moment(req.query.from || "").isValid()) {
+        query.signDate = { $gte: new Date(req.query.from) };
+    } else if (moment(req.query.to || "").isValid()) {
+        query.signDate = { $lt: new Date(req.query.to) };
     }
 
     // query orders by status
