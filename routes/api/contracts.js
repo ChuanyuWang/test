@@ -6,6 +6,7 @@ const { ObjectId } = require('mongodb');
 
 /**
  * {
+ *  serialNo: "",
  *  status: "open|outstanding|paid|closed|deleted",
  *  type: "new|renewal|donate|import|export|refund"
  *  goods: String,
@@ -43,7 +44,6 @@ var NORMAL_FIELDS = {
 router.use(helper.isAuthenticated);
 
 router.post('/', helper.requireRole("admin"), validateContract, async function(req, res, next) {
-    //TODO, find existing notpay order
     let contract = {
         serialNo: "",
         status: "open",
@@ -195,7 +195,7 @@ async function validateContract(req, res, next) {
 class ContractError extends Error {
     constructor(message) {
         super(message);
-        this.name = "UnifiedOrderError";
+        this.name = "Contract API Error";
     }
 }
 
@@ -211,19 +211,20 @@ async function generateContractNo(developmentMode) {
         let configDB = await db_utils.connect("config");
         let settings = configDB.collection("settings");
         let result = await settings.findOneAndUpdate({
-            _id: ObjectId("--contract-id--")
+            _id: ObjectId("-contract-id")
         }, {
             $inc: { seq: 1 }
         }, {
             upsert: true, returnDocument: "after"
         });
+
         let seq = parseInt(result.value.seq % 1000000); // get 6 digits seq number
         let datePart = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
         return datePart * 1000000 + seq + (developmentMode ? "t" : "");
     } catch (error) {
         let err = new ContractError("Fail to generate contract No.");
         err.innerError = error;
-        return error;
+        throw err;
     }
 }
 
