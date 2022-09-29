@@ -582,7 +582,7 @@ async function generateTradeNo(developmentMode) {
     } catch (error) {
         let err = new UnifiedOrderError("Fail to generate trade No.");
         err.innerError = error;
-        return error;
+        throw err;
     }
 }
 
