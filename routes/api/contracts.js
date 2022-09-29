@@ -154,7 +154,7 @@ router.get('/', async function(req, res, next) {
                     $expr: { $eq: ["$$memberID", "$_id"] }
                 }
             }, {
-                $project: { name: 1, contact: 1 }
+                $project: { name: 1, contact: 1, _id: 0 }
             }],
             as: 'member'
         }
