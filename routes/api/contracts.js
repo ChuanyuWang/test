@@ -135,16 +135,39 @@ router.get('/', async function(req, res, next) {
         pageSize = 100;
     }
 
+    let pipelines = [{
+        $match: query
+    }, {
+        $sort: sort
+    }, {
+        $skip: skip
+    }, {
+        $limit: pageSize
+    }, {
+        $project: NORMAL_FIELDS
+    }, {
+        $lookup: {
+            from: 'members',
+            let: { memberID: "$memberId" },
+            pipeline: [{
+                $match: {
+                    $expr: { $eq: ["$$memberID", "$_id"] }
+                }
+            }, {
+                $project: { name: 1, contact: 1 }
+            }],
+            as: 'member'
+        }
+    }];
+
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
-
-        // get the total of all matched members
+        // get the total of all matched contracts
         let cursor = contracts.find(query, { projection: NORMAL_FIELDS });
         let total = await cursor.count();
+        let docs = await contracts.aggregate(pipelines).toArray();
 
-        // use find() instead of aggregate()
-        let docs = await cursor.sort(sort).skip(skip).limit(pageSize).toArray();
         console.log(`Find ${docs.length} contracts from ${total} in total`);
         return res.json({
             total: total,

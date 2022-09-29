@@ -145,8 +145,9 @@ module.exports = {
       }
     },
     memberFormatter(value, row, index) {
+      var members = row.member || [];
       return [
-        value,
+        members.length > 0 ? members[0].name : value,
         ' <a href="./member/' + value + '" target="_blank">',
         '<i class="glyphicon glyphicon-share-alt"></i>',
         '</a>'
