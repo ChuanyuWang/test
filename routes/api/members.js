@@ -162,7 +162,6 @@ router.get('/', async function(req, res, next) {
     let cursor = members.find(query, { projection: NORMAL_FIELDS });
     let total = await cursor.count();
 
-    // use find() instead of aggregate()
     if (!req.query.hasOwnProperty('appendLeft')) {
         try {
             let docs = await cursor.sort(sort).skip(skip).limit(pageSize).toArray();
