@@ -222,9 +222,8 @@ router.get('/', async function(req, res, next) {
         // get the total of all matched members
         let cursor = orders.find(query, { projection: NORMAL_FIELDS });
         let total = await cursor.count();
-
-        // use find() instead of aggregate()
         let docs = await cursor.sort(sort).skip(skip).limit(pageSize).toArray();
+
         console.log(`Find ${docs.length} orders from ${total} in total`);
         return res.json({
             total: total,
