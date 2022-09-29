@@ -33,7 +33,7 @@ module.exports = {
         setting: './pages/settings/setting.js',
         statistics: './pages/statistics/statistics.js',
         admin: './pages/admin/admin.js',
-        finance: './pages/orders/finance.js',
+        finance: './pages/finance/finance.js',
         contract_create: './pages/finance/contract_create.js'
     },
 
