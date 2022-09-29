@@ -62,7 +62,7 @@ module.exports = {
     var vm = this;
     var request = $.getJSON("/api/setting/types");
     request.fail(function(jqXHR, textStatus, errorThrown) {
-      vm.errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+      var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
       console.error(errorMessage);
     });
     request.done(function(data, textStatus, jqXHR) {
