@@ -117,7 +117,7 @@ router.get('/trial', function(req, res) {
     });
 });
 
-router.get('/finance', function(req, res) {
+router.get('/finance', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/finance', {
         title: res.__('constracts'),
         currentUrl: 'finance',
