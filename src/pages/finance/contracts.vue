@@ -203,7 +203,7 @@ module.exports = {
       this.$refs.contractTable.refresh();
     },
     viewContract(e, value, row, index) {
-      //TODO
+      window.location.href = window.location.pathname + '/../contract/' + row._id;
     }
   },
   created() {

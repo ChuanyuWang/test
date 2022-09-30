@@ -125,9 +125,19 @@ router.get('/finance', function(req, res) {
     });
 });
 
-router.get('/contract/create', function(req, res) {
+router.get('/contract/create', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/pages/contract-create', {
         title: res.__('constracts_create'),
+        user: req.user
+    });
+});
+
+router.get('/contract/:contractID', helper.checkTenantUser, function(req, res, next) {
+    // skip to 404 page if contract ID is not valid
+    if (!ObjectId.isValid(req.params.contractID)) return next();
+    res.locals.contractID = req.params.contractID;
+    res.render('bqsq/pages/contract-detail', {
+        title: res.__('view_contract'),
         user: req.user
     });
 });

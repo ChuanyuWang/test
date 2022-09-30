@@ -21,5 +21,6 @@
     "view_member": "查看会员",
     "orders": "订单",
     "constracts": "合约",
-    "constracts_create": "创建合约"
+    "constracts_create": "创建合约",
+    "view_contract": "查看合约"
 }

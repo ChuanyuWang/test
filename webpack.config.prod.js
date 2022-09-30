@@ -34,7 +34,8 @@ module.exports = {
         statistics: './pages/statistics/statistics.js',
         admin: './pages/admin/admin.js',
         finance: './pages/finance/finance.js',
-        contract_create: './pages/finance/contract_create.js'
+        contract_create: './pages/finance/contract_create.js',
+        contract_detail: './pages/finance/contract_detail.js'
     },
 
     output: {
