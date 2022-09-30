@@ -117,7 +117,7 @@ router.get('/trial', function(req, res) {
     });
 });
 
-router.get('/orders', function(req, res) {
+router.get('/orders', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/orders', {
         title: res.__('orders'),
         currentUrl: 'orders',
