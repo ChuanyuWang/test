@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * setting.js setting page main entry module
+ * contract_create.js creating contract page main entry module
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('../../locales/i18nextplugin');
