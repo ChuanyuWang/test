@@ -4,6 +4,7 @@ const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const moment = require('moment');
+const mongojs = require('mongojs');
 
 /**
  * {
@@ -181,6 +182,21 @@ router.get('/', async function(req, res, next) {
         err.innerError = error;
         return next(err);
     }
+});
+
+router.get('/:contractID', function(req, res, next) {
+    var contracts = req.db.collection("contracts");
+    contracts.findOne({
+        _id: mongojs.ObjectId(req.params.contractID)
+    }, NORMAL_FIELDS, function(err, doc) {
+        if (err) {
+            var error = new Error("Get contract fails");
+            error.innerError = err;
+            return next(error);
+        }
+        console.log("find contract %j", doc);
+        res.json(doc);
+    });
 });
 
 router.patch('/:contractID', helper.requireRole("admin"), function(req, res, next) {
