@@ -173,9 +173,14 @@ app.use('/', routes);
 /// catch 404 if no router match
 app.use(function(req, res, next) {
     res.status(404);
-    res.render('404', {
-        title: res.__('error_title')
-    });
+    if (req.xhr) {
+        return res.send({ message: "API Not Found" });
+    }
+    else {
+        res.render('404', {
+            title: res.__('error_title')
+        });
+    }
 });
 
 /// error handlers
