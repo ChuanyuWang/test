@@ -34,6 +34,12 @@ util.showAlert = function(title, jqXHR, className) {
     }
 };
 
+/**
+ * Load JSON-encoded data from the server using a GET HTTP request. Print error via `console.error` if any.
+ * @param {String} url the URL to which the request is sent.
+ * @param {String|Object} data A plain object or string that is sent to the server with the request.
+ * @returns the jQuery XHR object
+ */
 util.getJSON = function(url, data) {
     var request = $.getJSON(url, data);
     request.fail(function(jqXHR, textStatus, errorThrown) {
