@@ -13,6 +13,7 @@ var util = {};
  * @param {String} className default is 'btn-danger'
  */
 util.showAlert = function(title, jqXHR, className) {
+    // the returned json body should have a message property to indicate the error
     var errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
     console.error(errorMsg);
     //if (bootbox) {// still throw error via vue.eval
@@ -32,5 +33,15 @@ util.showAlert = function(title, jqXHR, className) {
         console.error("bootbox is not defined");
     }
 };
+
+util.getJSON = function(url, data) {
+    var request = $.getJSON(url, data);
+    request.fail(function(jqXHR, textStatus, errorThrown) {
+        // the returned json body should have a message property to indicate the error
+        var errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        console.error(errorMsg);
+    });
+    return request;
+}
 
 module.exports = util;
