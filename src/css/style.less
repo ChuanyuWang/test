@@ -30,11 +30,15 @@ html {
 }
 
 .control-label-sm {
-  line-height : 30px;
-  padding : 0 0 0 7px;
-  margin-bottom : 0px;
-  text-align : right;
-  font-size : 14px;
+  line-height: 30px;
+  padding: 0 0 0 7px;
+  margin-bottom: 0px;
+  text-align: right;
+  font-size: 14px;
+}
+
+.form-condensed .form-group {
+  margin-bottom: 0px;
 }
 
 form .form-group {
@@ -42,37 +46,38 @@ form .form-group {
 }
 
 .form-group-sm input {
-  font-size : 14px  !important;
+  font-size: 14px !important;
 }
 
 .form-group-sm p {
-  font-size : 14px  !important;
-  padding-left : 1px !important;
-  padding-top : 5px !important;
-  padding-bottom : 5px !important;
+  font-size: 14px !important;
+  padding-left: 1px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
 }
 
 .class-separator {
-  border-top : darkgray solid 1px;
-  margin : 0 -7px 3px -7px;
+  border-top: darkgray solid 1px;
+  margin: 0 -7px 3px -7px;
 }
 
 .cls-free {
-  border : 1px solid;
-  color : #5cb85c;
+  border: 1px solid;
+  color: #5cb85c;
 }
 
 .remove {
-  animation:removeAnimation 1s;
+  animation: removeAnimation 1s;
 }
 
 @keyframes removeAnimation {
-   from {
-     opacity: 1 ;
-     transform: translateX( 0 );
-   }
-   to {
-     opacity: 0 ;
-     transform : translateX( 400px );
-   }
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(400px);
+  }
 }
