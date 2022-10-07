@@ -144,6 +144,7 @@ div
 
 var member_select_modal = require("../../components/member-select-modal.vue").default;
 var type_select_modal = require("../../components/type-select-modal.vue").default;
+var serviceUtil = require("../../services/util");
 
 module.exports = {
   name: "contract-create",
@@ -252,12 +253,6 @@ module.exports = {
   watch: {},
   filters: {},
   methods: {
-    test() {
-      console.log(this.contract.expireDate);
-      console.log(this.contract.signDate);
-      console.log(moment(this.contract.expireDate).isValid() ? this.contract.expireDate.toISOString() : null);
-      console.log(moment(this.contract.signDate).isValid() ? this.contract.signDate.toISOString() : null);
-    },
     openMemberSelectDialog() {
       this.$refs.memberSelectDlg.show();
     },
@@ -282,16 +277,7 @@ module.exports = {
     createContract() {
       this.contract.memberId = this.memberData.id;
       this.contract.goods = this.product.id;
-      var request = $.ajax("/api/contracts", {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(this.contract),
-        dataType: "json"
-      });
-      request.fail(function(jqXHR, textStatus, errorThrown) {
-        var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
-        console.error(errorMessage);
-      });
+      var request = serviceUtil.postJSON("/api/contracts", this.contract);
       request.done(function(data, textStatus, jqXHR) {
         // data is generated ObjectId for the insert operation
         window.location.href = window.location.pathname + '/../' + data;
