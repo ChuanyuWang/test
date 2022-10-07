@@ -2,27 +2,27 @@
 div
   div#contracts_toolbar
     div.form-inline(role="group")
-      div.btn-group(role='group',style="margin-right:3px")
-        a.btn.btn-success(type='button',href='contract/create') 创建
+      div.btn-group(role="group" style="margin-right: 3px")
+        a.btn.btn-success(type="button" href="contract/create") 创建
       div.input-group
-        span.input-group-addon {{$t("status")}}
-        select.form-control(v-model="filter",@change="refresh")
+        span.input-group-addon {{ $t('status') }}
+        select.form-control(v-model="filter" @change="refresh")
           //"open|outstanding|paid|closed",
-          option(value="") {{$t("all")}}
+          option(value="") {{ $t('all') }}
           option(value="open") 新建
           option(value="outstanding") 部分支付
           option(value="paid") 已支付
           option(value="closed") 完成
           option(value="deleted") 作废
-      date-picker(v-model='from',placeholder="签约日期",style="width:160px;margin-left:4px")
+      date-picker(v-model="from" placeholder="签约日期" style="width: 160px; margin-left: 4px")
       i.glyphicon.glyphicon-minus
-      date-picker(v-model='to',placeholder="结束",style="width:160px",:class='{"has-error": errors.to}')
-      button.btn.btn-primary(type="button",style="margin-left:4px",@click="refresh") 查询
-      button.btn.btn-default(type="button",style="margin-left:4px",@click="clear") 清空
-  bootstrap-table.table-striped(ref='contractTable',:columns='columns',:options='options')
-  modal-dialog(ref='errorDialog',buttonStyle="danger") 出错了
+      date-picker(v-model="to" placeholder="结束" style="width: 160px", :class="{ 'has-error': errors.to }")
+      button.btn.btn-primary(type="button" style="margin-left: 4px" @click="refresh") 查询
+      button.btn.btn-default(type="button" style="margin-left: 4px" @click="clear") 清空
+  bootstrap-table.table-striped(ref="contractTable", :columns="columns", :options="options")
+  modal-dialog(ref="errorDialog" buttonStyle="danger") 出错了
     template(v-slot:body)
-      p {{errorMessage}}
+      p {{ errorMessage }}
 </template>
 <script>
 
@@ -79,10 +79,7 @@ module.exports = {
       }, {
         //field: "status", // the events will not work when adding duplicate field
         title: "操作",
-        formatter: this.actionFormatter,
-        events: {
-          'click .view-contract': this.viewContract
-        }
+        formatter: this.actionFormatter
       }],
       options: {
         toolbar: "#contracts_toolbar",
@@ -149,7 +146,7 @@ module.exports = {
       return [
         members.length > 0 ? members[0].name : value,
         ' <a href="./member/' + value + '" target="_blank">',
-        '<i class="glyphicon glyphicon-share-alt"></i>',
+        '<i class="glyphicon glyphicon-search"></i>',
         '</a>'
       ].join('');
     },
@@ -174,19 +171,11 @@ module.exports = {
       return outstanding > 0 ? { classes: "text-danger" } : {};
     },
     actionFormatter(value, row, index) {
-      return [
-        '<div class="btn-group btn-group-xs" role="group">',
-        ['<button type="button" class="btn btn-primary view-contract" title="查看合约">',
-          '<span class="glyphicon glyphicon-folder-open"></span>',
-          '</button>'].join(""),
-        row.status === "notpay" ? ['<button type="button" class="btn btn-primary close-order" title="关闭订单">',
-          '<span class="glyphicon glyphicon-ban-circle"></span>',
-          '</button>'].join("") : "",
-        row.status === "success" ? ['<button type="button" class="btn btn-warning refund-order" title="退款">',
-          '<span class="glyphicon glyphicon-yen"></span>',
-          '</button>'].join("") : "",
-        '</div>'
-      ].join('');
+      var href = './contract/' + row._id;
+      return ['<a href="' + href + '" title="查看合约">',
+        '<i class="glyphicon glyphicon-search"></i>',
+        '</a>'
+      ].join("");
     },
     customQuery(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
@@ -201,9 +190,6 @@ module.exports = {
     },
     refresh() {
       this.$refs.contractTable.refresh();
-    },
-    viewContract(e, value, row, index) {
-      window.location.href = window.location.pathname + '/../contract/' + row._id;
     }
   },
   created() {
