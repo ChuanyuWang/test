@@ -16,6 +16,7 @@ const mongojs = require('mongojs');
  *  category: "credit|limited|infinite",
  *  memberId: ObjectId,
  *  credit: Number,
+ *  consumedCredit: Number,
  *  expendedCredit: Number,
  *  total: Number,
  *  discount: Number,
@@ -55,6 +56,7 @@ router.post('/', helper.requireRole("admin"), validateContract, async function(r
         category: "credit", // TODO, remove hardcode category
         memberId: ObjectId(req.body.memberId),
         credit: req.body.credit,
+        consumedCredit: 0,
         expendedCredit: req.body.expendedCredit || 0,
         total: parseInt(req.body.total),
         discount: parseInt(req.body.discount) || 0,
