@@ -27,7 +27,7 @@ div
 <script>
 
 module.exports = {
-  name: "contracts-page",
+  name: "contract-overview",
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,
