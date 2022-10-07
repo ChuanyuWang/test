@@ -44,6 +44,9 @@ module.exports = {
       from: null,
       to: null,
       columns: [{
+        align: "center",
+        formatter: this.actionFormatter
+      }, {
         field: "signDate",
         title: "签约日期",
         sortable: true,
@@ -76,10 +79,6 @@ module.exports = {
         title: "欠费金额",
         formatter: this.outstandingFormatter,
         cellStyle: this.outstandingStyle
-      }, {
-        //field: "status", // the events will not work when adding duplicate field
-        title: "操作",
-        formatter: this.actionFormatter
       }],
       options: {
         toolbar: "#contracts_toolbar",
@@ -144,9 +143,9 @@ module.exports = {
     memberFormatter(value, row, index) {
       var members = row.member || [];
       return [
-        members.length > 0 ? members[0].name : value,
         ' <a href="./member/' + value + '" target="_blank">',
-        '<i class="glyphicon glyphicon-search"></i>',
+        members.length > 0 ? members[0].name : value,
+        //'<i class="glyphicon glyphicon-search"></i>',
         '</a>'
       ].join('');
     },
@@ -173,7 +172,7 @@ module.exports = {
     actionFormatter(value, row, index) {
       var href = './contract/' + row._id;
       return ['<a href="' + href + '" title="查看合约">',
-        '<i class="glyphicon glyphicon-search"></i>',
+        '<i class="glyphicon glyphicon-edit"></i>',
         '</a>'
       ].join("");
     },
