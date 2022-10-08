@@ -75,4 +75,20 @@ describe('MongoDB driver 3.7+', function() {
         expect(result).to.have.property("name");
         expect(result).to.have.property("cost");
     });
+
+    it('test findOne with no result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.findOne({
+            // not existed ObjectId
+            _id: ObjectId("6241c5ac95fbe9165c55f5b2")
+        }, {
+            projection: {}
+        });
+        /**
+         * result is null
+         */
+        //console.log(result);
+        expect(result).to.be.null;
+    });
 });
