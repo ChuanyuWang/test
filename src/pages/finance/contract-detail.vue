@@ -11,7 +11,7 @@ div
       span.label.label-success.ms-3(style="font-size: 65%") 已缴清
     button.btn.btn-default.bg-primary(type="button" style="float: right", :disabled="hasError" @click="") 退费
     button.btn.btn-default.me-3(type="button" style="float: right", :disabled="hasError" @click="") 转课时
-    button.btn.btn-primary.me-3(type="button" style="float: right", :disabled="hasError" @click="") 缴费
+    button.btn.btn-primary.me-3(type="button" style="float: right", :disabled="hasError" @click="openPayDialog") 缴费
   div.container
     div.row
       div.col-sm-4
@@ -51,7 +51,7 @@ div
             label.col-sm-4.control-label 已消课时:
             div.col-sm-8
               p.form-control-static TBD课时
-                a.small.ms-3 消课记录
+                a.small.ms-3(role="button") 消课记录
                   i.glyphicon.glyphicon-search
           div.form-group
             label.col-sm-4.control-label 已消金额:
@@ -67,7 +67,7 @@ div
             label.col-sm-4.control-label 实收金额:
             div.col-sm-8
               p.form-control-static {{ contract.received }}元
-                a.small.ms-3 缴费记录
+                a.small.ms-3(role="button") 缴费记录
                   i.glyphicon.glyphicon-search
           div.form-group
             label.col-sm-4.control-label 欠费金额:
@@ -141,34 +141,11 @@ div
               button.btn.btn-primary(type="button" @click="test", :disabled="true") 保存
   div.page-header
     h3 缴费记录
-  div.container
-    div.row
-      div.col-sm-6
-        form.form-horizontal
-          div.form-group
-            label.control-label.col-sm-3 应收金额:
-            div.col-sm-4
-              div.input-group
-                input.form-control(type="number" readonly v-model="receivable")
-                span.input-group-addon 元
-          div.form-group
-            label.col-sm-3.control-label 支付方式:
-            div.col-sm-9
-              p.form-control-static 线下支付
-          div.form-group
-            label.col-sm-3.control-label 实收金额:
-            div.col-sm-4
-              div.input-group
-                input.form-control(type="number" min="1" step="1")
-                span.input-group-addon 元
-          div.form-group
-            label.col-sm-3.control-label 缴费日期:
-            div.col-sm-9
-              p.form-control-static 13512341234
   div.page-header
     h3 消课记录
   div.page-header
     h3 修改记录
+  pay-dialog(ref="payDialog" buttons="confirm" @ok="pay", :outstandingFee="outstandingFee")
 </template>
 <script>
 
@@ -184,7 +161,9 @@ module.exports = {
   components: {
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
-    "date-picker": require('../../components/date-picker.vue').default
+    "date-picker": require('../../components/date-picker.vue').default,
+    "modal-dialog": require("../../components/modal-dialog.vue").default,
+    "pay-dialog": require("./pay-modal.vue").default
   },
   data() {
     return {
@@ -312,6 +291,12 @@ module.exports = {
     },
     notImplement() {
       alert("该功能不支持");
+    },
+    openPayDialog() {
+      this.$refs.payDialog.show();
+    },
+    pay(payment) {
+      console.log(payment);
     },
     modifyContract() {
       var vm = this;
