@@ -11,6 +11,11 @@ let mongoClient = new MongoClient(connectionURI("config"), {
     poolSize: 20 // Maintain up to 20 socket connections for tenant database
 });
 
+mongoClient.connect().then(error => {
+    if (error) console.error(error);
+    mongoose.connection.setClient(mongoClient);
+});
+
 const dbCache = new Map();
 const manager = {};
 
@@ -26,6 +31,7 @@ function connectionURI(database) {
 /**
  * create mongoose default connection to 'config' database 
  */
+/*
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -39,6 +45,7 @@ const options = {
     bufferMaxEntries: 0,
     authSource: 'admin'
 };
+
 mongoose.connect(connectionURI("config"), options).then(function(params) {
     console.log('[mongoose] database "config" is connected');
 }, function(err) {
@@ -50,6 +57,7 @@ mongoose.connection.on('error', err => {
     // handle errors after initial connection was established
     console.error('[mongoose] connection with error', err);
 });
+*/
 
 manager.connect = async function(database) {
     if (typeof database !== 'string' || !database)
