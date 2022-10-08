@@ -91,4 +91,25 @@ describe('MongoDB driver 3.7+', function() {
         //console.log(result);
         expect(result).to.be.null;
     });
+
+    it('test insertOne result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.insertOne({
+            foo: 123
+        });
+        // result.result is {"n":1,"ok":1}
+        // result.ops is [{}] All the documents inserted
+        // result.insertedCount is 1
+        // result.insertedId is ObjectId, generated ObjectId for the insert operation
+        //console.log(result);
+        expect(result).to.be.exist;
+        result.should.be.a('object');
+        expect(result).to.have.property("result");
+        assert.deepEqual(result.result, { n: 1, ok: 1 });
+        expect(result).to.have.property("ops");
+        assert.typeOf(result.ops, "array");
+        expect(result).to.have.property("insertedCount");
+        expect(result).to.have.property("insertedId");
+    });
 });
