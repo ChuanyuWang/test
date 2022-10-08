@@ -48,6 +48,37 @@ describe('MongoDB driver 3.7+', function() {
         assert.equal(result.ok, 1);
     });
 
+    it.only('test findOneAndUpdate with no result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.findOneAndUpdate({
+            // not existed ObjectId
+            _id: ObjectId("6241c5ac95fbe9165c55f5b2")
+        }, {
+            $set: {
+                "capacity": 6
+            }
+        }, {
+            projection: { cost: 1, booking: 1 },
+            returnDocument: "after"
+        });
+        /**
+         * {
+            lastErrorObject: { n: 0, updatedExisting: false },
+            value: null,
+            ok: 1
+            }
+         */
+        //console.log(result);
+        result.should.be.a('object');
+        expect(result).to.have.property("lastErrorObject");
+        assert.typeOf(result.lastErrorObject, "object");
+        assert.deepEqual(result.lastErrorObject, { n: 0, updatedExisting: false });
+        expect(result).to.have.property("value");
+        expect(result).to.have.property("ok");
+        assert.equal(result.ok, 1);
+    });
+
     it('test findOne result', async function() {
         let tenantDB = await db_utils.connect(tenant.name);
         let classes = tenantDB.collection("classes");
