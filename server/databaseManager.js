@@ -4,12 +4,17 @@ const mongojs = require('mongojs');
 const { MongoClient } = require('mongodb');
 const mongoose = require('mongoose');
 
-let mongoClient = null;
+let mongoClient = new MongoClient(connectionURI("config"), {
+    authSource: 'admin',
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    poolSize: 20 // Maintain up to 20 socket connections for tenant database
+});
 
 const dbCache = new Map();
 const manager = {};
 
-manager.connectionURI = function(database) {
+function connectionURI(database) {
     //https://docs.mongodb.com/manual/reference/connection-string/#standard-connection-string-format
     if (config.user) {
         return util.format("mongodb://%s:%s@%s:27017/%s", config.user, config.pass, config.host, database);
@@ -34,7 +39,7 @@ const options = {
     bufferMaxEntries: 0,
     authSource: 'admin'
 };
-mongoose.connect(manager.connectionURI("config"), options).then(function(params) {
+mongoose.connect(connectionURI("config"), options).then(function(params) {
     console.log('[mongoose] database "config" is connected');
 }, function(err) {
     // handle initial connection error
@@ -50,14 +55,9 @@ manager.connect = async function(database) {
     if (typeof database !== 'string' || !database)
         throw new Error(`database name is not defined`);
 
-    if (!mongoClient) {
-        mongoClient = await MongoClient.connect(manager.connectionURI(database), {
-            authSource: 'admin',
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            poolSize: 20 // Maintain up to 20 socket connections for tenant database
-        });
-    }
+    if (mongoClient.topology == null)
+        await mongoClient.connect();
+
     //TODO, add 'error' listner to MongoClient when upgrade to mongodb 4.0+
     return mongoClient.db(database);
 }
