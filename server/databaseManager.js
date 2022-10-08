@@ -11,8 +11,8 @@ let mongoClient = new MongoClient(connectionURI("config"), {
     poolSize: 20 // Maintain up to 20 socket connections for tenant database
 });
 
-mongoClient.connect().then(error => {
-    if (error) console.error(error);
+mongoClient.connect(error => {
+    if (error) return console.error(error);
     mongoose.connection.setClient(mongoClient);
 });
 
