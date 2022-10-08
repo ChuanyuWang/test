@@ -26,14 +26,19 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
         label.col-sm-3.control-label 实收金额:
         div.col-sm-5
           div.input-group
-            input.form-control(type="number" min="1" step="1" v-model="payment.amount")
+            input.form-control(type="number" min="1" step="1" v-model.number="payment.amount")
             span.input-group-addon 元
-          span.help-block.ms-3(v-if="outstandingFee > payment.amount") 未缴费: {{ outstandingFee - payment.amount }}元
-          span.help-block.ms-3(v-else) 已缴清
+          span.help-block.ms-3.small(v-if="outstandingFee > payment.amount") 未缴费: {{ outstandingFee - payment.amount }}元
+          span.help-block.ms-3.small(v-else) 已缴清
       div.form-group(:class="{ 'has-error': errors.payDate }")
         label.col-sm-3.control-label 缴费日期:
         div.col-sm-5
           date-picker(v-model="payment.payDate")
+      div.form-group(:class="{ 'has-error': errors.comment }")
+        label.col-sm-3.control-label 缴费备注:
+        div.col-sm-9
+          textarea.form-control(rows="3" placeholder="添加缴费备注" name="note" v-model.trim="payment.comment" style="resize: vertical; min-height: 70px")
+          span.help-block.ms-3.small 最多256个字，缴费备注提交后无法修改
 </template>
 
 <script>
@@ -52,7 +57,8 @@ module.exports = {
         payDate: new Date(),
         amount: 0,
         method: "cash",
-        type: "offline"
+        type: "offline",
+        comment: ""
       }
     };
   },
@@ -63,6 +69,8 @@ module.exports = {
         errors.payDate = "缴费日期格式不正确";
       if (this.payment.amount <= 0)
         errors.amount = "缴费金额不能小于或等于零";
+      if (this.payment.comment.length > 256)
+        errors.comment = "缴费备注超出256个字";
       return errors;
     },
     hasError() {
@@ -72,13 +80,27 @@ module.exports = {
       })
     }
   },
+  watch: {
+    "payment.amount"(value) {
+      console.log(value);
+      this.payment.amount = Math.round(value * 100) / 100;
+    }
+  },
   methods: {
     show() {
+      // Reset to default value
+      this.payment.amount = 0;
+      this.payment.method = "cash";
+      this.payment.type = "offline";
+      this.payment.comment = "";
+      this.payment.payDate = new Date();
       this.$refs.dialog.show();
     },
     clickOK() {
       // copy the payment to get a plain object (without vue get/set functions)
-      this.$emit("ok", Object.assign({}, this.payment));
+      var payment = Object.assign({}, this.payment);
+      payment.amount = payment.amount * 100;
+      this.$emit("ok", payment);
     }
   },
   mounted() { },
