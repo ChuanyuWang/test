@@ -47,4 +47,25 @@ describe('MongoDB driver 3.7+', function() {
         expect(result).to.have.property("ok");
         assert.equal(result.ok, 1);
     });
+
+    it('test findOne result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.findOne({
+            _id: ObjectId("6241c5ac95fbe9165c55f5b1")
+        });
+        /**
+         * {
+            lastErrorObject: { n: 1, updatedExisting: true },
+            value: { _id: 6241c5dd5edea566404fe8a0, cost: 1, booking: [] },
+            ok: 1
+            }
+         */
+        console.log(result);
+        result.should.be.a('object');
+        expect(result).to.have.property("booking");
+        assert.typeOf(result.booking, "array");
+        expect(result).to.have.property("name");
+        expect(result).to.have.property("cost");
+    });
 });
