@@ -111,32 +111,6 @@ div
           div.form-group
             div.col-sm-offset-2.col-sm-10
               button.btn.btn-primary(type="button" @click="test", :disabled="true") 保存
-  div.page-header
-    h3 合约缴费
-  div.container
-    div.row
-      div.col-sm-6
-        form.form-horizontal
-          div.form-group
-            label.control-label.col-sm-3 应收金额:
-            div.col-sm-4
-              div.input-group
-                input.form-control(type="number" readonly v-model="receivable")
-                span.input-group-addon 元
-          div.form-group
-            label.col-sm-3.control-label 支付方式:
-            div.col-sm-9
-              p.form-control-static 线下支付
-          div.form-group
-            label.col-sm-3.control-label 实收金额:
-            div.col-sm-4
-              div.input-group
-                input.form-control(type="number" min="1" step="1")
-                span.input-group-addon 元
-          div.form-group
-            label.col-sm-3.control-label 缴费日期:
-            div.col-sm-9
-              p.form-control-static 13512341234
   member-select-modal(ref="memberSelectDlg" @ok="selectMember")
   type-select-modal(ref="typeSelectDlg" @ok="selectType")
 </template>
