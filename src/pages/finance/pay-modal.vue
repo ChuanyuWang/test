@@ -10,18 +10,18 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
         label.col-sm-3.control-label 支付方式:
         div.col-sm-8(style="height: 34px")
           label.radio-inline
-            input(type="radio" name="paymentChannel" value="Wechat" disabled v-model="payment.channel")
+            input(type="radio" name="paymentType" value="wechat" disabled v-model="payment.type")
             | 微信支付
           label.radio-inline
-            input(type="radio" name="paymentChannel" value="Offline" v-model="payment.channel")
+            input(type="radio" name="paymentType" value="offline" v-model="payment.type")
             | 线下支付
       div.form-group
         label.col-sm-3.control-label 支付渠道:
         div.col-sm-5
           select.form-control(v-model="payment.method")
-            option(value="Cash") 现金
-            option(value="BankCard") 银行卡
-            option(value="MobilePayment") 移动支付
+            option(value="cash") 现金
+            option(value="bankcard") 银行卡
+            option(value="mobilepayment") 移动支付
       div.form-group(:class="{ 'has-error': errors.amount }")
         label.col-sm-3.control-label 实收金额:
         div.col-sm-5
@@ -49,11 +49,10 @@ module.exports = {
   data() {
     return {
       payment: {
-        contractId: "",
         payDate: new Date(),
         amount: 0,
-        method: "Cash",
-        channel: "Offline"
+        method: "cash",
+        type: "offline"
       }
     };
   },
@@ -78,9 +77,8 @@ module.exports = {
       this.$refs.dialog.show();
     },
     clickOK() {
-      var payment = {}
-      Object.assign(payment, this.payment);
-      this.$emit("ok", Object.assign(payment, this.payment));
+      // copy the payment to get a plain object (without vue get/set functions)
+      this.$emit("ok", Object.assign({}, this.payment));
     }
   },
   mounted() { },
