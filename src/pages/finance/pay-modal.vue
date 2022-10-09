@@ -82,7 +82,6 @@ module.exports = {
   },
   watch: {
     "payment.amount"(value) {
-      console.log(value);
       this.payment.amount = Math.round(value * 100) / 100;
     }
   },
