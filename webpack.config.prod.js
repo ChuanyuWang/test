@@ -122,7 +122,8 @@ module.exports = {
             {
                 test: /\.less$/,
                 include: [
-                    path.resolve(__dirname, "src/pages")
+                    path.resolve(__dirname, "src/pages"),
+                    path.resolve(__dirname, "src/components")
                 ],
                 use: [
                     'vue-style-loader',
