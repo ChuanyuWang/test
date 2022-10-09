@@ -131,10 +131,13 @@ div
                 i.glyphicon.glyphicon-pencil.ms-3
   contract-comments(:contractId="contractId")
   div.page-header
-    h3 缴费记录
+    h3(style="display: inline-block") 缴费记录
+    button.btn.btn-default(type="button" @click="$refs.paymentTable.refresh()" style="float: right; margin-top: 16px")
+      span.glyphicon.glyphicon-refresh.me-3
+      | 刷新
   div.row
     div.col-sm-12
-      div#toolbar
+      div#paymentToolbar
       bootstrap-table(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
   div.page-header
     h3 消课记录
@@ -203,9 +206,9 @@ module.exports = {
         }
       }],
       paymentTableOptions: {
-        toolbar: "#toolbar",
+        //toolbar: "#paymentToolbar",
         locale: "zh-CN",
-        showRefresh: true,
+        //showRefresh: true,
         //search: true,
         queryParams: this.customQuery,
         url: "/api/payments",
