@@ -428,14 +428,14 @@ module.exports = {
 .container .page-header {
   padding-bottom: 3px;
 }
-.form-horizontal .control-label {
+.form-condensed .form-horizontal .control-label {
   padding-top: 7px;
   padding-right: 0;
   margin-bottom: 0;
   text-align: right;
 }
 
-.form-horizontal .form-group > div {
+.form-condensed .form-horizontal .form-group > div {
   padding-right: 0;
 }
 </style>
