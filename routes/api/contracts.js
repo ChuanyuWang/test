@@ -67,8 +67,18 @@ router.post('/', helper.requireRole("admin"), validateContract, async function(r
         //clientip: req.ip.match(/\d+\.\d+\.\d+\.\d+/),
         clientip: req.ip,
         signDate: req.body.signDate ? new Date(req.body.signDate) : new Date(),
-        lastUpdate: new Date()
+        lastUpdate: new Date(),
+        comments: []
     };
+    (req.body.comments || []).forEach(element => {
+        contract.comments.push({
+            // add posted date
+            posted: new Date(),
+            text: element.text,
+            // add comment author
+            author: req.user.username
+        })
+    });
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
@@ -231,6 +241,67 @@ router.delete('/:contractID', helper.requireRole("admin"), async function(req, r
     }
 });
 
+/**
+ * {
+ *    posted: Date,
+ *    updated: Date,
+ *    text: String,
+ *    author: String
+ * }
+ */
+router.post('/:contractID/comments', async function(req, res, next) {
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+
+        if (!req.body.text || req.body.text.length <= 0) {
+            return new ParamError("Missing param 'text'");
+        }
+        let comment = {
+            // add posted date
+            posted: new Date(),
+            text: req.body.text,
+            // add comment author
+            author: req.user.username
+        };
+        let result = await contracts.findOneAndUpdate({
+            _id: ObjectId(req.params.contractID)
+        }, {
+            $push: { comments: comment }
+        }, {
+            projection: { comments: 1 },
+            returnDocument: "after"
+        });
+
+        console.log(`add comment ${req.body.text} to contract ${req.params.contractID}`);
+        res.json(result.value);
+    } catch (error) {
+        var err = new Error("add comment fails");
+        err.innerError = error;
+        return next(err);
+    }
+});
+
+router.get('/:contractID/comments', async function(req, res, next) {
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+        let doc = await contracts.findOne({
+            _id: ObjectId(req.params.contractID)
+        }, {
+            projection: { comments: 1 }
+        });
+
+        console.log(`query comments from contract ${req.params.contractID}`);
+        res.json(doc);
+    } catch (error) {
+        var err = new Error("get contract's comments fails");
+        err.innerError = error;
+        return next(err);
+    }
+});
+
 async function validateContract(req, res, next) {
     try {
         //TODO, validate all fields of contract
@@ -257,6 +328,14 @@ class ContractError extends Error {
     constructor(message) {
         super(message);
         this.name = "Contract API Error";
+    }
+}
+
+class ParamError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "Invalid Parameter Error";
+        this.status = 400;
     }
 }
 

@@ -24,6 +24,10 @@ div
           label.col-sm-3.control-label 联系方式:
           div.col-sm-9
             p.form-control-static {{ memberData.contact }}
+        div.form-group(:class="{ 'has-error': errors.comment }")
+          label.col-sm-3.control-label 合约备注:
+          div.col-sm-9
+            textarea.form-control.has-3-rows(rows="3" v-model.trim="comment" placeholder="添加合约备注信息")
     div.col-sm-6
       form.form-horizontal
         div.form-group
@@ -99,18 +103,6 @@ div
           div.col-sm-5
             p.form-control-static
               strong {{ receivable }} 元
-  div.page-header
-    h3 合约备注
-  div.row
-    div.col-sm-6
-      form.form-horizontal
-        div.form-group
-          label.control-label.col-sm-2 新备注:
-          div.col-sm-10
-            textarea.form-control(rows="3" placeholder="添加合约备注信息, 保存后无法修改" name="note" v-model.trim="memberData.note" style="resize: vertical; min-height: 70px")
-        div.form-group
-          div.col-sm-offset-2.col-sm-10
-            button.btn.btn-primary(type="button" @click="", :disabled="true") 保存
   member-select-modal(ref="memberSelectDlg" @ok="selectMember")
   type-select-modal(ref="typeSelectDlg" @ok="selectType")
 </template>
@@ -131,6 +123,7 @@ module.exports = {
   data() {
     return {
       tenantConfig: {},
+      comment: "",
       memberData: {
         id: "",
         name: "",
@@ -156,7 +149,8 @@ module.exports = {
         createDate: new Date(),
         effectiveDate: new Date(),
         expireDate: null,
-        signDate: new Date()
+        signDate: new Date(),
+        comments: []
       }
     }
   },
@@ -195,6 +189,8 @@ module.exports = {
       var errors = {};
       if (!this.memberData.id)
         errors.memberId = "请选择会员";
+      if (this.comment.length > 256)
+        errors.comment = "备注不超过256个字";
       if (!this.product.id)
         errors.productId = "请选择课程";
       if (!moment(this.contract.effectiveDate).isValid())
@@ -251,6 +247,8 @@ module.exports = {
     createContract() {
       this.contract.memberId = this.memberData.id;
       this.contract.goods = this.product.id;
+      if (this.comment.length > 0)
+        this.contract.comments.push({ text: this.comment });
       var request = serviceUtil.postJSON("/api/contracts", this.contract);
       request.done(function(data, textStatus, jqXHR) {
         // data is generated ObjectId for the insert operation
