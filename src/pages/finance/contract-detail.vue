@@ -129,18 +129,7 @@ div
             p.form-control-static {{ discountFee }}元
               a(role="button" @click="notImplement")
                 i.glyphicon.glyphicon-pencil.ms-3
-  div.page-header
-    h3 合约备注
-  div.row
-    div.col-sm-6
-      form.form-horizontal
-        div.form-group
-          label.control-label.col-sm-2 新备注:
-          div.col-sm-10
-            textarea.form-control(rows="3" placeholder="添加合约备注信息, 保存后无法修改" name="note" v-model.trim="memberData.note" style="resize: vertical; min-height: 70px")
-        div.form-group
-          div.col-sm-offset-2.col-sm-10
-            button.btn.btn-primary(type="button" @click="test", :disabled="true") 保存
+  contract-comments(:contractId="contractId")
   div.page-header
     h3 缴费记录
   div.row
@@ -163,6 +152,7 @@ var member_select_modal = require("../../components/member-select-modal.vue").de
 var type_select_modal = require("../../components/type-select-modal.vue").default;
 var serviceUtil = require("../../services/util");
 var commonUtil = require("../../common/common");
+var contractComments = require("./contract-comments.vue").default;
 
 module.exports = {
   name: "contract-detail",
@@ -173,6 +163,7 @@ module.exports = {
     "BootstrapTable": BootstrapTable,
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
+    "contract-comments": contractComments,
     "date-picker": require('../../components/date-picker.vue').default,
     "modal-dialog": require("../../components/modal-dialog.vue").default,
     "pay-dialog": require("./pay-modal.vue").default
