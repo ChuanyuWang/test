@@ -7,7 +7,7 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
         div.col-sm-8
           p.form-control-static {{ outstandingFee }}
       div.form-group
-        label.col-sm-3.control-label 支付方式:
+        label.col-sm-3.control-label 支付渠道:
         div.col-sm-8(style="height: 34px")
           label.radio-inline
             input(type="radio" name="paymentType" value="wechat" disabled v-model="payment.type")
@@ -16,7 +16,7 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
             input(type="radio" name="paymentType" value="offline" v-model="payment.type")
             | 线下支付
       div.form-group
-        label.col-sm-3.control-label 支付渠道:
+        label.col-sm-3.control-label 支付方式:
         div.col-sm-5
           select.form-control(v-model="payment.method")
             option(value="cash") 现金
