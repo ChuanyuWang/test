@@ -2,9 +2,9 @@
 div
   div#member_toolbar
     form.form-inline
-      date-picker(v-model='targetYear', :config='datePickerConfig', @input="refresh",:label="$t('time')")
-      div.text-muted(style="display:inline-block;margin-left:1rem") 统计学员每个月消费的课时数（单位：课时）
-  bootstrap-table.table-striped(ref='memberTable',:columns='columns',:options='options')
+      date-picker(v-model="targetYear", :config="datePickerConfig" @input="refresh", :label="$t('time')")
+      div.text-muted(style="display: inline-block; margin-left: 1rem") 统计学员每个月消费的课时数（单位：课时）
+  bootstrap-table.table-striped(ref="memberTable", :columns="columns", :options="options")
 </template>
 
 <script>
@@ -125,7 +125,6 @@ module.exports = {
     },
     numberFormatter: function(value, row, index, field) {
       var data = row.value || [];
-      console.log(data)
       for (var i = 0; i < data.length; i++) {
         if (parseInt(field) === data[i].m) {
           return Math.round(data[i].t * 10) / 10
