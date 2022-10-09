@@ -39,21 +39,47 @@ router.post('/', helper.requireRole("admin"), validate, async function(req, res,
     };
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
-        let contractItem = await contracts.findOne({ _id: payment.contractId }, { projection: { _id: 1 } });
-        if (contractItem == null) {
-            throw new Error(`contract ${req.body.contractId} doesn't exist`);
-        }
+        // Check the member exist
         let members = tenantDB.collection("members");
         let memberItem = await members.findOne({ _id: payment.memberId }, { projection: { _id: 1 } });
         if (memberItem == null) {
-            throw new Error(`member ${req.body.memberId} doesn't exist`);
+            return next(new ParamError(`member ${req.body.memberId} doesn't exist`));
+        }
+        // Check the contract exist and update the field "received"
+        let contracts = tenantDB.collection("contracts");
+        let contractItem = await contracts.findOne({
+            _id: payment.contractId,
+            status: { $in: ["open", "outstanding"] }
+        }, { projection: { comments: 0 } });
+        if (contractItem == null) {
+            return next(new ParamError(`contract ${req.body.contractId} doesn't exist`));
+        }
+
+        // Update the status of contract is no outstanding
+        let status = contractItem.received + payment.amount < contractItem.total - contractItem.discount ? "outstanding" : "paid";
+
+        let updatedContractItem = await contracts.findOneAndUpdate({
+            _id: payment.contractId,
+            status: contractItem.status,
+            received: contractItem.received,
+            total: contractItem.total,
+            discount: contractItem.discount
+        }, {
+            $inc: { received: payment.amount },
+            $set: { status: status }
+        }, {
+            projection: { comments: 0 },
+            returnDocument: "after"
+        });
+
+        if (updatedContractItem.value == null) {
+            throw new Error(`contract ${contractItem.serialNo} is updated during incoming payment, please pay again`);
         }
 
         let payments = tenantDB.collection("payments");
         let result = await payments.insertOne(payment);
 
-        console.log(`Create payment successfully ${result.result}`);
+        console.log(`pay ${payment.amount / 100} successfully to contract ${contractItem.serialNo}`);
         return res.json(result.ops[0]);
     } catch (error) {
         let err = new Error("Create contract fails");
@@ -113,8 +139,6 @@ router.get('/', async function(req, res, next) {
     }, {
         $limit: pageSize
     }, {
-        $project: NORMAL_FIELDS
-    }, {
         $lookup: {
             from: 'members',
             let: { memberID: "$memberId" },
@@ -137,13 +161,13 @@ router.get('/', async function(req, res, next) {
         let total = await cursor.count();
         let docs = await payments.aggregate(pipelines).toArray();
 
-        console.log(`Find ${docs.length} payments from ${total} in total`);
+        console.log(`find ${docs.length} payments from ${total} in total`);
         return res.json({
             total: total,
             rows: docs
         });
     } catch (error) {
-        let err = new Error("Query payment fails");
+        let err = new Error("query payment fails");
         err.innerError = error;
         return next(err);
     }
@@ -175,17 +199,51 @@ router.patch('/:paymentID', helper.requireRole("admin"), function(req, res, next
 router.delete('/:paymentID', helper.requireRole("admin"), async function(req, res, next) {
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
+
         let payments = tenantDB.collection("payments");
         let query = { _id: ObjectId(req.params.paymentID) };
-        let doc = await payments.findOne(query);
-        if (!doc) {
-            let error = new Error(`Payment doesn't exist`);
-            error.status = 400;
-            return next(error);
+        let payment = await payments.findOne(query);
+        if (!payment) {
+            return next(new ParamError(`Payment ${req.params.paymentID} doesn't exist`));
         }
+
+        // Check the contract exist and update the field "received"
+        let contracts = tenantDB.collection("contracts");
+
+        let contractItem = await contracts.findOne({
+            _id: payment.contractId
+            //status: { $in: ["outstanding", "paid"] }
+        }, { projection: { comments: 0 } });
+
+        if (contractItem == null) {
+            return next(new ParamError(`Contract ${req.params.contractId} doesn't exist`));
+        } else if (contractItem.status == "closed" || contractItem.status == "deleted") {
+            return next(new ParamError(`Contract ${req.params.contractId} status is ${contractItem.status}, can't delete payment`));
+        }
+
+        // Update the status of contract is no outstanding
+        let status = contractItem.received - payment.amount < contractItem.total - contractItem.discount ? "outstanding" : "paid";
+        let updatedContractItem = await contracts.findOneAndUpdate({
+            _id: payment.contractId,
+            status: contractItem.status,
+            received: contractItem.received,
+            total: contractItem.total,
+            discount: contractItem.discount
+        }, {
+            $inc: { received: -payment.amount },
+            $set: { status: status }
+        }, {
+            projection: { comments: 0 },
+            returnDocument: "after"
+        });
+
+        if (updatedContractItem.value == null) {
+            throw new Error(`contract ${contractItem.serialNo} is updated during deleting payment, please pay again`);
+        }
+
         let result = await payments.deleteOne(query);
         // result.result is {"n":1,"ok":1}
-        console.log(`Payment ${req.params.paymentID} is deleted with result: %j`, result.result);
+        console.log(`undo payment ${payment.amount} from contract ${contractItem.serialNo}`);
         return res.json(result.result);
     } catch (error) {
         let err = new Error("Delete payment fails");
@@ -203,6 +261,14 @@ async function validate(req, res, next) {
         let err = new Error("validate peymant request body fails");
         err.innerError = error;
         return next(err);
+    }
+}
+
+class ParamError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "Invalid Parameter Error";
+        this.status = 400;
     }
 }
 
