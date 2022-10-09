@@ -52,7 +52,7 @@ module.exports = {
         return "";
     },
     /**
-     * Data fomatter function of bootstrap-table to format date localized string by 'll'
+     * Data fomatter function of bootstrap-table to format date localized string by 'll', e.g. 2022年10月9日
      * 
      * @param {Object} value the field value
      * @param {Object} row the row record data
@@ -63,6 +63,34 @@ module.exports = {
             return moment(value).format('ll');
         } else {
             return undefined;
+        }
+    },
+    /**
+     * Data fomatter function of bootstrap-table to format date localized string by 'll', e.g. 2022-10-09
+     * 
+     * @param {Object} value the field value
+     * @param {Object} row the row record data
+     * @param {Number} index the row index
+     */
+    dateFormatter2: function(value, row, index) {
+        if (value) {
+            return moment(value).format('YYYY-MM-DD');
+        } else {
+            return undefined;
+        }
+    },
+    /**
+     * CNY fomatter function of bootstrap-table to format money amount, e.g. 8000元
+     * 
+     * @param {Object} value the field value
+     * @param {Object} row the row record data
+     * @param {Number} index the row index
+     */
+    CNYFormatter: function(value, row, index) {
+        if (value) {
+            return value / 100 + "元";
+        } else {
+            return "0元";
         }
     },
     /**
