@@ -10,8 +10,8 @@ div
     h3(style="margin-top: 0; display: inline-block") 合约状态
       span.label.label-danger.ms-3(style="font-size: 65%" v-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
       span.label.label-success.ms-3(style="font-size: 65%" v-else) 已缴清
-    button.btn.btn-default(type="button" style="float: right", :disabled="contract.status == 'open'" @click="") 转课时
-    button.btn.btn-default.me-3(type="button" style="float: right", :disabled="contract.status == 'open'" @click="") 退费
+    button.btn.btn-default(type="button" style="float: right" disabled @click="") 转课时
+    button.btn.btn-default.me-3(type="button" style="float: right" disabled @click="") 退费
     button.btn.btn-primary.me-3(type="button" style="float: right" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
   div.row
     div.col-sm-4
