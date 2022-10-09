@@ -148,11 +148,13 @@ div
     template(v-slot:body)
       p 确认删除并撤销缴费吗？
       p.small (撤销后合约的实收金额和欠费金额会发生变动)
+  message-alert(ref="messager")
 </template>
 <script>
 
 var member_select_modal = require("../../components/member-select-modal.vue").default;
 var type_select_modal = require("../../components/type-select-modal.vue").default;
+var messageAlert = require("../../components/message-alert.vue").default;
 var serviceUtil = require("../../services/util");
 var commonUtil = require("../../common/common");
 var contractComments = require("./contract-comments.vue").default;
@@ -167,6 +169,7 @@ module.exports = {
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
     "contract-comments": contractComments,
+    "message-alert": messageAlert,
     "date-picker": require('../../components/date-picker.vue').default,
     "modal-dialog": require("../../components/modal-dialog.vue").default,
     "pay-dialog": require("./pay-modal.vue").default
@@ -381,11 +384,11 @@ module.exports = {
       request.done((data, textStatus, jqXHR) => {
         this.refresh();
         this.$refs.paymentTable.refresh();
-        //TODO, show success tip
+        this.$refs.messager.showSuccessMessage("缴费记录已经删除");
       });
     },
     notImplement() {
-      alert("该功能不支持");
+      this.$refs.messager.showErrorMessage("该功能不支持");
     },
     openPayDialog() {
       this.$refs.payDialog.show();
@@ -397,7 +400,7 @@ module.exports = {
       request.done((data, textStatus, jqXHR) => {
         this.refresh();
         this.$refs.paymentTable.refresh();
-        //TODO, show success tip
+        this.$refs.messager.showSuccessMessage("成功缴费");
       });
     },
     modifyContract() {
