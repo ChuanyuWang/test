@@ -8,150 +8,161 @@ div
     li.active 查看合约
   div.page-header(style="margin-top: 15px")
     h3(style="margin-top: 0; display: inline-block") 合约状态
-      span.label.label-success.ms-3(style="font-size: 65%") 已缴清
-    button.btn.btn-default.bg-primary(type="button" style="float: right", :disabled="hasError" @click="") 退费
-    button.btn.btn-default.me-3(type="button" style="float: right", :disabled="hasError" @click="") 转课时
-    button.btn.btn-primary.me-3(type="button" style="float: right", :disabled="hasError" @click="openPayDialog") 缴费
-  div.container
-    div.row
-      div.col-sm-4
-        form.form-horizontal.form-condensed
-          div.form-group
-            label.col-sm-4.control-label 类型:
-            div.col-sm-8
-              p.form-control-static {{ contract.type | typeFilter }}
-                span.label.label-primary.ms-3 课时卡
-          div.form-group
-            label.col-sm-4.control-label 签约日期:
-            div.col-sm-8
-              p.form-control-static {{ contract.signDate | dateFilter }}
-          div.form-group
-            label.col-sm-4.control-label 生效日期:
-            div.col-sm-8
-              p.form-control-static {{ contract.effectiveDate | dateFilter }}
-                a(role="button" @click="notImplement")
-                  i.glyphicon.glyphicon-pencil.ms-3
-          div.form-group
-            label.col-sm-4.control-label 截止日期:
-            div.col-sm-8
-              p.form-control-static {{ contract.expireDate | dateFilter }}
-                a(role="button" @click="notImplement")
-                  i.glyphicon.glyphicon-pencil.ms-3
-      div.col-sm-4
-        form.form-horizontal.form-condensed
-          div.form-group
-            label.col-sm-4.control-label 剩余课时:
-            div.col-sm-8
-              p.form-control-static TBD课时
-          div.form-group
-            label.col-sm-4.control-label 剩余金额:
-            div.col-sm-8
-              p.form-control-static TBD元
-          div.form-group
-            label.col-sm-4.control-label 已消课时:
-            div.col-sm-8
-              p.form-control-static TBD课时
-                a.small.ms-3(role="button") 消课记录
-                  i.glyphicon.glyphicon-search
-          div.form-group
-            label.col-sm-4.control-label 已消金额:
-            div.col-sm-8
-              p.form-control-static TBD元
-      div.col-sm-4
-        form.form-horizontal.form-condensed
-          div.form-group
-            label.col-sm-4.control-label 应收金额:
-            div.col-sm-8
-              p.form-control-static {{ receivable }}元
-          div.form-group
-            label.col-sm-4.control-label 实收金额:
-            div.col-sm-8
-              p.form-control-static {{ contract.received }}元
-                a.small.ms-3(role="button") 缴费记录
-                  i.glyphicon.glyphicon-search
-          div.form-group
-            label.col-sm-4.control-label 欠费金额:
-            div.col-sm-8(:class="{ 'text-danger': outstandingFee }")
-              p.form-control-static {{ outstandingFee }}元
+      span.label.label-danger.ms-3(style="font-size: 65%" v-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
+      span.label.label-success.ms-3(style="font-size: 65%" v-else) 已缴清
+    button.btn.btn-default(type="button" style="float: right", :disabled="contract.status == 'open'" @click="") 转课时
+    button.btn.btn-default.me-3(type="button" style="float: right", :disabled="contract.status == 'open'" @click="") 退费
+    button.btn.btn-primary.me-3(type="button" style="float: right" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
+  div.row
+    div.col-sm-4
+      form.form-horizontal.form-condensed
+        div.form-group
+          label.col-sm-4.control-label 类型:
+          div.col-sm-8
+            p.form-control-static {{ contract.type | typeFilter }}
+              span.label.label-primary.ms-3 课时卡
+        div.form-group
+          label.col-sm-4.control-label 签约日期:
+          div.col-sm-8
+            p.form-control-static {{ contract.signDate | dateFilter }}
+        div.form-group
+          label.col-sm-4.control-label 生效日期:
+          div.col-sm-8
+            p.form-control-static {{ contract.effectiveDate | dateFilter }}
+              a(role="button" @click="notImplement")
+                i.glyphicon.glyphicon-pencil.ms-3
+        div.form-group
+          label.col-sm-4.control-label 截止日期:
+          div.col-sm-8
+            p.form-control-static {{ contract.expireDate | dateFilter }}
+              a(role="button" @click="notImplement")
+                i.glyphicon.glyphicon-pencil.ms-3
+    div.col-sm-4
+      form.form-horizontal.form-condensed
+        div.form-group
+          label.col-sm-4.control-label 剩余课时:
+          div.col-sm-8
+            p.form-control-static TBD课时
+        div.form-group
+          label.col-sm-4.control-label 剩余金额:
+          div.col-sm-8
+            p.form-control-static TBD元
+        div.form-group
+          label.col-sm-4.control-label 已消课时:
+          div.col-sm-8
+            p.form-control-static TBD课时
+              a.small.ms-3(role="button") 消课记录
+                i.glyphicon.glyphicon-search
+        div.form-group
+          label.col-sm-4.control-label 已消金额:
+          div.col-sm-8
+            p.form-control-static TBD元
+    div.col-sm-4
+      form.form-horizontal.form-condensed
+        div.form-group
+          label.col-sm-4.control-label 应收金额:
+          div.col-sm-8
+            p.form-control-static {{ receivable }}元
+        div.form-group
+          label.col-sm-4.control-label 实收金额:
+          div.col-sm-8
+            p.form-control-static {{ contract.received / 100 }}元
+              a.small.ms-3(role="button") 缴费记录
+                i.glyphicon.glyphicon-search
+        div.form-group
+          label.col-sm-4.control-label 欠费金额:
+          div.col-sm-8(:class="{ 'text-danger': outstandingFee }")
+            p.form-control-static {{ outstandingFee }}元
   div.page-header
     h3 合约课程
-  div.container
-    div.row.form-condensed
-      div.col-sm-4
-        form.form-horizontal.form-condensed
-          div.form-group
-            label.col-sm-4.control-label 学员:
-            div.col-sm-8
-              div.input-group
-                p.form-control-static {{ memberData.name }}
-                  a(:href="'../member/' + contract.memberId" target="_blank")
-                    i.glyphicon.glyphicon-search.ms-3
-          div.form-group
-            label.col-sm-4.control-label 联系方式:
-            div.col-sm-8
-              p.form-control-static {{ memberData.contact }}
-      div.col-sm-4
-        form.form-horizontal
-          div.form-group
-            label.col-sm-4.control-label 课程:
-            div.col-sm-8
-              p.form-control-static {{ productName }}
-          div.form-group
-            label.col-sm-4.control-label 合约课时:
-            div.col-sm-8
-              p.form-control-static {{ contract.credit }}课时
-                a(role="button" @click="notImplement")
-                  i.glyphicon.glyphicon-pencil.ms-3
-          div.form-group
-            label.col-sm-4.control-label 课程单价:
-            div.col-sm-8
-              p.form-control-static {{ averageFee }}课时
-          div.form-group
-            label.col-sm-4.control-label 课程金额:
-            div.col-sm-8
-              p.form-control-static {{ totalFee }}元
-                a(role="button" @click="notImplement")
-                  i.glyphicon.glyphicon-pencil.ms-3
-      div.col-sm-4
-        form.form-horizontal
-          div.form-group
-            label.col-sm-4.control-label 系统外耗课:
-            div.col-sm-8
-              p.form-control-static {{ contract.expendedCredit }}课时
-                a.small.ms-3(style="color: #777" data-toggle="tooltip" title="系统外消耗课时是指使用系统前(合同签约前)上了的课时，例如：合约中有100课时，系统外耗课20课时，则实际可以使用的课时为80课时")
-                  i.glyphicon.glyphicon-info-sign
-          div.form-group
-            label.col-sm-4.control-label 折扣直减:
-            div.col-sm-8
-              p.form-control-static {{ discountFee }}元
-                a(role="button" @click="notImplement")
-                  i.glyphicon.glyphicon-pencil.ms-3
+  div.row.form-condensed
+    div.col-sm-4
+      form.form-horizontal.form-condensed
+        div.form-group
+          label.col-sm-4.control-label 合约编号:
+          div.col-sm-8
+            p.form-control-static {{ contract.serialNo }}
+        div.form-group
+          label.col-sm-4.control-label 学员:
+          div.col-sm-8
+            div.input-group
+              p.form-control-static {{ memberData.name }}
+                a(:href="'../member/' + contract.memberId" target="_blank")
+                  i.glyphicon.glyphicon-search.ms-3
+        div.form-group
+          label.col-sm-4.control-label 联系方式:
+          div.col-sm-8
+            p.form-control-static {{ memberData.contact }}
+    div.col-sm-4
+      form.form-horizontal
+        div.form-group
+          label.col-sm-4.control-label 课程:
+          div.col-sm-8
+            p.form-control-static {{ productName }}
+        div.form-group
+          label.col-sm-4.control-label 合约课时:
+          div.col-sm-8
+            p.form-control-static {{ contract.credit }}课时
+              a(role="button" @click="notImplement")
+                i.glyphicon.glyphicon-pencil.ms-3
+        div.form-group
+          label.col-sm-4.control-label 课程单价:
+          div.col-sm-8
+            p.form-control-static {{ averageFee }}课时
+        div.form-group
+          label.col-sm-4.control-label 课程金额:
+          div.col-sm-8
+            p.form-control-static {{ totalFee }}元
+              a(role="button" @click="notImplement")
+                i.glyphicon.glyphicon-pencil.ms-3
+    div.col-sm-4
+      form.form-horizontal
+        div.form-group
+          label.col-sm-4.control-label 系统外耗课:
+          div.col-sm-8
+            p.form-control-static {{ contract.expendedCredit }}课时
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="系统外消耗课时是指使用系统前(合同签约前)上了的课时，例如：合约中有100课时，系统外耗课20课时，则实际可以使用的课时为80课时")
+                i.glyphicon.glyphicon-info-sign
+        div.form-group
+          label.col-sm-4.control-label 折扣直减:
+          div.col-sm-8
+            p.form-control-static {{ discountFee }}元
+              a(role="button" @click="notImplement")
+                i.glyphicon.glyphicon-pencil.ms-3
   div.page-header
     h3 合约备注
-  div.container
-    div.row
-      div.col-sm-6
-        form.form-horizontal
-          div.form-group
-            label.control-label.col-sm-2 新备注:
-            div.col-sm-10
-              textarea.form-control(rows="3" placeholder="添加合约备注信息, 保存后无法修改" name="note" v-model.trim="memberData.note" style="resize: vertical; min-height: 70px")
-          div.form-group
-            div.col-sm-offset-2.col-sm-10
-              button.btn.btn-primary(type="button" @click="test", :disabled="true") 保存
+  div.row
+    div.col-sm-6
+      form.form-horizontal
+        div.form-group
+          label.control-label.col-sm-2 新备注:
+          div.col-sm-10
+            textarea.form-control(rows="3" placeholder="添加合约备注信息, 保存后无法修改" name="note" v-model.trim="memberData.note" style="resize: vertical; min-height: 70px")
+        div.form-group
+          div.col-sm-offset-2.col-sm-10
+            button.btn.btn-primary(type="button" @click="test", :disabled="true") 保存
   div.page-header
     h3 缴费记录
+  div.row
+    div.col-sm-12
+      div#toolbar
+      bootstrap-table(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
   div.page-header
     h3 消课记录
   div.page-header
     h3 修改记录
   pay-dialog(ref="payDialog" buttons="confirm" @ok="pay", :outstandingFee="outstandingFee")
+  modal-dialog(ref="confirmDeletePaymentDialog" buttons="confirm" @ok="deletePayment") 删除缴费记录
+    template(v-slot:body)
+      p 确认删除并撤销缴费吗？
+      p.small (撤销后合约的实收金额和欠费金额会发生变动)
 </template>
 <script>
 
 var member_select_modal = require("../../components/member-select-modal.vue").default;
 var type_select_modal = require("../../components/type-select-modal.vue").default;
 var serviceUtil = require("../../services/util");
+var commonUtil = require("../../common/common");
 
 module.exports = {
   name: "contract-detail",
@@ -159,6 +170,7 @@ module.exports = {
     contractId: String
   },
   components: {
+    "BootstrapTable": BootstrapTable,
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
     "date-picker": require('../../components/date-picker.vue').default,
@@ -171,7 +183,49 @@ module.exports = {
       types: [],
       productName: "",
       memberData: {},
-      contract: {}
+      contract: {},
+      paymentTableColumns: [{
+        field: "payDate",
+        title: "缴费日期",
+        sortable: true,
+        formatter: commonUtil.dateFormatter2
+      }, {
+        field: "amount",
+        title: "缴费金额",
+        formatter: commonUtil.CNYFormatter
+      }, {
+        field: "type",
+        title: "支付渠道",
+        formatter: this.typeFormatter
+      }, {
+        field: "method",
+        title: "支付方式",
+        formatter: this.methodFormatter
+      }, {
+        field: "comment",
+        title: "备注"
+      }, {
+        title: "操作",
+        formatter: this.actionFormatter,
+        events: {
+          'click .delete-payment': this.confirmDeletePayment
+        }
+      }],
+      paymentTableOptions: {
+        toolbar: "#toolbar",
+        locale: "zh-CN",
+        showRefresh: true,
+        //search: true,
+        queryParams: this.customQuery,
+        url: "/api/payments",
+        uniqueId: "_id",
+        sortName: "payDate",
+        sortOrder: "desc",
+        pageSize: 15,
+        pageList: [15, 25, 50, 100],
+        pagination: true,
+        sidePagination: "server"
+      }
     }
   },
   computed: {
@@ -289,6 +343,53 @@ module.exports = {
       console.log(moment(this.contract.expireDate).isValid() ? this.contract.expireDate.toISOString() : null);
       console.log(moment(this.contract.signDate).isValid() ? this.contract.signDate.toISOString() : null);
     },
+    customQuery(params) {
+      // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
+      params.contractId = this.contractId; // add the status filter
+      return params;
+    },
+    typeFormatter(value, row, index) {
+      switch (value) {
+        case "wechat":
+          return "微信支付";
+        case "offline":
+          return "线下支付";
+        default:
+          return null;
+      }
+    },
+    methodFormatter(value, row, index) {
+      switch (value) {
+        case "cash":
+          return "现金";
+        case "bankcard":
+          return "银行卡";
+        case "mobilepayment":
+          return "移动支付"
+        default:
+          return null;
+      }
+    },
+    actionFormatter(value, row, index) {
+      return [
+        '<div class="btn-group btn-group-xs" role="group">',
+        ['<a role="button" class="text-danger delete-payment" title="撤消缴费">',
+          '<i class="glyphicon glyphicon-trash"></i>',
+          '</a>'].join(""),
+        '</div>'
+      ].join('');
+    },
+    confirmDeletePayment(e, value, row, index) {
+      this.$refs.confirmDeletePaymentDialog.show(row._id);
+    },
+    deletePayment(paymentId) {
+      var request = serviceUtil.deleteJSON("/api/payments/" + paymentId);
+      request.done((data, textStatus, jqXHR) => {
+        this.refresh();
+        this.$refs.paymentTable.refresh();
+        //TODO, show success tip
+      });
+    },
     notImplement() {
       alert("该功能不支持");
     },
@@ -296,28 +397,36 @@ module.exports = {
       this.$refs.payDialog.show();
     },
     pay(payment) {
-      console.log(payment);
+      payment.contractId = this.contractId;
+      payment.memberId = this.memberData._id;
+      var request = serviceUtil.postJSON("/api/payments", payment);
+      request.done((data, textStatus, jqXHR) => {
+        this.refresh();
+        this.$refs.paymentTable.refresh();
+        //TODO, show success tip
+      });
     },
     modifyContract() {
-      var vm = this;
       var updatedContract = {
 
       };
       var request = serviceUtil.patchJSON("/api/contracts/" + this.contractId, updatedContract);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.contract = this.data || {};
+      request.done((data, textStatus, jqXHR) => {
+        this.contract = this.data || {};
       });
+    },
+    refresh() {
+      if (this.contractId) {
+        var request = serviceUtil.getJSON("/api/contracts/" + this.contractId);
+        request.done((data, textStatus, jqXHR) => {
+          this.contract = data || {};
+        });
+      }
     }
   },
   created() {
-    var vm = this;
-    vm.tenantConfig = _getTenantConfig();
-    if (this.contractId) {
-      var request = serviceUtil.getJSON("/api/contracts/" + this.contractId);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.contract = data || {};
-      });
-    }
+    this.tenantConfig = _getTenantConfig();
+    this.refresh();
   },
   mounted() {
     $('[data-toggle="tooltip"]').tooltip();
