@@ -13,119 +13,119 @@ div
     button.btn.btn-default(type="button" style="float: right" disabled @click="") 转课时
     button.btn.btn-default.me-3(type="button" style="float: right" disabled @click="") 退费
     button.btn.btn-primary.me-3(type="button" style="float: right" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
-  div.row
-    div.col-sm-4
-      form.form-horizontal.form-condensed
+  div.row.form-condensed
+    div.col-sm-4.col-xs-6
+      form.form-horizontal
         div.form-group
-          label.col-sm-4.control-label 类型:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 类型:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.type | typeFilter }}
               span.label.label-primary.ms-3 课时卡
         div.form-group
-          label.col-sm-4.control-label 签约日期:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 签约日期:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.signDate | dateFilter }}
         div.form-group
-          label.col-sm-4.control-label 生效日期:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 生效日期:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.effectiveDate | dateFilter }}
               a(role="button" @click="notImplement")
                 i.glyphicon.glyphicon-pencil.ms-3
         div.form-group
-          label.col-sm-4.control-label 截止日期:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 截止日期:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.expireDate | dateFilter }}
               a(role="button" @click="notImplement")
                 i.glyphicon.glyphicon-pencil.ms-3
-    div.col-sm-4
-      form.form-horizontal.form-condensed
+    div.col-sm-4.col-xs-6
+      form.form-horizontal
         div.form-group
-          label.col-sm-4.control-label 剩余课时:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static TBD课时
         div.form-group
-          label.col-sm-4.control-label 剩余金额:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 剩余金额:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static TBD元
         div.form-group
-          label.col-sm-4.control-label 已消课时:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 已消课时:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static TBD课时
               a.small.ms-3(role="button") 消课记录
                 i.glyphicon.glyphicon-search
         div.form-group
-          label.col-sm-4.control-label 已消金额:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static TBD元
-    div.col-sm-4
-      form.form-horizontal.form-condensed
+    div.col-sm-4.col-xs-6
+      form.form-horizontal
         div.form-group
-          label.col-sm-4.control-label 应收金额:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 应收金额:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ receivable }}元
         div.form-group
-          label.col-sm-4.control-label 实收金额:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 实收金额:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.received / 100 }}元
               a.small.ms-3(role="button") 缴费记录
                 i.glyphicon.glyphicon-search
         div.form-group
-          label.col-sm-4.control-label 欠费金额:
-          div.col-sm-8(:class="{ 'text-danger': outstandingFee }")
+          label.col-xs-6.col-sm-5.col-md-4.control-label 欠费金额:
+          div.col-xs-6.col-sm-7.col-md-8(:class="{ 'text-danger': outstandingFee }")
             p.form-control-static {{ outstandingFee }}元
   div.page-header
     h3 合约课程
   div.row.form-condensed
-    div.col-sm-4
-      form.form-horizontal.form-condensed
+    div.col-sm-4.col-xs-6
+      form.form-horizontal
         div.form-group
-          label.col-sm-4.control-label 合约编号:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 合约编号:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.serialNo }}
         div.form-group
-          label.col-sm-4.control-label 学员:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 学员:
+          div.col-xs-6.col-sm-7.col-md-8
             div.input-group
               p.form-control-static {{ memberData.name }}
                 a(:href="'../member/' + contract.memberId" target="_blank")
                   i.glyphicon.glyphicon-search.ms-3
         div.form-group
-          label.col-sm-4.control-label 联系方式:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 联系方式:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ memberData.contact }}
-    div.col-sm-4
+    div.col-sm-4.col-xs-6
       form.form-horizontal
         div.form-group
-          label.col-sm-4.control-label 课程:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 课程:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ productName }}
         div.form-group
-          label.col-sm-4.control-label 合约课时:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 合约课时:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.credit }}课时
               a(role="button" @click="notImplement")
                 i.glyphicon.glyphicon-pencil.ms-3
         div.form-group
-          label.col-sm-4.control-label 课程单价:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 课程单价:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ averageFee }}课时
         div.form-group
-          label.col-sm-4.control-label 课程金额:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 课程金额:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ totalFee }}元
               a(role="button" @click="notImplement")
                 i.glyphicon.glyphicon-pencil.ms-3
-    div.col-sm-4
+    div.col-sm-4.col-xs-6
       form.form-horizontal
         div.form-group
-          label.col-sm-4.control-label 系统外耗课:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 系统外耗课:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.expendedCredit }}课时
               a.small.ms-3(style="color: #777" data-toggle="tooltip" title="系统外消耗课时是指使用系统前(合同签约前)上了的课时，例如：合约中有100课时，系统外耗课20课时，则实际可以使用的课时为80课时")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
-          label.col-sm-4.control-label 折扣直减:
-          div.col-sm-8
+          label.col-xs-6.col-sm-5.col-md-4.control-label 折扣直减:
+          div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ discountFee }}元
               a(role="button" @click="notImplement")
                 i.glyphicon.glyphicon-pencil.ms-3
@@ -427,5 +427,15 @@ module.exports = {
 <style lang="less">
 .container .page-header {
   padding-bottom: 3px;
+}
+.form-horizontal .control-label {
+  padding-top: 7px;
+  padding-right: 0;
+  margin-bottom: 0;
+  text-align: right;
+}
+
+.form-horizontal .form-group > div {
+  padding-right: 0;
 }
 </style>
