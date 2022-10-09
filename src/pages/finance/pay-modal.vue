@@ -37,7 +37,7 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
       div.form-group(:class="{ 'has-error': errors.comment }")
         label.col-sm-3.control-label 缴费备注:
         div.col-sm-9
-          textarea.form-control(rows="3" placeholder="添加缴费备注" name="note" v-model.trim="payment.comment" style="resize: vertical; min-height: 70px")
+          textarea.form-control.has-3-rows(rows="3" placeholder="添加缴费备注" name="note" v-model.trim="payment.comment")
           span.help-block.ms-3.small 最多256个字，缴费备注提交后无法修改
 </template>
 
