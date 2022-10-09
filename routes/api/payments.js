@@ -118,6 +118,15 @@ router.get('/', async function(req, res, next) {
         query.payDate = { $lt: new Date(req.query.to) };
     }
 
+    // query payments by contractId
+    let contractId = req.query.contractId || "";
+    if (contractId) {
+        if (!ObjectId.isValid(req.query.contractId)) {
+            return next(new ParamError(`Invalid contractId ${req.query.contractId}`));
+        }
+        query['contractId'] = ObjectId(req.query.contractId);
+    }
+
     // support paginzation
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
