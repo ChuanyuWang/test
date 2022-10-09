@@ -9,6 +9,7 @@ div
   div.page-header
     h3(style="margin-top: 0; display: inline-block") 合约信息
     button.btn.btn-success(type="button" style="float: right", :disabled="hasError" @click="createContract") 确定
+    a.btn.btn-default.me-3(type="button" style="float: right" href="../finance" @click="createContract") 取消
   div.row
     div.col-sm-6
       form.form-horizontal
