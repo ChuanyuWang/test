@@ -213,12 +213,14 @@ router.get('/:contractID', async function(req, res, next) {
             projection: NORMAL_FIELDS
         });
 
+        if (!doc) {
+            return next(new ParamError("contract doesn't exist"));
+        }
+
         console.log("find contract %j", doc);
         res.json(doc);
     } catch (error) {
-        var err = new Error("get contract fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("get contract fails", error));
     }
 });
 
@@ -314,17 +316,18 @@ router.post('/:contractID/comments', async function(req, res, next) {
             returnDocument: "after"
         });
 
+        if (!result) {
+            return next(new ParamError("contract doesn't exist"));
+        }
+
         console.log(`add comment ${req.body.text} to contract ${req.params.contractID}`);
-        res.json(result.value);
+        res.json(result.value.comments || []);
     } catch (error) {
-        var err = new Error("add comment fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("add comment fails", error));
     }
 });
 
 router.get('/:contractID/comments', async function(req, res, next) {
-
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
@@ -334,12 +337,35 @@ router.get('/:contractID/comments', async function(req, res, next) {
             projection: { comments: 1 }
         });
 
+        if (!doc) {
+            return next(new ParamError("contract doesn't exist"));
+        }
+
         console.log(`query comments from contract ${req.params.contractID}`);
-        res.json(doc);
+        res.json(doc.comments || []);
     } catch (error) {
-        var err = new Error("get contract's comments fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("get contract's comments fails", error));
+    }
+});
+
+router.get('/:contractID/history', async function(req, res, next) {
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+        let doc = await contracts.findOne({
+            _id: ObjectId(req.params.contractID)
+        }, {
+            projection: { history: 1 }
+        });
+
+        if (!doc) {
+            return next(new ParamError("contract doesn't exist"));
+        }
+
+        console.log(`query history from contract ${req.params.contractID}`);
+        res.json(doc.history || []);
+    } catch (error) {
+        return next(new RuntimeError("get contract's history fails", error));
     }
 });
 

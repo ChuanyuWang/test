@@ -71,7 +71,7 @@ module.exports = {
       this.comment = "";
       var request = serviceUtil.postJSON("/api/contracts/" + this.contractId + "/comments", item);
       request.done((data, textStatus, jqXHR) => {
-        this.comments = data.comments || [];
+        this.comments = data || [];
       });
     }
   },
@@ -79,7 +79,7 @@ module.exports = {
     if (this.contractId) {
       var request = serviceUtil.getJSON("/api/contracts/" + this.contractId + "/comments");
       request.done((data, textStatus, jqXHR) => {
-        this.comments = data.comments || [];
+        this.comments = data || [];
       });
     }
   },
@@ -87,4 +87,5 @@ module.exports = {
 }
 </script>
 <style lang="less">
+
 </style>
