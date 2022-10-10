@@ -80,6 +80,20 @@ module.exports = {
         }
     },
     /**
+     * Datatime fomatter function of bootstrap-table to format date localized string by 'lll', e.g. 2022年10月11日 00:36
+     * 
+     * @param {Object} value the field value
+     * @param {Object} row the row record data
+     * @param {Number} index the row index
+     */
+    datetimeFormatter: function(value, row, index) {
+        if (value) {
+            return moment(value).format('lll');
+        } else {
+            return undefined;
+        }
+    },
+    /**
      * CNY fomatter function of bootstrap-table to format money amount, e.g. 8000元
      * 
      * @param {Object} value the field value
