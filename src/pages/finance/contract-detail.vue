@@ -21,6 +21,8 @@ div
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.type | typeFilter }}
               span.label.label-primary.ms-3 课时卡
+              a(role="button" @click="openModifyDialog")
+                i.glyphicon.glyphicon-pencil.ms-3
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 签约日期:
           div.col-xs-6.col-sm-7.col-md-8
@@ -29,13 +31,13 @@ div
           label.col-xs-6.col-sm-5.col-md-4.control-label 生效日期:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.effectiveDate | dateFilter }}
-              a(role="button" @click="notImplement")
+              a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 截止日期:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.expireDate | dateFilter }}
-              a(role="button" @click="notImplement")
+              a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
     div.col-sm-4.col-xs-6
       form.form-horizontal
@@ -103,7 +105,7 @@ div
           label.col-xs-6.col-sm-5.col-md-4.control-label 合约课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.credit }}课时
-              a(role="button" @click="notImplement")
+              a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 课程单价:
@@ -113,7 +115,7 @@ div
           label.col-xs-6.col-sm-5.col-md-4.control-label 课程金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ totalFee }}元
-              a(role="button" @click="notImplement")
+              a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
     div.col-sm-4.col-xs-6
       form.form-horizontal
@@ -127,7 +129,7 @@ div
           label.col-xs-6.col-sm-5.col-md-4.control-label 折扣直减:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ discountFee }}元
-              a(role="button" @click="notImplement")
+              a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
   contract-comments(:contractId="contractId")
   div.page-header
@@ -140,10 +142,11 @@ div
       div#paymentToolbar
       bootstrap-table(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
   div.page-header
-    h3 消课记录
-  div.page-header
     h3 修改记录
+  div.page-header
+    h3 消课记录
   pay-dialog(ref="payDialog" buttons="confirm" @ok="pay", :outstandingFee="outstandingFee")
+  modify-contract-dialog(ref="modifyDialog" @ok="modifyContract" :contract="contract")
   modal-dialog(ref="confirmDeletePaymentDialog" buttons="confirm" @ok="deletePayment") 删除缴费记录
     template(v-slot:body)
       p 确认删除并撤销缴费吗？
@@ -158,6 +161,7 @@ var messageAlert = require("../../components/message-alert.vue").default;
 var serviceUtil = require("../../services/util");
 var commonUtil = require("../../common/common");
 var contractComments = require("./contract-comments.vue").default;
+var modifyContractDialog = require("./modify-contract-modal.vue").default;
 
 module.exports = {
   name: "contract-detail",
@@ -169,6 +173,7 @@ module.exports = {
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
     "contract-comments": contractComments,
+    "modify-contract-dialog": modifyContractDialog,
     "message-alert": messageAlert,
     "date-picker": require('../../components/date-picker.vue').default,
     "modal-dialog": require("../../components/modal-dialog.vue").default,
@@ -230,55 +235,21 @@ module.exports = {
       var value = this.contract.total - this.contract.discount;
       return value > 0 ? Math.round(value) / 100 : 0;
     },
-    averageFee: {
-      get() {
-        var value = this.contract.credit > 0 ? this.contract.total / this.contract.credit : 0
-        return Math.round(value) / 100;
-      },
-      set(newValue) {
-        var total = this.contract.credit > 0 ? newValue * this.contract.credit : 0;
-        this.contract.total = Math.round(total * 100);
-      }
+    averageFee() {
+      var value = this.contract.credit > 0 ? this.contract.total / this.contract.credit : 0
+      return Math.round(value) / 100;
     },
-    totalFee: {
-      get() {
-        return Math.round(this.contract.total) / 100;
-      },
-      set(newValue) {
-        this.contract.total = Math.round(newValue * 100);
-      }
+    totalFee() {
+      return Math.round(this.contract.total) / 100;
     },
-    discountFee: {
-      get() {
-        return Math.round(this.contract.discount) / 100;
-      },
-      set(newValue) {
-        this.contract.discount = Math.round(newValue * 100);
-      }
+    discountFee() {
+      return Math.round(this.contract.discount) / 100;
     },
     outstandingFee() {
       return (this.contract.total - this.contract.discount - this.contract.received) / 100;
     },
     errors() {
       var errors = {};
-      if (!moment(this.contract.effectiveDate).isValid())
-        errors.effectiveDate = "生效日期未设置或格式不正常";
-      if (moment(this.contract.expireDate).isValid() && moment(this.contract.expireDate).isBefore(this.contract.effectiveDate))
-        errors.expireDate = "截止日期不能早于生效日期";
-      if (this.contract.credit <= 0)
-        errors.credit = "课时数不能小于零";
-      if (this.averageFee < 0)
-        errors.averageFee = "课程单价不能小于零";
-      if (this.contract.total < 0)
-        errors.total = "课程金额不能小于零";
-      if (this.contract.discount < 0)
-        errors.discount = "折扣金额不能小于零";
-      if (this.contract.discount > 0 && this.contract.total < this.contract.discount)
-        errors.discount = "折扣金额不能大于课程金额";
-      if (this.contract.expendedCredit < 0)
-        errors.expendedCredit = "已耗课时不能小于零";
-      if (this.contract.expendedCredit > 0 && this.contract.credit < this.contract.expendedCredit)
-        errors.expendedCredit = "已耗课时不能大于课时数";
       return errors;
     },
     hasError() {
@@ -334,11 +305,8 @@ module.exports = {
     },
   },
   methods: {
-    test() {
-      console.log(this.contract.expireDate);
-      console.log(this.contract.signDate);
-      console.log(moment(this.contract.expireDate).isValid() ? this.contract.expireDate.toISOString() : null);
-      console.log(moment(this.contract.signDate).isValid() ? this.contract.signDate.toISOString() : null);
+    openModifyDialog() {
+      this.$refs.modifyDialog.show();
     },
     customQuery(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
@@ -403,13 +371,11 @@ module.exports = {
         this.$refs.messager.showSuccessMessage("成功缴费");
       });
     },
-    modifyContract() {
-      var updatedContract = {
-
-      };
+    modifyContract(updatedContract) {
       var request = serviceUtil.patchJSON("/api/contracts/" + this.contractId, updatedContract);
       request.done((data, textStatus, jqXHR) => {
-        this.contract = this.data || {};
+        this.contract = data || {};
+        //TODO, refresh history table
       });
     },
     refresh() {
@@ -434,6 +400,7 @@ module.exports = {
 .container .page-header {
   padding-bottom: 3px;
 }
+
 .form-condensed .form-horizontal .control-label {
   padding-top: 7px;
   padding-right: 0;
@@ -441,7 +408,7 @@ module.exports = {
   text-align: right;
 }
 
-.form-condensed .form-horizontal .form-group > div {
+.form-condensed .form-horizontal .form-group>div {
   padding-right: 0;
 }
 </style>
