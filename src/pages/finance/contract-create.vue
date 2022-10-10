@@ -33,7 +33,7 @@ div
         div.form-group
           label.col-sm-4.col-md-3.control-label 类型:
           div.col-sm-4.col-md-3
-            select.col-sm-5.form-control(v-model="contract.type" @change="")
+            select.col-sm-5.form-control(v-model="contract.type")
               option.text-default(value="new") 新签
               option.text-default(value="renewal") 续费
               option.text-default(value="donate") 赠送
