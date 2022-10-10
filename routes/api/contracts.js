@@ -3,6 +3,8 @@ const router = express.Router();
 const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
+const { RuntimeError, ParamError } = require('./lib/basis');
+const { isEqual } = require('./lib/util');
 const moment = require('moment');
 
 /**
@@ -28,19 +30,25 @@ const moment = require('moment');
  *  lastUpdate: Date,
  *  clientip: String,
  *  comments: [{
- *      {
- *          posted: Date,
- *          updated: Date,
- *          text: String,
- *          author: String
- *      }
- *  }]
+ *      posted: Date,
+ *      updated: Date,
+ *      text: String,
+ *      author: String
+ *  }],
+ *  history: [{
+ *      date: Date,
+ *      user: String,
+ *      old: any,
+ *      new: any,
+ *      remark: String
+ *  }],
  * }
  * 
  */
 
 var NORMAL_FIELDS = {
-    comments: 0
+    comments: 0,
+    history: 0
 };
 
 router.use(helper.isAuthenticated);
@@ -59,7 +67,7 @@ router.post('/', helper.requireRole("admin"), validateContract, async function(r
         expendedCredit: req.body.expendedCredit || 0,
         total: parseInt(req.body.total),
         discount: parseInt(req.body.discount) || 0,
-        //receivable: parseInt(req.body.receivable),
+        //receivable: parseInt(req.body.receivable), //not necessary
         received: 0,
         createDate: new Date(req.body.createDate),
         effectiveDate: req.body.effectiveDate ? new Date(req.body.effectiveDate) : null,
@@ -214,11 +222,44 @@ router.get('/:contractID', async function(req, res, next) {
     }
 });
 
-router.patch('/:contractID', helper.requireRole("admin"), function(req, res, next) {
-    return next(new Error("Not Implemented"));
+router.patch('/:contractID', helper.requireRole("admin"), async function(req, res, next) {
+    try {
+        //TODO, validate content body
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+        let doc = await contracts.findOne({
+            _id: ObjectId(req.params.contractID)
+        }, { projection: NORMAL_FIELDS });
+
+        if (!doc) {
+            return next(new ParamError("contract doesn't exist"));
+        }
+
+        let remark = req.body.comment || "";
+        // remove comment before further proceed
+        delete req.body.comment;
+        let newValueSet = getUpdatedValueSet(doc, req.body);
+        let historyItem = buildHistoryRecord(doc, newValueSet, remark);
+        historyItem.user = req.user.username;
+
+        let result = await contracts.findOneAndUpdate({
+            _id: doc._id,
+        }, {
+            $set: newValueSet,
+            $push: { history: historyItem }
+        }, {
+            projection: NORMAL_FIELDS,
+            returnDocument: "after"
+        });
+        console.log("update contract by %j", newValueSet);
+        res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("modify contract fails", error));
+    }
 });
 
 router.delete('/:contractID', helper.requireRole("admin"), async function(req, res, next) {
+    //TODO, only contract without payments or classes can be deleted.
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
@@ -311,16 +352,11 @@ async function validateContract(req, res, next) {
         let members = tenantDB.collection("members");
         let doc = await members.findOne(query, { projection: { name: 1, contact: 1 } });
         if (!doc) {
-            let error = new Error("无法找到学员信息，请先注册/登录");
-            error.status = 400;
-            return next(error);
+            return next(new ParamError("member doesn't exist"));
         }
-        res.locals.member = doc;
         return next();
     } catch (error) {
-        let err = new Error("Find member fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("find member fails", error));
     }
 }
 
@@ -328,14 +364,6 @@ class ContractError extends Error {
     constructor(message) {
         super(message);
         this.name = "Contract API Error";
-    }
-}
-
-class ParamError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = "Invalid Parameter Error";
-        this.status = 400;
     }
 }
 
@@ -366,6 +394,44 @@ async function generateContractNo(developmentMode) {
         err.innerError = error;
         throw err;
     }
+}
+
+function buildHistoryRecord(oldDoc, newValueSet, remark) {
+    let oldValueSet = {};
+    for (let key in newValueSet) {
+        if (oldDoc.hasOwnProperty(key)) {
+            oldValueSet[key] = oldDoc[key];
+        } else {
+            oldValueSet[key] = null;
+        }
+    }
+    return {
+        date: new Date(),
+        //user: req.user.username,
+        old: oldValueSet,
+        new: newValueSet,
+        remark: remark
+    };
+}
+
+function getUpdatedValueSet(oldDoc, newDoc) {
+    let newValueSet = {};
+    let newItem = newDoc || {};
+    //TODO, validate request body according to schema
+    if (newItem.hasOwnProperty("effectiveDate") && newItem.effectiveDate) {
+        newItem.effectiveDate = new Date(newItem.effectiveDate);
+    }
+    if (newItem.hasOwnProperty("expireDate") && newItem.expireDate) {
+        newItem.expireDate = new Date(newItem.expireDate);
+    }
+    for (let key in newItem) {
+        if (oldDoc.hasOwnProperty(key) && isEqual(oldDoc[key], newItem[key])) {
+            // skip update of this field when it's the same
+            continue;
+        }
+        newValueSet[key] = newItem[key];
+    }
+    return newValueSet;
 }
 
 module.exports = router;
