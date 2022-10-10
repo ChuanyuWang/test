@@ -141,8 +141,7 @@ div
     div.col-sm-12
       div#paymentToolbar
       bootstrap-table(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
-  div.page-header
-    h3 修改记录
+  contract-history(ref="historySection" :contractId="contractId")
   div.page-header
     h3 消课记录
   pay-dialog(ref="payDialog" buttons="confirm" @ok="pay", :outstandingFee="outstandingFee")
@@ -161,6 +160,7 @@ var messageAlert = require("../../components/message-alert.vue").default;
 var serviceUtil = require("../../services/util");
 var commonUtil = require("../../common/common");
 var contractComments = require("./contract-comments.vue").default;
+var contractHistory = require("./contract-history.vue").default;
 var modifyContractDialog = require("./modify-contract-modal.vue").default;
 
 module.exports = {
@@ -173,6 +173,7 @@ module.exports = {
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
     "contract-comments": contractComments,
+    "contract-history": contractHistory,
     "modify-contract-dialog": modifyContractDialog,
     "message-alert": messageAlert,
     "date-picker": require('../../components/date-picker.vue').default,
@@ -355,9 +356,6 @@ module.exports = {
         this.$refs.messager.showSuccessMessage("缴费记录已经删除");
       });
     },
-    notImplement() {
-      this.$refs.messager.showErrorMessage("该功能不支持");
-    },
     openPayDialog() {
       this.$refs.payDialog.show();
     },
@@ -375,7 +373,8 @@ module.exports = {
       var request = serviceUtil.patchJSON("/api/contracts/" + this.contractId, updatedContract);
       request.done((data, textStatus, jqXHR) => {
         this.contract = data || {};
-        //TODO, refresh history table
+        this.$refs.historySection.refresh();
+        this.$refs.messager.showSuccessMessage("修改完成");
       });
     },
     refresh() {
