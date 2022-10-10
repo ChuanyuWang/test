@@ -47,3 +47,15 @@ exports.sign2 = function(params, key) {
 
     return Hex.stringify(HmacSHA256(querystring, key)).toUpperCase();
 }
+
+exports.isEqual = function(a, b) {
+    if (a === b) return true;
+    if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
+    if (a instanceof Array && b instanceof Array) {
+        if (a.length != b.length) return false;
+        else return a.every(function(u, i) {
+            return u == b[i];
+        });
+    }
+    return a == b;
+}
