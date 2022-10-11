@@ -16,8 +16,11 @@ util.showAlert = function(title, jqXHR, className) {
     // the returned json body should have a message property to indicate the error
     var errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
     console.error(errorMsg);
-    //if (bootbox) {// still throw error via vue.eval
-    if (typeof bootbox !== "undefined") {
+
+    if (typeof Vue.prototype.$messager !== "undefined") {
+        Vue.prototype.$messager.showErrorMessage(errorMsg);
+    } else if (typeof bootbox !== "undefined") {
+        //if (bootbox) {// still throw error via vue.eval
         bootbox.alert({
             message: errorMsg,
             title: title || '错误',
