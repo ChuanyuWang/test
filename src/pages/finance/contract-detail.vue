@@ -140,7 +140,7 @@ div.container
   div.row
     div.col-sm-12
       div#paymentToolbar
-      bootstrap-table(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
+      bootstrap-table.table-striped(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
   contract-history(ref="historySection" :contractId="contractId")
   div.page-header
     h3 消课记录

@@ -8,7 +8,7 @@ div
   div.row
     div.col-sm-12
       div#historyToolbar
-      bootstrap-table(ref="historyTable", :columns="historyTableColumns", :options="historyTableOptions")
+      bootstrap-table.table-striped(ref="historyTable", :columns="historyTableColumns", :options="historyTableOptions")
 </template>
 <script>
 
@@ -79,7 +79,7 @@ module.exports = {
     refresh() {
       this.$refs.historyTable.refresh();
     },
-    dateFormatter: function(value, row, index) {
+    dateFormatter(value, row, index) {
       if (value) {
         return moment(value).format('ll');
       } else {
