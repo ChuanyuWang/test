@@ -121,6 +121,7 @@ div.container
           textarea.form-control(rows='3', name='comment',placeholder='备注修改会员卡的原因（选填）',v-model='toBeSavedMemo')
           small(style='color:#777;float:right;margin-top:2px') 不超过256个字，添加到备忘和充值记录备注中
     template(v-slot:action) 保存
+  message-alert(ref="messager")
 </template>
 
 <script>
@@ -133,6 +134,7 @@ var cardComp = require('./card.vue').default;
 var date_picker = require('../../components/date-picker.vue').default;
 var modalDialog = require("../../components/modal-dialog.vue").default;
 var comment_dlg = require('./comment-modal.vue').default;
+var messageAlert = require("../../components/message-alert.vue").default;
 var common = require('../../common/common');
 var memberService = require('../../services/members');
 var class_service = require('../../services/classes');
@@ -151,7 +153,8 @@ module.exports = {
     "card": cardComp,
     "date-picker": date_picker,
     "modal-dialog": modalDialog,
-    "comment-modal": comment_dlg
+    "comment-modal": comment_dlg,
+    "message-alert": messageAlert
   },
   data: function() {
     var tenantSetting = common.getTenantSetting();
@@ -295,8 +298,8 @@ module.exports = {
         note: this.memberData.note,
         birthday: this.memberData.birthday && moment(this.memberData.birthday).toISOString()
       });
-      request.done(function(data, textStatus, jqXHR) {
-        bootbox.alert('会员基本资料更新成功');
+      request.done((data, textStatus, jqXHR) => {
+        this.$refs.messager.showSuccessMessage("会员基本资料更新成功");
       });
     },
     saveCardInfo: function(card, index) {
@@ -307,34 +310,25 @@ module.exports = {
       this.$refs.historyCommentDlg.show(this.toBeSavedMembershipIndex);
     },
     updateMembership: function(index) {
-      var vm = this;
       // append the memo for this change if there is any
       this.toBeSavedMembership.memo = this.toBeSavedMemo.trim();
       if (index > -1) {
         var request = memberService.updateCard(this.memberData._id, index, this.toBeSavedMembership);
-        request.done(function(data, textStatus, jqXHR) {
-          bootbox.alert('会员卡更新成功');
-          Vue.set(vm.memberData.membership, index, data.membership[index]);
+        request.done((data, textStatus, jqXHR) => {
+          this.$refs.messager.showSuccessMessage("会员卡更新成功");
+          Vue.set(this.memberData.membership, index, data.membership[index]);
         });
       } else {
         var request = memberService.createCard(this.memberData._id, this.toBeSavedMembership);
-        request.done(function(data, textStatus, jqXHR) {
-          bootbox.alert('会员卡创建成功');
-          vm.memberData.membership = data.membership;
+        request.done((data, textStatus, jqXHR) => {
+          this.$refs.messager.showSuccessMessage("会员卡创建成功");
+          this.memberData.membership = data.membership;
         });
       }
     },
     deactivateAlert: function(e) {
       if (this.memberData.status == 'inactive') {
-        bootbox.alert({
-          message: "未激活会员将无法进行自助预约<br><small>确定后，请点击保存进行修改</small>",
-          buttons: {
-            ok: {
-              label: "确定",
-              className: "btn-danger"
-            }
-          }
-        });
+        this.$refs.messager.showWarningMessage("未激活会员将无法进行自助预约，请点击<strong>保存</strong>按钮确定修改");
       }
     },
     addComment: function() {
@@ -521,21 +515,17 @@ module.exports = {
     this.tenantConfig = _getTenantConfig();
   },
   mounted: function() {
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     // 'this' is refer to vm instance
     var vm = this;
     // load member data
     var request = memberService.getMemberInfo(this.memberId);
-    request.done(function(data, textStatus, jqXHR) {
+    request.done((data, textStatus, jqXHR) => {
       if (data) {
-        vm.memberData = data || {};
+        this.memberData = data || {};
       } else {
-        // member not existed
-        bootbox.alert({
-          message: "查看的学员不存在",
-          buttons: {
-            ok: { className: "btn-danger" }
-          }
-        });
+        this.$refs.messager.showErrorMessage("查看的学员不存在");
       }
     });
 
