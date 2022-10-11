@@ -50,7 +50,7 @@ div.container
   template(v-if='memberData.membership&&memberData.membership.length')
     card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='tenantConfig.classrooms')
   template(v-else)
-    card(@save="saveCardInfo",:item='{credit:0,room:[],type:"ALL"}',:index=-1,key='-1',:classrooms='tenantConfig.classrooms')
+    card(@save="saveCardInfo" :item='{credit:0,room:[],type:"ALL"}' :index=-1,key='-1' :classrooms='tenantConfig.classrooms')
   div.page-header
     h3 {{$t('course_summary_title')}}
   table.table.table-bordered.table-striped
@@ -140,7 +140,12 @@ var class_service = require('../../services/classes');
 
 module.exports = {
   name: "member-view",
-  props: {},
+  props: {
+    appData: {
+      type: String, // should be member id
+      require: true
+    }
+  },
   components: {
     "BootstrapTable": BootstrapTable,
     "card": cardComp,
@@ -239,6 +244,9 @@ module.exports = {
     };
   },
   computed: {
+    memberId() {
+      return this.appData;
+    },
     commentCount: function() {
       return this.memberData.comments ? this.memberData.comments.length : 0;
     },
@@ -515,9 +523,8 @@ module.exports = {
   mounted: function() {
     // 'this' is refer to vm instance
     var vm = this;
-    var member_id = $('#memberID').data('member-id');
     // load member data
-    var request = memberService.getMemberInfo(member_id);
+    var request = memberService.getMemberInfo(this.memberId);
     request.done(function(data, textStatus, jqXHR) {
       if (data) {
         vm.memberData = data || {};
@@ -534,12 +541,12 @@ module.exports = {
 
     request.done(function(data, textStatus, jqXHR) {
       if (!data) return; // member not existed
-      var commentRequest = memberService.getMemberComments(member_id);
+      var commentRequest = memberService.getMemberComments(vm.memberId);
       commentRequest.done(function(data, textStatus, jqXHR) {
         vm.comments = data.comments;
       });
       // load the member's course summary
-      var summaryRequest = memberService.getMemberSummary(member_id);
+      var summaryRequest = memberService.getMemberSummary(vm.memberId);
       summaryRequest.done(function(data, textStatus, jqXHR) {
         vm.summary = data;
       });
@@ -553,6 +560,7 @@ module.exports = {
   margin: 15px 0;
   padding-bottom: 3px;
 }
+
 .container .page-header span:hover {
   transition: all 0.5s ease-in-out;
   transform: rotate(360deg);

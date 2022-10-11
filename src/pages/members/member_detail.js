@@ -13,8 +13,7 @@ $(document).ready(function() {
 
     new Vue({
         el: '#app',
-        components: { memberDetail },
-        template: '<member-detail/>'
+        components: { app: memberDetail }
     });
 });
 
@@ -23,6 +22,6 @@ $(document).ready(function() {
 function init() {
     console.log("init view member ~~~");
     moment.locale('zh-CN');
-    bootbox.setLocale('zh_CN');
+    //bootbox.setLocale('zh_CN');
     Vue.use(i18nextplugin);
 }
