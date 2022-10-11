@@ -31,7 +31,10 @@ var serviceUtil = require("../../services/util");
 module.exports = {
   name: "contract-comments",
   props: {
-    contractId: String
+    contractId: {
+      type: String,
+      require: true
+    }
   },
   components: {
     "modal-dialog": require("../../components/modal-dialog.vue").default

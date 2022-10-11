@@ -166,7 +166,10 @@ var modifyContractDialog = require("./modify-contract-modal.vue").default;
 module.exports = {
   name: "contract-detail",
   props: {
-    contractId: String
+    contractId: {
+      type: String,
+      require: true
+    }
   },
   components: {
     "BootstrapTable": BootstrapTable,
