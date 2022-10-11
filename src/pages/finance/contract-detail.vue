@@ -1,5 +1,5 @@
 <template lang="pug">
-div
+div.container
   ol.breadcrumb
     li
       a(href="../home") 主页
