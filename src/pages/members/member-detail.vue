@@ -51,6 +51,7 @@ div.container
     card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='tenantConfig.classrooms')
   template(v-else)
     card(@save="saveCardInfo" :item='{credit:0,room:[],type:"ALL"}' :index=-1,key='-1' :classrooms='tenantConfig.classrooms')
+  member-contracts(:memberId="memberId")
   div.page-header
     h3 {{$t('course_summary_title')}}
   table.table.table-bordered.table-striped
@@ -138,6 +139,7 @@ var messageAlert = require("../../components/message-alert.vue").default;
 var common = require('../../common/common');
 var memberService = require('../../services/members');
 var class_service = require('../../services/classes');
+var memberContracts = require("./member-contracts.vue").default;
 
 
 module.exports = {
@@ -154,7 +156,8 @@ module.exports = {
     "date-picker": date_picker,
     "modal-dialog": modalDialog,
     "comment-modal": comment_dlg,
-    "message-alert": messageAlert
+    "message-alert": messageAlert,
+    "member-contracts": memberContracts
   },
   data: function() {
     var tenantSetting = common.getTenantSetting();
