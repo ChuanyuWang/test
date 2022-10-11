@@ -14,8 +14,8 @@ append js
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
   script(src=CDN_FILES.bootstrap_table_vue)
-  script(src='/js/contract_detail.js')
+  script(src=entry_module)
 
 block page
   div.container(style={'padding-top': '69px'})
-    contract-detail#app(contract-id=contractID)
+    app#app(app-data=data)

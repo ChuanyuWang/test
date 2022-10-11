@@ -135,9 +135,10 @@ router.get('/contract/create', helper.checkTenantUser, function(req, res) {
 router.get('/contract/:contractID', helper.checkTenantUser, function(req, res, next) {
     // skip to 404 page if contract ID is not valid
     if (!ObjectId.isValid(req.params.contractID)) return next();
-    res.locals.contractID = req.params.contractID;
     res.render('bqsq/pages/contract-detail', {
         title: res.__('view_contract'),
+        entry_module: '/js/contract_detail.js',
+        data: req.params.contractID,
         user: req.user
     });
 });

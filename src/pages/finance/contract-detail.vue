@@ -166,8 +166,8 @@ var modifyContractDialog = require("./modify-contract-modal.vue").default;
 module.exports = {
   name: "contract-detail",
   props: {
-    contractId: {
-      type: String,
+    appData: {
+      type: String, // should be contract id
       require: true
     }
   },
@@ -235,6 +235,9 @@ module.exports = {
     }
   },
   computed: {
+    contractId() {
+      return this.appData;
+    },
     receivable() {
       var value = this.contract.total - this.contract.discount;
       return value > 0 ? Math.round(value) / 100 : 0;

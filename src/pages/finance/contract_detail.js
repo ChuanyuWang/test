@@ -12,8 +12,7 @@ $(document).ready(function() {
 
     new Vue({
         el: '#app',
-        components: { contractDetail }
-        //template: '<contract-detail/>',
+        components: { app: contractDetail }
     });
 });
 
