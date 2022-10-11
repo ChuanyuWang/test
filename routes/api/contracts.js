@@ -146,6 +146,12 @@ router.get('/', async function(req, res, next) {
         query['status'] = status;
     }
 
+    // query orders by member
+    let memberId = req.query.memberId || "";
+    if (memberId && ObjectId.isValid(memberId)) {
+        query['memberId'] = ObjectId(memberId);
+    }
+
     // support paginzation
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
