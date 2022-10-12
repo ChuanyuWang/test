@@ -8,6 +8,11 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
         h4.modal-title 添加课程到当前班级
       div.modal-body
         form.form-horizontal
+          div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
+            label.control-label.col-sm-2 类型:
+            div.col-sm-3
+              select.form-control(v-model="type")
+                option.text-default(v-for="item in types" :value="item.id") {{item.name}}
           div.form-group(:class='{"has-error": errors.name}')
             label.control-label.col-sm-2 名称:
             div.col-sm-5(:title="errors.name")
@@ -19,16 +24,18 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
                 date-picker(v-model='date',:config='dateFormat')
           div.form-group(:class='{"has-error": errors.cost}')
             label.control-label.col-sm-2 所须课时:
-            div.col-sm-2(:title="errors.cost")
+            div.col-sm-3(:title="errors.cost")
               input.form-control(type='number',name='cost',min='0',step='0.1',value=0,v-model.number='cost')
           div.form-group
             label.control-label.col-sm-2 教室:
-            select.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='room')
-              option(v-for='r in classrooms',:value='r.id') {{r.name}}
+            div.col-sm-3
+              select.form-control(v-model='room')
+                option(v-for='r in classrooms',:value='r.id') {{r.name}}
           div.form-group
             label.control-label.col-sm-2 老师:
-            select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='teacher')
-              option(v-for='t in teachers',:value='t._id') {{t.name}}
+            div.col-sm-3
+              select.form-control(v-model='teacher')
+                option(v-for='t in teachers',:value='t._id') {{t.name}}
             div.col-sm-offset-2.col-sm-10
               div.checkbox
                 label
@@ -65,6 +72,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
 
 var date_picker = require('../../components/date-picker.vue').default;
 var teacher_service = require('../../services/teachers');
+var serviceUtil = require("../../services/util");
 
 module.exports = {
   components: {
@@ -81,6 +89,7 @@ module.exports = {
   data: function() {
     return {
       name: this.defaultName || "",
+      type: "",
       date: moment(),
       begin: moment(),
       end: moment().add(1, 'week'),
@@ -89,13 +98,16 @@ module.exports = {
       weekdays: [],
       isRepeated: false,
       teacher: null, // selected teacher
-      teachers: [] // all active teachers
+      teachers: [], // all active teachers
+      types: [] // all class types
     };
   },
   watch: {},
   computed: {
     errors: function() {
       var errors = {};
+      if (!this.type || this.type.length == 0)
+        errors.type = '课程类型不能为空';
       if (!this.name || this.name.length == 0)
         errors.name = "名称不能为空";
       if (typeof (this.cost) !== 'number' || this.cost < 0)
@@ -145,9 +157,14 @@ module.exports = {
       all.push({ name: '<未指定>', _id: null });
       vm.teachers = all;
     });
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
+    });
   }
 };
 </script>
 
 <style lang='less'>
+
 </style>
