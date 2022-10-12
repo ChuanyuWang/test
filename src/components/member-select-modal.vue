@@ -1,26 +1,18 @@
 <template lang="pug">
-div.modal.fade(tabindex='-1',data-backdrop='static')
-  div.modal-dialog
-    div.modal-content
-      div.modal-header
-        button.close(type="button",data-dismiss="modal",aria-label="Close")
-          span(aria-hidden="true") &times
-        h4.modal-title {{$t('member_select_title')}}
-      div.modal-body
-        slot(name='toolbar')
-        table.member-table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
-          thead
-            tr
-              //th(data-field='_id',data-visible='false') ID
-              th(v-if='multiSelection',data-checkbox='true')
-              th(v-else,data-radio='true')
-              th(data-field='name',data-sortable='true') {{$t('member_name')}}
-              th(data-field='contact') {{$t('member_contact')}}
-              th(data-field='membership') 剩余课时
-      div.modal-footer
-        p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
-        button.btn.btn-default(type="button",data-dismiss="modal") {{$t('dialog_cancel')}}
-        button.btn.btn-success(type="button",@click='handleOK') {{$t('dialog_confirm')}}
+modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") {{$t('member_select_title')}}
+  template(v-slot:body)
+    slot(name='toolbar')
+    table.member-table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
+      thead
+        tr
+          //th(data-field='_id',data-visible='false') ID
+          th(v-if='multiSelection',data-checkbox='true')
+          th(v-else,data-radio='true')
+          th(data-field='name',data-sortable='true') {{$t('member_name')}}
+          th(data-field='contact') {{$t('member_contact')}}
+          th(data-field='membership') 剩余课时
+  template(v-slot:helpText)  
+    p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
 </template>
 
 <script>
@@ -29,6 +21,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  * member-select-modal.vue component for select one or multi members
  * --------------------------------------------------------------------------
  */
+var modalDialog = require("./modal-dialog.vue").default;
 
 module.exports = {
   props: {
@@ -40,12 +33,11 @@ module.exports = {
   data: function() {
     return {};
   },
-  watch: {
+  components: {
+    "modal-dialog": modalDialog
   },
-  computed: {
-  },
-  filters: {
-  },
+  computed: {},
+  filters: {},
   methods: {
     show: function(selectedIDs) {
       // clear existed selected items
@@ -61,8 +53,7 @@ module.exports = {
       }
       $(this.$el).modal('show');
     },
-    handleOK: function() {
-      $(this.$el).modal('hide');
+    clickOK: function() {
       var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
       this.$emit("ok", selections);
     },
@@ -96,4 +87,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
