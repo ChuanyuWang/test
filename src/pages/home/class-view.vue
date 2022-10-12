@@ -14,12 +14,12 @@ div.container
       form.form-horizontal
         div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
           label.control-label.col-sm-3.col-xs-4 类型:
-          div.col-sm-5.col-md-3.col-xs-8
+          div.col-sm-5.col-xs-8
             select.form-control(v-model="cls.type")
               option.text-default(v-for="item in types" :value="item.id") {{item.name}}
         div.form-group(:class='{"has-error": errors.name}')
           label.control-label.col-sm-3.col-xs-4 课程名称:
-          div.col-sm-9.col-md-5.col-xs-8(:title="errors.name")
+          div.col-sm-9.col-md-7.col-xs-8(:title="errors.name")
             input.form-control(type='text',v-model.trim='cls.name',placeholder='课程描述')
         div.form-group
           label.control-label.col-sm-3.col-xs-4 教室:
@@ -47,11 +47,11 @@ div.container
       form.form-horizontal
         div.form-group(:class='{"has-error": errors.date}')
           label.control-label.col-sm-3.col-xs-4 开课日期:
-          div.col-sm-8.col-md-5.col-xs-8(:title="errors.date")
+          div.col-sm-8.col-md-6.col-xs-8(:title="errors.date")
             date-picker(v-model='cls.date',:config="{format:'lll',locale:'zh-CN',sideBySide: true}")
         div.form-group(:class='{"has-error": errors.age}')
           label.control-label.col-sm-3.col-xs-4 年龄:
-          div.col-sm-8.col-md-5.col-xs-8(:title="errors.age")
+          div.col-sm-8.col-md-6.col-xs-8(:title="errors.age")
             div.input-group
               input.form-control(type='number',min='0',v-model.number='age.min')
               div.input-group-addon 至
@@ -59,7 +59,7 @@ div.container
               div.input-group-addon 岁
         div.form-group(:class='{"has-error": errors.capacity}')
           label.control-label.col-sm-3.col-xs-4 最大人数:
-          div.col-sm-3.col-xs-8(:title="errors.capacity")
+          div.col-sm-4.col-xs-8(:title="errors.capacity")
             input.form-control(type='number',min='0',v-model.number='cls.capacity')
         div.form-group(:class='{"has-error": errors.mediaUrl}')
           label.control-label.col-sm-3.col-xs-4 图片地址:
