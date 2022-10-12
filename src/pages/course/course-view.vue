@@ -10,89 +10,87 @@ div.container
     h3(style='margin-top:0;display:inline-block') 基本信息
     button.btn.btn-danger(type='button',style='float:right',:disabled='!course._id',@click='$refs.confirmDlg.show()') 删除班级
   form.form-horizontal
-    div.form-group
-      label.col-sm-2.control-label {{$t('status')}}:
-      select.col-sm-5.form-control(v-model='course.status',@change='closeAlert',style='margin-left:15px;width:auto')
-        option.text-success(value='active') 进行中
-        option.text-danger(value='closed') 结束
     div.form-group(:class='{"has-error": errors.name}')
-      label.col-sm-2.control-label 名称:
-      div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
+      label.col-xs-4.col-sm-2.control-label 名称:
+      div.col-xs-8.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
         input.form-control(v-model.trim='course.name', placeholder='班级名称')
-      div.col-sm-5
-        p.form-control-static(style='color:#808080')
-          small {{course.createDate | formatDate}}创建
+        span.help-block.small.ms-3 {{course.createDate | formatDate}}创建
     div.form-group
-      label.control-label.col-sm-2 教室:
-      select#roomList.form-control.col-sm-4(style='margin-left:15px;width:auto',v-model='course.classroom')
-        option(v-for='r in classrooms',:value='r.id') {{r.name}}
+      label.col-xs-4.col-sm-2.control-label {{$t('status')}}:
+      div.col-xs-8.col-sm-4.col-md-3
+        select.form-control(v-model='course.status',@change='closeAlert')
+          option.text-success(value='active') 进行中
+          option.text-danger(value='closed') 结束
     div.form-group
-      label.control-label.col-sm-2 简介:
-      div.col-sm-8
-        textarea.form-control(rows='3', v-model.trim='course.remark',style='resize:vertical;min-height:70px')
+      label.control-label.col-xs-4.col-sm-2 教室:
+      div.col-xs-8.col-sm-4.col-md-3
+        select#roomList.form-control(v-model='course.classroom')
+          option(v-for='r in classrooms',:value='r.id') {{r.name}}
     div.form-group
-      div.col-sm-offset-2.col-sm-10
+      label.control-label.col-xs-4.col-sm-2 简介:
+      div.col-xs-8
+        textarea.form-control.has-3-rows(rows='3', v-model.trim='course.remark')
+    div.form-group
+      div.col-sm-offset-2.col-xs-offset-4.col-sm-10.col-xs-8
         button.btn.btn-success(type='button',:disabled='!course._id || hasError',v-on:click='saveBasicInfo') {{$t('save')}}
   div.page-header
     h3 成员
-  form.form-horizontal
-    div.form-group
-      div.col-sm-2
-        button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',@click='showAddMemberDlg')
-          span.glyphicon.glyphicon-plus 添加
-      div.col-sm-7.col-md-5
-        ul.list-group(style='margin-bottom:0px')
-          transition-group(name="list")
-            li.list-group-item(v-for="member in memberList",:key='member.id')
-              span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
-              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
-              a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-              //span.badge(style='margin-right:3px;background-color:#337ab7;cursor:pointer',@click='showMemberCourse(member)') 分配
-              | {{member.name}}
-              div.small(style='color:#777') 学习进度
-              div.participation-status.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
-                template(v-for='item in member.participationStatus')
-                  div(v-if='item.status=="nonparticipant"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
-                  div.progress-bar-danger(v-if='item.status=="absent"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
-                  div.progress-bar-warning(v-if='item.status=="unchecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
-                  div.progress-bar-success(v-if='item.status=="checkin"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
-                  div.progress-bar.progress-bar-info.progress-bar-striped.active(v-if='item.status=="tobechecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
-        small(style='color:#777') 共{{membersCount}}人
-      div.col-sm-3.col-md-5.participation-status-legend        
-        div.progress
-          div.progress-bar(style='background-color:darkgrey') 未预约
-        div.progress
-          div.progress-bar.progress-bar-danger 缺席
-        div.progress
-          div.progress-bar.progress-bar-warning 未签到
-        div.progress
-          div.progress-bar.progress-bar-success 签到
-        div.progress
-          div.progress-bar.progress-bar-info.progress-bar-striped.active 剩余课程
+  div.row
+    div.col-xs-12.col-sm-2
+      button.btn.btn-primary.btn-sm.mb-3(type="button",:disabled='!course._id',@click='showAddMemberDlg')
+        span.glyphicon.glyphicon-plus 添加
+    div.col-xs-10.col-sm-7.col-md-5
+      ul.list-group(style='margin-bottom:0px')
+        transition-group(name="list")
+          li.list-group-item(v-for="member in memberList",:key='member.id')
+            span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
+            span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
+            a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+            //span.badge(style='margin-right:3px;background-color:#337ab7;cursor:pointer',@click='showMemberCourse(member)') 分配
+            | {{member.name}}
+            div.small(style='color:#777') 学习进度
+            div.participation-status.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
+              template(v-for='item in member.participationStatus')
+                div(v-if='item.status=="nonparticipant"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                div.progress-bar-danger(v-if='item.status=="absent"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                div.progress-bar-warning(v-if='item.status=="unchecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                div.progress-bar-success(v-if='item.status=="checkin"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+                div.progress-bar.progress-bar-info.progress-bar-striped.active(v-if='item.status=="tobechecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
+      small(style='color:#777') 共{{membersCount}}人
+    div.col-xs-2.col-sm-3.col-md-5.participation-status-legend(style="padding:0")
+      div.progress
+        div.progress-bar(style='background-color:darkgrey') 未预约
+      div.progress
+        div.progress-bar.progress-bar-danger 缺席
+      div.progress
+        div.progress-bar.progress-bar-warning 未签到
+      div.progress
+        div.progress-bar.progress-bar-success 签到
+      div.progress
+        div.progress-bar.progress-bar-info.progress-bar-striped.active 剩余课程
   div.page-header
     h3 课程
-  form.form-horizontal
-    div.form-group
-      div.col-sm-2
-        button.btn.btn-primary.btn-sm(type="button",:disabled='!course._id',@click='showAddClassDlg')
-          span.glyphicon.glyphicon-plus 添加
-      div.col-sm-7.col-md-5
-        ul.list-group(style='margin-bottom:0px')
-          transition-group(name="list")
-            li.list-group-item(v-for="item in sortedClasses",:key='item._id')
-              h4(style='margin: 3px 0') {{item.name}}
-              small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
-              p(style='margin: 3px 0', v-if='feature=="book"') 绘本: {{item.books | formatBooks}}
-              a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
-                i.glyphicon.glyphicon-calendar
-              span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
-              span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
-              a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-      div.col-sm-3.col-md-5
-        div
-          small(style='color:#777') 共{{classesCount}}节
-        div
-          small(style='color:#777') 已上{{completedClassesCount}}节/未上{{classesCount - completedClassesCount}}节
+  div.row
+    div.col-sm-2
+      button.btn.btn-primary.btn-sm.mb-3(type="button",:disabled='!course._id',@click='showAddClassDlg')
+        span.glyphicon.glyphicon-plus 添加
+    div.col-sm-7.col-md-5
+      ul.list-group(style='margin-bottom:0px')
+        transition-group(name="list")
+          li.list-group-item(v-for="item in sortedClasses",:key='item._id')
+            h4(style='margin: 3px 0') {{item.name}}
+            small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
+            p(style='margin: 3px 0', v-if='feature=="book"') 绘本: {{item.books | formatBooks}}
+            a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
+              i.glyphicon.glyphicon-calendar
+            span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
+            span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
+            a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+    div.col-sm-3.col-md-5
+      div
+        small(style='color:#777') 共{{classesCount}}节
+      div
+        small(style='color:#777') 已上{{completedClassesCount}}节/未上{{classesCount - completedClassesCount}}节
   div(style='height:20px')
   add-multi-class-modal(ref='modal',:classrooms='classrooms',:defaultName='this.course.name',@ok='addClass')
   view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
@@ -605,5 +603,12 @@ module.exports = {
   {
   opacity: 0;
   transform: translateX(30px);
+}
+
+.form-horizontal .control-label {
+  padding-top: 7px;
+  padding-right: 0;
+  margin-bottom: 0;
+  text-align: right;
 }
 </style>
