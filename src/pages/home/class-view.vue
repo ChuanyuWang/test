@@ -10,6 +10,11 @@ div.container
     h3(style='margin-top:0;display:inline-block') 基本信息
     button.btn.btn-danger(type='button',style='float:right',:disabled='!cls._id',@click='confirmDeleteClass') 删除课程
   form.form-horizontal
+    div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
+      label.control-label.col-sm-2 类型:
+      div.col-sm-3
+        select.form-control(v-model="cls.type")
+          option.text-default(v-for="item in types" :value="item.id") {{item.name}}
     div.form-group(:class='{"has-error": errors.name}')
       label.control-label.col-sm-2 课程名称:
       div.col-sm-5(:title="errors.name")
@@ -141,7 +146,7 @@ var member_select_modal = require("../../components/member-select-modal.vue").de
 var add_book_modal = require("./add-book-modal.vue").default;
 var messageAlert = require("../../components/message-alert.vue").default;
 var modalDialog = require("../../components/modal-dialog.vue").default;
-
+var serviceUtil = require("../../services/util");
 
 module.exports = {
   name: "class-view",
@@ -151,6 +156,7 @@ module.exports = {
   data: function() {
     return {
       tenantConfig: {},
+      types: [],
       cls: {
         books: [],
         booking: []
@@ -398,6 +404,10 @@ module.exports = {
     }
   },
   created: function() {
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
+    });
     // Load all teachers for selection
     var vm = this;
     var request = teacher_service.getAll({ status: "active" });
