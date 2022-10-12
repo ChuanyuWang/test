@@ -12,10 +12,10 @@ div.container
   div.row
     div.col-sm-6
       form.form-horizontal
-        div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
+        div.form-group
           label.control-label.col-sm-3.col-xs-4 类型:
           div.col-sm-5.col-xs-8
-            select.form-control(v-model="cls.type")
+            select.form-control(v-model="cls.type" disabled)
               option.text-default(v-for="item in types" :value="item.id") {{item.name}}
         div.form-group(:class='{"has-error": errors.name}')
           label.control-label.col-sm-3.col-xs-4 课程名称:
@@ -231,8 +231,6 @@ module.exports = {
       var errors = {};
       if (!this.cls.name || this.cls.name.length == 0)
         errors.name = "名称不能为空";
-      if (!this.cls.type)
-        errors.type = '课程类型不能为空';
       if (!this.cls.date) errors.date = "日期/时间未指定";
       if (this.cls.date && !moment(this.cls.date).isValid())
         errors.date = "日期/时间格式不正确";
@@ -302,7 +300,6 @@ module.exports = {
         // igonre the error in Internet Explorer
       }
 
-      var vm = this;
       var request = class_service.updateClass(this.cls._id, {
         name: this.cls.name,
         type: this.cls.type,
