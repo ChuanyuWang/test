@@ -136,7 +136,7 @@ div.container
       p 课程<strong>{{cls.name}}</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程
     template(v-slot:footer="slotProps")
       button.btn.btn-default(type="button" data-dismiss="modal") 取消
-      button.btn.btn-primary(type="button" data-dismiss="modal" @click='jumpToCourse') 查看班级
+      a.btn.btn-primary(:href='"../course/" + cls.courseID') 查看班级
   modal-dialog(ref='deleteClassDlg' buttonStyle="danger" buttons="confirm" @ok="deleteClass") 确定删除课程吗？
     template(v-slot:body="slotProps")
       p 只能删除没有会员预约的课程，如果有预约，请先取消预约
@@ -341,9 +341,6 @@ module.exports = {
       request.done((data, textStatus, jqXHR) => {
         this.cls.books = data.books || [];
       });
-    },
-    jumpToCourse() {
-      window.location.href = "../course/" + this.cls.courseID;
     },
     addReservation: function(selectedItems) {
       // reset the quantity of reservation
