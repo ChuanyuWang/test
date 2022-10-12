@@ -282,6 +282,9 @@ router.get('/:classID', function(req, res, next) {
 router.post('/', function(req, res, next) {
     var classes = req.db.collection("classes");
     convertDateObject(req.body);
+    // make sure necessary field existed
+    req.body.booking = req.body.booking || [];
+    req.body.books = req.body.books || [];
     // save the teacher as reference object
     if (req.body.hasOwnProperty('teacher')) {
         req.body.teacher = req.body.teacher ? mongojs.ObjectId(req.body.teacher) : null;
