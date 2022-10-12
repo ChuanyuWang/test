@@ -1,5 +1,5 @@
 <template lang="pug">
-div.modal(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-labelledby="Modal Label")
+div.modal.fade(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-labelledby="Modal Label")
   div.modal-dialog(:class="dialogSize")
     div.modal-content
       div.modal-header
@@ -10,6 +10,7 @@ div.modal(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",aria-l
       div.modal-body
         slot(name="body" v-bind:param="param")
       div.modal-footer
+        slot(name="helpText")
         slot(name="footer" v-bind:param="param")
           template(v-if='buttons === "ok"')
             button.btn(type="button",@click='hide(true)',:class='btnStyle') {{ $t('dialog_ok') }}
