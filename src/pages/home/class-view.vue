@@ -366,6 +366,7 @@ module.exports = {
             classid: vm.classId,
             contact: value.contact,
             name: value.name,
+            memberid: value._id,
             quantity: vm.quantity
           };
         });
