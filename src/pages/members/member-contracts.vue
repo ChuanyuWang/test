@@ -47,12 +47,14 @@ module.exports = {
         formatter: this.dateFormatter
       }, {
         field: "credit",
-        title: "已消/剩余课时",
-        formatter: this.creditFormatter
+        title: "已消/剩余课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        formatter: this.creditFormatter,
+        titleTooltip: "已消课时=已经完成的课程+已经排课但还没开始的课程\n剩余课时=没有使用的课时"
       }, {
         field: "total",
-        title: "已消/剩余金额",
-        formatter: this.totalFormatter
+        title: "已消/剩余金额<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        formatter: this.totalFormatter,
+        titleTooltip: "已消金额=已经完成的课程金额+已经排课但还没开始的课程金额\n剩余金额=没有使用的金额"
       }],
       contractTableOptions: {
         //toolbar: "#contractToolbar",
@@ -99,20 +101,26 @@ module.exports = {
       }
     },
     creditFormatter(value, row, index) {
-      return [
-        '<div><span>ABC</span><span style="float:right">DEF</span></div>',
-        '<div class="progress" style="margin:0">',
-        '<div class="progress-bar" role="progressbar" style="width: 6%;">',
-        '6%',
-        '</div>',
-        '</div>'
-      ].join('');
+      var consumedCredit = row.consumedCredit || 0;
+      var expendedCredit = row.expendedCredit || 0;
+      return this.buildProgressBar(consumedCredit + expendedCredit, value);
     },
     totalFormatter(value, row, index) {
+      var consumedCredit = row.consumedCredit || 0;
+      var expendedCredit = row.expendedCredit || 0;
+      var credit = row.credit || 0;
+      var percent = credit == 0 ? 0 : (consumedCredit + expendedCredit) / credit;
+      var total = row.total - row.discount;
+      return this.buildProgressBar(Math.round(total * percent) / 100, total / 100, "￥");
+    },
+    buildProgressBar(consume, total, symbol) {
+      var remaining = total - consume;
+      var percent = total == 0 ? 0 : consume / total;
+      percent = Math.round(percent * 100);
       return [
-        '<div><span>ABC</span><span style="float:right">DEF</span></div>',
-        '<div class="progress" style="margin:0">',
-        '<div class="progress-bar" role="progressbar" style="width: 60%;">',
+        `<div><span>消${symbol || ""}${consume}</span><span style="float:right">剩${symbol || ""}${remaining}</span></div>`,
+        '<div class="progress" style="margin:0;height:10px">',
+        `<div class="progress-bar" role="progressbar" style="width:${percent}%">`,
         '</div>',
         '</div>'
       ].join('');
