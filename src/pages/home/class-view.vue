@@ -9,75 +9,85 @@ div.container
   div.page-header
     h3(style='margin-top:0;display:inline-block') 基本信息
     button.btn.btn-danger(type='button',style='float:right',:disabled='!cls._id',@click='confirmDeleteClass') 删除课程
-  form.form-horizontal
-    div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
-      label.control-label.col-sm-2 类型:
-      div.col-sm-3
-        select.form-control(v-model="cls.type")
-          option.text-default(v-for="item in types" :value="item.id") {{item.name}}
-    div.form-group(:class='{"has-error": errors.name}')
-      label.control-label.col-sm-2 课程名称:
-      div.col-sm-5(:title="errors.name")
-        input.form-control(type='text',v-model.trim='cls.name',placeholder='课程描述')
-    div.form-group
-      label.control-label.col-sm-2 教室:
-      select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.classroom')
-        option(v-for='r in classrooms',:value='r.id') {{r.name}}
-    div.form-group
-      label.control-label.col-sm-2 老师:
-      select.form-control.col-sm-10(style='margin-left:15px;width:auto',v-model='cls.teacher')
-        option(v-for='t in teachers',:value='t._id') {{t.name}}
-    div.form-group(v-show='cls.courseID',style='display:none')
-      label.control-label.col-sm-2 所属班级:
-      div.col-sm-10
-        a.button.btn-primary.btn-sm(:href='"../course/" +cls.courseID',style='line-height:34px') 查看
-    div.form-group
-      label.control-label.col-sm-2 所须课时:
-      div.col-sm-10
-        p.form-control-static {{cls.cost}}
-    div.form-group
-      label.control-label.col-sm-2 价格:
-      div.col-sm-5
-        p.form-control-static {{cls.price | formatPrice}}元
-    div.form-group(:class='{"has-error": errors.date}')
-      label.control-label.col-sm-2 日期/时间:
-      div.col-sm-4(:title="errors.date")
-        date-picker(v-model='cls.date',:config="{format:'lll',locale:'zh-CN',sideBySide: true}")
-    div.form-group(:class='{"has-error": errors.age}')
-      label.control-label.col-sm-2 年龄:
-      div.col-sm-10(style="display:inline-flex",:title="errors.age")
-        input.form-control(type='number',v-model.number='age.min',min='0',style={'width':'70px'})
-        p.form-control-static(style={'display':'inline-block','margin-left':'3px','float':'left'}) 至
-        input.form-control(type='number',v-model.number='age.max',min='0',style={'width':'70px','margin-left':'3px'})
-        p.form-control-static(style={'display':'inline-block','margin-left':'3px'}) 岁
-    div.form-group(:class='{"has-error": errors.capacity}')
-      label.control-label.col-sm-2 最大人数:
-      div.col-sm-2(:title="errors.capacity")
-        input.form-control(type='number',min='0',v-model.number='cls.capacity')
-    div.form-group(:class='{"has-error": errors.mediaUrl}')
-      label.control-label.col-sm-2 图片地址:
-      div.col-sm-8(:title="errors.mediaUrl")
-        div.input-group
-          input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='http://或https://开头')
-          span.input-group-btn
-            button.btn.btn-default(type="button",@click="isPreview=true") 预览
-      div.col-sm-offset-2.col-sm-4(:src="cls.mediaUrl",style="margin-top:3px")
-        img.img-rounded.img-responsive(v-show="isPreview",:src="cls.mediaUrl")
-    div.form-group(:class='{"has-error": errors.description}')
-      label.control-label.col-sm-2 描述:
-      div.col-sm-8(:title="errors.description")
-        textarea.form-control(rows='3',placeholder='(选填) 添加课程描述信息,不超过256字',v-model.trim='cls.description',style='resize:vertical;min-height:70px')
-    div.form-group
-      div.col-sm-offset-2.col-sm-10
-        button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
+  div.row
+    div.col-sm-6
+      form.form-horizontal
+        div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
+          label.control-label.col-sm-3.col-xs-4 类型:
+          div.col-sm-5.col-md-3.col-xs-8
+            select.form-control(v-model="cls.type")
+              option.text-default(v-for="item in types" :value="item.id") {{item.name}}
+        div.form-group(:class='{"has-error": errors.name}')
+          label.control-label.col-sm-3.col-xs-4 课程名称:
+          div.col-sm-9.col-md-5.col-xs-8(:title="errors.name")
+            input.form-control(type='text',v-model.trim='cls.name',placeholder='课程描述')
+        div.form-group
+          label.control-label.col-sm-3.col-xs-4 教室:
+          div.col-sm-5.col-xs-8
+            select.form-control(v-model='cls.classroom')
+              option(v-for='r in classrooms',:value='r.id') {{r.name}}
+        div.form-group
+          label.control-label.col-sm-3.col-xs-4 老师:
+          div.col-sm-5.col-xs-8
+            select.form-control(v-model='cls.teacher')
+              option(v-for='t in teachers',:value='t._id') {{t.name}}
+        div.form-group(v-show='cls.courseID')
+          label.control-label.col-sm-3.col-xs-4 所属班级:
+          div.col-sm-8.col-xs-8
+            a.button.btn-primary.btn-sm(:href='"../course/" +cls.courseID',style='line-height:34px') 查看
+        div.form-group
+          label.control-label.col-sm-3.col-xs-4 所须课时:
+          div.col-sm-8.col-xs-8
+            p.form-control-static {{cls.cost}}
+        div.form-group
+          label.control-label.col-sm-3.col-xs-4 价格:
+          div.col-sm-5.col-xs-8
+            p.form-control-static {{cls.price | formatPrice}}元
+    div.col-sm-6
+      form.form-horizontal
+        div.form-group(:class='{"has-error": errors.date}')
+          label.control-label.col-sm-3.col-xs-4 开课日期:
+          div.col-sm-8.col-md-5.col-xs-8(:title="errors.date")
+            date-picker(v-model='cls.date',:config="{format:'lll',locale:'zh-CN',sideBySide: true}")
+        div.form-group(:class='{"has-error": errors.age}')
+          label.control-label.col-sm-3.col-xs-4 年龄:
+          div.col-sm-8.col-md-5.col-xs-8(:title="errors.age")
+            div.input-group
+              input.form-control(type='number',min='0',v-model.number='age.min')
+              div.input-group-addon 至
+              input.form-control(type='number',min='0',v-model.number='age.max')
+              div.input-group-addon 岁
+        div.form-group(:class='{"has-error": errors.capacity}')
+          label.control-label.col-sm-3.col-xs-4 最大人数:
+          div.col-sm-3.col-xs-8(:title="errors.capacity")
+            input.form-control(type='number',min='0',v-model.number='cls.capacity')
+        div.form-group(:class='{"has-error": errors.mediaUrl}')
+          label.control-label.col-sm-3.col-xs-4 图片地址:
+          div.col-sm-9.col-xs-8(:title="errors.mediaUrl")
+            div.input-group
+              input.form-control(type='text',v-model.trim='cls.mediaUrl',placeholder='http://或https://开头')
+              span.input-group-btn
+                button.btn.btn-default(type="button",@click="isPreview=true") 预览
+          div.col-sm-offset-3.col-sm-5.col-xs-offset-4.col-xs-8.mt-3(:src="cls.mediaUrl")
+            img.img-rounded.img-responsive(v-show="isPreview",:src="cls.mediaUrl")
+        div.form-group(:class='{"has-error": errors.description}')
+          label.control-label.col-sm-3.col-xs-4 描述:
+          div.col-sm-9.col-xs-8(:title="errors.description")
+            textarea.form-control.has-3-rows(rows='3',placeholder='(选填) 添加课程描述信息,不超过256字',v-model.trim='cls.description')
+  div.row
+    div.col-sm-6
+      form.form-horizontal
+        div.form-group
+          div.col-sm-offset-3.col-xs-offset-4.col-sm-8
+            button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
   div.page-header
     h3 预约
   form.form-horizontal
     div.form-group
-      div.col-sm-2
+      div.col-xs-2
         button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.memberSelectDlg.show()',style='margin-bottom:7px')
           span.glyphicon.glyphicon-plus 添加
-      div.col-sm-6
+      div.col-xs-10.col-sm-8.col-md-6
         ul.list-group(style='margin-bottom:0px')
           li.list-group-item(v-for="booking in bookings")
             div(style='display:flex')
@@ -95,10 +105,10 @@ div.container
     h3 绘本
   form.form-horizontal(v-if='feature=="book"')
     div.form-group
-      div.col-sm-2
+      div.col-xs-2
         button.btn.btn-primary.btn-sm(type="button",:disabled='!cls._id',@click='$refs.addBookDlg.show()',style='margin-bottom:7px')
           span.glyphicon.glyphicon-plus 添加
-      div.col-sm-6
+      div.col-xs-10.col-sm-8.col-md-6
         template(v-for="item in cls.books")
           div.media
             div.media-left
@@ -221,6 +231,8 @@ module.exports = {
       var errors = {};
       if (!this.cls.name || this.cls.name.length == 0)
         errors.name = "名称不能为空";
+      if (!this.cls.type)
+        errors.type = '课程类型不能为空';
       if (!this.cls.date) errors.date = "日期/时间未指定";
       if (this.cls.date && !moment(this.cls.date).isValid())
         errors.date = "日期/时间格式不正确";
@@ -293,6 +305,7 @@ module.exports = {
       var vm = this;
       var request = class_service.updateClass(this.cls._id, {
         name: this.cls.name,
+        type: this.cls.type,
         date: this.cls.date && moment(this.cls.date).toISOString(),
         classroom: this.cls.classroom,
         teacher: this.cls.teacher,
@@ -356,7 +369,7 @@ module.exports = {
       if (addedOnes.length > 0) {
         var result = addedOnes.map(function(value, index, array) {
           return {
-            classid: vm.cls._id,
+            classid: vm.classId,
             contact: value.contact,
             name: value.name,
             quantity: vm.quantity
@@ -385,19 +398,19 @@ module.exports = {
       });
     },
     addNewBook: function(newBook) {
-      var request = class_service.addBooks(vm.cls._id, newBook);
+      var request = class_service.addBooks(this.classId, newBook);
       request.done((data, textStatus, jqXHR) => {
         this.cls.books = data.books;
       });
     },
     checkin: function(memberid) {
-      var request = class_service.checkin(vm.cls._id, memberid);
+      var request = class_service.checkin(this.classId, memberid);
       request.done((data, textStatus, jqXHR) => {
         this.cls.booking = data.booking || [];
       });
     },
     absent: function(memberid) {
-      var request = class_service.absent(vm.cls._id, memberid);
+      var request = class_service.absent(this.classId, memberid);
       request.done((data, textStatus, jqXHR) => {
         this.cls.booking = data.booking || [];
       });
@@ -456,5 +469,12 @@ module.exports = {
 .container .page-header {
   margin: 15px 0;
   padding-bottom: 3px;
+}
+
+.col-sm-6 .form-horizontal .control-label {
+  padding-top: 7px;
+  padding-right: 0;
+  margin-bottom: 0;
+  text-align: right;
 }
 </style>
