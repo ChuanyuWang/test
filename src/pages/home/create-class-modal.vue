@@ -12,7 +12,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             label.control-label.col-sm-3 类型:
             div.col-sm-3
               select.form-control(v-model="type")
-                option.text-default(v-for="item in types" value="item.id") {{item.name}}
+                option.text-default(v-for="item in types" :value="item.id") {{item.name}}
           div.form-group(:class='{"has-error": errors.name}',:title='errors.name')
             label.control-label.col-sm-3(for='cls_name') 课程名称:
             div.col-sm-8
