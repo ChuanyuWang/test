@@ -24,6 +24,7 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 
 var modalDialog = require("./modal-dialog.vue").default;
 
 module.exports = {
+  name: "member-select-dialog",
   props: {
     multiSelection: {
       type: Boolean,
