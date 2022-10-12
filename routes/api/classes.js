@@ -7,6 +7,7 @@ var helper = require('../../helper');
 /**
  * {
  *  name: String,
+ *  type: String, // type id
  *  date: String,
  *  cost: Date,
  *  price: Number,
@@ -26,7 +27,8 @@ var helper = require('../../helper');
  *          status: "checkin|absent|null",
  *          flag: "null|red|yellow|green",
  *          comment: String,
- *          order: ObjectId
+ *          order: ObjectId,
+ *          contract: ObjectId
  *      }
  *  ],
  *  books: [
@@ -42,6 +44,7 @@ var helper = require('../../helper');
 
 var NORMAL_FIELDS = {
     name: 1,
+    type: 1,
     date: 1,
     courseID: 1,
     cost: 1,

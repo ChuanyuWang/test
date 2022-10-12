@@ -8,27 +8,33 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
         h4.modal-title 添加常规课程
       div.modal-body
         form.form-horizontal
+          div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
+            label.control-label.col-sm-3 类型:
+            div.col-sm-3
+              select.form-control(v-model="type")
+                option.text-default(v-for="item in types" value="item.id") {{item.name}}
           div.form-group(:class='{"has-error": errors.name}',:title='errors.name')
-            label.control-label.col-sm-2(for='cls_name') 课程名称:
-            div.col-sm-10
+            label.control-label.col-sm-3(for='cls_name') 课程名称:
+            div.col-sm-8
               input#cls_name.form-control(type='text',placeholder='课程描述',autofocus,v-model='name')
           div.form-group(:class='{"has-error": errors.cost}',:title='errors.cost')
-            label.control-label.col-sm-2(for='cost') 课时:
-            div.col-sm-2
+            label.control-label.col-sm-3(for='cost') 课时:
+            div.col-sm-3
               input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
           div.form-group(:class='{"has-error": errors.price}',:title='errors.price')
-            label.control-label.col-sm-2(for='price') 价格:
+            label.control-label.col-sm-3(for='price') 价格:
             div.col-sm-3
               div.input-group
                 input.form-control(type='number',name='price',min='0',step='1',v-model.number='price')
                 label.input-group-addon 元
           div.form-group
-            label.control-label.col-sm-2 时间:
-            div.col-sm-10
-              p.form-control-static(style="width:110px;float:left") {{classDate}}
-              date-picker(style="width:150px;float:left",v-model='startTime',:config='{locale: "zh-CN", format: "LT"}')
+            label.control-label.col-sm-3 时间:
+            div.col-sm-3
+              date-picker(v-model='startTime' :config='{locale: "zh-CN", format: "LT"}')
+            div.col-sm-3
+              p.form-control-static {{classDate}}
           div.form-group(:class='{"has-error": errors.age}',:title='errors.age')
-            label.control-label.col-sm-2 年龄:
+            label.control-label.col-sm-3 年龄:
             div.col-sm-5
               div.input-group
                 input.form-control(type='number',min='0',v-model.number='age.min')
@@ -36,7 +42,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
                 input.form-control(type='number',min='0',v-model.number='age.max')
                 div.input-group-addon 岁
           div.form-group(:class='{"has-error": errors.capacity}',:title='errors.capacity')
-            label.control-label.col-sm-2 最大人数:
+            label.control-label.col-sm-3 最大人数:
             div.col-sm-3
               div.input-group
                 input.form-control(type='number',min='0',v-model.number='capacity')
@@ -55,17 +61,19 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
  */
 
 var date_picker = require('../../components/date-picker.vue').default;
+var serviceUtil = require("../../services/util");
 
 module.exports = {
   components: {
     'date-picker': date_picker
   },
   props: {},
-  data: function() {
+  data() {
     return {
       startDate: moment(),
       startTime: moment(),
       name: '',
+      type: '',
       cost: 1,
       price: 0,
       capacity: 8,
@@ -73,26 +81,29 @@ module.exports = {
         min: null,
         max: null
       },
-      classroom: null
+      classroom: null,
+      types: []
     };
   },
   watch: {
-    capacity: function(value) {
+    capacity(value) {
       this.capacity = parseInt(value);
     }
   },
   computed: {
-    classDate: function() {
+    classDate() {
       return this.startDate.format('ll');
     },
-    finalPrice: function() {
+    finalPrice() {
       // change unit to fen
       return parseInt(this.price * 100) || 0;
     },
-    errors: function() {
+    errors() {
       var errors = {};
       if (!this.name || this.name.length == 0)
         errors.name = '课程名称不能为空';
+      if (!this.type || this.type.length == 0)
+        errors.type = '课程类型不能为空';
       if (this.cost === '' || this.cost < 0)
         errors.cost = '所需课时不能为负';
       if (this.finalPrice === 0 && this.price > 0)
@@ -134,6 +145,7 @@ module.exports = {
 
       var createdClass = {
         name: this.name,
+        type: this.type,
         // get the date from text control and appending the time
         date: moment(this.startDate).hours(this.startTime.hours()).minutes(this.startTime.minutes()),
         cost: this.cost,
@@ -149,11 +161,18 @@ module.exports = {
       $(this.$el).modal('hide');
     }
   },
-  mounted: function() {
+  mounted() {
     //var vm = this;
+  },
+  created() {
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
+    });
   }
 };
 </script>
 
 <style lang='less'>
+
 </style>
