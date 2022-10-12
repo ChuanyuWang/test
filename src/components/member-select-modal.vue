@@ -1,5 +1,5 @@
 <template lang="pug">
-modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") {{$t('member_select_title')}}
+modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK") {{$t('member_select_title')}}
   template(v-slot:body)
     slot(name='toolbar')
     table.member-table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
