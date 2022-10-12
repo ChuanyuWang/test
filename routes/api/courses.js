@@ -219,6 +219,7 @@ router.post('/:courseID/classes', function(req, res, next) {
             value.cost = value.cost || 0;
             value.capacity = value.capacity || 8;
             value.booking = []; // clear the booking for new added course's classes
+            value.books = []; // clear the books for new added course's classes
             return value;
         });
         req.db.collection('classes').insert(added_classes, function(err, docs) {
