@@ -154,7 +154,6 @@ div.container
 </template>
 <script>
 
-var member_select_modal = require("../../components/member-select-modal.vue").default;
 var type_select_modal = require("../../components/type-select-modal.vue").default;
 var messageAlert = require("../../components/message-alert.vue").default;
 var serviceUtil = require("../../services/util");
@@ -173,7 +172,6 @@ module.exports = {
   },
   components: {
     "BootstrapTable": BootstrapTable,
-    "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
     "contract-comments": contractComments,
     "contract-history": contractHistory,
