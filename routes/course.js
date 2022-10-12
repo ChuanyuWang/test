@@ -15,11 +15,11 @@ router.get('/', helper.checkTenantUser, function(req, res, next) {
 
 router.get('/:courseID', helper.checkTenantUser, function(req, res, next) {
     if (!ObjectId.isValid(req.params.courseID)) return next();
-    res.locals.courseID = req.params.courseID;
     res.render('bqsq/pages/course_view', {
         title: '查看班级',
         user: req.user,
-        classroom: req.tenant.classroom ? req.tenant.classroom : []
+        entry_module: '/js/contract_detail.js',
+        data: req.params.courseID
     });
 });
 

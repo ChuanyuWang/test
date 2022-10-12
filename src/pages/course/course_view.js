@@ -5,22 +5,16 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('../../locales/i18nextplugin');
-var course_service = require("../../services/courses");
 var courseView = require('./course-view.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
 
-    var request = course_service.getCourse($('#course_app').data('course-id'));
-    request.done(function(data, textStatus, jqXHR) {
-        // bootstrap the course view page
-        //new Vue({extends: classApp, el: '#class_app', props: {data: data}, propsData: { classrooms: _getClassrooms() }});
-        new Vue({
-            el: '#course_app',
-            components: { 'course-view': courseView },
-            data: { course: data }
-        });
+    // bootstrap the course view page
+    new Vue({
+        el: '#app',
+        components: { 'course-view': courseView }
     });
 });
 

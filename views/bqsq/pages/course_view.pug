@@ -15,12 +15,7 @@ append js
     script(src=CDN_FILES.vue)
   script(src='/js/course_view.js')
 
-  script(type='text/javascript').
-    function _getClassrooms() {
-        return !{JSON.stringify(classroom)};
-    };
-
 block page
-  div#course_app(style='padding-top:69px',data-course-id=courseID)
-    course-view(:course-data="course",:classrooms="_getClassrooms()")
+  div(style='padding-top:69px')
+    course-view#app(app-data=data)
     

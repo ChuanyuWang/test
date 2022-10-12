@@ -111,7 +111,6 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var util = require('../../common/common.js');
 var course_service = require("../../services/courses");
 var add_multi_class_modal = require("./add-multi-class-modal.vue").default;
 var view_member_course_modal = require("./view-member-course-modal.vue").default;
@@ -123,12 +122,11 @@ module.exports = {
   name: "course-view",
   inheritAttrs: false,
   props: {
-    courseData: Object, // course object, "null" stands for not existed course
-    classrooms: Array // Array of available classrooms
+    appData: String // the id of course object
   },
   data: function() {
     return {
-      course: this.courseData || {},
+      course: {},
       members: [],
       classes: [],
       feature: null
@@ -142,6 +140,12 @@ module.exports = {
     "confirm-delete-modal": confirm_delete_modal
   },
   computed: {
+    courseId() {
+      return this.appData;
+    },
+    classrooms() {
+      return this.tenantConfig.classrooms || [];
+    },
     membersCount: function() {
       return this.members ? this.members.length : 0;
     },
@@ -531,13 +535,32 @@ module.exports = {
       this.$refs.assignClassDlg.show();
     }
   },
-  mounted: function() {
+  created() {
     // load the setting of tenant
-    var setting = util.getTenantSetting();
-    this.feature = setting.feature;
+    this.tenantConfig = _getTenantConfig();
+    this.feature = this.tenantConfig.feature;
 
+    var request = course_service.getCourse(this.courseId);
+    request.done((data, textStatus, jqXHR) => {
+      this.course = data || {};
+      var request2 = course_service.getCourseClasses(this.courseId);
+      request2.done((data, textStatus, jqXHR) => {
+        // set classes property
+        this.classes = data || [];
+      });
+
+      if (this.course.members && this.course.members.length > 0) {
+        var request3 = course_service.getCourseMembers(this.courseId);
+        request3.done((data, textStatus, jqXHR) => {
+          // set members property
+          this.members = data && data.members || [];
+        });
+      }
+    });
+  },
+  mounted: function() {
     // handle invalid(404) course URL
-    if (!this.course._id) {
+    if (!this.courseId) {
       return bootbox.alert({
         message: "查看的班级不存在",
         buttons: {
@@ -545,22 +568,6 @@ module.exports = {
         }
       });
     };
-
-    // 'this' is refer to vm instance
-    var vm = this;
-    var request = course_service.getCourseClasses(vm.course._id);
-    request.done(function(data, textStatus, jqXHR) {
-      // set classes property
-      vm.classes = data || [];
-    });
-
-    if (vm.course.members && vm.course.members.length > 0) {
-      var request2 = course_service.getCourseMembers(vm.course._id);
-      request2.done(function(data, textStatus, jqXHR) {
-        // set members property
-        vm.members = data && data.members || [];
-      });
-    }
   }
 };
 </script>
