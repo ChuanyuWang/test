@@ -5,6 +5,7 @@ var reservation = require('./lib/reservation');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
+const { ParamError } = require("./lib/basis");
 
 
 router.use(helper.checkTenant);
@@ -102,9 +103,26 @@ classID : "5716630aa012576d0371e888"
 }
  */
 router.post('/', async function(req, res, next) {
-    if (!req.body.name || !req.body.contact || !req.body.classid || !req.body.quantity) {
-        res.status(400).send("Missing param 'name' or 'contact' or 'quantity' or 'classid'");
-        return;
+    if (!req.body.classid || !req.body.quantity) {
+        return next(new ParamError(`Missing param 'classid' or 'quantity'`));
+    }
+
+    if (req.body.classid && !ObjectId.isValid(req.body.classid)) {
+        return next(new ParamError(`classid ${req.body.classid} is invalid`));
+    }
+
+    let user_query = {};
+    if (req.body.memberid) {
+        if (ObjectId.isValid(req.body.memberid)) {
+            user_query._id = ObjectId(req.body.memberid)
+        } else {
+            return next(new ParamError(`memberid ${req.body.memberid} is invalid`));
+        }
+    } else if (req.body.name && req.body.contact) {
+        user_query.name = req.body.name;
+        user_query.contact = req.body.contact;
+    } else {
+        return next(new ParamError(`missing parameters of member`));
     }
 
     try {
@@ -133,10 +151,6 @@ router.post('/', async function(req, res, next) {
 
 
         let members = tenantDB.collection("members");
-        let user_query = {
-            name: req.body.name,
-            contact: req.body.contact
-        };
         // find the user who want to book a class
         let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
         if (!doc) {
