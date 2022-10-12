@@ -6,24 +6,15 @@
  */
 
 var i18nextplugin = require('../../locales/i18nextplugin');
-var class_service = require('../../services/classes');
 var classView = require('./class-view.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
-    // load class object
-    var request = class_service.getClass($('#class_app').data('class-id'));
-    request.done(function(data, textStatus, jqXHR) {
 
-        // bootstrap the class view page
-        //new Vue({extends: classApp, el: '#class_app', props: {data: data}, propsData: { classrooms: _getClassrooms() }});
-        new Vue({
-            el: '#class_app',
-            //template: '<class-view :data="cls"/>',
-            components: { 'class-view': classView },
-            data: { cls: data }
-        });
+    new Vue({
+        el: '#app',
+        components: { 'app': classView }
     });
 });
 
@@ -35,5 +26,5 @@ function init() {
     Vue.use(i18nextplugin);
     //TODO, localization 
     moment.locale('zh-CN');
-    bootbox.setLocale('zh_CN');
+    //bootbox.setLocale('zh_CN');
 }

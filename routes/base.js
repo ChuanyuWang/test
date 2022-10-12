@@ -14,9 +14,10 @@ router.get('/home', helper.checkTenantUser, function(req, res) {
 router.get('/class/:classID', helper.checkTenantUser, function(req, res, next) {
     // skip to 404 page if class ID is not valid
     if (!ObjectId.isValid(req.params.classID)) return next();
-    res.locals.classID = req.params.classID;
-    res.render('bqsq/pages/class_view', {
+    res.render('bqsq/pages/detail-page', {
         title: res.__('view_session'),
+        entry_module: '/js/class_view.js',
+        data: req.params.classID,
         user: req.user
     });
 });

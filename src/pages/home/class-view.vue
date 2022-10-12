@@ -8,7 +8,7 @@ div.container
     li.active 查看课程
   div.page-header
     h3(style='margin-top:0;display:inline-block') 基本信息
-    button.btn.btn-danger(type='button',style='float:right',:disabled='!cls._id',@click='deleteClass') 删除课程
+    button.btn.btn-danger(type='button',style='float:right',:disabled='!cls._id',@click='confirmDeleteClass') 删除课程
   form.form-horizontal
     div.form-group(:class='{"has-error": errors.name}')
       label.control-label.col-sm-2 课程名称:
@@ -83,7 +83,7 @@ div.container
               button.btn.btn-danger.btn-xs(v-show='booking.status!=="absent"',type='button',style='margin-right:3px',@click='absent(booking.member)') 缺席
               button.btn.btn-success.btn-xs(v-show='booking.status!=="checkin"',type='button',style='margin-right:3px',@click='checkin(booking.member)') 签到
               a.btn.btn-xs.btn-primary(:href='"../member/" + booking.member',style='margin-right:3px',target='_blank') 查看
-              button.btn.btn-default.btn-xs(type='button',style='',@click='cancelReservation(booking)') 取消
+              button.btn.btn-default.btn-xs(type='button',style='',@click='$refs.cancelReservationDlg.show(booking)') 取消
             p.small(style='color:#777;margin:5px 3px 0px;text-align:right') 于{{booking.bookDate | formatDate}}预约
         small(style='color:#777') 共{{membersCount}}人
   div.page-header(v-if='feature=="book"')
@@ -101,7 +101,7 @@ div.container
             div.media-body
               h4.media-heading(style='font-size:small') {{item.title}}
               p.small(style='color:#777') {{item.info}} by {{getTeacherName(cls.teacher) || item.teacher || '未指定'}}
-                span.badge(style='background-color:#d9534f;cursor:pointer;float:right;margin-right:16px',@click='removeBook(item)') 删除
+                span.badge(style='background-color:#d9534f;cursor:pointer;float:right;margin-right:16px',@click='$refs.deleteBookDlg.show(item)') 删除
         small(style='color:#777') 共{{booksCount}}本
   add-book-modal(ref='addBookDlg',@ok='addNewBook')
   member-select-modal(ref='memberSelectDlg',@ok='addReservation')
@@ -109,6 +109,22 @@ div.container
       div.btn-group(style='display:inline-flex;position:absolute;top:25px;left:20px')
         label(style='margin-right:4px;line-height:34px') 人数:
         input.form-control(type='number',min='1',step='1',style='width:90px',v-model.number='quantity')
+  message-alert(ref="messager")
+  modal-dialog(ref='deleteBookDlg' buttonStyle="primary" buttons="confirm" @ok="removeBook") 确定删除绘本吗？
+    template(v-slot:body="slotProps")
+      p 从当前课程中删除绘本《{{ slotProps.param.title }}》
+  modal-dialog(ref='cancelReservationDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定取消会员预约吗？
+    template(v-slot:body="slotProps")
+      p 取消会员的预约，并且返还扣除的课时，无法在课程开始后取消
+  modal-dialog(ref='deleteCourseClassDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定删除班级中的课程吗？
+    template(v-slot:body="slotProps")
+      p 课程<strong>{{cls.name}}</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程
+    template(v-slot:footer="slotProps")
+      button.btn.btn-default(type="button" data-dismiss="modal") 取消
+      button.btn.btn-primary(type="button" data-dismiss="modal" @click='jumpToCourse') 查看班级
+  modal-dialog(ref='deleteClassDlg' buttonStyle="danger" buttons="confirm" @ok="deleteClass") 确定删除课程吗？
+    template(v-slot:body="slotProps")
+      p 只能删除没有会员预约的课程，如果有预约，请先取消预约
 </template>
 
 <script>
@@ -118,28 +134,27 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var util = require("../../common/common");
 var date_picker = require("../../components/date-picker.vue").default;
 var teacher_service = require("../../services/teachers");
 var class_service = require("../../services/classes");
 var member_select_modal = require("../../components/member-select-modal.vue").default;
 var add_book_modal = require("./add-book-modal.vue").default;
+var messageAlert = require("../../components/message-alert.vue").default;
+var modalDialog = require("../../components/modal-dialog.vue").default;
+
 
 module.exports = {
   name: "class-view",
   props: {
-    data: Object, // class object
-    classrooms: Array // Array of available classrooms
+    appData: String // the id of class object
   },
   data: function() {
-    // clone the pass in data, because class-view component will
-    // modify the booking and books property of cls
-    var tmp = this.data || {};
     return {
-      cls: Object.assign({}, tmp, {
-        books: tmp.books || [],
-        booking: tmp.booking || []
-      }),
+      tenantConfig: {},
+      cls: {
+        books: [],
+        booking: []
+      },
       isPreview: false,
       quantity: 1,
       teachers: [],
@@ -150,9 +165,17 @@ module.exports = {
   components: {
     "date-picker": date_picker,
     "member-select-modal": member_select_modal,
-    "add-book-modal": add_book_modal
+    "add-book-modal": add_book_modal,
+    "message-alert": messageAlert,
+    "modal-dialog": modalDialog
   },
   computed: {
+    classId() {
+      return this.appData;
+    },
+    classrooms() {
+      return this.tenantConfig.classrooms || [];
+    },
     bookings: function() {
       var vm = this;
       var result = vm.cls.booking || [];
@@ -276,85 +299,44 @@ module.exports = {
         mediaUrl: urlObject && urlObject.href || "", // property 'href' is encoded URL
         description: this.cls.description
       });
-      request.done(function(data, textStatus, jqXHR) {
-        bootbox.alert("课程基本资料更新成功");
-        vm.cls = data;
-        vm.cls.books = data.books || [];
+      request.done((data, textStatus, jqXHR) => {
+        this.$refs.messager.showSuccessMessage("课程基本资料更新成功");
+        this.cls = Object.assign({}, data, {
+          books: data.books || [],
+          booking: data.booking || []
+        });
       });
     },
-    deleteClass: function() {
-      var vm = this;
-      if (vm.cls.courseID) {
-        return bootbox.confirm({
-          title: "确定删除班级中的课程吗？",
-          message:
-            "课程<strong>" +
-            vm.cls.name +
-            "</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程",
-          buttons: {
-            confirm: {
-              label: "查看班级",
-              className: "btn-success"
-            }
-          },
-          callback: function(ok) {
-            if (ok) {
-              window.location.href = "../course/" + vm.cls.courseID;
-            }
-          }
-        });
+    confirmDeleteClass() {
+      if (this.cls.courseID) {
+        this.$refs.deleteCourseClassDlg.show()
+      } else {
+        this.$refs.deleteClassDlg.show()
       }
-      bootbox.confirm({
-        title: "确定删除课程吗？",
-        message: "只能删除没有会员预约的课程，如果有预约，请先取消预约",
-        buttons: {
-          confirm: {
-            className: "btn-danger"
-          }
-        },
-        callback: function(ok) {
-          if (!ok) return;
-          var request = class_service.removeClass(vm.cls._id);
-          request.done(function(data, textStatus, jqXHR) {
-            window.location.href = "../home";
-          });
-        }
+    },
+    deleteClass: function() {
+      var request = class_service.removeClass(this.classId);
+      request.done((data, textStatus, jqXHR) => {
+        window.location.href = "../home";
       });
     },
     removeBook: function(item) {
-      var vm = this;
-      bootbox.confirm({
-        title: "确定删除绘本吗？",
-        message: "从当前课程中删除绘本《" + item.title + "》",
-        buttons: {
-          confirm: {
-            className: "btn-danger"
-          }
-        },
-        callback: function(ok) {
-          if (!ok) return;
-          var request = class_service.deleteBook(vm.cls._id, item);
-          request.done(function(data, textStatus, jqXHR) {
-            vm.cls.books = data.books;
-          });
-        }
+      var request = class_service.deleteBook(this.classId, item);
+      request.done((data, textStatus, jqXHR) => {
+        this.cls.books = data.books || [];
       });
+    },
+    jumpToCourse() {
+      window.location.href = "../course/" + this.cls.courseID;
     },
     addReservation: function(selectedItems) {
       // reset the quantity of reservation
       if (this.quantity === "") this.quantity = 1;
 
       var vm = this;
-      if (selectedItems.length == 0)
-        return bootbox.alert({
-          message: "请选择会员",
-          size: "small",
-          buttons: {
-            ok: {
-              className: "btn-danger"
-            }
-          }
-        });
+      if (selectedItems.length == 0) {
+        return this.$refs.messager.showErrorMessage("请选择会员");
+      };
 
       var members = vm.bookings || [];
       var addedOnes = selectedItems.filter(function(element, index, array) {
@@ -382,52 +364,36 @@ module.exports = {
             userName: data["member"].name
           });
           vm.cls.booking = data["class"].booking || [];
-          bootbox.alert("预约成功");
+          this.$refs.messager.showSuccessMessage("预约成功")
         });
       } else {
-        bootbox.alert("所选会员已经预约");
+        this.$refs.messager.showWarningMessage("所选会员已经预约")
       }
     },
     cancelReservation: function(item) {
-      var vm = this;
-      bootbox.confirm({
-        title: "确定取消会员预约吗？",
-        message: "取消会员的预约，并且返还扣除的课时，无法在课程开始后取消",
-        buttons: {
-          confirm: {
-            className: "btn-danger"
-          }
-        },
-        callback: function(ok) {
-          if (!ok) return;
-          var request = class_service.deleteReservation(vm.cls._id, {
-            memberid: item.member
-          });
-          request.done(function(data, textStatus, jqXHR) {
-            vm.cls.booking = data.booking || [];
-          });
-        }
+      var request = class_service.deleteReservation(this.classId, {
+        memberid: item.member
+      });
+      request.done((data, textStatus, jqXHR) => {
+        this.cls.booking = data.booking || [];
       });
     },
     addNewBook: function(newBook) {
-      var vm = this;
       var request = class_service.addBooks(vm.cls._id, newBook);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.cls.books = data.books;
+      request.done((data, textStatus, jqXHR) => {
+        this.cls.books = data.books;
       });
     },
     checkin: function(memberid) {
-      var vm = this;
       var request = class_service.checkin(vm.cls._id, memberid);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.cls.booking = data.booking || [];
+      request.done((data, textStatus, jqXHR) => {
+        this.cls.booking = data.booking || [];
       });
     },
     absent: function(memberid) {
-      var vm = this;
       var request = class_service.absent(vm.cls._id, memberid);
-      request.done(function(data, textStatus, jqXHR) {
-        vm.cls.booking = data.booking || [];
+      request.done((data, textStatus, jqXHR) => {
+        this.cls.booking = data.booking || [];
       });
     }
   },
@@ -441,30 +407,37 @@ module.exports = {
       all.push({ name: "<未指定>", _id: null });
       vm.teachers = all;
     });
+    this.tenantConfig = _getTenantConfig();
+    this.feature = this.tenantConfig.feature;
+
+    // load class object
+    if (this.classId) {
+      var request = class_service.getClass(this.classId);
+      request.done((data, textStatus, jqXHR) => {
+        // clone the returned data, ensure property "books" and "booking" existed
+        if (data) {
+          this.cls = Object.assign({}, data, {
+            books: data.books || [],
+            booking: data.booking || []
+          })
+        }
+      });
+    }
   },
   mounted: function() {
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     // 'this' is refer to vm instance
     var vm = this;
     // load class reservations
-    if (this.cls._id) {
-      var request = class_service.getReservations(this.cls._id);
+    if (this.classId) {
+      var request = class_service.getReservations(this.classId);
       request.done(function(data, textStatus, jqXHR) {
         vm.bookedMembers = data || [];
       });
     } else {
-      bootbox.alert({
-        message: "查看的课程不存在",
-        buttons: {
-          ok: {
-            className: "btn-danger"
-          }
-        }
-      });
+      this.$refs.messager.showErrorMessage("查看的课程不存在");
     }
-
-    // load the setting of tenant
-    var setting = util.getTenantSetting();
-    vm.feature = setting.feature;
   }
 };
 </script>
