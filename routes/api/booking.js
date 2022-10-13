@@ -255,63 +255,6 @@ router.delete('/:classID', async function(req, res, next) {
     }
 });
 
-/**
- * 
- * @param {Object} tenantDB 
- * @param {Object} doc 
- * @param {Object} cls 
- * @param {Number} quantity 
- */
-async function createNewBook(tenantDB, doc, cls, quantity) {
-    //TODO, parseInt the 'quantity'
-    let newbooking = {
-        member: doc._id,
-        quantity: quantity,
-        bookDate: new Date()
-    };
-    let classes = tenantDB.collection("classes");
-    // TODO, check member is not bookded
-    // "booking.member": {$ne: ObjectId('5788fa45a62991e02aaf04c0')}
-    let result = await classes.findOneAndUpdate(
-        { _id: cls._id },
-        {
-            $push: {
-                booking: newbooking
-            }
-        },
-        { returnDocument: "after" }
-    );
-    let after_cls = result.value;
-    //TODO, support multi membership card
-    if (doc.membership && doc.membership.length > 0 && after_cls.cost > 0) {
-        try {
-            // update the credit value in membership
-            let members = tenantDB.collection("members");
-            let result = await members.findOneAndUpdate(
-                { _id: doc._id },
-                {
-                    $inc: { "membership.0.credit": -quantity * after_cls.cost }
-                },
-                {
-                    projection: { membership: 1 },
-                    returnDocument: "after"
-                }
-            );
-            let m = result.value;
-            if (m) {
-                console.log("deduct %f credit from member %s (after: %j)", quantity * after_cls.cost, doc._id, m.membership);
-                // update the parameter 'doc' with updated memberhsip, which is returned to client
-                doc.membership = m.membership;
-            }
-        } catch (err) {
-            //TODO, roll back with transaction feature of MongoDB 4.0 or higher
-            console.error(err);
-        }
-    }
-    //return the updated class
-    return after_cls;
-}
-
 function validateCreateBooking(req, res, next) {
     if (!req.tenant || !req.tenant.name) {
         return next(new ParamError(`tenant is undefined`));
