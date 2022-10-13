@@ -120,10 +120,6 @@ div.container
         small(style='color:#777') 共{{booksCount}}本
   add-book-modal(ref='addBookDlg',@ok='addNewBook')
   member-select-modal(ref='memberSelectDlg',@ok='addReservation')
-    template(v-slot:toolbar)
-      div.btn-group(style='display:inline-flex;position:absolute;top:25px;left:20px')
-        label(style='margin-right:4px;line-height:34px') 人数:
-        input.form-control(type='number',min='1',step='1',style='width:90px',v-model.number='quantity')
   message-alert(ref="messager")
   modal-dialog(ref='deleteBookDlg' buttonStyle="primary" buttons="confirm" @ok="removeBook") 确定删除绘本吗？
     template(v-slot:body="slotProps")

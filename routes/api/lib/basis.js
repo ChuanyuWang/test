@@ -1,5 +1,8 @@
 const db_utils = require('../../../server/databaseManager');
 
+/**
+ * 400 status Error
+ */
 class ParamError extends Error {
     constructor(message, code) {
         super(message);

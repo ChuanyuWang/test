@@ -1,4 +1,4 @@
-const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
+//const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
 
 function validate(member, cls, quantity, error) {
     error.class = cls.name;
@@ -31,19 +31,6 @@ function validate(member, cls, quantity, error) {
         return false;
     }
 
-    //TODO, support multi membership card
-    var membership = null;
-    if (member.membership && member.membership.length > 0) {
-        membership = member.membership[0];
-    }
-
-    // unregister user wants to book non-free session
-    if (cls.cost > 0 && !membership) {
-        error.cause = new Error("您还未办理会员卡（剩余课时不足），如有问题，欢迎来电或到店咨询");
-        error.cause.code = 7002;
-        return false;
-    }
-
     // check the age limitation for current member
     if (cls.age && cls.age.max && member.birthday) {
         var oldest = new Date(cls.date.getTime());
@@ -67,32 +54,6 @@ function validate(member, cls, quantity, error) {
             error.cause = new Error("小朋友年龄不到指定要求，无法预约，如有问题，欢迎来电或到店咨询");
             return false;
         }
-    }
-
-    // if it's a free course, then it's open for all kinds of membership
-    if (cls.cost <= 0) {
-        return true;
-    }
-
-    if (membership.expire && membership.expire < cls.date) {
-        //TODO, use client locale date instead of server
-        error.cause = new Error("您的会员卡有效期至" + membership.expire.toLocaleDateString() + "，无法预约，如有问题，欢迎来电或到店咨询");
-        return false;
-    }
-
-    //check if the member is limited to some classroom
-    if (membership.type === "LIMITED") {
-        membership.room = membership.room || [];
-        if (membership.room.indexOf(cls.classroom) === -1) {
-            error.cause = new Error("您的会员卡不能预约此教室课程，如有问题，欢迎来电或到店咨询");
-            return false;
-        }
-    }
-
-    if (membership.credit + EPSILON < quantity * cls.cost) {
-        error.cause = new Error("您的剩余课时不足，无法预约，如有问题，欢迎来电或到店咨询");
-        error.cause.code = 7001;
-        return false;
     }
 
     return true;

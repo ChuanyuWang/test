@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var reservation = require('./lib/reservation');
+var { check } = require('./lib/reservation');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-const { ParamError, RuntimeError, asyncMiddlewareWrapper, R } = require("./lib/basis");
-
+const { ParamError, asyncMiddlewareWrapper, RuntimeError } = require("./lib/basis");
+const moment = require('moment');
+const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
 
 router.use(helper.checkTenant);
 
@@ -110,37 +111,59 @@ router.post('/',
     validateCreateBooking,
     postR(getClassObj),
     postR(createMemberIfNotExist),
+    checkSeatandAge,
+    postR(findContract),
+    postR(deductContract),
     async function(req, res, next) {
         try {
             let cls = res.locals.cls;
+            let contract = res.locals.contract;
             let member = res.locals.member;
-            let error = reservation.check(member, cls, req.body.quantity);
-            if (error) {
-                return next(error);
+            let tenantDB = await db_utils.connect(req.tenant.name);
+            let classes = tenantDB.collection("classes");
+            //let after_cls = await createNewBook(tenantDB, member, cls, req.body.quantity);
+
+            let newbooking = {
+                member: member._id,
+                quantity: 1, // always be 1 since new version
+                bookDate: new Date(),
+                contract: contract ? contract._id : undefined
+            };
+            let result = await classes.findOneAndUpdate({
+                // We have to skip the check, contract has been deduct, we have to insert anyway
+                //"booking.member": { $ne: member._id }, 
+                _id: cls._id
+            }, {
+                $push: {
+                    booking: newbooking
+                }
+            }, { returnDocument: "after" });
+            if (!result.value) {
+                console.error("fatal error occurred: %j", result.lastErrorObject);
+                return next(new RuntimeError("class seems been deleted just before booking, but contract already been deduct!"));
             }
 
-            let tenantDB = await db_utils.connect(req.tenant.name);
-            let after_cls = await createNewBook(tenantDB, member, cls, req.body.quantity);
-            //return the status of booking class
+            console.log(`add booking successfuly to class ${cls._id}`);
             return res.json({
-                class: after_cls,
+                class: result.value,
                 member: member
             });
-        } catch (err) {
-            let error = new Error('Fail to book');
-            error.innerError = err;
-            return next(error);
+        } catch (error) {
+            return next(new RuntimeError("Fail to book", error));
         }
     }
 );
 
 // remove specfic user's booking info
-// TODO, the delete operation may sent unwantted.
+// TODO, the delete operation may sent accidentally.
 router.delete('/:classID', async function(req, res, next) {
+    if (!req.tenant || !req.tenant.name) {
+        return next(new ParamError(`tenant is undefined`));
+    }
     if (!req.body.memberid) {
-        let error = new Error(`Missing param "memberid"`);
-        error.status = 400;
-        return next(error);
+        return next(new ParamError(`Missing param "memberid"`));
+    } else if (!ObjectId.isValid(req.body.memberid)) {
+        return next(new ParamError(`memberid ${req.body.memberid} is invalid`));
     }
 
     try {
@@ -152,27 +175,17 @@ router.delete('/:classID', async function(req, res, next) {
         });
 
         if (!doc) {
-            let error = new Error("没有找到指定课程预约，请刷新重试");
-            error.status = 400;
-            error.code = 2009;
-            return next(error);
+            return next(new ParamError("没有找到指定课程预约，请刷新重试", 2009));
         }
 
         // find the booking info of member
-        let bookingInfo = null;
-        for (let i = 0; i < doc.booking.length; i++) {
-            if (doc.booking[i].member.toString() == req.body.memberid) {
-                bookingInfo = doc.booking[i];
-                break;
-            }
-        }
-
+        let bookingInfo = doc.booking.find(value => {
+            return value.member.toString() == req.body.memberid;
+        });
         // Can't cancel the booking if order is available
         // TODO, check refund status and cancel booking
         if (bookingInfo.order) {
-            let error = new Error("预约订单已经支付，请联系门店取消预约");
-            error.status = 400;
-            return next(error);
+            return next(new ParamError("预约订单已经支付，请联系门店取消预约"));
         }
 
         if (req.isAuthenticated() && req.user.tenant === req.tenant.name) {
@@ -184,16 +197,12 @@ router.delete('/:classID', async function(req, res, next) {
                 // 1 hours = 3600000 (1*60*60*1000)
                 console.log("User %s cancel the booking of %s", req.user.username, req.body.memberid);
             } else {
-                let error = new Error("不能在课程开始1小时后取消预约");
-                error.status = 400;
-                return next(error);
+                return next(new ParamError("不能在课程开始1小时后取消预约"));
             }
         } else if (Date.now() + 86400000 > doc.date.getTime()) {
             // be free to cancel the booking if it's less than 24 hours before begin
             // 24 hours = 86400000 ms (24*60*60*1000)
-            let error = new Error("不能在开始前24小时内取消课程或取消已经结束的课程");
-            error.status = 400;
-            return next(error);
+            return next(new ParamError("不能在开始前24小时内取消课程或取消已经结束的课程"));
         }
 
         let result = await classes.findOneAndUpdate({
@@ -218,25 +227,23 @@ router.delete('/:classID', async function(req, res, next) {
         }
         // update the class session with new data
         doc = result.value;
-        if (doc.cost > 0) {
-            //TODO, support multi membership card
+        if (doc.cost > 0 && bookingInfo.contract) {
             //TODO, handle the callback when member is inactive.
-            let members = tenantDB.collection("members");
-            result = await members.findOneAndUpdate({
-                _id: ObjectId(req.body.memberid),
-                "membership.0": { $exists: true }
+            let contracts = tenantDB.collection("contracts");
+            result = await contracts.findOneAndUpdate({
+                _id: bookingInfo.contract
             }, {
-                $inc: { "membership.0.credit": doc.cost * bookingInfo.quantity }
+                $inc: { "consumedCredit": -doc.cost }
             }, {
-                projection: { membership: 1 },
+                projection: { credit: 1, consumedCredit: 1 },
                 returnDocument: "after"
             });
 
             if (result.lastErrorObject.updatedExisting) {
-                console.log(`return ${doc.cost * bookingInfo.quantity} credit to member ${req.body.memberid} (after: ${JSON.stringify(result.value.membership)})`);
+                console.log(`return ${doc.cost} credit to contract ${bookingInfo.contract} (after: ${JSON.stringify(result.value)})`);
             } else {
-                //TODO, handle the callback when member is not existed.
-                console.error(`Fail to return expense to member ${req.body.memberid}`);
+                //TODO, handle the callback when contract is not existed.
+                console.error(`Fail to return expense to contract ${bookingInfo.contract}`);
             }
         }
 
@@ -310,8 +317,8 @@ function validateCreateBooking(req, res, next) {
         return next(new ParamError(`tenant is undefined`));
     }
 
-    if (!req.body.classid || !req.body.quantity) {
-        return next(new ParamError(`Missing param 'classid' or 'quantity'`));
+    if (!req.body.classid) {
+        return next(new ParamError(`Missing param 'classid'`));
     }
 
     if (req.body.classid && !ObjectId.isValid(req.body.classid)) {
@@ -389,6 +396,80 @@ async function createMemberIfNotExist(db, req, locals) {
         }
     }
     locals.member = doc;
+}
+
+function checkSeatandAge(req, res, next) {
+    let cls = res.locals.cls;
+    let member = res.locals.member;
+    let error = check(member, cls, 1);
+    if (error) {
+        return next(error);
+    } else {
+        return next();
+    }
+}
+
+async function findContract(db, req, locals) {
+    let cls = locals.cls;
+    if (cls.cost <= 0) return; // free class
+
+    let member = locals.member;
+    let contracts = db.collection("contracts");
+    // sort result from old to new ['2022-9-29','2022-10-8']
+    let cursor = contracts.find({ memberId: member._id }, {
+        projection: { comments: 0, history: 0 },
+        sort: [['effectiveDate', 1]]
+    });
+
+    let docs = await cursor.toArray();
+    const now = moment();
+    for (let index = 0; index < docs.length; index++) {
+        const contract = docs[index];
+        console.log(contract.status);
+        if (contract.status !== "paid") continue;
+        console.log(contract.goods);
+        if (contract.goods !== cls.type) continue;
+        console.log(contract.effectiveDate);
+        if (moment(contract.effectiveDate).isValid() && moment(contract.effectiveDate).isAfter(now)) continue;
+        console.log(contract.expireDate);
+        if (moment(contract.expireDate).isValid() && moment(contract.expireDate).isBefore(now)) continue;
+
+        // (0.1 + 0.2 <= 0.3) ==> false; (0.1 + 0.2 <= 0.3 + EPSILON) ==> true
+        console.log(contract.consumedCredit + contract.expendedCredit + cls.cost <= contract.credit + EPSILON);
+        if (contract.consumedCredit + contract.expendedCredit + cls.cost <= contract.credit + EPSILON) {
+            locals.contract = contract;
+            console.log("find contract to deduct: %j", contract);
+            break;
+        } else {
+            console.log(contract);
+        }
+    }
+    if (!locals.contract) {
+        throw new RuntimeError("无法预约，无此课程的有效合约");
+    }
+}
+
+async function deductContract(db, req, locals) {
+    let contract = locals.contract;
+    if (!contract) return; // free class
+    let cls = locals.cls;
+    let contracts = db.collection("contracts");
+    let result = await contracts.findOneAndUpdate({
+        _id: contract._id,
+        consumedCredit: contract.consumedCredit,
+        status: contract.status
+    }, {
+        $inc: { "consumedCredit": cls.cost }
+    }, {
+        projection: { credit: 1, consumedCredit: 1 },
+        returnDocument: "after"
+    });
+
+    if (!result.value) {
+        throw new RuntimeError("扣课时失败，请重试")
+    }
+    console.log("deduct %f credit from contract %s (after: %j)", cls.cost, contract.serialNo, result.value);
+    locals.contract = result.value;
 }
 
 module.exports = router;
