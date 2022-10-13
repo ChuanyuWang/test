@@ -5,7 +5,7 @@ var reservation = require('./lib/reservation');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-const { ParamError } = require("./lib/basis");
+const { ParamError, RuntimeError, asyncMiddlewareWrapper, R } = require("./lib/basis");
 
 
 router.use(helper.checkTenant);
@@ -93,109 +93,46 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
         res.json(book_items);
     });
 });
-/* booking a class by member
 
-req.body = {
-openid : "o0uUrv4RGMMiGasPF5bvlggasfGk", (optional)
-name : "小朋友1",
-contact : "13500000000",
-classID : "5716630aa012576d0371e888"
-}
+const postR = asyncMiddlewareWrapper("Fail to book");
+/**
+ * booking a class by member
+ * 
+ * req.body = {
+    openid : "o0uUrv4RGMMiGasPF5bvlggasfGk", (optional)
+    name : "小朋友1",
+    contact : "13500000000",
+    classID : "5716630aa012576d0371e888",
+    memberid: String
+ }
  */
-router.post('/', async function(req, res, next) {
-    if (!req.body.classid || !req.body.quantity) {
-        return next(new ParamError(`Missing param 'classid' or 'quantity'`));
-    }
-
-    if (req.body.classid && !ObjectId.isValid(req.body.classid)) {
-        return next(new ParamError(`classid ${req.body.classid} is invalid`));
-    }
-
-    let user_query = {};
-    if (req.body.memberid) {
-        if (ObjectId.isValid(req.body.memberid)) {
-            user_query._id = ObjectId(req.body.memberid)
-        } else {
-            return next(new ParamError(`memberid ${req.body.memberid} is invalid`));
-        }
-    } else if (req.body.name && req.body.contact) {
-        user_query.name = req.body.name;
-        user_query.contact = req.body.contact;
-    } else {
-        return next(new ParamError(`missing parameters of member`));
-    }
-
-    try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        // find the class want to book
-        let classes = tenantDB.collection("classes");
-        let cls = await classes.findOne({ _id: ObjectId(req.body.classid) });
-        if (!cls) {
-            let error = new Error("没有找到指定课程，请刷新重试");
-            error.status = 400;
-            error.code = 2002;
-            return next(error);
-        }
-        console.log("class is found %j", cls);
-
-        // 1 hour = 3600000 (1*60*60*1000)
-        // 1 minute = 60000 (1*60*1000)
-        if (Date.now() > cls.date.getTime() - 60000) {
-            if (req.isUnauthenticated() || req.user.tenant != req.tenant.name) {
-                // member can only book the class 1 hour before started
-                let error = new Error("课程已经开始或即将开始(不足1分钟)");
-                error.status = 400;
+router.post('/',
+    validateCreateBooking,
+    postR(getClassObj),
+    postR(createMemberIfNotExist),
+    async function(req, res, next) {
+        try {
+            let cls = res.locals.cls;
+            let member = res.locals.member;
+            let error = reservation.check(member, cls, req.body.quantity);
+            if (error) {
                 return next(error);
             }
-        }
 
-
-        let members = tenantDB.collection("members");
-        // find the user who want to book a class
-        let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
-        if (!doc) {
-            // create new member if not exist
-            doc = {
-                name: req.body.name,
-                contact: req.body.contact,
-                status: "active",
-                source: "book",
-                since: new Date(),
-                membership: [],
-                openid: req.body.openid || undefined
-            };
-            let result = await members.insertOne(doc);
-            console.debug("create member successfully with result: %j", result.result);
-            console.log("member is created automatically during booking: %j", doc);
-        } else {
-            console.log("member is found %j", doc);
-            // update openid if not the same
-            if (req.body.openid && req.body.openid !== doc.openid) {
-                await members.findOneAndUpdate(
-                    { _id: doc._id },
-                    { $set: { "openid": req.body.openid } }
-                );
-                doc.openid = req.body.openid;
-            }
-        }
-
-
-        let error = reservation.check(doc, cls, req.body.quantity);
-        if (error) {
+            let tenantDB = await db_utils.connect(req.tenant.name);
+            let after_cls = await createNewBook(tenantDB, member, cls, req.body.quantity);
+            //return the status of booking class
+            return res.json({
+                class: after_cls,
+                member: member
+            });
+        } catch (err) {
+            let error = new Error('Fail to book');
+            error.innerError = err;
             return next(error);
         }
-        let after_cls = await createNewBook(tenantDB, doc, cls, req.body.quantity);
-        //return the status of booking class
-        return res.json({
-            class: after_cls,
-            member: doc
-        });
-    } catch (err) {
-        let error = new Error('Fail to book');
-        error.innerError = err;
-        return next(error);
     }
-});
+);
 
 // remove specfic user's booking info
 // TODO, the delete operation may sent unwantted.
@@ -366,6 +303,92 @@ async function createNewBook(tenantDB, doc, cls, quantity) {
     }
     //return the updated class
     return after_cls;
+}
+
+function validateCreateBooking(req, res, next) {
+    if (!req.tenant || !req.tenant.name) {
+        return next(new ParamError(`tenant is undefined`));
+    }
+
+    if (!req.body.classid || !req.body.quantity) {
+        return next(new ParamError(`Missing param 'classid' or 'quantity'`));
+    }
+
+    if (req.body.classid && !ObjectId.isValid(req.body.classid)) {
+        return next(new ParamError(`classid ${req.body.classid} is invalid`));
+    }
+
+    let user_query = {};
+    if (req.body.memberid) {
+        if (ObjectId.isValid(req.body.memberid)) {
+            user_query._id = ObjectId(req.body.memberid)
+        } else {
+            return next(new ParamError(`memberid ${req.body.memberid} is invalid`));
+        }
+    } else if (req.body.name && req.body.contact) {
+        user_query.name = req.body.name;
+        user_query.contact = req.body.contact;
+    } else {
+        return next(new ParamError(`missing parameters of member`));
+    }
+    res.locals.user_query = user_query;
+    return next();
+}
+
+async function getClassObj(db, req, locals) {
+    // find the class want to book
+    let classes = db.collection("classes");
+    let cls = await classes.findOne({ _id: ObjectId(req.body.classid) });
+    if (!cls) {
+        throw new ParamError("没有找到指定课程，请刷新重试", 2002);
+    }
+    console.log("class is found %j", cls);
+
+    // 1 hour = 3600000 (1*60*60*1000)
+    // 1 minute = 60000 (1*60*1000)
+    if (Date.now() > cls.date.getTime() - 60000) {
+        if (req.isUnauthenticated() || req.user.tenant != req.tenant.name) {
+            // member can only book the class 1 hour before started
+            throw new ParamError("课程已经开始或即将开始(不足1分钟)");
+        }
+    }
+    locals.cls = cls;
+}
+
+async function createMemberIfNotExist(db, req, locals) {
+    let members = db.collection("members");
+    let user_query = locals.user_query;
+    // find the user who want to book a class
+    let doc = await members.findOne(user_query, { projection: { history: 0, comments: 0 } });
+    if (!doc) {
+        if (user_query._id) {
+            throw new ParamError(`member ${req.body.memberid} doesn't exist`);
+        }
+        // create new member if not exist
+        doc = {
+            name: req.body.name,
+            contact: req.body.contact,
+            status: "active",
+            source: "book",
+            since: new Date(),
+            membership: [],
+            openid: req.body.openid || undefined
+        };
+        let result = await members.insertOne(doc);
+        console.debug("create member successfully with result: %j", result.result);
+        console.log("member is created automatically during booking: %j", doc);
+    } else {
+        console.log("member is found %j", doc);
+        // update openid if not the same
+        if (req.body.openid && req.body.openid !== doc.openid) {
+            await members.findOneAndUpdate(
+                { _id: doc._id },
+                { $set: { "openid": req.body.openid } }
+            );
+            doc.openid = req.body.openid;
+        }
+    }
+    locals.member = doc;
 }
 
 module.exports = router;
