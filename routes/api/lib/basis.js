@@ -29,7 +29,7 @@ exports.asyncMiddlewareWrapper = function(erorrMessage) {
                 if (error instanceof ParamError || error instanceof RuntimeError)
                     return next(error);
                 else
-                    return new RuntimeError(erorrMessage, error);
+                    return next(new RuntimeError(erorrMessage, error));
             }
         }
     }
