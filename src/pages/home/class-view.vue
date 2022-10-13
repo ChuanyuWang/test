@@ -378,7 +378,7 @@ module.exports = {
             userName: data["member"].name
           });
           vm.cls.booking = data["class"].booking || [];
-          this.$refs.messager.showSuccessMessage("预约成功")
+          vm.$refs.messager.showSuccessMessage("预约成功")
         });
       } else {
         this.$refs.messager.showWarningMessage("所选会员已经预约")
