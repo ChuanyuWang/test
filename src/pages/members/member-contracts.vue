@@ -84,7 +84,9 @@ module.exports = {
         ' <a href="../contract/' + row._id + '" target="_blank">',
         value,
         //'<i class="glyphicon glyphicon-search"></i>',
-        '</a>'
+        '</a>',
+        row.status === "open" || row.status === "outstanding" ? '<span class="label label-danger ms-3">欠费</span>' : '',
+        row.status === "paid" ? '<span class="label label-success ms-3">缴清</span>' : ''
       ].join('');
     },
     dateFormatter(value, row, index) {
@@ -128,11 +130,11 @@ module.exports = {
     typeFormatter(value, row, index) {
       switch (value) {
         case "new":
-          return "新签<span class='label label-success ms-3'>课时卡</span>";
+          return "新签<span class='label label-primary ms-3'>课时卡</span>";
         case "renewal":
-          return "续费<span class='label label-success ms-3'>课时卡</span>";
+          return "续费<span class='label label-primary ms-3'>课时卡</span>";
         case "donate":
-          return "赠送<span class='label label-success ms-3'>课时卡</span>";
+          return "赠送<span class='label label-primary ms-3'>课时卡</span>";
         default:
           return null;
       }
