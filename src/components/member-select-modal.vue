@@ -1,5 +1,5 @@
 <template lang="pug">
-modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK") {{$t('member_select_title')}}
+modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK" @show="lazyRefresh") {{$t('member_select_title')}}
   template(v-slot:body)
     slot(name='toolbar')
     table.member-table(data-checkbox-header='false',data-striped='true',data-search='true',data-pagination='true',data-page-size='8',data-unique-id="_id",data-search-align='right',data-click-to-select='true')
@@ -32,7 +32,9 @@ module.exports = {
     }
   },
   data: function() {
-    return {};
+    return {
+      firstOpen: true
+    };
   },
   components: {
     "modal-dialog": modalDialog
@@ -40,6 +42,12 @@ module.exports = {
   computed: {},
   filters: {},
   methods: {
+    lazyRefresh() {
+      if (this.firstOpen) {
+        this.firstOpen = false;
+        $(this.$el).find('table.member-table').bootstrapTable('refresh', { url: '/api/members?status=active' });
+      }
+    },
     show: function(selectedIDs) {
       // clear existed selected items
       var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
@@ -77,8 +85,9 @@ module.exports = {
     var vm = this;
     $(vm.$el).find('table.member-table').bootstrapTable({
       sidePagination: "server",
-      url: '/api/members?status=active', // only display active members
+      //url: '/api/members?status=active', // only display active members
       locale: 'zh-CN',
+      showRefresh: true,
       columns: [{}, {}, {}, {
         formatter: vm.creditFormatter
       }]
