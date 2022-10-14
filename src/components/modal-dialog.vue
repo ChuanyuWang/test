@@ -90,7 +90,6 @@ module.exports = {
   },
   mounted: function() {
     $(this.$el).on("show.bs.modal", e => {
-      console.log("show.bs.modal");
       this.$emit('show');
     });
   }
