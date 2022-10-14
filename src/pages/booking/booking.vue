@@ -53,14 +53,14 @@ div
           div.col-xs-9
             p.form-control-static(style='height:auto') {{bookItem.content}}
         div.form-group.form-group-sm(:class='{"has-error": errors.name}')
-          label.control-label-sm.col-xs-3 小朋友姓名:
+          label.control-label-sm.col-xs-3 学员姓名:
           div.col-xs-9
-            input.form-control(type='text',placeholder='小朋友注册时用的名称',v-model='bookItem.name')
+            input.form-control(type='text',placeholder='学员报名时登记的姓名',v-model='bookItem.name')
         div.form-group.form-group-sm(:class='{"has-error": errors.contact}')
           label.control-label-sm.col-xs-3 联系方式:
           div.col-xs-9
             input.form-control(type='tel',placeholder='135xxx',v-model='bookItem.contact')
-        div.form-group.form-group-sm(:class='{"has-error": errors.quantity}')
+        div.form-group.form-group-sm(:class='{"has-error": errors.quantity}' v-show="false")
           label.control-label-sm.col-xs-3 人数:
           div.col-xs-4
             input.form-control(type='number',min='1',step='1',v-model='bookItem.quantity')
@@ -406,6 +406,7 @@ module.exports = {
   min-width: 50px;
   text-align: center;
   line-height: 1;
+
   small {
     font-size: 12px;
     color: #808080;
@@ -427,20 +428,24 @@ module.exports = {
   float: right;
   width: 20%;
   max-width: 60px;
+
   .finish-btn {
     float: right;
     margin-top: 3px;
   }
+
   .cancel-btn {
     .finish-btn;
     opacity: 0.5;
   }
+
   .book-btn {
     .finish-btn;
     padding-bottom: 3px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
   }
+
   .remain-btn {
     font-size: 12px;
     float: right;
@@ -450,6 +455,7 @@ module.exports = {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     opacity: 1 !important; // remain button is disabled by default, keep the opacity as 1 for better visual
+
     .remain-span {
       padding: 2px;
       margin-left: 1px;
