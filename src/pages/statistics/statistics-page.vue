@@ -10,8 +10,6 @@ div
     li(role='presentation')
       a(href="#analytics",role='tab',data-toggle='tab') {{$t('consume')}}
     li(role='presentation')
-      a(href="#hint",role='tab',data-toggle='tab') {{$t('passive_title')}}
-    li(role='presentation')
       a(href="#member",role='tab',data-toggle='tab') 消课
   div.tab-content
     div.tab-pane.active(role="tabpanel",id="checkin")
@@ -22,8 +20,6 @@ div
       teacher-tab(ref='teacherTab')
     div.tab-pane(role="tabpanel",id="analytics")
       consume-tab(ref='consumeChart')
-    div.tab-pane(role="tabpanel",id="hint")
-      passive-tab(ref='passiveChart')
     div.tab-pane(role="tabpanel",id="member")
       member-tab
 </template>
@@ -39,7 +35,6 @@ var checkinTab = require("./checkin-tab.vue").default;
 var teacherTab = require("./teacher-tab.vue").default;
 var opportunityTab = require("./opportunity-tab.vue").default;
 var consumeTab = require("./consume-tab.vue").default;
-var passiveTab = require("./passive-tab.vue").default;
 var memberTab = require("./member-tab.vue").default;
 
 module.exports = {
@@ -54,7 +49,6 @@ module.exports = {
     "teacher-tab": teacherTab,
     "opportunity-tab": opportunityTab,
     "consume-tab": consumeTab,
-    "passive-tab": passiveTab,
     "member-tab": memberTab
   },
   computed: {},
@@ -83,4 +77,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
