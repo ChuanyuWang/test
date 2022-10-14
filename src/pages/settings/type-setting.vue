@@ -4,6 +4,7 @@ div
     div.col-xs-6
       div.btn-group(role='group',style="margin:7px 0")
         button.btn.btn-success(type='button',@click='beforeCreateType()') 添加
+      p.small.ms-3.mb-3 添加至少一种课程类型，用于创建对应的课程；开放预约的课程允许家长自助约课
       template(v-for='(type, index) in types')
         div.panel.panel-default(style="margin-bottom:7px")
           div.panel-heading {{type.name}} 
@@ -179,4 +180,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
