@@ -388,7 +388,7 @@ async function findContract(db, req, locals) {
         }
     }
     if (!locals.contract) {
-        throw new RuntimeError("无法预约，无此课程的有效合约");
+        throw new RuntimeError("预约失败，没有找到选择课程的有效合约");
     }
 }
 
