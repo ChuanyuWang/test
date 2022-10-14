@@ -60,7 +60,7 @@ module.exports = {
         // select the pass in ones
         $(this.$el).find('table.member-table').bootstrapTable('checkBy', { field: '_id', values: selectedIDs });
       }
-      $(this.$el).modal('show');
+      this.$refs.dialog.show();
     },
     clickOK: function() {
       var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
