@@ -29,7 +29,7 @@ module.exports.checkTenantUser = function(req, res, next) {
 };
 
 exports.checkTenant = function(req, res, next) {
-    if (!req.tenant) {
+    if (!req.tenant || !req.tenant.name) {
         let error = new Error("tenant is not defined");
         error.status = 400;
         return next(error);
