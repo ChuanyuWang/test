@@ -1,13 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var { check } = require('./lib/reservation');
+var { check, findAvailableContract } = require('./lib/reservation');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { ParamError, asyncMiddlewareWrapper, RuntimeError } = require("./lib/basis");
-const moment = require('moment');
-const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
 
 router.use(helper.checkTenant);
 
@@ -365,28 +363,7 @@ async function findContract(db, req, locals) {
     });
 
     let docs = await cursor.toArray();
-    const now = moment();
-    for (let index = 0; index < docs.length; index++) {
-        const contract = docs[index];
-        console.log(contract.status);
-        if (contract.status !== "paid") continue;
-        console.log(contract.goods);
-        if (contract.goods !== cls.type) continue;
-        console.log(contract.effectiveDate);
-        if (moment(contract.effectiveDate).isValid() && moment(contract.effectiveDate).isAfter(now)) continue;
-        console.log(contract.expireDate);
-        if (moment(contract.expireDate).isValid() && moment(contract.expireDate).isBefore(now)) continue;
-
-        // (0.1 + 0.2 <= 0.3) ==> false; (0.1 + 0.2 <= 0.3 + EPSILON) ==> true
-        console.log(contract.consumedCredit + contract.expendedCredit + cls.cost <= contract.credit + EPSILON);
-        if (contract.consumedCredit + contract.expendedCredit + cls.cost <= contract.credit + EPSILON) {
-            locals.contract = contract;
-            console.log("find contract to deduct: %j", contract);
-            break;
-        } else {
-            console.log(contract);
-        }
-    }
+    locals.contract = findAvailableContract(cls, docs);
     if (!locals.contract) {
         throw new RuntimeError("预约失败，没有找到选择课程的有效合约");
     }
@@ -409,7 +386,7 @@ async function deductContract(db, req, locals) {
     });
 
     if (!result.value) {
-        throw new RuntimeError("扣课时失败，请重试")
+        throw new RuntimeError("扣课时失败，请重试");
     }
     console.log("deduct %f credit from contract %s (after: %j)", cls.cost, contract.serialNo, result.value);
     locals.contract = result.value;

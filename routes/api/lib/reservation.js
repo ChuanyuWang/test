@@ -1,4 +1,6 @@
-//const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
+const moment = require('moment');
+
+const EPSILON = 2e-10; // Number.EPSILON is not big enough, e.g. (3.6-1.2-2.4) < Number.EPSILON => false
 
 function validate(member, cls, quantity, error) {
     error.class = cls.name;
@@ -75,9 +77,9 @@ function generateBooking(member, cls, quantity) {
         var membership = null;
         if (member.membership && member.membership.length > 0) {
             membership = member.membership[0];
+            // deduct the expense
+            membership.credit -= quantity * cls.cost;
         }
-        // deduct the expense
-        membership.credit -= quantity * cls.cost;
     }
 
     return newbooking;
@@ -144,4 +146,28 @@ exports.check = function(member, classToBook, quantity) {
 
 exports.remove = function(memberOrMembers, classOrClasses) {
 
+}
+
+/**
+ * Find the available contract to deduct
+ * @param {object} class2Book class document
+ * @param {array} allContracts must be sorted by effectiveDate "[['effectiveDate', 1]]"
+ * @returns 
+ */
+exports.findAvailableContract = function(class2Book, allContracts) {
+    const now = moment();
+    for (let index = 0; index < allContracts.length; index++) {
+        const contract = allContracts[index];
+        if (contract.status !== "paid") continue;
+        if (contract.goods !== class2Book.type) continue;
+        if (moment(contract.effectiveDate).isValid() && moment(contract.effectiveDate).isAfter(now)) continue;
+        if (moment(contract.expireDate).isValid() && moment(contract.expireDate).isBefore(now)) continue;
+
+        // (0.1 + 0.2 <= 0.3) ==> false; (0.1 + 0.2 <= 0.3 + EPSILON) ==> true
+        if (contract.consumedCredit + contract.expendedCredit + class2Book.cost <= contract.credit + EPSILON) {
+            console.log("find contract to deduct: %j", contract);
+            return contract;
+        }
+    }
+    return null;
 }
