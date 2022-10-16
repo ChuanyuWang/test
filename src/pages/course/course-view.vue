@@ -42,7 +42,7 @@ div.container
     div.col-xs-10.col-sm-7.col-md-5
       ul.list-group(style='margin-bottom:0px')
         transition-group(name="list")
-          li.list-group-item(v-for="member in memberList",:key='member.id')
+          li.list-group-item(v-for="member in memberList" :key='member.id')
             span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
             span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
             a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
@@ -77,7 +77,7 @@ div.container
     div.col-sm-7.col-md-5
       ul.list-group(style='margin-bottom:0px')
         transition-group(name="list")
-          li.list-group-item(v-for="item in sortedClasses",:key='item._id')
+          li.list-group-item(v-for="item in sortedClasses" :key='item._id')
             h4(style='margin: 3px 0') {{item.name}}
             small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
             p(style='margin: 3px 0', v-if='feature=="book"') 绘本: {{item.books | formatBooks}}
@@ -188,7 +188,7 @@ module.exports = {
           });
         });
         return {
-          id: member.id,
+          id: member._id,
           name: member.name,
           participationStatus: allClassesStatus
         };
@@ -220,7 +220,7 @@ module.exports = {
           }
         });
         //status.total = status.done + status.absent + status.left + status.uninvolved;
-        progress[member.id] = status;
+        progress[member._id] = status;
       });
       return progress;
     },
@@ -262,6 +262,22 @@ module.exports = {
   },
   watch: {},
   methods: {
+    refreshMembers() {
+      if (this.course.members && this.course.members.length > 0) {
+        var request = course_service.getCourseMembers(this.courseId);
+        request.done((data, textStatus, jqXHR) => {
+          // set members property
+          this.members = data || [];
+        });
+      }
+    },
+    refreshClasses() {
+      var request2 = course_service.getCourseClasses(this.courseId);
+      request2.done((data, textStatus, jqXHR) => {
+        // set classes property
+        this.classes = data || [];
+      });
+    },
     showTooltip: function(e) {
       // must listen to 'touchstart' event
       $(document).one("touchstart", function() {
@@ -283,7 +299,7 @@ module.exports = {
     isAbsent: function(cls, member) {
       var booking = cls.booking || [];
       var hasReservation = function(value, index, array) {
-        return value.member === member.id;
+        return value.member === member._id;
       };
       return !booking.some(hasReservation);
     },
@@ -291,7 +307,7 @@ module.exports = {
       var booking = cls.booking || [];
       var checkinStatus = null;
       var hasReservation = function(value, index, array) {
-        if (value.member === member.id) {
+        if (value.member === member._id) {
           checkinStatus = value.status || 'unchecked';
           return true;
         }
@@ -416,6 +432,7 @@ module.exports = {
           vm.classes.push(value);
         });
         vm.$refs.summaryDlg.show(data.result || {});
+        console.log(data.errors);
         //bootbox.alert('班级课程添加成功');
       });
     },
@@ -457,7 +474,7 @@ module.exports = {
         // filter the new added member
         return !members.some(function(value, index, array) {
           // find one matched member and return true
-          return value.id == element._id;
+          return value._id == element._id;
         });
       });
 
@@ -473,12 +490,15 @@ module.exports = {
           vm.course._id,
           result
         );
-        request.done(function(data, textStatus, jqXHR) {
-          result.forEach(function(value, index, array) {
+        request.done((data, textStatus, jqXHR) => {
+          var addedMembers = data && data.addedMembers || [];
+          addedMembers.forEach(function(value, index, array) {
             vm.members.push(value);
           });
-          vm.classes = data.updateClasses || [];
+          //vm.classes = data.updateClasses || [];
+          this.refreshClasses();
           vm.$refs.summaryDlg.show(data.result || {});
+          console.log(data.errors);
           //bootbox.alert('添加班级成员成功');
         });
       }
@@ -543,19 +563,8 @@ module.exports = {
     var request = course_service.getCourse(this.courseId);
     request.done((data, textStatus, jqXHR) => {
       this.course = data || {};
-      var request2 = course_service.getCourseClasses(this.courseId);
-      request2.done((data, textStatus, jqXHR) => {
-        // set classes property
-        this.classes = data || [];
-      });
-
-      if (this.course.members && this.course.members.length > 0) {
-        var request3 = course_service.getCourseMembers(this.courseId);
-        request3.done((data, textStatus, jqXHR) => {
-          // set members property
-          this.members = data && data.members || [];
-        });
-      }
+      this.refreshClasses();
+      this.refreshMembers();
     });
   },
   mounted: function() {

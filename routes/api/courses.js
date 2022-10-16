@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var helper = require('../../helper');
-var reservation = require('./lib/reservation');
+const { ObjectId } = require("mongodb");
+const { isAuthenticated, checkTenant, requireRole } = require('../../helper');
+var { check, findAvailableContract } = require('./lib/reservation');
+var { ParamError, RuntimeError, asyncMiddlewareWrapper } = require('./lib/basis');
 
 var NORMAL_FIELDS = {
     name: 1,
@@ -16,7 +18,7 @@ var NORMAL_FIELDS = {
 // Below APIs are visible to anonymous users
 
 /// Below APIs are visible to authenticated users only
-router.use(helper.isAuthenticated);
+router.use(isAuthenticated);
 
 /**
  * {
@@ -74,89 +76,32 @@ router.get('/:courseID', function(req, res, next) {
 });
 
 // get the course members with name
-router.get('/:courseID/members', function(req, res, next) {
-    var courses = req.db.collection("courses");
-    courses.aggregate([
-        {
-            $match: { _id: mongojs.ObjectId(req.params.courseID) }
-        }, {
-            $unwind: "$members"
-        }, {
-            $lookup: {
-                from: "members",
-                localField: "members.id",
-                foreignField: "_id",
-                as: "member"
-            }
-        }, {
-            $project: {
-                "member.name": 1,
-                "members": 1
-            }
-        }
-    ], function(err, docs) {
-        if (err) {
-            var error = new Error("Get course members fails");
-            error.innerError = err;
-            return next(error);
-        }
+const getM = asyncMiddlewareWrapper("Get course members fails");
+router.get('/:courseID/members',
+    getM(checkCourse),
+    getM(getMemebers),
+    function(req, res, next) {
+        let docs = res.locals.members || [];
         console.log("get course members: %j", docs ? docs.length : 0);
-        if (!docs || docs.length === 0) {
-            return res.json({
-                _id: req.params.courseID,
-                members: []
-            });
-        }
-        var members = docs.map(function name(value, index, array) {
-            return {
-                id: value.members.id,
-                // display the cached member name if member is deleted
-                name: value.member.length > 0 ? value.member[0].name : value.members.name
-            }
-        });
-        res.json({
-            _id: req.params.courseID,
-            members: members
-        });
-    });
-});
+        return res.json(docs);
+    }
+);
 
-router.post('/:courseID/members', function(req, res, next) {
-    var courses = req.db.collection("courses");
-    var added_members = Array.isArray(req.body) ? req.body : [req.body];
-    added_members = added_members.map(function(value, index, array) {
-        value.id = mongojs.ObjectId(value.id);
-        return value;
-    });
-    courses.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.courseID)
-        },
-        update: {
-            $push: { members: { $each: added_members } }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("add course's members fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("add %j members to course %s", req.body, req.params.courseID);
-        getCourseClasses(req.params.courseID, req.db.collection('classes'), function(error, classes) {
-            if (error) return next(error);
-            getCourseMemebers(added_members, req.db.collection('members'), function(error, members) {
-                if (error) return next(error);
-
-                var result = reservation.add(members, classes, 1, true);
-                createReservation(req.db, result, function(error, addedClasses) {
-                    res.json({ "updateClasses": classes, "result": result });
-                });
-            });
+const postM = asyncMiddlewareWrapper("add course's members fails");
+router.post('/:courseID/members',
+    checkTenant,
+    postM(getAddedMembers),
+    postM(addMembers2Course),
+    postM(getClasses),
+    postM(deductContracts),
+    function(req, res, next) {
+        return res.json({
+            addedMembers: res.locals.memberes,
+            updatedClasses: res.locals.classes,
+            errors: res.locals.errors
         });
-    });
-});
+    }
+);
 
 router.delete('/:courseID/members', function(req, res, next) {
     if (!req.body.hasOwnProperty('id')) {
@@ -192,55 +137,19 @@ router.delete('/:courseID/members', function(req, res, next) {
     });
 });
 
-router.post('/:courseID/classes', function(req, res, next) {
-    var courses = req.db.collection("courses");
-    var items = Array.isArray(req.body) ? req.body : [req.body];
-    // none classes needed to be created
-    if (items.length === 0) return res.json([]);
-
-    getCourse(req.params.courseID, courses, function(error, doc) {
-        if (error) return next(error);
-
-        if (doc.status == 'closed') {
-            var error = new Error("班级已经结束，不能添加课程");
-            error.status = 400;
-            return next(error);
-        }
-        // create new added classes
-        var added_classes = items.map(function(value, index, array) {
-            value.courseID = doc._id;
-            if (value.hasOwnProperty("date")) {
-                value["date"] = new Date(value["date"]);
-            }
-            if (value.teacher) {
-                // save the teacher property as object reference
-                value["teacher"] = mongojs.ObjectId(value["teacher"]);
-            }
-            value.cost = value.cost || 0;
-            value.capacity = value.capacity || 8;
-            value.booking = []; // clear the booking for new added course's classes
-            value.books = []; // clear the books for new added course's classes
-            return value;
+const postC = asyncMiddlewareWrapper("add course's classes fails");
+router.post('/:courseID/classes',
+    postC(checkCourse),
+    postC(addClasses2Course),
+    postC(getMemebers),
+    postC(deductContracts),
+    function(req, res, next) {
+        return res.json({
+            addedClasses: res.locals.classes,
+            errors: res.locals.errors
         });
-        req.db.collection('classes').insert(added_classes, function(err, docs) {
-            if (err) {
-                var error = new Error("add course's classes fails");
-                error.innerError = err;
-                return next(error);
-            }
-            console.log("add %j classes to course %s", docs, req.params.courseID);
-            // Get course members for adding reservation
-            getCourseMemebers(doc.members, req.db.collection('members'), function(error, members) {
-                if (error) return next(error);
-
-                var result = reservation.add(members, docs, 1, true);
-                createReservation(req.db, result, function(error, addedClasses) {
-                    res.json({ "addedClasses": docs, "result": result });
-                });
-            });
-        });
-    });
-});
+    }
+);
 
 router.post('/', function(req, res, next) {
     if (!req.body.hasOwnProperty('name')) {
@@ -265,7 +174,7 @@ router.post('/', function(req, res, next) {
 });
 
 /// Below APIs are only visible to authenticated users with 'admin' role
-router.use(helper.requireRole("admin"));
+router.use(requireRole("admin"));
 
 router.patch('/:courseID', function(req, res, next) {
     var courses = req.db.collection("courses");
@@ -458,89 +367,223 @@ function removeCourseMember(db, courseID, memberID, callback) {
     });
 }
 
-function getCourse(id, collection, callback) {
-    collection.findOne({
-        _id: mongojs.ObjectId(id)
-    }, NORMAL_FIELDS, function(err, doc) {
-        if (err) {
-            var error = new Error("Get course fails");
-            error.innerError = err;
-            return callback(error);
-        }
-        if (!doc) {
-            var error = new Error("Course doesn't exist");
-            error.status = 400;
-            return callback(error);
-        }
-
-        return callback(null, doc);
-    });
+async function checkCourse(db, req, locals) {
+    if (!ObjectId.isValid(req.params.courseID)) {
+        throw ParamError(`course id ${req.params.courseID} is invalid`);
+    }
+    let courses = db.collection("courses");
+    let doc = await courses.findOne({ _id: ObjectId(req.params.courseID), });
+    if (!doc) {
+        throw new RuntimeError("未找到班级");
+    }
+    locals.course = doc;
 }
 
-function getCourseMemebers(merberIDs, membersCol, callback) {
-    var course_members = merberIDs || [];
-    if (course_members.length == 0) return callback(null, []);
-    var memberIDs = course_members.map(function(value, index, array) {
-        return mongojs.ObjectId(value.id);
+async function getAddedMembers(db, req, locals) {
+    // find the members to add
+    let members = db.collection("members");
+
+    var added_members = Array.isArray(req.body) ? req.body : [req.body];
+    added_members = added_members.map(function(value, index, array) {
+        //TODO, ensure property "id" is valid
+        if (ObjectId.isValid(value.id)) return ObjectId(value.id);
+        return undefined;
     });
-    membersCol.find({
-        _id: { $in: memberIDs }
-    }, { name: 1, birthday: 1, status: 1, membership: 1 }, function(err, members) {
-        if (err) {
-            var error = new Error("get course's members fails");
-            error.innerError = err;
-            return callback(error);
-        }
-        return callback(null, members);
-    });
+    if (added_members.length === 0) return locals.members = [];
+
+    // TODO, check the status of member before adding to course
+    let cursor = members.find({
+        _id: { $in: added_members }
+    }, { projection: { name: 1, contact: 1, status: 1 } });
+    let docs = await cursor.toArray();
+
+    console.log(`find ${docs.length} members to add into course`);
+    locals.members = docs;
 }
 
-function getCourseClasses(courseID, classesCol, callback) {
-    classesCol.find({
-        'courseID': mongojs.ObjectId(courseID),
-    }, function(err, docs) {
-        if (err) {
-            var error = new Error("get course's classes fails");
-            error.innerError = err;
-            return callback(error);
+async function addClasses2Course(db, req, locals) {
+    let items = Array.isArray(req.body) ? req.body : [req.body];
+    // none classes needed to be created
+    if (items.length === 0) return locals.classes = [];
+
+    let course = locals.course;
+    if (course.status === "closed") {
+        throw new RuntimeError("添加课程失败, 班级已经结束, 不能添加学员或课程");
+    }
+    // create new added classes
+    let added_classes = items.map(function(value, index, array) {
+        value.courseID = course._id;
+        if (value.hasOwnProperty("date")) {
+            value["date"] = new Date(value["date"]);
         }
-        return callback(null, docs);
+        if (value.teacher) {
+            // save the teacher property as object reference
+            value["teacher"] = ObjectId(value["teacher"]);
+        }
+        value.cost = value.cost || 0;
+        value.capacity = value.capacity || 8;
+        value.booking = []; // clear the booking for new added course's classes
+        value.books = []; // clear the books for new added course's classes
+        return value;
     });
+
+    let classes = db.collection('classes');
+    let result = classes.insertMany(added_classes);
+    console.log("add %j classes to course %s", result.ops, req.params.courseID);
+    locals.classes = added_classes;
 }
 
-function createReservation(db, result, callback) {
-    //deduct the expense from membership card
-    var bulk1 = db.collection('members').initializeUnorderedBulkOp();
-    Object.keys(result.memberSummary).forEach(function(memberID) {
-        var res = result.memberSummary[memberID];
-        if (res.expense > 0) {
-            console.log("deduct %f credit from member %s", res.expense, memberID);
-            bulk1.find({ _id: mongojs.ObjectId(memberID) }).updateOne({
-                $inc: { "membership.0.credit": -res.expense }
+async function addMembers2Course(db, req, locals) {
+    let added_members = locals.members || [];
+    if (added_members.length === 0) {
+        throw new ParamError("添加学员失败, 未找到学员");
+    }
+    let course_added_members = added_members.map(function(value, index, array) {
+        return {
+            id: value._id,
+            name: value.name
+        };
+    });
+
+    let courses = db.collection("courses");
+    let result = await courses.findOneAndUpdate({
+        // We have to skip the check, contract has been deduct, we have to insert anyway
+        //"booking.member": { $ne: member._id }, 
+        _id: ObjectId(req.params.courseID),
+        status: { $ne: "closed" }
+    }, {
+        $push: {
+            members: { $each: course_added_members }
+        }
+    }, {
+        projection: NORMAL_FIELDS,
+        returnDocument: "after"
+    });
+
+    if (!result.value) {
+        console.error("fatal error occurred: %j", result.lastErrorObject);
+        throw new RuntimeError("添加学员失败, 班级已经结束, 不能添加学员或课程");
+    } else {
+        console.log("add %j members to course %s", req.body, req.params.courseID);
+        locals.course = result.value;
+    }
+}
+
+async function getClasses(db, req, locals) {
+    // find all the classes of the course
+    let course = locals.course;
+    let classes = db.collection("classes");
+
+    // only get classes not started
+    let cursor = classes.find({ courseID: course._id, date: { $gt: new Date() } });
+    let docs = await cursor.toArray();
+
+    console.debug(`find ${docs.length} class to add booking`);
+    locals.classes = docs || [];
+}
+
+async function getMemebers(db, req, locals) {
+    let course = locals.course;
+    let course_members = course.members || [];
+    if (course_members.length == 0) return locals.members = [];
+    let memberIDs = course_members.map(function(value, index, array) {
+        return value.id;
+    });
+    let members = db.collection("members");
+    let cursor = members.find({ _id: { $in: memberIDs } }, {
+        projection: { name: 1, contact: 1, status: 1 }
+    });
+    locals.members = await cursor.toArray();
+}
+
+async function deductContracts(db, req, locals) {
+    let added_members = locals.members || [];
+    let added_classes = locals.classes || [];
+    if (added_classes.length === 0 || added_members.length === 0) {
+        return locals.errors = [];
+    }
+
+    let errors = [];
+    function errorbuilder(m, c, msg) {
+        return `添加${m.name}到课程${c.name}失败，原因: ${msg}`;
+    }
+    let contracts = db.collection("contracts");
+    let classes = db.collection("classes");
+    for (let i = 0; i < added_members.length; i++) {
+        const m = added_members[i];
+
+        // sort result from old to new ['2022-9-29','2022-10-8']
+        let cursor = contracts.find({ memberId: m._id }, {
+            projection: { comments: 0, history: 0 },
+            sort: [['effectiveDate', 1]]
+        });
+
+        let all_contracts = await cursor.toArray();
+
+        for (let j = 0; j < added_classes.length; j++) {
+            const c = added_classes[j];
+
+            let error = check(m, c, 1);
+            if (error) {
+                errors.push(errorbuilder(m, c, error.message));
+                continue;
+            }
+
+            let contract2Deduct = findAvailableContract(c, all_contracts);
+            if (!contract2Deduct) {
+                errors.push(errorbuilder(m, c, "无有效合约"));
+                continue;
+            }
+
+            //deduct contract
+            let result = await contracts.findOneAndUpdate({
+                _id: contract2Deduct._id,
+                consumedCredit: contract2Deduct.consumedCredit,
+                status: contract2Deduct.status
+            }, {
+                $inc: { "consumedCredit": c.cost }
+            }, {
+                projection: { comments: 0, history: 0 },
+                returnDocument: "after"
             });
-        }
-    });
-    bulk1.execute(function(err, res) {
-        //TODO, handle error
-        if (err) console.error(err);
-        else console.log("deduct the expense from membership card with %j", res);
-    });
-    //add the booking info into corresponding classes
-    var bulk2 = db.collection('classes').initializeUnorderedBulkOp();
-    Object.keys(result.classSummary).forEach(function(classID) {
-        var res = result.classSummary[classID];
-        if (res.newbookings.length > 0) {
-            bulk2.find({ _id: mongojs.ObjectId(classID) }).updateOne({
-                $push: { booking: { $each: res.newbookings } }
+
+            if (!result.value) {
+                console.error("fatal error occurred: %j", result.lastErrorObject);
+                continue;
+            }
+            console.log("deduct %f credit from contract %s (after: %j)", c.cost, contract2Deduct.serialNo, result.value);
+            // update consumedCredit for next check
+            contract2Deduct.consumedCredit += c.cost;
+
+            // add booking
+            let newbooking = {
+                member: m._id,
+                quantity: 1, // always be 1 since new version
+                bookDate: new Date(),
+                contract: contract2Deduct._id
+            };
+            result = await classes.findOneAndUpdate({
+                // We have to skip the check, contract has been deduct, we have to insert anyway
+                //"booking.member": { $ne: member._id }, 
+                _id: c._id
+            }, {
+                $push: { booking: newbooking }
+            }, {
+                projection: { booking: 1, cost: 1 },
+                returnDocument: "after"
             });
+
+            if (!result.value) {
+                console.error("fatal error occurred: %j", result.lastErrorObject);
+                continue
+            }
+
+            console.log(`add booking successfuly to class ${c._id}`);
+            // update booking for next check
+            c.booking = result.value.booking;
         }
-    });
-    bulk2.execute(function(err, res) {
-        //TODO, handle error
-        if (err) console.error(err);
-        else console.log("add booking info into classes with %j", res);
-        callback(null, res)
-    });
+    }
+    locals.errors = errors;
 }
 
 module.exports = router;
