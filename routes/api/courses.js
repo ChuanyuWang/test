@@ -96,46 +96,30 @@ router.post('/:courseID/members',
     postM(deductContracts),
     function(req, res, next) {
         return res.json({
-            addedMembers: res.locals.memberes,
+            addedMembers: res.locals.members,
             updatedClasses: res.locals.classes,
             errors: res.locals.errors
         });
     }
 );
 
-router.delete('/:courseID/members', function(req, res, next) {
+const deleteM = asyncMiddlewareWrapper("delete course's members fails");
+router.delete('/:courseID/members', (req, res, next) => {
     if (!req.body.hasOwnProperty('id')) {
-        var error = new Error('Missing param "id"');
-        error.status = 400;
-        return next(error);
+        return next(new ParamError('Missing param "id"'));
+    } else if (!ObjectId.isValid(req.body.id)) {
+        return next(new ParamError("member id is invalid"))
+    } else if (!ObjectId.isValid(req.params.courseID)) {
+        return next(new ParamError("course id is invalid"))
     }
-    //TODO, support remove multi members
-    var memberIDs = [mongojs.ObjectId(req.body.id)];
-    var courses = req.db.collection("courses");
-    courses.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.courseID)
-        },
-        update: {
-            $pull: {
-                members: { id: { $in: memberIDs } }
-            }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("delete course's members fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("delete %j members from course %s", req.body, req.params.courseID);
-        removeCourseMember(req.db, req.params.courseID, memberIDs[0], function(error, result) {
-            if (error) return next(error);
-            res.json(doc);
-        });
-    });
-});
+    return next();
+}, deleteM(removeMembers),
+    deleteM(getClasses),
+    deleteM(retoreContracts),
+    function(req, res, next) {
+        return res.json({});
+    }
+);
 
 const postC = asyncMiddlewareWrapper("add course's classes fails");
 router.post('/:courseID/classes',
@@ -315,58 +299,6 @@ function convertDateObject(doc) {
     return doc;
 }
 
-function removeCourseMember(db, courseID, memberID, callback) {
-    db.collection('classes').find({
-        'courseID': mongojs.ObjectId(courseID),
-        date: { $gte: new Date() },
-        'booking.member': mongojs.ObjectId(memberID)
-    }, function(err, docs) {
-        if (err) return callback(new Error(`Get course classes of ${memberID} fail`));
-
-        var expense = 0;
-        docs.forEach(function(cls, index, array) {
-            if (cls.cost > 0) {
-                var bookings = cls.booking || [];
-                var booking_item = bookings.find(function(val) {
-                    return val.member.toString() == memberID;
-                });
-                expense += cls.cost * booking_item.quantity;
-            }
-        });
-        if (expense > 0) {
-            // return the cost to membership card
-            db.collection('members').findAndModify({
-                query: {
-                    _id: mongojs.ObjectId(memberID)
-                },
-                update: {
-                    $inc: { "membership.0.credit": expense }
-                },
-                fields: { name: 1, membership: 1 },
-                new: true
-            }, function(err, doc, lastErrorObject) {
-                //TODO, handle error
-                if (err) console.error(err);
-                if (doc) console.log("return %f credit to member %s (after: %j)", expense, memberID, doc.membership);
-                else console.log(`member ${memberID} doesn't exist`)
-            });
-        }
-        if (docs.length > 0) {
-            // cancel the booking reservation
-            db.collection('classes').update({
-                'courseID': mongojs.ObjectId(courseID),
-                date: { $gte: new Date() }
-            }, { $pull: { booking: { member: mongojs.ObjectId(memberID) } } }, { multi: true }, function(err, result) {
-                //TODO, handle error
-                if (err) console.error(err);
-                return callback(null, result);
-            });
-        } else {
-            return callback(null, {});
-        }
-    });
-}
-
 async function checkCourse(db, req, locals) {
     if (!ObjectId.isValid(req.params.courseID)) {
         throw ParamError(`course id ${req.params.courseID} is invalid`);
@@ -469,6 +401,12 @@ async function addMembers2Course(db, req, locals) {
     }
 }
 
+/**
+ * Get all unstarted classes of one course
+ * @param {Object} db 
+ * @param {Request} req 
+ * @param {*} locals 
+ */
 async function getClasses(db, req, locals) {
     // find all the classes of the course
     let course = locals.course;
@@ -478,7 +416,7 @@ async function getClasses(db, req, locals) {
     let cursor = classes.find({ courseID: course._id, date: { $gt: new Date() } });
     let docs = await cursor.toArray();
 
-    console.debug(`find ${docs.length} class to add booking`);
+    console.debug(`find ${docs.length} unstarted classes of course ${course._id}`);
     locals.classes = docs || [];
 }
 
@@ -584,6 +522,93 @@ async function deductContracts(db, req, locals) {
         }
     }
     locals.errors = errors;
+}
+
+async function removeMembers(db, req, locals) {
+    //TODO, support remove multi members
+    let memberIDs = [ObjectId(req.body.id)];
+    let courses = db.collection("courses");
+
+    //remove members
+    let result = await courses.findOneAndUpdate({
+        _id: ObjectId(req.params.courseID)
+    }, {
+        $pull: {
+            "members": { id: { $in: memberIDs } }
+        }
+    }, {
+        projection: NORMAL_FIELDS,
+        returnDocument: "after"
+    });
+
+    if (!result.value) {
+        console.error("fatal eror occurred: %j", result.lastErrorObject);
+        throw new RuntimeError("fail to remove members from course document");
+    }
+
+    console.log("delete %j members from course %s", req.body, req.params.courseID);
+    locals.course = result.value;
+    // [memberId, memberId, memberId]
+    locals.removed_members = memberIDs;
+}
+
+async function retoreContracts(db, req, locals) {
+    let unStartedClasses = locals.classes;
+    let removed_members = locals.removed_members; // [memberId, memberId, memberId]
+    if (unStartedClasses.length === 0 || removed_members.length === 0) return locals.errors = [];
+
+    const classes = db.collection("classes");
+    const contracts = db.collection("contracts");
+    for (let i = 0; i < removed_members.length; i++) {
+        // m is the ObjectID of member
+        const m = removed_members[i];
+
+        for (let j = 0; j < unStartedClasses.length; j++) {
+            const c = unStartedClasses[j];
+            // skip free class
+            if (c.cost <= 0) continue;
+
+            let booking = c.booking || [];
+            let removedBooking = booking.find(value => {
+                return value.member.toString() == m;
+            });
+
+            // skip if not booking
+            if (!removedBooking) continue;
+
+            if (!ObjectId.isValid(removedBooking.contract)) {
+                console.error(`contract is not found: class ${c._id}`);
+                continue;
+            }
+
+            //retore credit to contract
+            let result = await contracts.findOneAndUpdate({
+                _id: removedBooking.contract
+            }, {
+                $inc: { "consumedCredit": -c.cost }
+            }, {
+                projection: { credit: 1, consumedCredit: 1 },
+                returnDocument: "after"
+            });
+
+            if (result.value) {
+                console.log(`return ${c.cost} credit to contract ${removedBooking.contract} (after: ${JSON.stringify(result.value)})`);
+            } else {
+                //TODO, handle the callback when contract is not existed.
+                console.error(`Fail to return expense to contract ${removedBooking.contract}`);
+            }
+        }
+
+        // remove the booking reservation
+        let result = await classes.updateMany({
+            'courseID': ObjectId(req.params.courseID),
+            date: { $gte: new Date() }
+        }, {
+            $pull: { booking: { member: m } }
+        });
+
+        console.log(`remove the booking of member ${m} from not started classes: %j`, result.result);
+    }
 }
 
 module.exports = router;
