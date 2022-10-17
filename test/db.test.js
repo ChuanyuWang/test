@@ -48,7 +48,7 @@ describe('MongoDB driver 3.7+', function() {
         assert.equal(result.ok, 1);
     });
 
-    it.only('test findOneAndUpdate with no result', async function() {
+    it('test findOneAndUpdate with no result', async function() {
         let tenantDB = await db_utils.connect(tenant.name);
         let classes = tenantDB.collection("classes");
         let result = await classes.findOneAndUpdate({
