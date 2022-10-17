@@ -27,7 +27,7 @@ div
       a.btn.btn-success(style='margin:83px auto;display:table',href='setting') {{$t('create_classroom')}}
   p.small.pull-right.hidden-print *打印课程表时请选择横向，并根据打印机调整缩放比例，效果更佳
   create-class-modal(ref='createClsDlg',@ok='createClass')
-  notification(ref='alertbar')
+  message-alert(ref="messager")
 </template>
 
 <script>
@@ -39,13 +39,14 @@ div
 
 var common = require("../../common/common");
 var class_service = require("../../services/classes");
+var messageAlert = require("../../components/message-alert.vue").default;
 
 module.exports = {
   name: "app",
   components: {
-    'notification': require("./notification.vue").default,
     "date-picker": require("../../components/date-picker.vue").default,
     "class-list": require("./class-list.vue").default,
+    "message-alert": messageAlert,
     "create-class-modal": require("./create-class-modal.vue").default
   },
   props: {},
@@ -184,7 +185,7 @@ module.exports = {
             var request = class_service.removeClass(classItem._id);
             request.done(function(data, textStatus, jqXHR) {
               vm.removeClasses(classItem);
-              vm.$refs.alertbar.showSuccessMsg("删除成功");
+              vm.$refs.messager.showSuccessMessage("删除成功");
             });
           }
         }
@@ -223,12 +224,11 @@ module.exports = {
           vm.updateClasses(data);
           // jump to new class page
           //window.location.href = './class/' + data._id;
-          vm.$refs.alertbar.showSuccessMsg('添加成功');
+          vm.$refs.messager.showSuccessMessage("添加成功");
         },
         error: function(jqXHR, status, err) {
-          vm.$refs.alertbar.showErrorMsg(
-            jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText
-          );
+          console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+          vm.$refs.messager.showErrorMessage("添加课程失败");
         },
         dataType: "json"
       });
@@ -280,12 +280,14 @@ module.exports = {
 <style lang='less'>
 .class-table {
   table-layout: fixed;
+
   tbody td p {
     display: inline-block;
     height: 100%;
     padding-bottom: 16px;
     margin-bottom: -6px;
   }
+
   tbody tr td {
     overflow: hidden;
   }
