@@ -510,7 +510,7 @@ module.exports = {
         message:
           "从班级中移除" +
           item.name +
-          "，并取消此成员所有未开始的课程吗?<br><small>同时返还相关课时到会员卡中</small>",
+          "，并取消此成员所有未开始的课程吗?<br><small>同时返还消费课时</small>",
         buttons: {
           confirm: {
             className: "btn-danger"
