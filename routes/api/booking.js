@@ -243,6 +243,8 @@ router.delete('/:classID', async function(req, res, next) {
                 //TODO, handle the callback when contract is not existed.
                 console.error(`Fail to return expense to contract ${bookingInfo.contract}`);
             }
+        } else if (doc.cost > 0) {
+            console.error(`Can't find the contract of session ${req.params.classID}`);
         }
 
         return res.json(doc);
