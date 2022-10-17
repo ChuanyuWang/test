@@ -524,7 +524,7 @@ module.exports = {
           request.done(function(data, textStatus, jqXHR) {
             var members = vm.members || [];
             for (var i = 0; i < members.length; i++) {
-              if (members[i].id == item.id) {
+              if (members[i]._id == item.id) {
                 members.splice(i, 1);
                 break;
               }
