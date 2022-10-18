@@ -395,6 +395,8 @@ module.exports = {
     this.refresh();
   },
   mounted() {
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     $('[data-toggle="tooltip"]').tooltip();
   }
 }
