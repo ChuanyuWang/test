@@ -1,12 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var mongojs = require('mongojs');
+const express = require('express');
+const router = express.Router();
+const mongojs = require('mongojs');
 const { ObjectId } = require("mongodb");
 const { isAuthenticated, checkTenant, requireRole } = require('../../helper');
-var { check, findAvailableContract } = require('./lib/reservation');
-var { ParamError, RuntimeError, asyncMiddlewareWrapper } = require('./lib/basis');
+const { check, findAvailableContract } = require('./lib/reservation');
+const { ParamError, RuntimeError, asyncMiddlewareWrapper } = require('./lib/basis');
 
-var NORMAL_FIELDS = {
+const NORMAL_FIELDS = {
     name: 1,
     status: 1, //"active"|"closed"
     classroom: 1,
@@ -315,7 +315,7 @@ async function getAddedMembers(db, req, locals) {
     // find the members to add
     let members = db.collection("members");
 
-    var added_members = Array.isArray(req.body) ? req.body : [req.body];
+    let added_members = Array.isArray(req.body) ? req.body : [req.body];
     added_members = added_members.map(function(value, index, array) {
         //TODO, ensure property "id" is valid
         if (ObjectId.isValid(value.id)) return ObjectId(value.id);
