@@ -44,7 +44,7 @@ div.container
         transition-group(name="list")
           li.list-group-item(v-for="member in memberList" :key='member.id')
             span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
-            span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
+            span.badge(style='background-color:#d9534f;cursor:pointer',@click='$refs.removeMemberDialog.show(member)') 移除
             a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
             | {{member.name}}
             div.small(style='color:#777') 学习进度
@@ -83,7 +83,7 @@ div.container
             a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
               i.glyphicon.glyphicon-calendar
             span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
-            span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
+            span.badge(style='background-color:#d9534f;cursor:pointer',@click='$refs.removeClassDialog.show(item)') 删除
             a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
     div.col-sm-3.col-md-4.col-lg-5
       div
@@ -105,6 +105,12 @@ div.container
       p 当添加学员或课程到班级时，系统会为学员自动预约尚未开始的课程，无法自动预约的情况如下：
       ul.list-group
         li.list-group-item.list-group-item-danger.small(v-for="item in slotProps.param") {{item}}
+  modal-dialog(ref='removeClassDialog' buttonStyle="danger" buttons="confirm" @ok="removeClass") 删除课程
+    template(v-slot:body="slotProps")
+      p 删除{{slotProps.param.date | formatDetailDate}}的"{{slotProps.param.name}}"课程吗?<br><small>同时返还消费课时</small>
+  modal-dialog(ref='removeMemberDialog' buttonStyle="danger" buttons="confirm" @ok="removeMember") 移除班级成员
+    template(v-slot:body="slotProps")
+      p 从班级中移除<strong>{{slotProps.param.name}}</strong>学员, 并取消此成员所有未开始的课程吗?<br><small>同时返还消费课时</small>
 </template>
 
 <script>
@@ -243,6 +249,10 @@ module.exports = {
     formatDate: function(value) {
       if (!value) return "?";
       return moment(value).format("ll");
+    },
+    formatDetailDate: function(value) {
+      if (!value) return "?";
+      return moment(value).format("ll dddd");
     },
     formatDateTime: function(value) {
       if (!value) return "?";
@@ -438,34 +448,18 @@ module.exports = {
       });
     },
     removeClass: function(item) {
-      var vm = this;
-      bootbox.confirm({
-        title: "删除课程",
-        message:
-          "删除" +
-          moment(item.date).format("ll dddd") +
-          " 课程吗?<br><small>同时返还消费课时</small>",
-        buttons: {
-          confirm: {
-            className: "btn-danger"
+      var request = course_service.removeCourseClasses(this.courseId, {
+        id: item._id
+      });
+      request.done((data, textStatus, jqXHR) => {
+        var classes = this.classes;
+        for (var i = 0; i < classes.length; i++) {
+          if (classes[i]._id == item._id) {
+            classes.splice(i, 1);
+            break;
           }
-        },
-        callback: function(ok) {
-          if (!ok) return;
-          var request = course_service.removeCourseClasses(vm.course._id, {
-            id: item._id
-          });
-          request.done(function(data, textStatus, jqXHR) {
-            var classes = vm.classes;
-            for (var i = 0; i < classes.length; i++) {
-              if (classes[i]._id == item._id) {
-                classes.splice(i, 1);
-                break;
-              }
-            }
-            vm.$refs.messager.showSuccessMessage("删除班级课程成功");
-          });
         }
+        this.$refs.messager.showSuccessMessage("删除班级课程成功");
       });
     },
     addMembers: function(selectedMembers) {
@@ -506,34 +500,18 @@ module.exports = {
       }
     },
     removeMember: function(item) {
-      var vm = this;
-      bootbox.confirm({
-        title: "移除班级成员",
-        message:
-          "从班级中移除" +
-          item.name +
-          "，并取消此成员所有未开始的课程吗?<br><small>同时返还消费课时</small>",
-        buttons: {
-          confirm: {
-            className: "btn-danger"
+      var request = course_service.removeCourseMember(this.courseId, {
+        id: item.id
+      });
+      request.done((data, textStatus, jqXHR) => {
+        var members = this.members || [];
+        for (var i = 0; i < members.length; i++) {
+          if (members[i]._id == item.id) {
+            members.splice(i, 1);
+            break;
           }
-        },
-        callback: function(ok) {
-          if (!ok) return;
-          var request = course_service.removeCourseMember(vm.course._id, {
-            id: item.id
-          });
-          request.done(function(data, textStatus, jqXHR) {
-            var members = vm.members || [];
-            for (var i = 0; i < members.length; i++) {
-              if (members[i]._id == item.id) {
-                members.splice(i, 1);
-                break;
-              }
-            }
-            vm.$refs.messager.showSuccessMessage("删除班级成员成功");
-          });
         }
+        this.$refs.messager.showSuccessMessage("删除班级成员成功");
       });
     },
     closeAlert: function(e) {
