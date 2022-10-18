@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
-var { check, findAvailableContract } = require('./lib/reservation');
+const { check, findAvailableContract } = require('./lib/reservation');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');

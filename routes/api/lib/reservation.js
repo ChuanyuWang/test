@@ -165,7 +165,7 @@ exports.findAvailableContract = function(class2Book, allContracts) {
 
         // (0.1 + 0.2 <= 0.3) ==> false; (0.1 + 0.2 <= 0.3 + EPSILON) ==> true
         if (contract.consumedCredit + contract.expendedCredit + class2Book.cost <= contract.credit + EPSILON) {
-            console.log("find contract to deduct: %j", contract);
+            console.debug("find contract to deduct: %j", contract);
             return contract;
         }
     }

@@ -443,7 +443,7 @@ module.exports = {
         message:
           "删除" +
           moment(item.date).format("ll dddd") +
-          " 课程吗?<br><small>同时返还相关课时到预约会员的会员卡中</small>",
+          " 课程吗?<br><small>同时返还消费课时</small>",
         buttons: {
           confirm: {
             className: "btn-danger"

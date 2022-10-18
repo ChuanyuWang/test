@@ -25,7 +25,6 @@ router.use(isAuthenticated);
         "_id": "1",
         "name": "123",
         "createDate": "2017-02-26T02:00:00Z",
-        "date": "2017-02-27T02:00:00Z",
         "status": "active|closed",
         "remark": "summar only",
         "classroom": "room1",
@@ -110,7 +109,7 @@ router.delete('/:courseID/members',
     deleteM(getClasses),
     deleteM(retoreContracts),
     function(req, res, next) {
-        return res.json({});
+        return res.json({ ok: 1 });
     }
 );
 
@@ -185,46 +184,13 @@ router.patch('/:courseID', function(req, res, next) {
 });
 
 const deleteC = asyncMiddlewareWrapper("delete course's classes fails");
-router.delete('/:courseID/classes', checkParamId, deleteC(removeClasses), function(req, res, next) {
-    //TODO, support remove multi classes
-    var classIDs = [req.body.id];
-    var classes = req.db.collection("classes");
-    classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(classIDs[0])
-        },
-        remove: true,
-        new: false
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("delete course's classes fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("delete classes %j from course %s", req.body, req.params.courseID);
-        if (doc && doc.cost > 0) {
-            var booking = doc.booking || [];
-            if (booking.length === 0) return res.json(doc);
-
-            // return the cost to membership card
-            var bulk1 = req.db.collection('members').initializeUnorderedBulkOp();
-            booking.forEach(function(booking_item) {
-                console.log("return %f credit to member %s", doc.cost * booking_item.quantity, booking_item.member);
-                bulk1.find({ _id: booking_item.member }).updateOne({
-                    $inc: { "membership.0.credit": doc.cost * booking_item.quantity }
-                });
-            });
-            bulk1.execute(function(err, result) {
-                // result is {"writeErrors":[],"writeConcernErrors":[],"nInserted":0,"nUpserted":1,
-                // "nMatched":0,"nModified":0,"nRemoved":0,"upserted":[],"ok":1}
-                //TODO, handle error
-                if (err) console.error(err);
-                else console.log("return the cost to membership card with %j", result);
-            });
-        }
-        return res.json(doc);
-    });
-});
+router.delete('/:courseID/classes',
+    checkParamId,
+    deleteC(removeClasses),
+    function(req, res, next) {
+        return res.json({ ok: 1 });
+    }
+);
 
 router.delete('/:courseID', function(req, res, next) {
     req.db.collection('classes').find({
@@ -312,6 +278,49 @@ async function checkCourse(db, req, locals) {
 }
 
 async function removeClasses(db, req, locals) {
+    //TODO, support remove multi classes
+    let removedClassIDs = [ObjectId(req.body.id)];
+    let classes = db.collection("classes");
+    let contracts = db.collection("contracts");
+
+    for (let i = 0; i < removedClassIDs.length; i++) {
+        const id = removedClassIDs[i];
+        let result = await classes.findOneAndDelete({ _id: id });
+        // result is { lastErrorObject: { n: 1 }, value: deleted_doc, ok: 1}
+        if (!result.value) {
+            console.error(`fatal error occurred: class ${id} is not deleted`);
+            continue;
+        }
+        let c = result.value;
+
+        console.log(`delete classes ${id} from course ${req.params.courseID}`);
+        let booking = c.booking || [];
+
+        if (booking.length === 0) continue;
+
+        let restoreContracts = booking.map(value => {
+            return ObjectId.isValid(value.contract) ? value.contract : null;
+        });
+
+        //check if quantity is more than 1
+        let quantityGT1 = booking.some(value => {
+            value.quantity > 1;
+        });
+        if (quantityGT1) console.error(`fatal error occurred. Invalid quantity is found when restoring contracts according to %j`, booking);
+
+        result = await contracts.updateMany({
+            _id: { $in: restoreContracts }
+        }, {
+            $inc: { "consumedCredit": -c.cost } // assume quantity is always 1
+        });
+
+        //result.result is {ok: 1, n: 10, nModified: 5}
+        if (result.result.nModified !== booking.length) {
+            console.error(`fatal error occurred when cancel all booking %j`, booking);
+        }
+
+        console.log(`return ${c.cost} credit to contracts with result: %j`, result.result);
+    }
 }
 
 async function getAddedMembers(db, req, locals) {
@@ -363,7 +372,8 @@ async function addClasses2Course(db, req, locals) {
     });
 
     let classes = db.collection('classes');
-    let result = classes.insertMany(added_classes);
+    let result = await classes.insertMany(added_classes);
+    // result is {result: {ok:1, n:1}, ops: [], insertedCount: 1, insertedIds: {'0': ObjectId}}
     console.log("add %j classes to course %s", result.ops, req.params.courseID);
     locals.classes = added_classes;
 }
@@ -489,9 +499,9 @@ async function deductContracts(db, req, locals) {
                 consumedCredit: contract2Deduct.consumedCredit,
                 status: contract2Deduct.status
             }, {
-                $inc: { "consumedCredit": c.cost }
+                $inc: { "consumedCredit": c.cost } // quantity is always 1 since new version
             }, {
-                projection: { comments: 0, history: 0 },
+                projection: { consumedCredit: 1, credit: 1 },
                 returnDocument: "after"
             });
 
@@ -591,11 +601,12 @@ async function retoreContracts(db, req, locals) {
                 continue;
             }
 
+            let quantity = removedBooking.quantity || 1;
             //retore credit to contract
             let result = await contracts.findOneAndUpdate({
                 _id: removedBooking.contract
             }, {
-                $inc: { "consumedCredit": -c.cost }
+                $inc: { "consumedCredit": -c.cost * quantity }
             }, {
                 projection: { credit: 1, consumedCredit: 1 },
                 returnDocument: "after"
