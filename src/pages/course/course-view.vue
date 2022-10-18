@@ -34,19 +34,18 @@ div.container
       div.col-sm-offset-2.col-xs-offset-4.col-sm-10.col-xs-8
         button.btn.btn-success(type='button',:disabled='!course._id || hasError',v-on:click='saveBasicInfo') {{$t('save')}}
   div.page-header
-    h3 成员
+    h3 学员
   div.row
     div.col-xs-12.col-sm-2
       button.btn.btn-primary.btn-sm.mb-3(type="button",:disabled='!course._id',@click='showAddMemberDlg')
         span.glyphicon.glyphicon-plus 添加
-    div.col-xs-10.col-sm-7.col-md-5
+    div.col-xs-10.col-sm-7.col-md-6.col-lg-5
       ul.list-group(style='margin-bottom:0px')
         transition-group(name="list")
           li.list-group-item(v-for="member in memberList" :key='member.id')
             span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
             span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeMember(member)') 移除
             a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-            //span.badge(style='margin-right:3px;background-color:#337ab7;cursor:pointer',@click='showMemberCourse(member)') 分配
             | {{member.name}}
             div.small(style='color:#777') 学习进度
             div.participation-status.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
@@ -57,7 +56,7 @@ div.container
                 div.progress-bar-success(v-if='item.status=="checkin"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
                 div.progress-bar.progress-bar-info.progress-bar-striped.active(v-if='item.status=="tobechecked"',style='flex-grow:1',:title='item.date',data-toggle='tooltip',@touchend='showTooltip')
       small(style='color:#777') 共{{membersCount}}人
-    div.col-xs-2.col-sm-3.col-md-5.participation-status-legend(style="padding:0")
+    div.col-xs-2.col-sm-3.col-md-4.col-lg-5.participation-status-legend(style="padding:0")
       div.progress
         div.progress-bar(style='background-color:darkgrey') 未预约
       div.progress
@@ -74,7 +73,7 @@ div.container
     div.col-sm-2
       button.btn.btn-primary.btn-sm.mb-3(type="button",:disabled='!course._id',@click='showAddClassDlg')
         span.glyphicon.glyphicon-plus 添加
-    div.col-sm-7.col-md-5
+    div.col-sm-7.col-md-6.col-lg-5
       ul.list-group(style='margin-bottom:0px')
         transition-group(name="list")
           li.list-group-item(v-for="item in sortedClasses" :key='item._id')
@@ -86,22 +85,26 @@ div.container
             span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
             span.badge(style='background-color:#d9534f;cursor:pointer',@click='removeClass(item)') 删除
             a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
-    div.col-sm-3.col-md-5
+    div.col-sm-3.col-md-4.col-lg-5
       div
         small(style='color:#777') 共{{classesCount}}节
       div
         small(style='color:#777') 已上{{completedClassesCount}}节/未上{{classesCount - completedClassesCount}}节
   div(style='height:20px')
   add-multi-class-modal(ref='modal',:classrooms='classrooms',:defaultName='course.name',@ok='addClass')
-  view-member-course-modal(ref='assignClassDlg',courseID='#{courseID}')
-  show-booking-result-modal(ref='summaryDlg')
   confirm-delete-modal(ref='confirmDlg', @ok='deleteCourse')
+  message-alert(ref="messager")
   member-select-modal(ref='memberSelectDlg',@ok='addMembers',:multi-selection='true')
     template(v-slot:toolbar)
       div.checkbox(style='position:absolute;top:25px;left:20px')
         label
           input(type='checkbox',checked,disabled)
           |仅参加尚未开始的课程
+  modal-dialog(ref='resultDialog',buttonStyle="primary",buttons="ok",@ok="") 自动预约课程出错
+    template(v-slot:body="slotProps")
+      p 当添加学员或课程到班级时，系统会为学员自动预约尚未开始的课程，无法自动预约的情况如下：
+      ul.list-group
+        li.list-group-item.list-group-item-danger.small(v-for="item in slotProps.param") {{item}}
 </template>
 
 <script>
@@ -113,10 +116,10 @@ div.container
 
 var course_service = require("../../services/courses");
 var add_multi_class_modal = require("./add-multi-class-modal.vue").default;
-var view_member_course_modal = require("./view-member-course-modal.vue").default;
-var show_booking_result_modal = require("./show-booking-result-modal.vue").default;
 var member_select_modal = require("../../components/member-select-modal.vue").default;
 var confirm_delete_modal = require("./confirm-delete-course.vue").default;
+var messageAlert = require("../../components/message-alert.vue").default;
+var modalDialog = require("../../components/modal-dialog.vue").default;
 
 module.exports = {
   name: "course-view",
@@ -134,9 +137,9 @@ module.exports = {
   },
   components: {
     "add-multi-class-modal": add_multi_class_modal,
-    "view-member-course-modal": view_member_course_modal,
-    "show-booking-result-modal": show_booking_result_modal,
     "member-select-modal": member_select_modal,
+    "modal-dialog": modalDialog,
+    "message-alert": messageAlert,
     "confirm-delete-modal": confirm_delete_modal
   },
   computed: {
@@ -327,8 +330,8 @@ module.exports = {
         classroom: this.course.classroom,
         remark: this.course.remark
       });
-      request.done(function(data, textStatus, jqXHR) {
-        bootbox.alert("班级基本资料更新成功");
+      request.done((data, textStatus, jqXHR) => {
+        this.$refs.messager.showSuccessMessage("班级基本资料更新成功");
       });
     },
     deleteCourse: function() {
@@ -342,12 +345,8 @@ module.exports = {
       this.$refs.modal.show();
     },
     showAddMemberDlg: function(params) {
-      var checkedItems = (this.members || []).map(function(
-        value,
-        index,
-        array
-      ) {
-        return value.id;
+      var checkedItems = (this.members || []).map((value) => {
+        return value._id;
       });
       this.$refs.memberSelectDlg.show(checkedItems);
     },
@@ -407,8 +406,6 @@ module.exports = {
         var startdate = options.begin;
         var enddate = options.end;
         var days = options.weekdays || [];
-        if (enddate.diff(startdate, "days") > 180)
-          return bootbox.alert("开始和结束日期不能超过180天");
         result = this.genRepeatClass(datetime, startdate, enddate, days, options.name);
       } else {
         result.push({
@@ -416,7 +413,9 @@ module.exports = {
           date: datetime.toISOString()
         });
       }
-      if (result.length === 0) return bootbox.alert("没有符合所选条件的课程");
+      if (result.length === 0) {
+        return vm.$refs.messager.showWarningMessage("没有符合所选条件的课程");
+      }
       // assign classroom, type and others
       result.forEach(function(value, index, array) {
         value.type = options.type;
@@ -431,9 +430,11 @@ module.exports = {
         addedClasses.forEach(function(value, index, array) {
           vm.classes.push(value);
         });
-        vm.$refs.summaryDlg.show(data.result || {});
-        console.log(data.errors);
-        //bootbox.alert('班级课程添加成功');
+        var errors = data.errors || [];
+        if (errors.length > 0)
+          vm.$refs.resultDialog.show(errors);
+        else
+          vm.$refs.messager.showSuccessMessage("班级课程添加成功");
       });
     },
     removeClass: function(item) {
@@ -462,7 +463,7 @@ module.exports = {
                 break;
               }
             }
-            //bootbox.alert('删除班级课程成功');
+            vm.$refs.messager.showSuccessMessage("删除班级课程成功");
           });
         }
       });
@@ -495,11 +496,12 @@ module.exports = {
           addedMembers.forEach(function(value, index, array) {
             vm.members.push(value);
           });
-          //vm.classes = data.updateClasses || [];
           this.refreshClasses();
-          vm.$refs.summaryDlg.show(data.result || {});
-          console.log(data.errors);
-          //bootbox.alert('添加班级成员成功');
+          var errors = data.errors || [];
+          if (errors.length > 0)
+            vm.$refs.resultDialog.show(errors);
+          else
+            vm.$refs.messager.showSuccessMessage("添加班级成员成功");
         });
       }
     },
@@ -529,30 +531,15 @@ module.exports = {
                 break;
               }
             }
-            //bootbox.alert('删除班级成员成功');
+            vm.$refs.messager.showSuccessMessage("删除班级成员成功");
           });
         }
       });
     },
     closeAlert: function(e) {
       if (this.course.status == "closed") {
-        bootbox.alert({
-          message:
-            "请在结束此班级前请确认所有课程全部结束<br><small>确认后，请点击保存进行修改</small>",
-          buttons: {
-            ok: {
-              label: "确定",
-              className: "btn-danger"
-            }
-          }
-        });
+        this.$refs.messager.showWarningMessage("请在<strong>保存</strong>前确认全部课程已结束");
       }
-    },
-    showMemberCourse: function(member) {
-      //TODO
-      //alert(member)
-      this.$refs.assignClassDlg.name = member.name;
-      this.$refs.assignClassDlg.show();
     }
   },
   created() {
@@ -568,14 +555,11 @@ module.exports = {
     });
   },
   mounted: function() {
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     // handle invalid(404) course URL
     if (!this.courseId) {
-      return bootbox.alert({
-        message: "查看的班级不存在",
-        buttons: {
-          ok: { className: "btn-danger" }
-        }
-      });
+      this.$refs.messager.showErrorMessage("删除班级课程成功");
     };
   }
 };

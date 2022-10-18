@@ -49,6 +49,7 @@ module.exports = {
       }
     },
     show: function(selectedIDs) {
+      // TODO, check if data is loaded successfully at the very first time
       // clear existed selected items
       var selections = $(this.$el).find('table.member-table').bootstrapTable('getAllSelections');
       selections = selections.map(function(value) {
