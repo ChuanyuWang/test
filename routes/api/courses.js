@@ -104,16 +104,9 @@ router.post('/:courseID/members',
 );
 
 const deleteM = asyncMiddlewareWrapper("delete course's members fails");
-router.delete('/:courseID/members', (req, res, next) => {
-    if (!req.body.hasOwnProperty('id')) {
-        return next(new ParamError('Missing param "id"'));
-    } else if (!ObjectId.isValid(req.body.id)) {
-        return next(new ParamError("member id is invalid"))
-    } else if (!ObjectId.isValid(req.params.courseID)) {
-        return next(new ParamError("course id is invalid"))
-    }
-    return next();
-}, deleteM(removeMembers),
+router.delete('/:courseID/members',
+    checkParamId,
+    deleteM(removeMembers),
     deleteM(getClasses),
     deleteM(retoreContracts),
     function(req, res, next) {
@@ -191,13 +184,9 @@ router.patch('/:courseID', function(req, res, next) {
     });
 });
 
-router.delete('/:courseID/classes', function(req, res, next) {
-    if (!req.body.hasOwnProperty('id')) {
-        var error = new Error('Missing param "id"');
-        error.status = 400;
-        return next(error);
-    }
-    //TODO, support remove multi members
+const deleteC = asyncMiddlewareWrapper("delete course's classes fails");
+router.delete('/:courseID/classes', checkParamId, deleteC(removeClasses), function(req, res, next) {
+    //TODO, support remove multi classes
     var classIDs = [req.body.id];
     var classes = req.db.collection("classes");
     classes.findAndModify({
@@ -299,6 +288,17 @@ function convertDateObject(doc) {
     return doc;
 }
 
+function checkParamId(req, res, next) {
+    if (!req.body.hasOwnProperty('id')) {
+        return next(new ParamError('missing param "id"'));
+    } else if (!ObjectId.isValid(req.body.id)) {
+        return next(new ParamError("param id is invalid"))
+    } else if (!ObjectId.isValid(req.params.courseID)) {
+        return next(new ParamError("course id is invalid"))
+    }
+    return next();
+}
+
 async function checkCourse(db, req, locals) {
     if (!ObjectId.isValid(req.params.courseID)) {
         throw ParamError(`course id ${req.params.courseID} is invalid`);
@@ -309,6 +309,9 @@ async function checkCourse(db, req, locals) {
         throw new RuntimeError("未找到班级");
     }
     locals.course = doc;
+}
+
+async function removeClasses(db, req, locals) {
 }
 
 async function getAddedMembers(db, req, locals) {
@@ -420,6 +423,13 @@ async function getClasses(db, req, locals) {
     locals.classes = docs || [];
 }
 
+/**
+ * Get all member documents of current course
+ * @param {*} db 
+ * @param {*} req 
+ * @param {*} locals 
+ * @returns 
+ */
 async function getMemebers(db, req, locals) {
     let course = locals.course;
     let course_members = course.members || [];
