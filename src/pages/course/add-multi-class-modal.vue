@@ -114,6 +114,10 @@ module.exports = {
           errors.begin = "起始日期格式不正确";
         if (!this.end || !this.end.isValid())
           errors.end = "结束日期格式不正确";
+        if (this.begin && this.end && this.begin.isValid() && this.end.isValid() && this.end.diff(this.begin, "days") > 180)
+          errors.end = "开始和结束日期不能超过180天";
+        if (this.begin && this.end && this.begin.isValid() && this.end.isValid() && this.end.isBefore(this.begin))
+          errors.end = "结束日期不能小于开始日期";
       }
       return errors;
     },
