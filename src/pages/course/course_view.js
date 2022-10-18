@@ -14,7 +14,7 @@ $(document).ready(function() {
     // bootstrap the course view page
     new Vue({
         el: '#app',
-        components: { 'course-view': courseView }
+        components: { 'app': courseView }
     });
 });
 
@@ -26,5 +26,5 @@ function init() {
     Vue.use(i18nextplugin);
     //TODO, localization 
     moment.locale('zh-CN');
-    bootbox.setLocale('zh_CN');
+    //bootbox.setLocale('zh_CN');
 }
