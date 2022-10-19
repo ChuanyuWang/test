@@ -44,21 +44,21 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static TBD课时
+            p.form-control-static {{remainingCredit}}课时
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余金额:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static TBD元
+            p.form-control-static {{remainingFee}}元
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 已消课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static TBD课时
+            p.form-control-static {{consumedTotalCredit}}课时
               a.small.ms-3(role="button") 消课记录
                 i.glyphicon.glyphicon-search
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static TBD元
+            p.form-control-static {{consumedFee}}元
     div.col-sm-4.col-xs-6
       form.form-horizontal
         div.form-group
@@ -252,6 +252,18 @@ module.exports = {
     },
     outstandingFee() {
       return (this.contract.total - this.contract.discount - this.contract.received) / 100;
+    },
+    remainingCredit() {
+      return this.contract.credit - this.consumedTotalCredit;
+    },
+    remainingFee() {
+      return Math.round(this.contract.total * this.remainingCredit / this.contract.credit) / 100;
+    },
+    consumedTotalCredit() {
+      return this.contract.consumedCredit + this.contract.expendedCredit || 0;
+    },
+    consumedFee() {
+      return Math.round(this.contract.total * this.consumedTotalCredit / this.contract.credit) / 100;
     },
     errors() {
       var errors = {};
