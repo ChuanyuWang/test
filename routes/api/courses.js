@@ -329,7 +329,6 @@ async function getAddedMembers(db, req, locals) {
 
     let added_members = Array.isArray(req.body) ? req.body : [req.body];
     added_members = added_members.map(function(value, index, array) {
-        //TODO, ensure property "id" is valid
         if (ObjectId.isValid(value.id)) return ObjectId(value.id);
         return undefined;
     });
