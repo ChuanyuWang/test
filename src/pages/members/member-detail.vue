@@ -120,7 +120,7 @@ div.container
         div.form-group
           label.control-label 备注:
           textarea.form-control(rows='3', name='comment',placeholder='备注修改会员卡的原因（选填）',v-model='toBeSavedMemo')
-          small(style='color:#777;float:right;margin-top:2px') 不超过256个字，添加到备忘和充值记录备注中
+          small(style='color:#777;float:right;margin-top:2px') 不超过256个字, 添加到备忘和充值记录备注中
     template(v-slot:action) 保存
   message-alert(ref="messager")
 </template>
@@ -254,7 +254,7 @@ module.exports = {
       return this.appData;
     },
     commentCount: function() {
-      return this.memberData.comments ? this.memberData.comments.length : 0;
+      return this.comments ? this.comments.length : 0;
     },
     errors: function() {
       var errors = {};
