@@ -143,7 +143,15 @@ div.container
       bootstrap-table.table-striped(ref="paymentTable", :columns="paymentTableColumns", :options="paymentTableOptions")
   contract-history(ref="historySection" :contractId="contractId")
   div.page-header
-    h3 消课记录
+    h3(style="display: inline-block") 消课记录
+    button.btn.btn-default(type="button" @click="$refs.classesTable.refresh({url: '/api/classes'})" style="float: right; margin-top: 16px")
+      span.glyphicon.glyphicon-refresh.me-3
+      | 刷新
+  div.row
+    div.col-sm-12
+      div#classesToolbar
+      bootstrap-table.table-striped(ref="classesTable", :columns="classesTableColumns", :options="classesTableOptions")
+
   pay-dialog(ref="payDialog" buttons="confirm" @ok="pay", :outstandingFee="outstandingFee")
   modify-contract-dialog(ref="modifyDialog" @ok="modifyContract" :contract="contract")
   modal-dialog(ref="confirmDeletePaymentDialog" buttons="confirm" @ok="deletePayment") 删除缴费记录
@@ -224,6 +232,46 @@ module.exports = {
         url: "/api/payments",
         uniqueId: "_id",
         sortName: "payDate",
+        sortOrder: "desc",
+        pageSize: 15,
+        pageList: [15, 25, 50, 100],
+        pagination: true,
+        sidePagination: "server"
+      },
+      classesTableColumns: [{
+        field: "date",
+        title: "日期",
+        sortable: true,
+        formatter: commonUtil.dateFormatter2
+      }, {
+        field: "name",
+        title: "课程名称",
+        formatter: (value, row) => {
+          return `<a href="../class/${row._id}" target="_blank">${value}<i class="glyphicon glyphicon-search ms-3"></i></a>`;
+        }
+      }, {
+        field: "cost",
+        title: "消耗课时"
+      }, {
+        field: "cost",
+        title: "消耗金额",
+        formatter: value => {
+          return value * this.averageFee + "元";
+        }
+      }, {
+        field: "type",
+        title: "课程类型",
+        formatter: this.goodsTypeFormatter
+      }],
+      classesTableOptions: {
+        //toolbar: "#paymentToolbar",
+        locale: "zh-CN",
+        //showRefresh: true,
+        //search: true,
+        queryParams: this.customQuery,
+        //url: "/api/classes",
+        uniqueId: "_id",
+        sortName: "date",
         sortOrder: "desc",
         pageSize: 15,
         pageList: [15, 25, 50, 100],
@@ -360,6 +408,12 @@ module.exports = {
           '</a>'].join(""),
         '</div>'
       ].join('');
+    },
+    goodsTypeFormatter(value, row, index) {
+      var type = this.types.find(item => {
+        return item.id === value;
+      });
+      return type && type.name;
     },
     confirmDeletePayment(e, value, row, index) {
       this.$refs.confirmDeletePaymentDialog.show(row._id);

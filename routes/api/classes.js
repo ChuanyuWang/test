@@ -92,6 +92,10 @@ router.get('/', function(req, res, next) {
     if (req.query.hasOwnProperty('memberid')) {
         query['booking.member'] = mongoist.ObjectId(req.query.memberid);
     }
+    // get all classes attached to one contract
+    if (req.query.hasOwnProperty('contractId')) {
+        query['booking.contract'] = mongoist.ObjectId(req.query.contractId);
+    }
 
     // check if there is at least one filter, it's not supposed to return all classes
     if (Object.keys(query).length === 0) {
