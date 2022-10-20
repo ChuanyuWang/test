@@ -14,7 +14,7 @@ div
               a.btn(role="button" @click='$refs.deleteTypeDialog.show(type)')
                 i.glyphicon.glyphicon-remove-circle.text-danger
             span.label.label-default(v-if="type.status === 'closed'") 已完结
-            span.label.label-info(v-else-if="type.visible === true") 开放预约
+            span.label.label-primary(v-else-if="type.visible === true") 开放预约
     div.col-xs-6
       ul.list-group
         li.list-group-item(v-for='(product, index) in products') {{product.name}}
