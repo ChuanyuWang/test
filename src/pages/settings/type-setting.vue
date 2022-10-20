@@ -52,8 +52,12 @@ div
                 |开放预约
     template(v-slot:footer="slotProps")
       button.btn.btn-default(type="button",data-dismiss="modal") 取消
-      button.btn.btn-danger(type="button",:disabled='hasError',v-if='isEditing',@click='notImplemented') 完结课程
+      button.btn.btn-danger(type="button",data-dismiss="modal",:disabled='hasError',v-if='isEditing && status==="open"',@click='$refs.closeTypeDialog.show(slotProps.param)') 完结课程
+      button.btn.btn-success(type="button",data-dismiss="modal",:disabled='hasError',v-if='isEditing && status==="closed"',@click='restoreType(slotProps.param)') 恢复课程
       button.btn.btn-primary(type="button",data-dismiss="modal",:disabled='hasError',@click='editType(slotProps.param)') 确认
+  modal-dialog(ref='closeTypeDialog',buttons="confirm" @ok="closeType") 确定完结课程吗?
+    template(v-slot:body)
+      p 完结课程后，在创建课程或合约时，隐藏此课程类型
 </template>
 
 <script>
@@ -148,6 +152,34 @@ module.exports = {
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.refresh();
+      });
+    },
+    closeType(typeId) {
+      var fields = {
+        name: this.name,
+        status: "closed",
+        visible: this.visible
+      };
+      var request = util.patchJSON("/api/setting/types/" + typeId, fields);
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("完结课程失败", jqXHR);
+      });
+      request.done((data, textStatus, jqXHR) => {
+        this.refresh();
+      });
+    },
+    restoreType(typeId) {
+      var fields = {
+        name: this.name,
+        status: "open",
+        visible: this.visible
+      };
+      var request = util.patchJSON("/api/setting/types/" + typeId, fields);
+      request.fail(function(jqXHR, textStatus, errorThrown) {
+        util.showAlert("恢复课程失败", jqXHR);
+      });
+      request.done((data, textStatus, jqXHR) => {
+        this.refresh();
       });
     },
     beforeCreateType() {
