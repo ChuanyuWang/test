@@ -28,14 +28,14 @@ div
       div.page-header(style='margin-top:0')
         h3 微信入口Url
       form.form-horizontal
-        span.help-block 请根据业务需要选择不同的功能入口Url，然后设置在微信公共号的自定义菜单中，并将 <b>{{hostname}}</b> 添加到公共号的三个业务域名的任一个，参见
+        span.help-block 请根据业务需要选择不同的功能入口Url, 然后设置在微信公共号的自定义菜单中, 并将 <b>{{hostname}}</b> 添加到公共号的三个业务域名的任一个, 参见
           a(href='http://kf.qq.com/faq/120911VrYVrA150323ZJfURJ.html',target='_blank') 腾讯帮助文档
           |中《域名设置》部分
         div.form-group
           label.col-sm-2.control-label 在线预约
           div.col-sm-10
             p.form-control-static {{tenantUrl + '/booking'}}
-            span.help-block 预约入口，访问用户可以查看本周全部课程，并根据注册信息进行课程预约；未开始课程，会员可以提前24小时取消。
+            span.help-block 预约入口, 访问用户可以查看本周全部课程, 并根据注册信息进行课程预约; 未开始课程, 会员可以提前24小时取消。
         div.form-group
           label.col-sm-2.control-label 我的课程
           div.col-sm-10
@@ -51,6 +51,7 @@ div
           div.col-sm-10
             p.form-control-static {{tenantUrl + '/myReadBooks'}}
             span.help-block 我的阅读入口，访问用户可以根据注册信息查看所有历史课程中使用的绘本，包括书名和授课老师。
+  message-alert(ref="messager")
 </template>
 <script>
 var teacher_setting = require('./teach-setting.vue').default;
@@ -59,6 +60,7 @@ var general_setting = require('./general-setting.vue').default;
 var classroom_setting = require('./classrooms.vue').default;
 var type_setting = require('./type-setting.vue').default;
 var common = require('../../common/common');
+var messageAlert = require("../../components/message-alert.vue").default;
 
 module.exports = {
   name: "settings",
@@ -74,6 +76,7 @@ module.exports = {
     "general-setting": general_setting,
     "user-setting": users_setting,
     "classroom-setting": classroom_setting,
+    "message-alert": messageAlert,
     "teacher-setting": teacher_setting,
     "type-setting": type_setting
   },
@@ -85,6 +88,8 @@ module.exports = {
     }
   },
   mounted() {
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     // default tab is classroom
     var showTab = common.getParam("activetab") || "classroom";
     $('a[href="#' + showTab + '"]').tab('show');

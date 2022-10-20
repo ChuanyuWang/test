@@ -115,7 +115,6 @@ module.exports = {
       });
     },
     createType() {
-      var vm = this;
       var fields = {
         name: this.name,
         status: this.status,
@@ -130,8 +129,9 @@ module.exports = {
       request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert("创建课程失败", jqXHR);
       });
-      request.done(function(data, textStatus, jqXHR) {
-        vm.refresh();
+      request.done((data, textStatus, jqXHR) => {
+        this.refresh();
+        this.$messager.showSuccessMessage(`课程类型<strong>${fields.name}</strong>已创建`);
       });
     },
     editType(typeId) {
