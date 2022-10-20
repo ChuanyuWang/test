@@ -3,6 +3,7 @@ var router = express.Router();
 var db_utils = require('../../server/databaseManager');
 var helper = require('../../helper');
 const { ObjectId } = require('mongodb');
+const { RuntimeError, asyncMiddlewareWrapper } = require("./lib/basis");
 
 /**
  * {
@@ -147,7 +148,7 @@ router.post('/types', helper.requireRole("admin"), async function(req, res, next
             { returnDocument: "after" }
         );
 
-        if (result.ok !== 1) {
+        if (!result.value) {
             return next(new Error("Fail to add new class type"));
         }
 
@@ -186,21 +187,41 @@ router.patch('/types/:typeId', helper.requireRole("admin"), async function(req, 
             { returnDocument: "after" }
         );
 
-        if (result.ok !== 1) {
+        if (!result.value) {
             return next(new Error(`Fail to update type ${req.params.typeId}`));
         }
 
         console.log(`update class type ${req.params.typeId}`);
         res.send(result.value);
-    } catch (err) {
-        var error = new Error("修改课程类型失败");
-        error.innerError = err;
-        return next(error);
+    } catch (error) {
+        return next(new RuntimeError("修改课程类型失败", error));
     }
 });
 
-router.delete('/types/:typeId', helper.requireRole("admin"), async function(req, res, next) {
-    next(new Error('not implemented'));
+const deleteT = asyncMiddlewareWrapper("删除课程类型失败");
+router.delete('/types/:typeId', helper.requireRole("admin"), deleteT(checkHasContractsOrClasses), async function(req, res, next) {
+    try {
+        let configDB = await db_utils.connect("config");
+        let tenants = configDB.collection("tenants");
+        let result = await tenants.findOneAndUpdate({
+            name: req.user.tenant
+        }, {
+            $pull: {
+                types: {
+                    id: req.params.typeId
+                }
+            }
+        }, { returnDocument: "after" });
+
+        if (!result.value) {
+            return next(new Error(`Fail to delete type ${req.params.typeId}`));
+        }
+
+        console.log(`update class type ${req.params.typeId}`);
+        res.send(result.value);
+    } catch (error) {
+        return next(new RuntimeError("删除课程类型失败", error));
+    }
 });
 
 router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
@@ -345,6 +366,16 @@ function migrateFreeClass(room, database) {
         }
         console.log("%d class is/are linked to classroom %s", result.n, room.id);
     });
+}
+
+async function checkHasContractsOrClasses(db, req, locals) {
+    let contracts = db.collection("contracts");
+    let doc = await contracts.findOne({ goods: req.params.typeId });
+    if (doc) throw new RuntimeError("不能删除已产生合约的课程类型");
+
+    let classes = db.collection("classes");
+    doc = await classes.findOne({ type: req.params.typeId });
+    if (doc) throw new RuntimeError("不能删除已创建课程的课程类型");
 }
 
 module.exports = router;

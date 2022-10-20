@@ -11,7 +11,7 @@ div
             div.btn-group.btn-group-xs.pull-right(role="group")
               a.btn(role="button" @click='beforeEditType(type)')
                 i.glyphicon.glyphicon-edit.text-primary
-              a.btn(role="button" @click='notImplemented(type)')
+              a.btn(role="button" @click='$refs.deleteTypeDialog.show(type)')
                 i.glyphicon.glyphicon-remove-circle.text-danger
             span.label.label-default(v-if="type.status === 'closed'") 已完结
             span.label.label-info(v-else-if="type.visible === true") 开放预约
@@ -58,6 +58,10 @@ div
   modal-dialog(ref='closeTypeDialog',buttons="confirm" @ok="closeType") 确定完结课程吗?
     template(v-slot:body)
       p 完结课程后，在创建课程或合约时，隐藏此课程类型
+  modal-dialog(ref='deleteTypeDialog',buttons="confirm" @ok="deleteType") 确定删除课程吗?
+    template(v-slot:body="slotProps")
+      p 删除课程类型<strong>{{slotProps.param.name}}</strong>
+      p.text-danger.small 不能删除已产生合约的课程类型, 或者已经创建课程的类型
 </template>
 
 <script>
@@ -181,6 +185,16 @@ module.exports = {
         this.types = data && data.types || [];
       });
     },
+    deleteType(t) {
+      var request = util.deleteJSON("/api/setting/types/" + t.id);
+      request.fail((jqXHR, textStatus, errorThrown) => {
+        util.showAlert("删除课程失败", jqXHR);
+      });
+      request.done((data, textStatus, jqXHR) => {
+        this.types = data && data.types || [];
+        this.$messager.showSuccessMessage(`课程类型<strong>${t.name}</strong>已删除`);
+      });
+    },
     beforeCreateType() {
       this.name = "";
       this.status = "open";
@@ -199,9 +213,6 @@ module.exports = {
       this.status = t.status;
       this.visible = t.visible;
       this.$refs.closeTypeDialog.show(t.id);
-    },
-    notImplemented() {
-      alert("暂不支持此功能");
     }
   },
   created() {
