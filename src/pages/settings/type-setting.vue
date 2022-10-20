@@ -9,15 +9,15 @@ div
         div.panel.panel-default(style="margin-bottom:7px")
           div.panel-heading {{type.name}} 
             div.btn-group.btn-group-xs.pull-right(role="group")
-              button.btn(type='button',@click='beforeEditType(type)')
-                span.glyphicon.glyphicon-edit.text-primary
-              button.btn(type="button",@click='notImplemented(type)')
-                span.glyphicon.glyphicon-remove-circle.text-danger
+              a.btn(role="button" @click='beforeEditType(type)')
+                i.glyphicon.glyphicon-edit.text-primary
+              a.btn(role="button" @click='notImplemented(type)')
+                i.glyphicon.glyphicon-remove-circle.text-danger
             span.label.label-default(v-if="type.status === 'closed'") 已完结
             span.label.label-info(v-else-if="type.visible === true") 开放预约
-          ul.list-group
-            li.list-group-item(v-for='(product, index) in products') {{product.name}}
     div.col-xs-6
+      ul.list-group
+        li.list-group-item(v-for='(product, index) in products') {{product.name}}
   modal-dialog(ref='createTypeDialog',buttons="confirm",@ok="createType()",:hasError="hasError") 创建课程
     template(v-slot:body)
       form.form-horizontal
@@ -130,12 +130,11 @@ module.exports = {
         util.showAlert("创建课程失败", jqXHR);
       });
       request.done((data, textStatus, jqXHR) => {
-        this.refresh();
+        this.types = data && data.types || [];
         this.$messager.showSuccessMessage(`课程类型<strong>${fields.name}</strong>已创建`);
       });
     },
     editType(typeId) {
-      var vm = this;
       var fields = {
         name: this.name,
         status: this.status,
@@ -147,11 +146,11 @@ module.exports = {
         data: JSON.stringify(fields),
         dataType: "json"
       });
-      request.fail(function(jqXHR, textStatus, errorThrown) {
+      request.fail((jqXHR, textStatus, errorThrown) => {
         util.showAlert("修改课程失败", jqXHR);
       });
-      request.done(function(data, textStatus, jqXHR) {
-        vm.refresh();
+      request.done((data, textStatus, jqXHR) => {
+        this.types = data && data.types || [];
       });
     },
     closeType(typeId) {
@@ -165,7 +164,7 @@ module.exports = {
         util.showAlert("完结课程失败", jqXHR);
       });
       request.done((data, textStatus, jqXHR) => {
-        this.refresh();
+        this.types = data && data.types || [];
       });
     },
     restoreType(typeId) {
@@ -179,7 +178,7 @@ module.exports = {
         util.showAlert("恢复课程失败", jqXHR);
       });
       request.done((data, textStatus, jqXHR) => {
-        this.refresh();
+        this.types = data && data.types || [];
       });
     },
     beforeCreateType() {
