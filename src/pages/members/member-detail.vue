@@ -4,8 +4,8 @@ div.container
     li
       a(href="../home") 主页
     li
-      a(href="../member") 会员列表
-    li.active 查看会员
+      a(href="../member") 学员列表
+    li.active 查看学员
   div.page-header
     h3(style='margin-top:0;display:inline-block') 基本信息
     button.btn.btn-danger(type='button',style='float:right',disabled,@click='') 删除学员
@@ -26,10 +26,10 @@ div.container
     div.form-group(:class='{"has-error": errors.name}')
       label.col-sm-2.control-label 姓名:
       div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
-        input.form-control(v-model.trim='memberData.name', placeholder='小朋友姓名')
+        input.form-control(v-model.trim='memberData.name', placeholder='学员姓名')
       div.col-sm-5
         p.form-control-static(style='color:#808080')
-          small {{memberData.since | formatDate}}注册会员
+          small {{memberData.since | formatDate}}创建学员
     div.form-group(:class='{"has-error": errors.contact}')
       label.col-sm-2.control-label 联系方式:
       div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.contact")
@@ -47,6 +47,7 @@ div.container
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
   div.page-header
     h3 会员卡
+      span.label.label-danger.ms-3 待移除
   template(v-if='memberData.membership&&memberData.membership.length')
     card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='tenantConfig.classrooms')
   template(v-else)
@@ -92,13 +93,14 @@ div.container
         small(style='color:#777') 共{{commentCount}}条备忘
   div.page-header
     h3(style='margin-top:0;display:inline-block') 充值记录
-    a(href='#',title='点击加载',@click='loadHistory')
+      span.label.label-danger.ms-3 待移除
+    a(role='button',title='点击加载',@click='loadHistory')
       span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
   div#loadHistory_mask(style='display:none')
     bootstrap-table.table-striped(ref='historyTable',:columns='changeHistory.columns',:options='changeHistory.options')
   div.page-header
     h3(style='margin-top:0;display:inline-block') 上课记录
-    a(href='#',title='点击加载',@click='loadClasses')
+    a(role='button',title='点击加载',@click='loadClasses')
       span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
   div#loadClasses_mask(style='display:none')
     div.filter(style='margin:0 0 7px 3px')
@@ -302,7 +304,7 @@ module.exports = {
         birthday: this.memberData.birthday && moment(this.memberData.birthday).toISOString()
       });
       request.done((data, textStatus, jqXHR) => {
-        this.$refs.messager.showSuccessMessage("会员基本资料更新成功");
+        this.$refs.messager.showSuccessMessage("学员基本资料更新成功");
       });
     },
     saveCardInfo: function(card, index) {
@@ -331,7 +333,7 @@ module.exports = {
     },
     deactivateAlert: function(e) {
       if (this.memberData.status == 'inactive') {
-        this.$refs.messager.showWarningMessage("未激活会员将无法进行自助预约，请点击<strong>保存</strong>按钮确定修改");
+        this.$refs.messager.showWarningMessage("未激活学员将无法进行自助预约，请点击<strong>保存</strong>按钮确定修改");
       }
     },
     addComment: function() {
