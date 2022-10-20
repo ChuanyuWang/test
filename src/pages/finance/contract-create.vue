@@ -111,6 +111,7 @@ div.container
 var member_select_modal = require("../../components/member-select-modal.vue").default;
 var type_select_modal = require("../../components/type-select-modal.vue").default;
 var serviceUtil = require("../../services/util");
+var common = require('../../common/common');
 
 module.exports = {
   name: "contract-create",
@@ -261,6 +262,18 @@ module.exports = {
   },
   mounted() {
     $('[data-toggle="tooltip"]').tooltip();
+    // default tab is classroom
+    var memberId = common.getParam("memberId");
+    if (memberId) {
+      var request = serviceUtil.getJSON("/api/members/" + memberId);
+      request.done((data, textStatus, jqXHR) => {
+        if (data) {
+          this.memberData.id = data._id;
+          this.memberData.name = data.name;
+          this.memberData.contact = data.contact;
+        }
+      });
+    }
   }
 }
 </script>

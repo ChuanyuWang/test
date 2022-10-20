@@ -5,6 +5,7 @@ div
     button.btn.btn-default(type="button" @click="refresh" style="float: right; margin-top: 16px")
       span.glyphicon.glyphicon-refresh.me-3
       | 刷新
+    a.btn.btn-success.me-3(:href="'../contract/create?memberId='+ memberId" style="float: right; margin-top: 16px") 购课
   div.row
     div.col-sm-12
       div#contractToolbar
