@@ -29,11 +29,13 @@ div
           label.control-label.col-sm-2 课程名称:
           div.col-sm-8
             input.form-control(type='text',placeholder='课程名称',v-model='name')
+        div.form-group
           div.col-sm-offset-2.col-sm-10
             div.checkbox
               label
                 input(type='checkbox',v-model='visible')
                 |开放预约
+                span.help-block.small 开放预约的课程类型允许家长自助约课
   modal-dialog(ref='editTypeDialog',buttons="confirm") 修改课程
     template(v-slot:body)
       form.form-horizontal
@@ -45,11 +47,13 @@ div
           label.control-label.col-sm-2 课程名称:
           div.col-sm-8
             input.form-control(type='text',placeholder='课程名称',v-model='name')
+        div.form-group
           div.col-sm-offset-2.col-sm-10
             div.checkbox
               label
                 input(type='checkbox',v-model='visible')
                 |开放预约
+                span.help-block.small 开放预约的课程类型允许家长自助约课
     template(v-slot:footer="slotProps")
       button.btn.btn-default(type="button",data-dismiss="modal") 取消
       button.btn.btn-danger(type="button",data-dismiss="modal",:disabled='hasError',v-if='isEditing && status==="open"',@click='$refs.closeTypeDialog.show(slotProps.param)') 完结课程
