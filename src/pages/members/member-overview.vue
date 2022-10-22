@@ -22,7 +22,7 @@ div
         input.form-control(type="number",style="width:70px",placeholder="页码",v-model="pageNumber")
         span.input-group-btn
           button#jumpToButton.btn.btn-default(type="button",@click="jumpToPage") 跳转
-  bootstrap-table(ref='memberTable',:columns='tableColumns',:options='tableOptions')
+  bootstrap-table.table-striped(ref='memberTable',:columns='tableColumns',:options='tableOptions')
 
   modal-dialog(ref='createMemberDialog',buttons="confirm",@ok="addNewMember",:hasError="hasError") 添加会员
     template(v-slot:body)
@@ -42,7 +42,7 @@ div
             p.form-control-static(style='color:#808080')
               small 必填
         div.form-group
-          label.control-label.col-sm-2(for='birth') 生日:
+          label.control-label.col-sm-2(for='birth') 出生日期:
           div.col-sm-4
             date-picker(v-model='birthday')
         div.form-group
@@ -93,10 +93,16 @@ module.exports = {
         title: "联系方式"
       }, {
         field: "birthday",
-        title: "生日",
+        title: "出生日期",
         sortable: true,
-        formatter: common.dateFormatter
+        formatter: common.dateFormatter,
+        visible: false
       }, {
+        field: "_id",
+        title: "剩余课时/合约课时",
+        sortable: false,
+        formatter: value => { return "TBD" }
+      },/*{
         field: "allRemaining",
         title: "剩余总课时",
         sortable: true,
@@ -115,11 +121,11 @@ module.exports = {
         sortable: true,
         visible: false,
         formatter: this.creditFormatter
-      }, {
+      }, */{
         field: "unStartedClassCount",
-        title: "剩余课程(节)",
-        sortable: true,
-        visible: false
+        title: "未上课程(节)",
+        sortable: false,
+        visible: true
       }, {
         field: "note",
         title: "描述",

@@ -35,7 +35,7 @@ div.container
       div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.contact")
         input.form-control(v-model.trim='memberData.contact', placeholder='135xxx')
     div.form-group(:class='{"has-error": errors.birthday}')
-      label.control-label.col-sm-2 生日:
+      label.control-label.col-sm-2 出生日期:
       div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
         date-picker(v-model='memberData.birthday')
     div.form-group
