@@ -149,7 +149,7 @@ module.exports = {
       // define the options of charts
       var option = {
         title: {
-          text: (this.unit === 'year' ? "每" : year) + "年课时消费明细",
+          text: (this.unit === 'year' ? "每" : year) + "年会员卡课时消费明细",
           top: "top",
           left: "center"
         },
@@ -316,4 +316,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
