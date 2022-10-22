@@ -10,8 +10,9 @@ div.container
     h3(style="margin-top: 0; display: inline-block") 合约状态
       span.label.label-danger.ms-3(style="font-size: 65%" v-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
       span.label.label-success.ms-3(style="font-size: 65%" v-else) 已缴清
-    button.btn.btn-default(type="button" style="float: right" disabled @click="") 转课时
-    button.btn.btn-default.me-3(type="button" style="float: right" disabled @click="") 退费
+    button.btn.btn-default(type="button" style="float: right" @click="notImplemented") 转课时
+    button.btn.btn-default.me-3(type="button" style="float: right" @click="notImplemented") 退费
+    button.btn.btn-danger.me-3(type="button" style="float: right" @click="notImplemented") 删除
     button.btn.btn-primary.me-3(type="button" style="float: right" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
   div.row.form-condensed
     div.col-sm-4.col-xs-6
@@ -374,6 +375,9 @@ module.exports = {
     },
   },
   methods: {
+    notImplemented() {
+      this.$refs.messager.showErrorMessage("此功能尚不支持, 请等系统更新后再试");
+    },
     openModifyDialog() {
       this.$refs.modifyDialog.show();
     },
