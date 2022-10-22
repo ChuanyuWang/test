@@ -45,6 +45,10 @@ div
     template(v-slot:body)
       form.form-horizontal
         div.form-group.form-group-sm
+          label.control-label-sm.col-xs-3 课程:
+          div.col-xs-9
+            p.form-control-static {{typeFormatter(bookItem.type)}}
+        div.form-group.form-group-sm
           label.control-label-sm.col-xs-3 时间:
           div.col-xs-9
             p.form-control-static {{bookItem.date | dateTimeFormatter}}
@@ -94,6 +98,7 @@ div
  */
 
 var common = require("../../common/common");
+var serviceUtil = require("../../services/util");
 var class_service = require("../../services/classes");
 var modalDialog = require("../../components/modal-dialog.vue").default;
 var payDialog = require("./pay-modal.vue").default;
@@ -109,6 +114,7 @@ module.exports = {
   data: function() {
     return {
       tenantName: common.getTenantName(),
+      types: [],
       tenantConfig: {},
       loading: false,
       errorMessage: "",
@@ -121,6 +127,7 @@ module.exports = {
       bookItem: {
         quantity: 1,
         date: null,
+        type: "",
         content: "",
         name: "",
         teacher: "",
@@ -213,6 +220,12 @@ module.exports = {
     }
   },
   methods: {
+    typeFormatter(value) {
+      var item = (this.types || []).find(item => {
+        return item.id === value;
+      });
+      return item && item.name;
+    },
     updateSchedule(delta) {
       var vue = this;
       this.loading = true;
@@ -237,7 +250,7 @@ module.exports = {
         vue.scrollToToday();
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        console.error(jqXHR.responseText);
+        console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
       request.always(function(data, textStatus, jqXHR) {
         vue.loading = false;
@@ -330,6 +343,7 @@ module.exports = {
         return;
       }
       this.bookItem.classid = item._id;
+      this.bookItem.type = item.type;
       this.bookItem.date = item.date;
       this.bookItem.content = item.name;
       this.bookItem.price = item.price || 0;
@@ -384,6 +398,10 @@ module.exports = {
   },
   created: function() {
     this.tenantConfig = _getTenantConfig();
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
+    });
   },
   mounted: function() {
     this.updateSchedule("today");
