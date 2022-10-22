@@ -53,8 +53,8 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 已消课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{consumedTotalCredit}}课时
-              a.small.ms-3(role="button") 消课记录
-                i.glyphicon.glyphicon-search
+              a.small.ms-3(role="button" href="#classes-section") 消课记录
+                i.glyphicon.glyphicon-search.ms-3
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
           div.col-xs-6.col-sm-7.col-md-8
@@ -69,8 +69,8 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 实收金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ contract.received / 100 }}元
-              a.small.ms-3(role="button") 缴费记录
-                i.glyphicon.glyphicon-search
+              a.small.ms-3(role="button" href="#payments-section") 缴费记录
+                i.glyphicon.glyphicon-search.ms-3
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 欠费金额:
           div.col-xs-6.col-sm-7.col-md-8(:class="{ 'text-danger': outstandingFee }")
@@ -134,6 +134,7 @@ div.container
   contract-comments(:contractId="contractId")
   div.page-header
     h3(style="display: inline-block") 缴费记录
+      a(name="payments-section")
     button.btn.btn-default(type="button" @click="$refs.paymentTable.refresh()" style="float: right; margin-top: 16px")
       span.glyphicon.glyphicon-refresh.me-3
       | 刷新
@@ -144,6 +145,7 @@ div.container
   contract-history(ref="historySection" :contractId="contractId")
   div.page-header
     h3(style="display: inline-block") 消课记录
+      a(name="classes-section")
     button.btn.btn-default(type="button" @click="$refs.classesTable.refresh({url: '/api/classes'})" style="float: right; margin-top: 16px")
       span.glyphicon.glyphicon-refresh.me-3
       | 刷新
