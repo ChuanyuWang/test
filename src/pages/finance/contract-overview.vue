@@ -67,10 +67,14 @@ module.exports = {
         field: "credit",
         title: "合约课时"
       }, {
+        field: "consumedCredit",
+        title: "已消课时",
+        formatter: (value, row) => { return value + row.expendedCredit || 0 }
+      }, {
         field: "effectiveDate",
         title: "生效日期",
         sortable: true,
-        formatter: this.dateTimeFormatter
+        formatter: this.dateFormatter
       }, {
         title: "合约金额",
         formatter: this.totalFormatter
@@ -206,4 +210,5 @@ module.exports = {
 }
 </script>
 <style lang="less">
+
 </style>
