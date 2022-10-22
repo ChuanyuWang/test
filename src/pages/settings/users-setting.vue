@@ -20,8 +20,8 @@ div(style='padding:7px')
           span.glyphicon.glyphicon-ok.text-success
   p.small 
     |*删除课程 - 店长可以删除未开始的课程;管理员不受限制<br/>
-    |*预约课程 - 如果课程已经开始或者距离开始时间不足1小时，会员将无法预约;管理员和店长不受限制<br/>
-    |*取消预约 - 会员可以在课程开始前24小时取消预约;店长可以在课程开始1小时内取消预约;管理员不受限制<br/>
+    |*预约课程 - 如果课程已经开始或者距离开始时间不足1分钟, 学员将无法预约;管理员和店长不受限制<br/>
+    |*取消预约 - 学员可以在课程开始前24小时取消预约;店长可以在课程开始1小时内取消预约;管理员不受限制<br/>
     |*签到 - 店长可以在课程开始72小时内签到;管理员不受限制
 </template>
 
@@ -51,6 +51,11 @@ module.exports = {
         { name: "综合设置", role: "admin" },
 
         { name: "查看课程", role: "guest" },
+        { name: "添加课程类型", role: "admin" },
+        { name: "修改课程类型", role: "admin" },
+        { name: "删除课程类型", role: "admin" },
+
+        { name: "查看课程", role: "guest" },
         { name: "添加课程", role: "user" },
         { name: "删除课程*", role: "user" },
         { name: "修改课程", role: "user" },
@@ -59,13 +64,20 @@ module.exports = {
         { name: "预约课程*", role: "guest" },
         { name: "取消预约*", role: "guest" },
 
-        { name: "查看会员", role: "user" },
-        { name: "添加会员", role: "admin" },
-        { name: "删除会员", role: "admin" },
-        { name: "修改会员", role: "admin" },
+        { name: "查看学员", role: "user" },
+        { name: "添加学员", role: "admin" },
+        { name: "删除学员", role: "admin" },
+        { name: "修改学员", role: "admin" },
         { name: "添加备注", role: "user" },
-        { name: "添加会员卡", role: "admin" },
-        { name: "修改会员卡", role: "admin" },
+
+        { name: "查看合约", role: "user" },
+        { name: "添加合约", role: "user" },
+        { name: "删除合约", role: "admin" },
+        { name: "修改合约", role: "admin" },
+        { name: "合约备注", role: "user" },
+
+        { name: "合约缴费", role: "user" },
+        { name: "撤销缴费", role: "admin" },
 
         { name: "查看班级", role: "user" },
         { name: "添加班级", role: "user" },
@@ -97,4 +109,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
