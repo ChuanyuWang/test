@@ -26,7 +26,7 @@ var NORMAL_FIELDS = {
 
 router.use(helper.isAuthenticated);
 
-router.post('/', helper.requireRole("admin"), validate, async function(req, res, next) {
+router.post('/', validate, async function(req, res, next) {
     let payment = {
         contractId: ObjectId(req.body.contractId),
         contractNo: req.body.contractNo,
