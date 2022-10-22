@@ -5,7 +5,7 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
       div.form-group
         label.control-label.col-sm-3 应收金额:
         div.col-sm-8
-          p.form-control-static {{ outstandingFee }}
+          p.form-control-static {{ outstandingFee }}元
       div.form-group
         label.col-sm-3.control-label 支付渠道:
         div.col-sm-8(style="height: 34px")
