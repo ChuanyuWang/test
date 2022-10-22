@@ -10,9 +10,9 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK" @show="lazyRefresh") {
           th(v-else,data-radio='true')
           th(data-field='name',data-sortable='true') {{$t('member_name')}}
           th(data-field='contact') {{$t('member_contact')}}
-          th(data-field='membership') 剩余课时
+          th(data-field='_id') 课程合约
   template(v-slot:helpText)  
-    p.small(style='color:#777;float:left;margin-top:7px') *仅显示激活会员
+    p.small(style='color:#777;float:left;margin-top:7px') *仅显示在读学员
 </template>
 
 <script>
@@ -80,6 +80,9 @@ module.exports = {
       } else {
         return undefined;
       }
+    },
+    contractFormatter(value, row, index) {
+      return "TBD";
     }
   },
   mounted: function() {
@@ -90,7 +93,7 @@ module.exports = {
       locale: 'zh-CN',
       showRefresh: true,
       columns: [{}, {}, {}, {
-        formatter: vm.creditFormatter
+        formatter: vm.contractFormatter
       }]
     });
   }

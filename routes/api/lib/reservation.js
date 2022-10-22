@@ -17,7 +17,7 @@ function validate(member, cls, quantity, error) {
 
     // only active members can book classes
     if (member.status != 'active') {
-        error.cause = new Error("您的会员状态还未激活，如有问题，欢迎来电或到店咨询");
+        error.cause = new Error("您的会员状态已过期，如有问题，欢迎来电或到店咨询");
         return false;
     }
 

@@ -13,8 +13,8 @@ div.container
     div.form-group
       label.col-sm-2.control-label 状态:
       select.col-sm-5.form-control(v-model='memberData.status',@change='deactivateAlert',style='margin-left:15px;width:auto')
-        option.text-success(value='active') 激活
-        option.text-danger(value='inactive') 未激活
+        option.text-success(value='active') 在读
+        option.text-danger(value='inactive') 过期
     div.form-group
       label.col-sm-2.control-label 来源:
       div.col-sm-10
@@ -333,7 +333,7 @@ module.exports = {
     },
     deactivateAlert: function(e) {
       if (this.memberData.status == 'inactive') {
-        this.$refs.messager.showWarningMessage("未激活学员将无法进行自助预约，请点击<strong>保存</strong>按钮确定修改");
+        this.$refs.messager.showWarningMessage("过期学员将无法进行自助预约，请点击<strong>保存</strong>按钮确定修改");
       }
     },
     addComment: function() {

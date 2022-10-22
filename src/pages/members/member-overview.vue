@@ -15,8 +15,8 @@ div
       div.input-group.status-filter(style="margin-left:3px")
         span.input-group-addon 状态:
         select.form-control(@change="refresh",v-model="statusFilter")
-          option(value="active") 正常
-          option(value="inactive") 停用
+          option(value="active") 在读
+          option(value="inactive") 过期
           option(value="") 全部
       div.input-group(style="margin-left:3px")
         input.form-control(type="number",style="width:70px",placeholder="页码",v-model="pageNumber")
