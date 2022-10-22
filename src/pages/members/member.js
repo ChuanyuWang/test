@@ -22,6 +22,6 @@ $(document).ready(function() {
 
 function init() {
     moment.locale('zh-CN');
-    bootbox.setLocale('zh_CN');
+    //bootbox.setLocale('zh_CN');
     Vue.use(i18nextplugin);
 }

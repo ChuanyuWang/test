@@ -49,6 +49,7 @@ div
           label.control-label.col-sm-2(for='note') 描述:
           div.col-sm-10
             textarea.form-control(rows='3',style='resize:vertical;min-height:70px',v-model.trim='note',name='note',placeholder='添加更多备注信息, 比如昵称')
+  message-alert(ref="messager")
 </template>
 
 <script>
@@ -58,6 +59,8 @@ div
  * --------------------------------------------------------------------------
  */
 var common = require('../../common/common');
+var serviceUtil = require('../../services/util');
+var messageAlert = require("../../components/message-alert.vue").default;
 
 module.exports = {
   name: "member-overview",
@@ -65,6 +68,7 @@ module.exports = {
   components: {
     "BootstrapTable": BootstrapTable,
     "date-picker": require("../../components/date-picker.vue").default,
+    "message-alert": messageAlert,
     "modal-dialog": require("../../components/modal-dialog.vue").default
   },
   data: function() {
@@ -194,17 +198,7 @@ module.exports = {
           window.location.href = window.location.pathname + '/' + data._id;
         },
         error: function(jqXHR, status, err) {
-          bootbox.dialog({
-            message: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText,
-            title: "添加会员失败",
-            buttons: {
-              danger: {
-                label: "确定",
-                className: "btn-danger",
-              }
-            }
-          });
-          //console.error(jqXHR);
+          serviceUtil.showAlert("添加会员失败", jqXHR);
         },
         dataType: "json"
       });
@@ -292,11 +286,12 @@ module.exports = {
     this.tenantConfig = _getTenantConfig();
   },
   mounted: function() {
-    // 'this' is refer to vm instance
-    //var vm = this;
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
   }
 }
 </script>
 
 <style lang='less'>
+
 </style>
