@@ -4,8 +4,8 @@ div
     label.col-xs-4(style='padding:7px 3px 0px 3px;text-align:right') 显示:
     div.col-xs-8
       select.form-control(v-model='filter')
-        option(value='active') 激活
-        option(value='inactive') 未激活
+        option(value='active') {{$t('status_active')}}
+        option(value='inactive') {{$t('status_inactive')}}
         option(value='deleted') 已删除
         option(value='all') 全部
   template(v-for='(teacher, index) in data')
@@ -56,6 +56,7 @@ module.exports = {
   border-right: 2px solid #337ab7;
   color: #337ab7;
 }
+
 .teacher-list-item:hover {
   background-color: aliceblue;
   cursor: pointer;
