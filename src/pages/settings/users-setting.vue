@@ -74,7 +74,7 @@ module.exports = {
         { name: "添加合约", role: "user" },
         { name: "删除合约", role: "admin" },
         { name: "修改合约", role: "admin" },
-        { name: "合约备注", role: "user" },
+        { name: "备注合约", role: "user" },
 
         { name: "合约缴费", role: "user" },
         { name: "撤销缴费", role: "admin" },
