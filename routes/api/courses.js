@@ -488,7 +488,7 @@ async function deductContracts(db, req, locals) {
 
             let contract2Deduct = findAvailableContract(c, all_contracts);
             if (!contract2Deduct) {
-                errors.push(errorbuilder(m, c, "无有效合约"));
+                errors.push(errorbuilder(m, c, "未购买课程或合约未生效"));
                 continue;
             }
 

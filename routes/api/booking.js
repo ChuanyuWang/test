@@ -367,7 +367,7 @@ async function findContract(db, req, locals) {
     let docs = await cursor.toArray();
     locals.contract = findAvailableContract(cls, docs);
     if (!locals.contract) {
-        throw new RuntimeError("预约失败，没有找到选择课程的有效合约");
+        throw new RuntimeError("预约失败，没有购买课程或合约已失效");
     }
 }
 
