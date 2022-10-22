@@ -45,6 +45,8 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{remainingCredit}}课时
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时是未排课的课时")
+                i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余金额:
           div.col-xs-6.col-sm-7.col-md-8
