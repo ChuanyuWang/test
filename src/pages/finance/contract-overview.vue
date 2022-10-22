@@ -25,6 +25,7 @@ div
       p {{ errorMessage }}
 </template>
 <script>
+var serviceUtil = require("../../services/util");
 
 module.exports = {
   name: "contract-overview",
@@ -90,7 +91,7 @@ module.exports = {
         pagination: true,
         pageSize: 15,
         pageList: [15, 25, 50, 110],
-        url: "/api/contracts",
+        //url: "/api/contracts",
         uniqueId: "_id",
         sidePagination: "server",
         search: false,
@@ -192,18 +193,17 @@ module.exports = {
       this.to = null;
     },
     refresh() {
-      this.$refs.contractTable.refresh();
+      this.$refs.contractTable.refresh({ url: "/api/contracts" });
     }
   },
   created() {
     var vm = this;
     this.tenantConfig = _getTenantConfig();
-    var request = $.getJSON("/api/setting/types");
-    request.done(function(data, textStatus, jqXHR) {
-      vm.types = data || []
-    });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-      console.log(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      vm.types = data || [];
+      // delay the refresh after types fetched
+      this.refresh();
     });
   },
   mounted() { }
