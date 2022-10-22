@@ -62,7 +62,7 @@ module.exports = {
         locale: "zh-CN",
         //showRefresh: true,
         queryParams: this.customQuery,
-        url: "/api/contracts",
+        //url: "/api/contracts",
         uniqueId: "_id",
         sortName: "effectiveDate",
         sortOrder: "asc",
@@ -78,7 +78,7 @@ module.exports = {
   filters: {},
   methods: {
     refresh() {
-      this.$refs.contractsTable.refresh();
+      this.$refs.contractsTable.refresh({ url: "/api/contracts" });
     },
     contractLinkFormatter(value, row, index) {
       return [
@@ -152,7 +152,10 @@ module.exports = {
       this.types = data || [];
     });
   },
-  mounted() { }
+  mounted() {
+    // delay the refresh after types fetched
+    this.refresh();
+  }
 }
 </script>
 <style lang="less">
