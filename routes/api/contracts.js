@@ -53,7 +53,7 @@ var NORMAL_FIELDS = {
 
 router.use(helper.isAuthenticated);
 
-router.post('/', helper.requireRole("admin"), validateContract, async function(req, res, next) {
+router.post('/', validateContract, async function(req, res, next) {
     let contract = {
         serialNo: "",
         status: "open",
