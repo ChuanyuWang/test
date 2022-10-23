@@ -248,8 +248,9 @@ router.post('/api/upgrade', isAuthenticated, getTenantInfo, function(req, res, n
             //TODO, send the complete message when all data update
             res.send("Tenant update to 5.0");
         });
-    } else if (doc.version == VERSION) {
-        res.send("Tenant is already update to date");
+    } else if (doc.version == 5) {
+        upgradeFromFive(req, res, next);
+        //res.send("Tenant is already update to date");
     } else {
         var error = new Error("tenant version is not valid");
         error.status = 400;
@@ -486,6 +487,10 @@ function upgradeFromFour(req, res, next) {
             else console.log("add status field in all classes %j", result);
         });
     });
+}
+
+function upgradeFromFive(req, res, next) {
+    res.send("Tenant is already update to date");
 }
 
 function checkTenantUser(req, res, next) {
