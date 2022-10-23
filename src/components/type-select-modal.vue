@@ -7,7 +7,7 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 
         label
           input(type="radio",name="typeOptions",:value="item.id",v-model="selectedTypeId")
           |{{item.name}} 
-          span.label.label-info(v-show="item.visible!==false") 开放预约
+          span.label.label-primary(v-show="item.visible!==false") 开放预约
 </template>
 
 <script>

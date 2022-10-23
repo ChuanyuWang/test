@@ -8,7 +8,8 @@ div.container
     li.active 查看合约
   div.page-header(style="margin-top: 15px")
     h3(style="margin-top: 0; display: inline-block") 合约状态
-      span.label.label-danger.ms-3(style="font-size: 65%" v-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
+      span.label.label-danger.ms-3(style="font-size: 65%" v-if="isExpired") 已过期
+      span.label.label-danger.ms-3(style="font-size: 65%" v-else-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
       span.label.label-success.ms-3(style="font-size: 65%" v-else) 已缴清
     button.btn.btn-default(type="button" style="float: right" @click="notImplemented") 转课时
     button.btn.btn-default.me-3(type="button" style="float: right" @click="notImplemented") 退费
@@ -317,6 +318,12 @@ module.exports = {
     },
     consumedFee() {
       return Math.round(this.contract.total * this.consumedTotalCredit / this.contract.credit) / 100;
+    },
+    isExpired() {
+      if (moment(this.contract.expireDate).isValid() && moment(this.contract.expireDate).isBefore())
+        return true;
+      else
+        return false;
     },
     errors() {
       var errors = {};
