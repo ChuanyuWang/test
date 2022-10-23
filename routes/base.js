@@ -23,49 +23,10 @@ router.get('/class/:classID', helper.checkTenantUser, function(req, res, next) {
 });
 
 router.get('/member', helper.checkTenantUser, function(req, res) {
-    var members = req.db.collection("members");
-    //TODO, support multi membership card
-    members.aggregate([{
-        $match: {
-            membership: {
-                $size: 1
-            },
-            "membership.0.expire": {
-                $gt: new Date()
-            },
-            "membership.0.credit": {
-                $gt: 0
-            }
-        }
-    }, {
-        $unwind: "$membership"
-    }, {
-        $group: {
-            _id: null,
-            count: {
-                $sum: 1 // the count of valid member who is not expire and has remaining credit
-            },
-            total: {
-                $sum: "$membership.credit" // the total of valid members' remaining credit
-            }
-        }
-    }], function(err, docs) {
-        if (err)
-            console.error(err);
-
-        var doc = { count: 0, total: 0 };
-        if (docs && docs.length == 1)
-            doc = docs[0];
-
-        res.render('bqsq/member', {
-            title: res.__('members'),
-            user: req.user,
-            currentUrl: 'member',
-            statistics: {
-                count: doc.count,
-                total: Math.round(doc.total * 10) / 10
-            }
-        });
+    res.render('bqsq/member', {
+        title: res.__('members'),
+        user: req.user,
+        currentUrl: 'member'
     });
 });
 
