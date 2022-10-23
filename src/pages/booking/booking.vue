@@ -98,7 +98,6 @@ div
  */
 
 var common = require("../../common/common");
-var serviceUtil = require("../../services/util");
 var class_service = require("../../services/classes");
 var modalDialog = require("../../components/modal-dialog.vue").default;
 var payDialog = require("./pay-modal.vue").default;
@@ -114,7 +113,6 @@ module.exports = {
   data: function() {
     return {
       tenantName: common.getTenantName(),
-      types: [],
       tenantConfig: {},
       loading: false,
       errorMessage: "",
@@ -142,6 +140,9 @@ module.exports = {
     "pay-dialog": payDialog
   },
   computed: {
+    types() {
+      return this.tenantConfig.types || [];
+    },
     classesByDay() {
       var today = moment(0, "HH"); // today, 00:00:00.000
       var results = [];
@@ -246,7 +247,10 @@ module.exports = {
         minAge: this.minimumAge || undefined // 'undefined' field will not append to the URL
       });
       request.done(function(data, textStatus, jqXHR) {
-        vue.items = data || [];
+        // filter out not visible class
+        vue.items = (data || []).filter(element => {
+          return vue.isVisiable(element.type);
+        });
         vue.scrollToToday();
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
@@ -255,6 +259,13 @@ module.exports = {
       request.always(function(data, textStatus, jqXHR) {
         vue.loading = false;
       });
+    },
+    isVisiable(t) {
+      if (!t) return true;
+      var item = (this.types || []).find(item => {
+        return item.id === t;
+      });
+      return (item && item.visible) !== false;
     },
     addNewBook(bookInfo) {
       var vm = this;
@@ -398,10 +409,6 @@ module.exports = {
   },
   created: function() {
     this.tenantConfig = _getTenantConfig();
-    var request = serviceUtil.getJSON("/api/setting/types");
-    request.done((data, textStatus, jqXHR) => {
-      this.types = data || [];
-    });
   },
   mounted: function() {
     this.updateSchedule("today");
