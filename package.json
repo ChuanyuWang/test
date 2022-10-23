@@ -1,6 +1,6 @@
 {
   "name": "e-education",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "On-line course management",
   "private": true,
   "main": "./bin/www",
