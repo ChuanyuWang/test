@@ -120,6 +120,7 @@ async function getTenantInfo(req, res, next) {
         // navTitle is the title on the navigation bar
         res.locals.navTitle = tenant.displayName || "";
         res.locals.classrooms = tenant.classroom || [];
+        res.locals.types = tenant.types || [];
         res.locals.logoPath = helper.getTenantLogo(tenant);
         res.locals.tenant_feature = tenant.feature || "common"; // default is common
         res.locals.tenant_address = tenant.address || "";
