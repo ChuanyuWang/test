@@ -98,10 +98,10 @@ module.exports = {
         formatter: common.dateFormatter,
         visible: false
       }, {
-        field: "_id",
-        title: "剩余课时/合约课时",
+        field: "contracts",
+        title: "课程合约 (已消/合约)",
         sortable: false,
-        formatter: value => { return "TBD" }
+        formatter: this.contractsFormatter
       },/*{
         field: "allRemaining",
         title: "剩余总课时",
@@ -121,12 +121,12 @@ module.exports = {
         sortable: true,
         visible: false,
         formatter: this.creditFormatter
-      }, */{
+      }, {
         field: "unStartedClassCount",
         title: "未上课程(节)",
         sortable: false,
         visible: true
-      }, {
+      }, */{
         field: "note",
         title: "描述",
         visible: false
@@ -150,6 +150,13 @@ module.exports = {
     };
   },
   computed: {
+    types() {
+      var result = {};
+      (this.tenantConfig.types || []).forEach(value => {
+        result[value.id] = value.name;
+      });
+      return result;
+    },
     errors: function() {
       var errors = {};
       if (!this.name || this.name.length === 0)
@@ -216,6 +223,18 @@ module.exports = {
         '<i class="glyphicon glyphicon-edit"></i>',
         '</a>'
       ].join('');
+    },
+    contractsFormatter(value, row, index) {
+      var contracts = value || [];
+      var result = "";
+      contracts.forEach((element, i) => {
+        result += this.types[element.goods] + `: ${element.consumedCredit}/${element.credit}课时`;
+        if (element.status !== "paid") {
+          result += "<span class='label label-danger' style='font-size: 50%''>欠费</span>"
+        }
+        if (i < contracts.length - 1) result += "; "
+      });
+      return result;
     },
     remainingFormatter(value, row, index) {
       return [

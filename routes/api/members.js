@@ -53,7 +53,7 @@ var NORMAL_FIELDS = {
     expire: 1,
     note: 1,
     source: 1,
-    membership: 1,
+    //membership: 1,
     openid: 1
 };
 
@@ -184,35 +184,31 @@ router.get('/', async function(req, res, next) {
         $project: NORMAL_FIELDS
     }, {
         $lookup: {
-            from: 'classes',
+            from: 'contracts',
             let: { memberID: "$_id" },
             pipeline: [{
                 $match: {
-                    date: { $gte: new Date() },
-                    "booking.0": { $exists: true },
-                    $expr: { $in: ["$$memberID", "$booking.member"] }
+                    status: { $nin: ["closed", "deleted"] },
+                    $expr: { $eq: ["$$memberID", "$memberId"] }
                 }
             }, {
-                $project: { name: 1, date: 1, cost: 1, _id: 0 }
+                $project: { comments: 0, history: 0 }
             }],
-            as: 'unStartedClass'
+            as: 'contracts'
         }
     }, {
         $addFields: {
-            unStartedClassCount: {
-                $size: "$unStartedClass"
+            contractsCount: {
+                $size: "$contracts"
             },
-            unStartedClassCost: {
-                $sum: "$unStartedClass.cost"
+            contractsTotalCredit: {
+                $sum: "$contracts.credit"
             },
-            credit: {
-                $sum: "$membership.credit"
-            }
-        }
-    }, {
-        $addFields: {
-            allRemaining: {
-                $add: ["$unStartedClassCost", "$credit"]
+            contractsTotalConsumed: {
+                $sum: "$contracts.consumedCredit"
+            },
+            contractsTotalExpended: {
+                $sum: "$contracts.expendedCredit"
             }
         }
     }];
@@ -239,7 +235,7 @@ router.get('/', async function(req, res, next) {
 
     try {
         let docs = await members.aggregate(pipelines).toArray();
-        console.log(`find ${docs.length} members with remaining classes from ${total} in total`);
+        console.log(`find ${docs.length} members with relevant contracts from ${total} in total`);
         return res.json({
             total: total,
             rows: docs
