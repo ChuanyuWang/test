@@ -298,7 +298,6 @@ module.exports = {
 
       var request = class_service.updateClass(this.cls._id, {
         name: this.cls.name,
-        type: this.cls.type,
         date: this.cls.date && moment(this.cls.date).toISOString(),
         classroom: this.cls.classroom,
         teacher: this.cls.teacher,
