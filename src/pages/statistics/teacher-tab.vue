@@ -3,6 +3,11 @@ div
   div#teacher_toolbar
     form.form-inline
       date-picker(v-model='targetMonth', :config='datePickerConfig', @input="refresh",:label="$t('time')")
+      div.input-group.ms-3
+        span.input-group-addon 课程
+        select.form-control(v-model="typeFilter" @change="refresh")
+          option(value="") {{ $t('all') }}
+          option(v-for="item in types" :value="item.id") {{item.name}}
   bootstrap-table.table-striped(ref='checkinTable',:columns='columns',:options='options')
 </template>
 
@@ -24,8 +29,8 @@ module.exports = {
     // load the setting of tenant from html root-level elements
     var setting = common.getTenantSetting();
     return {
-      timeFilter: 'today',
-      flagFilter: 'red',
+      tenantSettings: {},
+      typeFilter: "",
       targetMonth: moment().startOf('month'),
       datePickerConfig: { "format": "YYYY-MM", "locale": "zh-CN", "viewMode": "months" },
       feature: setting.feature,
@@ -88,6 +93,9 @@ module.exports = {
     'date-picker': date_picker
   },
   computed: {
+    types() {
+      return this.tenantSettings.types || [];
+    },
     teachers: function() {
       var res = {};
       this.teacherData.forEach(function(val, index, array) {
@@ -136,6 +144,7 @@ module.exports = {
     statusQuery: function(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
       params.targetMonth = this.targetMonth.toISOString();
+      params.type = this.typeFilter || undefined;
       return params;
     }
   },
@@ -145,6 +154,7 @@ module.exports = {
     request.done(function(data, textStatus, jqXHR) {
       vm.teacherData = data || [];
     });
+    this.tenantSettings = _getTenantConfig();
   },
   mounted: function() { }
 };
