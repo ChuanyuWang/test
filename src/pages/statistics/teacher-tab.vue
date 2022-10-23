@@ -51,9 +51,10 @@ module.exports = {
           formatter: this.statusFormatter
         }, {
           field: "counter",
-          title: "完成课节",
+          title: "完成课节<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
           sortable: false,
-          formatter: this.counterFormatter
+          formatter: this.counterFormatter,
+          titleTooltip: "完成课节=完成课次*每节课时，例如：完成两次课，课时分别为1课时和2课时，则完成课节为3 (1+2)"
         }, {
           title: "实际完成课时",
           sortable: false,
@@ -113,7 +114,11 @@ module.exports = {
       });
     },
     counterFormatter: function(value, row, index) {
-      return (value || []).length;
+      var sum = 0;
+      (value || []).forEach(value => {
+        sum += value.cost;
+      });
+      return sum;
     },
     nameFormatter: function(value, row, index) {
       return value ? this.teachers[value].name : "<未指定>";

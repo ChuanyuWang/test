@@ -104,7 +104,7 @@ module.exports = {
         formatter: this.contractsFormatter
       },/*{
         field: "allRemaining",
-        title: "剩余总课时",
+        title: "剩余总课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
         sortable: true,
         titleTooltip: "剩余总课时=剩余未使用课时+已使用但未开始的课时\n例如: 50 (40/10) 剩余40课时未使用/已使用但尚未开始的课程共计10课时，剩余总课时为50",
         formatter: this.remainingFormatter,
