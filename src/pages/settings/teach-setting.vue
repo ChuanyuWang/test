@@ -48,7 +48,7 @@ module.exports = {
       });
     },
     addUnsaveOne: function() {
-      this.data.push({ name: "", status: "inactive" });
+      this.data.push({ name: "", status: "active" });
       this.$refs.teachList.setSelectedIndex(this.data.length - 1);
     },
     addTeacher: function(params) {
