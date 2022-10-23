@@ -6,7 +6,7 @@
  */
 
 var i18nextplugin = require('../../locales/i18nextplugin');
-var classView = require('./class-view.vue').default;
+var classView = require('./class-detail.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {

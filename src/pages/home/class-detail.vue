@@ -155,7 +155,7 @@ var modalDialog = require("../../components/modal-dialog.vue").default;
 var serviceUtil = require("../../services/util");
 
 module.exports = {
-  name: "class-view",
+  name: "class-detail",
   props: {
     appData: String // the id of class object
   },
