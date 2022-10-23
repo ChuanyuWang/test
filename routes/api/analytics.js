@@ -255,6 +255,10 @@ router.get("/teacherAnalysis", async function(req, res, next) {
         "booking.0": { $exists: true },
     };
 
+    if (req.query.hasOwnProperty("type")) {
+        query.type = req.query.type;
+    }
+
     // build pipelines for aggregate()
     let pipelines = [{
         $match: query
