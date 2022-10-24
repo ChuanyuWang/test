@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Account = require('../account');
 const db_utils = require('../server/databaseManager');
+const { ParamError } = require("./api/lib/basis");
 var mongojs = require('mongojs');
 
 var VERSION = 5; // current tenant version
@@ -195,7 +196,48 @@ router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
 });
 
 // upgrade the tenant
-router.post('/api/upgrade', isAuthenticated, getTenantInfo, function(req, res, next) {
+router.post('/api/upgrade',
+    isAuthenticated,
+    getTenantInfo,
+    legacyUpgrade,
+    upgradeFromFive,
+    function(req, res, next) {
+        // get the tenant to be upgraded
+        let doc = req.tenant;
+        return next(new ParamError(`tenant version ${doc.version} is not valid`));
+    }
+);
+
+async function getTenantInfo(req, res, next) {
+    try {
+        if (req.body.hasOwnProperty('tenant')) {
+            let tenantName = req.body.tenant;
+            let config_datebase = await db_utils.connect('config');
+            let tenant = await config_datebase.collection('tenants').findOne({
+                name: tenantName
+            });
+            if (!tenant) {
+                let error = new Error(`tenant ${tenantName} doesn't exist`);
+                error.status = 400;
+                return next(error);
+            }
+            console.log("Find tenant %j", tenant);
+            req.tenant = tenant;
+            req.db = await db_utils.mongojsDB(tenantName);
+            return next();
+        } else {
+            var err = new Error("Missing param 'tenant'");
+            err.status = 400;
+            return next(err);
+        }
+    } catch (error) {
+        let err = new Error("get tenant fails");
+        err.innerError = error;
+        return next(err);
+    }
+}
+
+function legacyUpgrade(req, res, next) {
     // get the tenant to be upgraded
     let doc = req.tenant;
     if (!doc.version) {
@@ -248,42 +290,8 @@ router.post('/api/upgrade', isAuthenticated, getTenantInfo, function(req, res, n
             //TODO, send the complete message when all data update
             res.send("Tenant update to 5.0");
         });
-    } else if (doc.version == 5) {
-        upgradeFromFive(req, res, next);
-        //res.send("Tenant is already update to date");
     } else {
-        var error = new Error("tenant version is not valid");
-        error.status = 400;
-        return next(error);
-    }
-});
-
-async function getTenantInfo(req, res, next) {
-    try {
-        if (req.body.hasOwnProperty('tenant')) {
-            let tenantName = req.body.tenant;
-            let config_datebase = await db_utils.connect('config');
-            let tenant = await config_datebase.collection('tenants').findOne({
-                name: tenantName
-            });
-            if (!tenant) {
-                let error = new Error(`tenant ${tenantName} doesn't exist`);
-                error.status = 400;
-                return next(error);
-            }
-            console.log("Find tenant %j", tenant);
-            req.tenant = tenant;
-            req.db = await db_utils.mongojsDB(tenantName);
-            return next();
-        } else {
-            var err = new Error("Missing param 'tenant'");
-            err.status = 400;
-            return next(err);
-        }
-    } catch (error) {
-        let err = new Error("get tenant fails");
-        err.innerError = error;
-        return next(err);
+        return next();
     }
 }
 
@@ -489,8 +497,14 @@ function upgradeFromFour(req, res, next) {
     });
 }
 
-function upgradeFromFive(req, res, next) {
-    res.send("Tenant is already update to date");
+async function upgradeFromFive(req, res, next) {
+    // get the tenant to be upgraded
+    let doc = req.tenant;
+    if (doc.version == 5) {
+        res.json("Tenant is already update to date");
+    } else {
+        return next();
+    }
 }
 
 function checkTenantUser(req, res, next) {
