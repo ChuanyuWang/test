@@ -13,10 +13,28 @@ class ParamError extends Error {
     }
 }
 
+class BadRequestError extends Error {
+    constructor(message, code) {
+        super(message);
+        this.name = "Bad Reqeust Error";
+        this.status = 400;
+        if (typeof code == "number")
+            this.code = code;
+    }
+}
+
 class RuntimeError extends Error {
     constructor(message, error) {
         super(message);
         this.name = "Server Runtime Error";
+        this.innerError = error;
+    }
+}
+
+class InternalServerError extends Error {
+    constructor(message, error) {
+        super(message);
+        this.name = "Internal Server Error";
         this.innerError = error;
     }
 }
@@ -40,3 +58,5 @@ exports.asyncMiddlewareWrapper = function(erorrMessage) {
 
 exports.ParamError = ParamError;
 exports.RuntimeError = RuntimeError;
+exports.BadRequestError = BadRequestError;
+exports.InternalServerError = InternalServerError;
