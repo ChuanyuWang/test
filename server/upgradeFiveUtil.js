@@ -54,3 +54,42 @@ exports.setDefaultTypeForNotStartedClasses = async function(tenant, defaultType)
 
     console.log("default type are to all not started classes: %j", result.result);
 }
+
+exports.createtDefaultContracts = async function(tenant, defaultType) {
+    let db = await db_utils.connect(tenant.name);
+    let members = db.collection("members");
+
+    let pipelines = [{
+        $match: {
+            membership: {
+                $size: 1
+            }
+        }
+    }, {
+        $lookup: {
+            from: 'classes',
+            let: { memberID: "$_id" },
+            pipeline: [{
+                $match: {
+                    date: { $gt: new Date() },
+                    "booking.0": { $exists: true },
+                    $expr: { $in: ["$$memberID", "$booking.member"] }
+                    //$expr: { $eq: ["$$memberID", "$booking.member"] } // invalid express for query elements from array
+                }
+            }, {
+                $project: { name: 1, date: 1, cost: 1, _id: 0, booking: 1 }
+            }],
+            as: 'classes'
+        }
+    }, {
+        $match: {
+            $or: [
+                { "membership.0.credit": { $gt: 0.0001 } },
+                { "classes.0": { $exists: true } }
+            ]
+        }
+    }];
+
+    let docs = await members.aggregate(pipelines).toArray();
+    console.log(`find ${docs.length} members with relevant classes`);
+}

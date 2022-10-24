@@ -4,7 +4,7 @@ var Account = require('../account');
 const db_utils = require('../server/databaseManager');
 const { ParamError, InternalServerError, BaseError } = require("./api/lib/basis");
 var mongojs = require('mongojs');
-const { createDefaultClassType, setDefaultTypeForNotStartedClasses } = require("../server/upgradeFiveUtil");
+const { createDefaultClassType, setDefaultTypeForNotStartedClasses, createtDefaultContracts } = require("../server/upgradeFiveUtil");
 
 var VERSION = 5; // current tenant version
 var config_db = null;
@@ -511,7 +511,7 @@ async function upgradeFromFive(req, res, next) {
         await setDefaultTypeForNotStartedClasses(tenant, defaultType);
 
         // step 3: create contract for all active members, which has remaining credit or classes
-
+        await createtDefaultContracts(tenant, defaultType);
         res.json("Tenant is updated to 6.0");
     } catch (error) {
         if (error instanceof BaseError)
