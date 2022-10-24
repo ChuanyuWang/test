@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 var Account = require('../account');
 const db_utils = require('../server/databaseManager');
-const { ParamError } = require("./api/lib/basis");
+const { ParamError, InternalServerError, BaseError } = require("./api/lib/basis");
 var mongojs = require('mongojs');
+const { createDefaultClassType, setDefaultTypeForNotStartedClasses } = require("../server/upgradeFiveUtil");
 
 var VERSION = 5; // current tenant version
 var config_db = null;
@@ -499,11 +500,24 @@ function upgradeFromFour(req, res, next) {
 
 async function upgradeFromFive(req, res, next) {
     // get the tenant to be upgraded
-    let doc = req.tenant;
-    if (doc.version == 5) {
-        res.json("Tenant is already update to date");
-    } else {
-        return next();
+    let tenant = req.tenant;
+    if (tenant.version !== 5) return next();
+
+    try {
+        // step 1: create default type
+        let defaultType = await createDefaultClassType(tenant);
+
+        // step 2: set unstarted classes with default type
+        await setDefaultTypeForNotStartedClasses(tenant, defaultType);
+
+        // step 3: create contract for all active members, which has remaining credit or classes
+
+        res.json("Tenant is updated to 6.0");
+    } catch (error) {
+        if (error instanceof BaseError)
+            return next(error);
+        else
+            return next(new InternalServerError("fail to upgrade from version 5", error));
     }
 }
 
