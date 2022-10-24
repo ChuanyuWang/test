@@ -1,9 +1,13 @@
 const db_utils = require('../../../server/databaseManager');
 
+class BaseError extends Error {
+
+}
+
 /**
  * 400 status Error
  */
-class ParamError extends Error {
+class ParamError extends BaseError {
     constructor(message, code) {
         super(message);
         this.name = "Invalid Parameter Error";
@@ -13,7 +17,7 @@ class ParamError extends Error {
     }
 }
 
-class BadRequestError extends Error {
+class BadRequestError extends BaseError {
     constructor(message, code) {
         super(message);
         this.name = "Bad Reqeust Error";
@@ -23,7 +27,7 @@ class BadRequestError extends Error {
     }
 }
 
-class RuntimeError extends Error {
+class RuntimeError extends BaseError {
     constructor(message, error) {
         super(message);
         this.name = "Server Runtime Error";
@@ -31,7 +35,7 @@ class RuntimeError extends Error {
     }
 }
 
-class InternalServerError extends Error {
+class InternalServerError extends BaseError {
     constructor(message, error) {
         super(message);
         this.name = "Internal Server Error";
@@ -56,6 +60,7 @@ exports.asyncMiddlewareWrapper = function(erorrMessage) {
     }
 }
 
+exports.BaseError = BaseError;
 exports.ParamError = ParamError;
 exports.RuntimeError = RuntimeError;
 exports.BadRequestError = BadRequestError;
