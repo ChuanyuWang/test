@@ -3,7 +3,7 @@ const router = express.Router();
 const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-const { RuntimeError, ParamError } = require('./lib/basis');
+const { RuntimeError, ParamError, BaseError, generateContractNo } = require('./lib/basis');
 const { isEqual } = require('./lib/util');
 const moment = require('moment');
 
@@ -76,7 +76,8 @@ router.post('/', validateContract, async function(req, res, next) {
         clientip: req.ip,
         signDate: req.body.signDate ? new Date(req.body.signDate) : new Date(),
         lastUpdate: new Date(),
-        comments: []
+        comments: [],
+        history: []
     };
     (req.body.comments || []).forEach(element => {
         contract.comments.push({
@@ -87,6 +88,10 @@ router.post('/', validateContract, async function(req, res, next) {
             author: req.user.username
         })
     });
+    if (contract.total === 0) {
+        // if the contract has 0 total, change the status as "paid" right after created.
+        contract.status = "paid";
+    }
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
@@ -100,7 +105,7 @@ router.post('/', validateContract, async function(req, res, next) {
         console.log(`Create contract ${contract.serialNo} successfully`);
         return res.json(result.insertedId);
     } catch (error) {
-        if (error instanceof ContractError) {
+        if (error instanceof BaseError) {
             return next(error);
         } else {
             let err = new Error("Create contract fails");
@@ -389,42 +394,6 @@ async function validateContract(req, res, next) {
         return next();
     } catch (error) {
         return next(new RuntimeError("find member fails", error));
-    }
-}
-
-class ContractError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = "Contract API Error";
-    }
-}
-
-/**
- * YYYYMMDD + 6-digit seq No. e.g. 20220321000055
- * @param {ObjectId} id 
- * @returns String
- */
-async function generateContractNo(developmentMode) {
-    try {
-        let d = new Date();
-        // The trade No has to be unique across all tenants
-        let configDB = await db_utils.connect("config");
-        let settings = configDB.collection("settings");
-        let result = await settings.findOneAndUpdate({
-            _id: ObjectId("-contract-id")
-        }, {
-            $inc: { seq: 1 }
-        }, {
-            upsert: true, returnDocument: "after"
-        });
-
-        let seq = parseInt(result.value.seq % 1000000); // get 6 digits seq number
-        let datePart = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-        return datePart * 1000000 + seq + (developmentMode ? "t" : "");
-    } catch (error) {
-        let err = new ContractError("Fail to generate contract No.");
-        err.innerError = error;
-        throw err;
     }
 }
 
