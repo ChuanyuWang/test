@@ -511,8 +511,9 @@ async function upgradeFromFive(req, res, next) {
         await setDefaultTypeForNotStartedClasses(tenant, defaultType);
 
         // step 3: create contract for all active members, which has remaining credit or classes
-        await createtDefaultContracts(tenant, defaultType);
-        res.json("Tenant is updated to 6.0");
+        let contracts = await createtDefaultContracts(tenant, defaultType);
+        //res.json("Tenant is updated to 6.0");
+        res.json(contracts);
     } catch (error) {
         if (error instanceof BaseError)
             return next(error);
