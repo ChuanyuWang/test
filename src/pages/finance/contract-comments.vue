@@ -9,7 +9,8 @@ div
           div.media-left
             span.glyphicon.glyphicon-comment.text-primary(style="font-size: large; opacity: 0.8")
           div.media-body
-            h4.media-heading(style="font-size: small") {{ comment.text }}
+            //h4.media-heading(style="font-size: small") Title
+            p(style="font-size: small") {{ comment.text }}
             p.small(style="color: #777; position: relative") by {{ comment.author }} at {{ comment.posted | formatDateTime }}
               //a.edit(role="button" v-on:click="editComment(key)" style="margin: -3px 3px; position: absolute")
                 i.glyphicon.glyphicon-pencil
