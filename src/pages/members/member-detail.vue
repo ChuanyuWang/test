@@ -89,7 +89,8 @@ div.container
             div.media-left
               span.glyphicon.glyphicon-comment.text-primary(style='font-size:large;opacity:0.8')
             div.media-body
-              h4.media-heading(style='font-size:small') {{comment.text}}
+              //h4.media-heading(style='font-size:small') {{comment.text}}
+              p(style='font-size:small') {{comment.text}}
               p.small(style='color:#777;position:relative') by {{comment.author}} at {{comment.posted | formatDateTime}}
                 button.btn.btn-default.btn-xs.edit(type='button',v-on:click='editComment(key)',style='margin:-3px 3px;position:absolute')
                   span.glyphicon.glyphicon-pencil
