@@ -228,7 +228,7 @@ module.exports = {
       var contracts = value || [];
       var result = "";
       contracts.forEach((element, i) => {
-        result += this.types[element.goods] + `: ${element.consumedCredit}/${element.credit}课时`;
+        result += this.types[element.goods] + `: ${element.consumedCredit || 0}/${element.credit}课时`;
         if (element.status !== "paid") {
           result += "<span class='label label-danger' style='font-size: 50%''>欠费</span>"
         }
