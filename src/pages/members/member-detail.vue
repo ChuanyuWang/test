@@ -11,39 +11,42 @@ div.container
     button.btn.btn-danger(type='button',style='float:right',disabled,@click='') 删除学员
   form.form-horizontal
     div.form-group
-      label.col-sm-2.control-label 状态:
-      select.col-sm-5.form-control(v-model='memberData.status',@change='deactivateAlert',style='margin-left:15px;width:auto')
-        option.text-success(value='active') 在读
-        option.text-danger(value='inactive') 过期
+      label.col-sm-2.col-xs-3.control-label 状态:
+      div.col-sm-3.col-xs-9
+        select.form-control(v-model='memberData.status',@change='deactivateAlert')
+          option.text-success(value='active') 在读
+          option.text-danger(value='inactive') 过期
     div.form-group
-      label.col-sm-2.control-label 来源:
-      div.col-sm-10
+      label.col-sm-2.col-xs-3.control-label 来源:
+      div.col-sm-10.col-xs-9
         p.form-control-static {{source|sourceFormatter}}
+          span.small.ms-3(style='color:#808080') ({{memberData.since | formatDate}}添加)
     div.form-group(style='display:none')
-      label.col-sm-2.control-label openID:
-      div.col-sm-10
+      label.col-sm-2.col-xs-3.control-label openID:
+      div.col-sm-10.col-xs-9
         p.form-control-static {{memberData.openid}}
     div.form-group(:class='{"has-error": errors.name}')
-      label.col-sm-2.control-label 姓名:
-      div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
+      label.col-sm-2.col-xs-3.control-label 姓名:
+      div.col-sm-4.col-xs-9(data-toggle="tooltip",data-placement="right",:title="errors.name")
         input.form-control(v-model.trim='memberData.name', placeholder='学员姓名')
-      div.col-sm-5
-        p.form-control-static(style='color:#808080')
-          small {{memberData.since | formatDate}}创建学员
     div.form-group(:class='{"has-error": errors.contact}')
-      label.col-sm-2.control-label 联系方式:
-      div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.contact")
+      label.col-sm-2.col-xs-3.control-label 联系方式:
+      div.col-sm-4.col-xs-9(data-toggle="tooltip",data-placement="right",:title="errors.contact")
         input.form-control(v-model.trim='memberData.contact', placeholder='135xxx')
     div.form-group(:class='{"has-error": errors.birthday}')
-      label.control-label.col-sm-2 出生日期:
-      div.col-sm-4(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
+      label.control-label.col-sm-2.col-xs-3 出生日期:
+      div.col-sm-4.col-xs-9(data-toggle="tooltip",data-placement="right",:title="errors.birthday")
         date-picker(v-model='memberData.birthday')
     div.form-group
-      label.control-label.col-sm-2 描述:
-      div.col-sm-8
-        textarea.form-control(rows='3', placeholder='添加更多备注信息, 比如昵称', name='note',v-model.trim='memberData.note',style='resize:vertical;min-height:70px')
+      label.control-label.col-sm-2.col-xs-3 描述:
+      div.col-sm-8.col-xs-9
+        textarea.form-control.has-3-rows(rows='3', placeholder='添加更多备注信息, 比如昵称', name='note',v-model.trim='memberData.note')
     div.form-group
-      div.col-sm-offset-2.col-sm-10
+      label.control-label.col-sm-2.col-xs-3 会员卡(旧):
+      div.col-sm-8.col-xs-9
+        p.form-control-static {{memberData.membership | membershipFilter}}
+    div.form-group
+      div.col-sm-offset-2.col-sm-10.col-xs-offset-3.col-xs-9
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
   div.page-header
     h3 会员卡
@@ -291,6 +294,21 @@ module.exports = {
     sourceFormatter: function(value) {
       if (value === "book") return "扫码预约";
       else return "手动添加";
+    },
+    membershipFilter(value) {
+      let cards = value || [];
+      if (cards.length === 0) {
+        return "会员卡未创建";
+      } else if (cards.length > 1) {
+        return "会员卡错误";
+      }
+
+      let credit = Math.round(cards[0].credit * 10) / 10;
+      // "2012/12/20" without time
+      let expire = cards[0].expire ? moment(cards[0].expire).format('ll') : cards[0].expire;
+      let cardType = cards[0].type === "LIMITED" ? `卡片类型为限定卡 (可用教室: ${(cards[0].room || []).join(",")})` : "卡片类型为通用卡";
+
+      return `截止2022年10月31日, 剩余${credit || 0}课时, 有效期到${expire}, ${cardType}`;
     }
   },
   methods: {
@@ -559,5 +577,12 @@ module.exports = {
 .container .page-header span:hover {
   transition: all 0.5s ease-in-out;
   transform: rotate(360deg);
+}
+
+.form-horizontal .control-label {
+  padding-top: 7px;
+  padding-right: 0;
+  margin-bottom: 0;
+  text-align: right;
 }
 </style>

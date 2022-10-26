@@ -53,7 +53,7 @@ var NORMAL_FIELDS = {
     expire: 1,
     note: 1,
     source: 1,
-    //membership: 1,
+    membership: 1,
     openid: 1
 };
 
