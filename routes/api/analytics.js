@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
+const { InternalServerError } = require('./lib/basis');
+
 
 /// Below APIs are visible to authenticated users only
 router.use(helper.checkTenant, helper.isAuthenticated);
@@ -430,6 +432,88 @@ router.get('/memberdata', function(req, res, next) {
         console.log("analyze member: ", docs ? docs.length : 0);
         res.json(docs);
     });
+});
+
+router.get('/classexpense', async function(req, res, next) {
+    //[Default] get the current year consumption by month
+    var year = (new Date()).getFullYear();
+    var unit = 'month';
+    if (req.query.hasOwnProperty("year")) {
+        year = parseInt(req.query.year);
+    }
+    if (req.query.hasOwnProperty("unit")) {
+        unit = req.query.unit;
+    }
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let classes = tenantDB.collection("classes");
+
+        let pipelines = [{
+            $match: {
+                "booking.0": { // array size >= 1
+                    $exists: true
+                },
+                "date": {
+                    $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
+                    $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
+                },
+                "cost": {
+                    $gt: 0
+                }
+            }
+        }, {
+            $unwind: "$booking"
+        }, {
+            $lookup: {
+                from: "contracts",
+                let: { contractID: "$booking.contract" },
+                pipeline: [{
+                    $match: {
+                        $expr: { $eq: ["$$contractID", "$_id"] }
+                    }
+                }, {
+                    $project: { comments: 0, history: 0 }
+                }],
+                as: 'contracts'
+            }
+        }, {
+            $match: {
+                "contracts.0": { $exists: true }
+            }
+        }, {
+            $unwind: "$contracts"
+        }, {
+            $project: {
+                type: 1,
+                week: { $week: "$date" },
+                month: { $month: "$date" },
+                year: { $year: "$date" },
+                totalCost: {
+                    $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
+                },
+                creditPrice: {
+                    $divide: [{ $subtract: ["$contracts.total", "$contracts.discount"] }, "$contracts.credit"]
+                }
+            }
+        }, {
+            $group: {
+                _id: "$" + unit, // group the data according to unit (month/week/year)
+                total: {
+                    $sum: { $multiply: ["$creditPrice", "$totalCost"] }
+                }
+            }
+        }, {
+            // sort the data by date, from old to new
+            $sort: { "_id": 1 }
+        }];
+        let docs = await classes.aggregate(pipelines).toArray();
+
+        console.log("analyze expense: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analysis class expense fails", error));
+    }
 });
 
 module.exports = router;
