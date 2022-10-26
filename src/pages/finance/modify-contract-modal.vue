@@ -91,6 +91,8 @@ module.exports = {
         errors.expireDate = "截止日期不能早于生效日期";
       if (this.item.credit < this.contract.consumedCredit + this.contract.expendedCredit)
         errors.credit = "课时数不能小于已消耗课时";
+      if (this.item.credit <= 0)
+        errors.credit = "课时数不能小于或等于零";
       if (this.item.total < this.item.discount)
         errors.total = "课程金额不能小于折扣";
       return errors;

@@ -199,7 +199,7 @@ module.exports = {
       if (moment(this.contract.expireDate).isValid() && moment(this.contract.expireDate).isBefore(this.contract.effectiveDate))
         errors.expireDate = "截止日期不能早于生效日期";
       if (this.contract.credit <= 0)
-        errors.credit = "课时数不能小于零";
+        errors.credit = "课时数不能小于或等于零";
       if (this.averageFee < 0)
         errors.averageFee = "课程单价不能小于零";
       if (this.contract.total < 0)
