@@ -114,7 +114,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 课程单价:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{ averageFee }}课时
+            p.form-control-static {{ averageFee }}元
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 课程金额:
           div.col-xs-6.col-sm-7.col-md-8
