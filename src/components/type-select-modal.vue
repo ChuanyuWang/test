@@ -11,6 +11,8 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 
 </template>
 
 <script>
+var serviceUtil = require("../services/util");
+
 module.exports = {
   name: "type-dialog",
   props: {},
@@ -59,14 +61,9 @@ module.exports = {
   },
   mounted() { },
   created() {
-    var vm = this;
-    var request = $.getJSON("/api/setting/types");
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-      var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
-      console.error(errorMessage);
-    });
-    request.done(function(data, textStatus, jqXHR) {
-      vm.types = data || [];
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
     });
   }
 }
