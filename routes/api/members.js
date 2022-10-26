@@ -3,6 +3,7 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var helper = require('../../helper');
 var db_utils = require('../../server/databaseManager');
+const { isEqual } = require('./lib/util');
 
 /**
  * {
@@ -822,18 +823,6 @@ function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery
             remark: memo
         });
     }
-}
-
-function isEqual(a, b) {
-    if (a === b) return true;
-    if (a.constructor === Date && b.constructor === Date) return a.getTime() === b.getTime();
-    if (a.constructor === Array && b.constructor === Array) {
-        if (a.length != b.length) return false;
-        else return a.every(function(u, i) {
-            return u == b[i];
-        });
-    }
-    return a == b;
 }
 
 /*
