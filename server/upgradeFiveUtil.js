@@ -150,14 +150,14 @@ function createUpgradeComment(member) {
         return 0;
     }
 
-    let credit = Math.round(cards[0].credit || 0) / 10;
+    let credit = Math.round(cards[0].credit * 10) / 10;
     // "2012/12/20" without time
     let expire = cards[0].expire instanceof Date ? cards[0].expire.toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' }) : cards[0].expire;
     let cardType = cards[0].type === "LIMITED" ? `卡片类型为限定卡 (可用教室: ${(cards[0].room || []).join(",")})` : "卡片类型为通用卡";
 
     return {
         posted: new Date(),
-        text: `系统自动创建的合约，原会员卡中剩余${credit}课时, 有效期到${expire}, ${cardType}`,
+        text: `系统自动创建的合约，原会员卡中剩余${credit || 0}课时, 有效期到${expire}, ${cardType}`,
         author: `System`
     };
 }
