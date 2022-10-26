@@ -54,6 +54,7 @@ var NORMAL_FIELDS = {
 router.use(helper.isAuthenticated);
 
 router.post('/', validateContract, async function(req, res, next) {
+    //TODO, validate content body
     let contract = {
         serialNo: "",
         status: "open",
