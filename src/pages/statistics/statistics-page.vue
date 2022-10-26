@@ -21,7 +21,7 @@ div
     div.tab-pane(role="tabpanel",id="teacher")
       teacher-tab(ref='teacherTab')
     div.tab-pane(role="tabpanel",id="contracts")
-      div TBD
+      expense-tab(ref='expenseChart')
     div.tab-pane(role="tabpanel",id="analytics")
       consume-tab(ref='consumeChart')
     div.tab-pane(role="tabpanel",id="member")
@@ -39,6 +39,7 @@ var checkinTab = require("./checkin-tab.vue").default;
 var teacherTab = require("./teacher-tab.vue").default;
 var opportunityTab = require("./opportunity-tab.vue").default;
 var consumeTab = require("./consume-tab.vue").default;
+var expenseTab = require("./expense-tab.vue").default;
 var memberTab = require("./member-tab.vue").default;
 
 module.exports = {
@@ -53,6 +54,7 @@ module.exports = {
     "teacher-tab": teacherTab,
     "opportunity-tab": opportunityTab,
     "consume-tab": consumeTab,
+    "expense-tab": expenseTab,
     "member-tab": memberTab
   },
   computed: {},
@@ -65,6 +67,11 @@ module.exports = {
     // refresh the chart when user switch to consume tab first time, otherwise width is 0
     $(this.$el).find('a[href="#analytics"]').one('shown.bs.tab', function(e) {
       vm.$refs.consumeChart.refreshChart();
+    });
+
+    // refresh the chart when user switch to consume tab first time, otherwise width is 0
+    $(this.$el).find('a[href="#contracts"]').one('shown.bs.tab', function(e) {
+      vm.$refs.expenseChart.refreshChart();
     });
 
     // refresh the chart when user switch to hint tab first time
