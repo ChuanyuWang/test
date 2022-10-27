@@ -53,7 +53,7 @@ module.exports = {
       yearPickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
       monthPickerConfig: { "format": "YYYY-MM", "locale": "zh-CN", "viewMode": "years" },
       year: moment(current.getFullYear(), "YYYY"),
-      selectedMonth: moment(`${current.getFullYear()}-${current.getMonth()}`, "YYYY-MM"),
+      selectedMonth: moment(`${current.getFullYear()}-${current.getMonth() + 1}`, "YYYY-MM"),
       unit: "month"
     };
   },
@@ -118,7 +118,7 @@ module.exports = {
         util.showAlert("刷新图表失败", jqXHR);
       });
       request3.done((data, textStatus, jqXHR) => {
-        this.drawChart3(data || [], this.selectedMonth.format("YYYY[年]MMM"), "日");
+        this.drawChart3(data || [], this.selectedMonth.clone(), "日");
       });
       request3.always(() => {
         request3 = null;
@@ -268,15 +268,36 @@ module.exports = {
       // Apply the chart options to create/update chart instance
       this.chart2.setOption(option);
     },
-    drawChart3: function(rawData, yearAndMonth, unitName) {
+    drawChart3: function(rawData, selectedMonth, unitName) {
+      var dataObj = {};
+      // parse the comsumption data
+      rawData.forEach(function(value, index, array) {
+        var key = value._id;
+        if (typeof key !== "number") return;
+        dataObj[key] = value.total;
+      });
+
+      var fullMonth = [];
+      for (let index = 1; index <= selectedMonth.endOf("month").date(); index++) {
+        fullMonth[index] = dataObj[index] || 0;
+      }
+
+      // array.map will only loop array indexes which have assigned values
+      var fullMonthData = fullMonth.map((value, index) => {
+        return {
+          _id: index,
+          total: value
+        }
+      });
+
       // prepare the data
-      var data = this.assembleOneSeriesData(rawData, unitName);
+      var data = this.assembleOneSeriesData(fullMonthData, unitName);
       // resize the chart according to its parent dom size
       this.chart3.resize();
       // define the options of charts
       var option = {
         title: {
-          text: yearAndMonth + "课消金额统计",
+          text: selectedMonth.format("YYYY[年]MMM") + "课消金额统计",
           top: "top",
           left: "center"
         },
