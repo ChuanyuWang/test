@@ -516,4 +516,53 @@ router.get('/classexpense', async function(req, res, next) {
     }
 });
 
+router.get('/incomingpayment', async function(req, res, next) {
+    //[Default] get the current year consumption by month
+    let year = (new Date()).getFullYear();
+    let unit = 'month';
+    if (req.query.hasOwnProperty("year")) {
+        year = parseInt(req.query.year);
+    }
+    if (req.query.hasOwnProperty("unit")) {
+        unit = req.query.unit;
+    }
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let payments = tenantDB.collection("payments");
+
+        let pipelines = [{
+            $match: {
+                "payDate": {
+                    $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
+                    $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
+                }
+            }
+        }, {
+            $project: {
+                week: { $week: "$payDate" },
+                month: { $month: "$payDate" },
+                year: { $year: "$payDate" },
+                amount: 1
+            }
+        }, {
+            $group: {
+                _id: "$" + unit, // group the data according to unit (month/week/year)
+                total: {
+                    $sum: "$amount"
+                }
+            }
+        }, {
+            // sort the data by date, from old to new
+            $sort: { "_id": 1 }
+        }];
+        let docs = await payments.aggregate(pipelines).toArray();
+
+        console.log("analyze incoming payments: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analysis incoming payments fails", error));
+    }
+});
+
 module.exports = router;
