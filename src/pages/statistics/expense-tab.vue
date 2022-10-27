@@ -16,8 +16,7 @@ div
   div.row(style="margin-top:15px")
     div.col-sm-12.col-md-6
       div#chart1(style="height:400px")
-  div.row(style="margin-top:15px")
-    div.col-xs-12
+    div.col-sm-12.col-md-6
       div#chart2(style="height:400px")
 </template>
 
@@ -30,7 +29,10 @@ div
 
 var util = require('../../services/util');
 var date_picker = require('../../components/date-picker.vue').default;
-var request = null;
+var waldenTheme = require("./walden.json");
+var westerosTheme = require("./westeros.json");
+var request1 = null;
+var request2 = null;
 
 module.exports = {
   name: "expense-tab",
@@ -69,19 +71,33 @@ module.exports = {
         unit: this.unit,
         year: this.year.year()
       };
-      if (request) request.abort("abort by user");
-      request = util.getJSON("/api/analytics/classexpense", filter);
-      request.fail(jqXHR => {
+      //load data for chart1
+      if (request1) request1.abort("abort by user");
+      request1 = util.getJSON("/api/analytics/classexpense", filter);
+      request1.fail(jqXHR => {
         util.showAlert("刷新图表失败", jqXHR);
       });
-      request.done((data, textStatus, jqXHR) => {
+      request1.done((data, textStatus, jqXHR) => {
         this.drawChart1(data || [], filter.year, this.unitName);
       });
-      request.always(() => {
-        request = null;
-      })
+      request1.always(() => {
+        request1 = null;
+      });
+
+      // load data for chart2
+      if (request2) request2.abort("abort by user");
+      request2 = util.getJSON("/api/analytics/incomingpayment", filter);
+      request2.fail(jqXHR => {
+        util.showAlert("刷新图表失败", jqXHR);
+      });
+      request2.done((data, textStatus, jqXHR) => {
+        this.drawChart2(data || [], filter.year, this.unitName);
+      });
+      request2.always(() => {
+        request2 = null;
+      });
     },
-    preChart1Data: function(rawData) {
+    assembleOneSeriesData: function(rawData) {
       var chartData = {
         xAxis: [],
         series0: []
@@ -99,20 +115,20 @@ module.exports = {
         if (typeof i !== "number") return;
 
         data[i] = data[i] || {};
-        data[i].storyConsumption = value.total;
+        data[i].amount = value.total;
       });
       data.forEach((value, index, array) => {
         if (!value) return;
         chartData.xAxis.push(index + this.unitName);
         chartData.series0.push(
-          Math.round((value.storyConsumption || 0) / 100 * 10) / 10
+          Math.round((value.amount || 0) / 100 * 10) / 10
         );
       });
       return chartData;
     },
     drawChart1: function(rawData, year, unitName) {
       // prepare the data
-      var data = this.preChart1Data(rawData);
+      var data = this.assembleOneSeriesData(rawData);
       // resize the chart according to its parent dom size
       this.chart1.resize();
       // define the options of charts
@@ -131,17 +147,19 @@ module.exports = {
           }
         },
         grid: {
-          left: '5%',
-          right: '15%',
-          bottom: '10%'
+          //left: '5%',
+          //right: '15%',
+          //bottom: '10%'
         },
         legend: {
           data: ["课消金额"],
-          top: "10%",
-          right: 10,
-          orient: "vertical"
+          //top: "10%",
+          //right: 10,
+          bottom: 0,
+          //orient: "horizontal"
         },
         xAxis: {
+          type: 'category',
           name: unitName,
           data: data.xAxis
         },
@@ -161,44 +179,80 @@ module.exports = {
 
       // Apply the chart options to create/update chart instance
       this.chart1.setOption(option);
+    },
+    drawChart2: function(rawData, year, unitName) {
+      // prepare the data
+      var data = this.assembleOneSeriesData(rawData);
+      // resize the chart according to its parent dom size
+      this.chart2.resize();
+      // define the options of charts
+      var option = {
+        title: {
+          text: (this.unit === 'year' ? "每" : year) + "年缴费金额统计",
+          top: "top",
+          left: "center"
+        },
+        tooltip: {
+          trigger: "axis"
+        },
+        toolbox: {
+          feature: {
+            dataView: { readOnly: true }
+          }
+        },
+        grid: {
+          //left: '5%',
+          //right: '15%',
+          //bottom: '10%'
+        },
+        legend: {
+          data: ["缴费金额"],
+          //top: "10%",
+          bottom: 10,
+          //orient: "vertical"
+        },
+        xAxis: {
+          type: 'category',
+          name: unitName,
+          data: data.xAxis
+        },
+        yAxis: {
+          name: "元"
+        },
+        series: [
+          {
+            name: "缴费金额",
+            type: "bar",
+            stack: "one",
+            barGap: 0,
+            data: data.series0
+          }
+        ]
+      };
+
+      // Apply the chart options to create/update chart instance
+      this.chart2.setOption(option);
     }
   },
   created: function() { },
   mounted: function() {
-    // register vintage Theme for echarts
-    var colorPalette = [
-      "#d87c7c",
-      "#919e8b",
-      "#d7ab82",
-      "#6e7074",
-      "#61a0a8",
-      "#efa18d",
-      "#787464",
-      "#cc7e63",
-      "#724e58",
-      "#4b565b"
-    ];
-    echarts.registerTheme("vintage", {
-      color: colorPalette,
-      backgroundColor: "#ffffff",
-      graph: {
-        color: colorPalette
-      }
-    });
+    echarts.registerTheme("walden", waldenTheme);
+    echarts.registerTheme("westeros", westerosTheme);
 
     this.chart1 = echarts.init(
       $(this.$el).find("#chart1")[0],
-      "vintage"
+      "westeros"
+    );
+
+    this.chart2 = echarts.init(
+      $(this.$el).find("#chart2")[0],
+      "walden"
     );
 
     window.onresize = () => {
       this.chart1.resize();
+      this.chart2.resize();
     };
-
-    this.chart2 = echarts.init(
-      $(this.$el).find("#chart2")[0],
-      "vintage"
-    );
   }
 };
 </script>
