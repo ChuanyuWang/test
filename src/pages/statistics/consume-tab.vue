@@ -14,9 +14,11 @@ div
       div
         date-picker(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
   div.row(style="margin-top:15px")
-    div#consume_chart(style="height:400px")
+    div.col-xs-12
+      div#consume_chart(style="height:400px")
   div.row(style="margin-top:15px")
-    div#orders_chart(style="height:400px")
+    div.col-xs-12
+      div#orders_chart(style="height:400px")
 </template>
 
 <script>
