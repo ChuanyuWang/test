@@ -3,16 +3,16 @@ div
   div.row(style="margin-top:7px")
     div.col-md-12
       form.form-inline.pull-right
-        div.form-group
+        div.form-group.me-7
           label.text-nowrap 年份:
           date-picker.ms-3(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
-        div.form-group.ms-7
+        div.form-group.me-7
           label 单位:
           select.form-control.ms-3(v-model='unit',@change='refreshChart')
-            //option(value='year') 年
+            option(value='year') 年
             option(value='month') 月
             option(value='week') 周
-        button.btn.btn-primary.ms-7(type="button",@click='refreshChart') 刷新
+        button.btn.btn-primary(type="button",@click='refreshChart') 刷新
   div.row(style="margin-top:15px")
     div.col-sm-12.col-md-6
       div#chart1(style="height:400px")
