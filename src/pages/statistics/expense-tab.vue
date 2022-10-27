@@ -1,22 +1,24 @@
 <template lang="pug">
 div
   div.row(style="margin-top:7px")
-    div.col-md-1.pull-right(style="display:inline-flex")
-      button.btn.btn-primary(type="button",@click='refreshChart') 刷新
-    div.col-md-3.pull-right(style="display:inline-flex")
-      p.form-control-static.text-nowrap(style="display:inline-table") 单位：
-      select.form-control(v-model='unit',@change='refreshChart')
-        option(value='year') 年
-        option(value='month') 月
-        option(value='week') 周
-    div.col-md-3.pull-right(style="display:inline-flex")
-      p.form-control-static.text-nowrap(style="display:inline-table") 年份：
-      div
-        date-picker(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
+    div.col-md-12
+      form.form-inline.pull-right
+        div.form-group
+          label.text-nowrap 年份:
+          date-picker.ms-3(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
+        div.form-group.ms-7
+          label 单位:
+          select.form-control.ms-3(v-model='unit',@change='refreshChart')
+            //option(value='year') 年
+            option(value='month') 月
+            option(value='week') 周
+        button.btn.btn-primary.ms-7(type="button",@click='refreshChart') 刷新
   div.row(style="margin-top:15px")
-    div#chart1(style="height:400px")
+    div.col-sm-12.col-md-6
+      div#chart1(style="height:400px")
   div.row(style="margin-top:15px")
-    div#chart2(style="height:400px")
+    div.col-xs-12
+      div#chart2(style="height:400px")
 </template>
 
 <script>
@@ -28,6 +30,7 @@ div
 
 var util = require('../../services/util');
 var date_picker = require('../../components/date-picker.vue').default;
+var request = null;
 
 module.exports = {
   name: "expense-tab",
@@ -66,14 +69,17 @@ module.exports = {
         unit: this.unit,
         year: this.year.year()
       };
-
-      var request = util.getJSON("/api/analytics/classexpense", filter);
+      if (request) request.abort("abort by user");
+      request = util.getJSON("/api/analytics/classexpense", filter);
       request.fail(jqXHR => {
         util.showAlert("刷新图表失败", jqXHR);
       });
       request.done((data, textStatus, jqXHR) => {
         this.drawChart1(data || [], filter.year, this.unitName);
       });
+      request.always(() => {
+        request = null;
+      })
     },
     preChart1Data: function(rawData) {
       var chartData = {
@@ -140,7 +146,7 @@ module.exports = {
           data: data.xAxis
         },
         yAxis: {
-          name: "课时"
+          name: "元"
         },
         series: [
           {
@@ -184,6 +190,10 @@ module.exports = {
       $(this.$el).find("#chart1")[0],
       "vintage"
     );
+
+    window.onresize = () => {
+      this.chart1.resize();
+    };
 
     this.chart2 = echarts.init(
       $(this.$el).find("#chart2")[0],

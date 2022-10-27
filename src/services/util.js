@@ -17,12 +17,14 @@ util.showAlert = function(title, jqXHR, className) {
     var errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
     console.error(errorMsg);
 
+    if (!errorMsg) return; // jqXHR is abort by user
+
     if (typeof Vue.prototype.$messager !== "undefined") {
         Vue.prototype.$messager.showErrorMessage(errorMsg);
     } else if (typeof bootbox !== "undefined") {
         //if (bootbox) {// still throw error via vue.eval
         bootbox.alert({
-            message: errorMsg,
+            message: errorMsg || "Unknown Error",
             title: title || '错误',
             buttons: {
                 ok: {
