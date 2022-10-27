@@ -68,5 +68,6 @@
   "order_notpay": "未支付",
   "order_success": "已支付",
   "order_closed": "关闭",
-  "order_refund": "退款"
+  "order_refund": "退款",
+  "contracts": "合约"
 }
