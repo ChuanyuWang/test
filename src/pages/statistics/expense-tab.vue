@@ -134,7 +134,7 @@ module.exports = {
         return chartData;
       }
 
-      var data = [];
+      var data = {};
       // parse the comsumption data
       rawData.forEach(function(value, index, array) {
         if (!value) return;
@@ -144,6 +144,7 @@ module.exports = {
         data[i] = data[i] || {};
         data[i].amount = value.total;
       });
+      /*
       data.forEach((value, index, array) => {
         if (!value) return;
         chartData.xAxis.push(index + unitName);
@@ -151,6 +152,13 @@ module.exports = {
           Math.round((value.amount || 0) / 100 * 10) / 10
         );
       });
+      */
+      for (var key in data) {
+        chartData.xAxis.push(key + unitName);
+        chartData.series0.push(
+          Math.round((data[key].amount || 0) / 100 * 10) / 10
+        );
+      }
       return chartData;
     },
     drawChart1: function(rawData, year, unitName) {
