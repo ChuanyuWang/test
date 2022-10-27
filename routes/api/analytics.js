@@ -436,13 +436,38 @@ router.get('/memberdata', function(req, res, next) {
 
 router.get('/classexpense', async function(req, res, next) {
     //[Default] get the current year consumption by month
-    var year = (new Date()).getFullYear();
-    var unit = 'month';
+    let currentDate = new Date();
+
+    let t_year = currentDate.getFullYear();
     if (req.query.hasOwnProperty("year")) {
-        year = parseInt(req.query.year);
+        t_year = parseInt(req.query.year);
     }
-    if (req.query.hasOwnProperty("unit")) {
+    let t_month = currentDate.getMonth();
+    if (req.query.hasOwnProperty("month")) {
+        t_month = parseInt(req.query.month);
+    }
+    let unit = 'month';
+    if (req.query.hasOwnProperty("unit")) { // day|week|month|year
         unit = req.query.unit;
+    }
+
+    let begin = new Date(t_year, 0), end = new Date(t_year + 1, 0);
+    switch (unit) {
+        case "day":
+            begin = new Date(t_year, t_month);
+            end = new Date(t_year, t_month + 1);
+            break;
+        case "week":
+        case "month":
+            break;
+        case "year":
+            begin = new Date(0);
+            end = new Date(9999, 0);
+            break;
+        default:
+            console.warn(`unit ${unit} is invalid, query by "month" as default`);
+            unit = "month";
+            break;
     }
 
     try {
@@ -455,8 +480,8 @@ router.get('/classexpense', async function(req, res, next) {
                     $exists: true
                 },
                 "date": {
-                    $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
-                    $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
+                    $gte: begin,
+                    $lt: end
                 },
                 "cost": {
                     $gt: 0
@@ -489,6 +514,7 @@ router.get('/classexpense', async function(req, res, next) {
                 week: { $week: "$date" },
                 month: { $month: "$date" },
                 year: { $year: "$date" },
+                day: { $dayOfMonth: "$date" },
                 totalCost: {
                     $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
                 },
