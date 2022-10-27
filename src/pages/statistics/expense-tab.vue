@@ -18,6 +18,12 @@ div
       div#chart1(style="height:400px")
     div.col-sm-12.col-md-6
       div#chart2(style="height:400px")
+  div.row(style="margin-top:15px")
+    div.col-sm-12.col-md-6
+      date-picker.mb-7(v-model='selectedMonth', label="月份:" :config='monthPickerConfig', @input="refreshChart3", style="width:40%;margin-left:auto")
+      div#chart3(style="height:400px")
+    div.col-sm-12.col-md-6
+      div#chart4(style="height:400px")
 </template>
 
 <script>
@@ -33,16 +39,21 @@ var waldenTheme = require("./walden.json");
 var westerosTheme = require("./westeros.json");
 var request1 = null;
 var request2 = null;
+var request3 = null;
 
 module.exports = {
   name: "expense-tab",
   props: {},
   data: function() {
+    var current = new Date();
     return {
       chart1: null,
       chart2: null,
+      chart3: null,
       yearPickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
-      year: moment(new Date().getFullYear(), "YYYY"),
+      monthPickerConfig: { "format": "YYYY-MM", "locale": "zh-CN", "viewMode": "years" },
+      year: moment(current.getFullYear(), "YYYY"),
+      selectedMonth: moment(`${current.getFullYear()}-${current.getMonth()}`, "YYYY-MM"),
       unit: "month"
     };
   },
@@ -59,6 +70,8 @@ module.exports = {
           return "月";
         case "week":
           return "周";
+        case "day":
+          return "日";
         default:
           return "";
       }
@@ -97,7 +110,21 @@ module.exports = {
         request2 = null;
       });
     },
-    assembleOneSeriesData: function(rawData) {
+    refreshChart3() {
+      // load data for chart3
+      if (request3) request3.abort("abort by user");
+      request3 = util.getJSON("/api/analytics/classexpense", { unit: "day", year: this.selectedMonth.year(), month: this.selectedMonth.month() });
+      request3.fail(jqXHR => {
+        util.showAlert("刷新图表失败", jqXHR);
+      });
+      request3.done((data, textStatus, jqXHR) => {
+        this.drawChart3(data || [], this.selectedMonth.format("YYYY[年]MMM"), "日");
+      });
+      request3.always(() => {
+        request3 = null;
+      });
+    },
+    assembleOneSeriesData: function(rawData, unitName) {
       var chartData = {
         xAxis: [],
         series0: []
@@ -119,7 +146,7 @@ module.exports = {
       });
       data.forEach((value, index, array) => {
         if (!value) return;
-        chartData.xAxis.push(index + this.unitName);
+        chartData.xAxis.push(index + unitName);
         chartData.series0.push(
           Math.round((value.amount || 0) / 100 * 10) / 10
         );
@@ -128,7 +155,7 @@ module.exports = {
     },
     drawChart1: function(rawData, year, unitName) {
       // prepare the data
-      var data = this.assembleOneSeriesData(rawData);
+      var data = this.assembleOneSeriesData(rawData, unitName);
       // resize the chart according to its parent dom size
       this.chart1.resize();
       // define the options of charts
@@ -182,7 +209,7 @@ module.exports = {
     },
     drawChart2: function(rawData, year, unitName) {
       // prepare the data
-      var data = this.assembleOneSeriesData(rawData);
+      var data = this.assembleOneSeriesData(rawData, unitName);
       // resize the chart according to its parent dom size
       this.chart2.resize();
       // define the options of charts
@@ -232,6 +259,59 @@ module.exports = {
 
       // Apply the chart options to create/update chart instance
       this.chart2.setOption(option);
+    },
+    drawChart3: function(rawData, yearAndMonth, unitName) {
+      // prepare the data
+      var data = this.assembleOneSeriesData(rawData, unitName);
+      // resize the chart according to its parent dom size
+      this.chart3.resize();
+      // define the options of charts
+      var option = {
+        title: {
+          text: yearAndMonth + "课消金额统计",
+          top: "top",
+          left: "center"
+        },
+        tooltip: {
+          trigger: "axis"
+        },
+        toolbox: {
+          feature: {
+            dataView: { readOnly: true }
+          }
+        },
+        grid: {
+          //left: '5%',
+          //right: '15%',
+          //bottom: '10%'
+        },
+        legend: {
+          data: ["课消金额"],
+          //top: "10%",
+          bottom: 10,
+          //orient: "vertical"
+        },
+        xAxis: {
+          type: 'category',
+          name: unitName,
+          data: data.xAxis
+        },
+        yAxis: {
+          name: "元"
+        },
+        series: [
+          {
+            name: "课消金额",
+            type: "bar",
+            stack: "one",
+            barGap: 0,
+            data: data.series0
+          }
+        ]
+      };
+
+      // Apply the chart options to create/update chart instance
+      this.chart3.setOption(option);
     }
   },
   created: function() { },
@@ -249,9 +329,15 @@ module.exports = {
       "walden"
     );
 
+    this.chart3 = echarts.init(
+      $(this.$el).find("#chart3")[0],
+      "westeros"
+    );
+
     window.onresize = () => {
       this.chart1.resize();
       this.chart2.resize();
+      this.chart3.resize();
     };
   }
 };
