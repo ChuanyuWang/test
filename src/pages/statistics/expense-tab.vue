@@ -23,6 +23,7 @@ div
       date-picker.mb-7(v-model='selectedMonth', label="月份:" :config='monthPickerConfig', @input="refreshChart3", style="width:40%;margin-left:auto")
       div#chart3(style="height:400px")
     div.col-sm-12.col-md-6
+      date-picker.mb-7(v-model='selectedDay', label="日期:" :config='dayPickerConfig', @input="refreshChart4", style="width:40%;margin-left:auto")
       div#chart4(style="height:400px")
 </template>
 
@@ -40,20 +41,23 @@ var westerosTheme = require("./westeros.json");
 var request1 = null;
 var request2 = null;
 var request3 = null;
+var request4 = null;
 
 module.exports = {
   name: "expense-tab",
   props: {},
   data: function() {
-    var current = new Date();
     return {
       chart1: null,
       chart2: null,
       chart3: null,
+      chart4: null,
       yearPickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
-      monthPickerConfig: { "format": "YYYY-MM", "locale": "zh-CN", "viewMode": "years" },
-      year: moment(current.getFullYear(), "YYYY"),
-      selectedMonth: moment(`${current.getFullYear()}-${current.getMonth() + 1}`, "YYYY-MM"),
+      monthPickerConfig: { "format": "YYYY年MMM", "locale": "zh-CN", "viewMode": "months" },
+      dayPickerConfig: { "format": "L", "locale": "zh-CN", "viewMode": "days" },
+      year: moment().startOf("year"),
+      selectedMonth: moment().startOf("month"),
+      selectedDay: moment().startOf("day"),
       unit: "month"
     };
   },
@@ -79,6 +83,11 @@ module.exports = {
   },
   filters: {},
   methods: {
+    refresh() {
+      this.refreshChart();
+      this.refreshChart3();
+      this.refreshChart4();
+    },
     refreshChart: function() {
       var filter = {
         unit: this.unit,
@@ -134,6 +143,24 @@ module.exports = {
       request3.always(() => {
         request3 = null;
         this.chart3.hideLoading();
+      });
+    },
+    refreshChart4() {
+      // load data for chart4
+      if (request4) request4.abort("abort by user");
+      // resize the chart according to its parent dom size
+      this.chart4.resize();
+      this.chart4.showLoading();
+      request4 = util.getJSON("/api/analytics/classexpense2", { date: this.selectedDay.toISOString() });
+      request4.fail(jqXHR => {
+        util.showAlert("刷新图表失败", jqXHR);
+      });
+      request4.done((data, textStatus, jqXHR) => {
+        this.drawChart4(data || [], this.selectedDay.clone());
+      });
+      request4.always(() => {
+        request4 = null;
+        this.chart4.hideLoading();
       });
     },
     assembleOneSeriesData: function(rawData, unitName) {
@@ -308,6 +335,7 @@ module.exports = {
           left: "center"
         },
         tooltip: {
+          //format: "{b0}",
           trigger: "axis"
         },
         toolbox: {
@@ -347,6 +375,62 @@ module.exports = {
 
       // Apply the chart options to create/update chart instance
       this.chart3.setOption(option);
+    },
+    drawChart4: function(rawData, selectedDay, unitName) {
+      var chartData = rawData.map(item => {
+        return {
+          name: item._id && item._id.name || "",
+          //name: item._id && item._id._id || "",
+          value: Math.round(item.total) / 100
+        }
+      });
+
+      // define the options of charts
+      var option = {
+        title: {
+          text: selectedDay.format("ll") + "课消金额统计",
+          top: "top",
+          left: "center"
+        },
+        tooltip: {
+          //format: "'{b0}: {c0}<br />{b1}: {c1}'",
+          trigger: "item"
+        },
+        toolbox: {
+          feature: {
+            dataView: { readOnly: true },
+            myTool: {
+              show: true,
+              //title: "abc",
+              icon: "path://M200.753 408.251c-57.062 0-103.749 46.687-103.749 103.749s46.687 103.749 103.749 103.749S304.502 569.062 304.502 512s-46.687-103.749-103.749-103.749z m622.494 0c-57.062 0-103.749 46.687-103.749 103.749s46.687 103.749 103.749 103.749S926.996 569.062 926.996 512s-46.687-103.749-103.749-103.749z m-311.247 0c-57.062 0-103.749 46.687-103.749 103.749S454.938 615.749 512 615.749 615.749 569.062 615.749 512 569.062 408.251 512 408.251z",
+              onclick: o => {
+                //console.log(o);
+              }
+            }
+          }
+        },
+        legend: {
+          //top: "10%",
+          //orient: "vertical"
+          bottom: 10
+        },
+        series: [{
+          name: "课消金额",
+          type: "pie",
+          radius: "50%",
+          data: chartData,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+          }
+        }]
+      };
+
+      // Apply the chart options to create/update chart instance
+      this.chart4.setOption(option);
     }
   },
   created: function() { },
@@ -369,10 +453,16 @@ module.exports = {
       "westeros"
     );
 
+    this.chart4 = echarts.init(
+      $(this.$el).find("#chart4")[0],
+      "walden"
+    );
+
     window.onresize = () => {
       this.chart1.resize();
       this.chart2.resize();
       this.chart3.resize();
+      this.chart4.resize();
     };
   }
 };
