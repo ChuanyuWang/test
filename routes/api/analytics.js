@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
-const { InternalServerError } = require('./lib/basis');
+const { InternalServerError, BadRequestError } = require('./lib/basis');
+const moment = require('moment');
 
 
 /// Below APIs are visible to authenticated users only
@@ -539,6 +540,83 @@ router.get('/classexpense', async function(req, res, next) {
         res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analysis class expense fails", error));
+    }
+});
+
+// analysis for one day
+router.get('/classexpense2', async function(req, res, next) {
+    //[Default] get the result from today
+    let t_date = new Date();
+    if (req.query.hasOwnProperty("date") && moment(req.query.date).isValid()) {
+        t_date = new Date(req.query.date);
+    } else {
+        return next(new BadRequestError(`param date ${req.query.date} is not valid`));
+    }
+    let begin = moment(t_date).startOf("day"), end = moment(t_date).endOf("day");
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let classes = tenantDB.collection("classes");
+
+        let pipelines = [{
+            $match: {
+                "booking.0": { // array size >= 1
+                    $exists: true
+                },
+                "date": {
+                    $gte: begin,
+                    $lt: end
+                },
+                "cost": {
+                    $gt: 0
+                }
+            }
+        }, {
+            $unwind: "$booking"
+        }, {
+            $lookup: {
+                from: "contracts",
+                let: { contractID: "$booking.contract" },
+                pipeline: [{
+                    $match: {
+                        $expr: { $eq: ["$$contractID", "$_id"] }
+                    }
+                }, {
+                    $project: { comments: 0, history: 0 }
+                }],
+                as: 'contracts'
+            }
+        }, {
+            $match: {
+                "contracts.0": { $exists: true }
+            }
+        }, {
+            $unwind: "$contracts"
+        }, {
+            $project: {
+                type: 1,
+                name: 1,
+                totalCost: {
+                    $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
+                },
+                creditPrice: {
+                    $divide: [{ $subtract: ["$contracts.total", "$contracts.discount"] }, "$contracts.credit"]
+                }
+            }
+        }, {
+            $group: {
+                _id: { "_id": "$_id", type: "$type", name: "$name" }, // group the cost by class session
+                total: {
+                    $sum: { $multiply: ["$creditPrice", "$totalCost"] }
+                }
+            }
+        }];
+        let docs = await classes.aggregate(pipelines).toArray();
+
+        console.log("analyze one day expense: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analysis one day class expense fails", error));
     }
 });
 
