@@ -564,8 +564,8 @@ router.get('/classexpense2', async function(req, res, next) {
                     $exists: true
                 },
                 "date": {
-                    $gte: begin,
-                    $lt: end
+                    $gte: begin.toDate(),
+                    $lt: end.toDate()
                 },
                 "cost": {
                     $gt: 0
