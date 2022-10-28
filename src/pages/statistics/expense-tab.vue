@@ -332,8 +332,8 @@ module.exports = {
           {
             name: "课消金额",
             type: "bar",
-            stack: "one",
-            barGap: 0,
+            //stack: "one",
+            //barGap: 0,
             data: data.series0
           }
         ]
