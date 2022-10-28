@@ -153,7 +153,7 @@ div.container
     button.btn.btn-default(type="button" @click="$refs.classesTable.refresh({url: '/api/classes'})" style="float: right; margin-top: 16px")
       span.glyphicon.glyphicon-refresh.me-3
       | 刷新
-  div.row
+  div.row(style="margin-bottom:20px")
     div.col-sm-12
       div#classesToolbar
       bootstrap-table.table-striped(ref="classesTable", :columns="classesTableColumns", :options="classesTableOptions")
