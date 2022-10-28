@@ -86,6 +86,9 @@ module.exports = {
       };
       //load data for chart1
       if (request1) request1.abort("abort by user");
+      // resize the chart according to its parent dom size
+      this.chart1.resize();
+      this.chart1.showLoading();
       request1 = util.getJSON("/api/analytics/classexpense", filter);
       request1.fail(jqXHR => {
         util.showAlert("刷新图表失败", jqXHR);
@@ -95,10 +98,14 @@ module.exports = {
       });
       request1.always(() => {
         request1 = null;
+        this.chart1.hideLoading();
       });
 
       // load data for chart2
       if (request2) request2.abort("abort by user");
+      // resize the chart according to its parent dom size
+      this.chart2.resize();
+      this.chart2.showLoading();
       request2 = util.getJSON("/api/analytics/incomingpayment", filter);
       request2.fail(jqXHR => {
         util.showAlert("刷新图表失败", jqXHR);
@@ -108,11 +115,15 @@ module.exports = {
       });
       request2.always(() => {
         request2 = null;
+        this.chart2.hideLoading();
       });
     },
     refreshChart3() {
       // load data for chart3
       if (request3) request3.abort("abort by user");
+      // resize the chart according to its parent dom size
+      this.chart3.resize();
+      this.chart3.showLoading();
       request3 = util.getJSON("/api/analytics/classexpense", { unit: "day", year: this.selectedMonth.year(), month: this.selectedMonth.month() });
       request3.fail(jqXHR => {
         util.showAlert("刷新图表失败", jqXHR);
@@ -122,6 +133,7 @@ module.exports = {
       });
       request3.always(() => {
         request3 = null;
+        this.chart3.hideLoading();
       });
     },
     assembleOneSeriesData: function(rawData, unitName) {
@@ -164,8 +176,6 @@ module.exports = {
     drawChart1: function(rawData, year, unitName) {
       // prepare the data
       var data = this.assembleOneSeriesData(rawData, unitName);
-      // resize the chart according to its parent dom size
-      this.chart1.resize();
       // define the options of charts
       var option = {
         title: {
@@ -218,8 +228,6 @@ module.exports = {
     drawChart2: function(rawData, year, unitName) {
       // prepare the data
       var data = this.assembleOneSeriesData(rawData, unitName);
-      // resize the chart according to its parent dom size
-      this.chart2.resize();
       // define the options of charts
       var option = {
         title: {
@@ -292,8 +300,6 @@ module.exports = {
 
       // prepare the data
       var data = this.assembleOneSeriesData(fullMonthData, unitName);
-      // resize the chart according to its parent dom size
-      this.chart3.resize();
       // define the options of charts
       var option = {
         title: {
