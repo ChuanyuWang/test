@@ -395,7 +395,7 @@ module.exports = {
           left: "center"
         },
         tooltip: {
-          //format: "'{b0}: {c0}<br />{b1}: {c1}'",
+          //formatter: "{a}<br>{b} <b>{c}</b>元",
           trigger: "item"
         },
         toolbox: {
