@@ -2,13 +2,11 @@
 div
   div.row(style="margin-top:7px")
     div.col-md-12
-      form.form-inline.pull-right
-        div.form-group.me-7
-          label.text-nowrap 年份:
-          date-picker.ms-3(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
-        div.form-group.me-7
-          label 单位:
-          select.form-control.ms-3(v-model='unit',@change='refreshChart')
+      div.d-flex.justify-content-end
+        date-picker.me-7(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart" label="年份:" style="max-width:160px")
+        div.input-group.me-7
+          span.input-group-addon 单位:
+          select.form-control(v-model='unit',@change='refreshChart')
             //option(value='year') 年
             option(value='month') 月
             option(value='week') 周
@@ -20,10 +18,14 @@ div
       div#chart2(style="height:400px")
   div.row(style="margin-top:15px")
     div.col-sm-12.col-md-6
-      date-picker.mb-7(v-model='selectedMonth', label="月份:" :config='monthPickerConfig', @input="refreshChart3", style="width:40%;margin-left:auto")
+      div.d-flex.justify-content-end(style="margin-bottom:15px")
+        date-picker.me-7(v-model='selectedMonth', label="月份:" :config='monthPickerConfig', @input="refreshChart3", style="max-width:200px")
+        button.btn.btn-primary(type="button",@click='refreshChart3') 刷新
       div#chart3(style="height:400px")
     div.col-sm-12.col-md-6
-      date-picker.mb-7(v-model='selectedDay', label="日期:" :config='dayPickerConfig', @input="refreshChart4", style="width:40%;margin-left:auto")
+      div.d-flex.justify-content-end(style="margin-bottom:15px")
+        date-picker.me-7(v-model='selectedDay', label="日期:" :config='dayPickerConfig', @input="refreshChart4", style="max-width:200px")
+        button.btn.btn-primary(type="button",@click='refreshChart4') 刷新
       div#chart4(style="height:400px")
 </template>
 
