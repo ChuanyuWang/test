@@ -32,7 +32,7 @@ div
 <script>
 /**
  * --------------------------------------------------------------------------
- * consume-tab display a panel for consume statistics
+ * expense-tab display a panel for consume statistics
  * --------------------------------------------------------------------------
  */
 
