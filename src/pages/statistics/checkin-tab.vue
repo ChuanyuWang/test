@@ -1,30 +1,32 @@
 <template lang="pug">
 div
-  div#checkin_toolbar(style='line-height:1.5;display:inline-block')
-    label(style='margin:0 3px') {{$t('time')}}:
-    select.input-sm(v-model='timeFilter',style='margin-right:7px',@change='refreshCheckinStatus')
-      option(value='today') {{$t('today')}}
-      option(value='yesterday') {{$t('yesterday')}}
-      option(value='past_week') {{$t('past_week')}}
-      option(value='past_month') {{$t('past_month')}}
-      option(value='') {{$t('all')}}
-    label(style='margin:0 3px') {{$t('flag')}}:
-    select.input-sm(v-model='flagFilter',style='margin-right:7px',@change='refreshCheckinStatus')
-      option(value='red') {{$t('red_flag')}}
-      option(value='green') {{$t('green_flag')}}
-      option(value='') {{$t('all')}}
+  div#checkin_toolbar.d-flex.align-items-center
+    div.input-group.me-3
+      span.input-group-addon {{$t('time')}}:
+      select.form-control(v-model='timeFilter' @change='refreshCheckinStatus')
+        option(value='today') {{$t('today')}}
+        option(value='yesterday') {{$t('yesterday')}}
+        option(value='past_week') {{$t('past_week')}}
+        option(value='past_month') {{$t('past_month')}}
+        option(value='') {{$t('all')}}
+    div.input-group.me-7
+      span.input-group-addon {{$t('flag')}}:
+      select.form-control(v-model='flagFilter' @change='refreshCheckinStatus')
+        option(value='red') {{$t('red_flag')}}
+        option(value='green') {{$t('green_flag')}}
+        option(value='') {{$t('all')}}
     label.text-success.checkbox-inline
       input(type="checkbox",value='checkin',@click='refreshCheckinStatus')
       | {{$t('checked_in')}}
-      span.glyphicon.glyphicon-ok(style='margin-left:3px')
+      span.glyphicon.glyphicon-ok.ms-3
     label.text-danger.checkbox-inline
       input(type="checkbox",value='absent',@click='refreshCheckinStatus',checked)
       | {{$t('absent')}}
-      span.glyphicon.glyphicon-remove(style='margin-left:3px')
+      span.glyphicon.glyphicon-remove.ms-3
     label.checkbox-inline
       input(type="checkbox",value='',@click='refreshCheckinStatus',checked)
       | {{$t('uncheckin')}}
-      span.glyphicon.glyphicon-question-sign(style='margin-left:3px;color:#777')
+      span.glyphicon.glyphicon-question-sign.ms-3(style='color:#777')
   bootstrap-table.table-striped(ref='checkinTable',:columns='columns',:options='options')
 </template>
 
