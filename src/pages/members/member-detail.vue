@@ -48,13 +48,6 @@ div.container
     div.form-group
       div.col-sm-offset-2.col-sm-10.col-xs-offset-3.col-xs-9
         button.btn.btn-success(type='button',v-on:click='saveBasicInfo',:disabled='hasError') 保存
-  div.page-header
-    h3 会员卡
-      span.label.label-danger.ms-3 待移除
-  template(v-if='memberData.membership&&memberData.membership.length')
-    card(v-for="(card, i) in memberData.membership",@save="saveCardInfo",:item='card',:index='i',:key='i',:classrooms='tenantConfig.classrooms')
-  template(v-else)
-    card(@save="saveCardInfo" :item='{credit:0,room:[],type:"ALL"}' :index=-1,key='-1' :classrooms='tenantConfig.classrooms')
   member-contracts(:memberId="memberId")
   div.page-header
     h3 {{$t('course_summary_title')}}
@@ -97,7 +90,7 @@ div.container
         small(style='color:#777') 共{{commentCount}}条备忘
   div.page-header
     h3(style='margin-top:0;display:inline-block') 充值记录
-      span.label.label-danger.ms-3 待移除
+      span.label.label-danger.ms-3(style="font-size:60%") 待移除
     a(role='button',title='点击加载',@click='loadHistory')
       span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
   div#loadHistory_mask(style='display:none')
@@ -120,14 +113,6 @@ div.container
     bootstrap-table.table-striped(ref='classesTable',:columns='classRecord.columns',:options='classRecord.options')
   div(style='height:20px')
   comment-modal(ref='commentDlg')
-  modal-dialog(ref='historyCommentDlg',buttonStyle="success",buttons="confirm",@ok="updateMembership") 确认并保存
-    template(v-slot:body)
-      form
-        div.form-group
-          label.control-label 备注:
-          textarea.form-control(rows='3', name='comment',placeholder='备注修改会员卡的原因（选填）',v-model='toBeSavedMemo')
-          small(style='color:#777;float:right;margin-top:2px') 不超过256个字, 添加到备忘和充值记录备注中
-    template(v-slot:action) 保存
   message-alert(ref="messager")
 </template>
 
@@ -137,7 +122,6 @@ div.container
  * member-view.js display details of single member item
  * --------------------------------------------------------------------------
  */
-var cardComp = require('./card.vue').default;
 var date_picker = require('../../components/date-picker.vue').default;
 var modalDialog = require("../../components/modal-dialog.vue").default;
 var comment_dlg = require('./comment-modal.vue').default;
@@ -158,7 +142,6 @@ module.exports = {
   },
   components: {
     "BootstrapTable": BootstrapTable,
-    "card": cardComp,
     "date-picker": date_picker,
     "modal-dialog": modalDialog,
     "comment-modal": comment_dlg,
@@ -325,30 +308,6 @@ module.exports = {
       request.done((data, textStatus, jqXHR) => {
         this.$refs.messager.showSuccessMessage("学员基本资料更新成功");
       });
-    },
-    saveCardInfo: function(card, index) {
-      this.toBeSavedMembership = card;
-      this.toBeSavedMembershipIndex = index;
-      // open the confirm dialog with comment
-      this.toBeSavedMemo = "";
-      this.$refs.historyCommentDlg.show(this.toBeSavedMembershipIndex);
-    },
-    updateMembership: function(index) {
-      // append the memo for this change if there is any
-      this.toBeSavedMembership.memo = this.toBeSavedMemo.trim();
-      if (index > -1) {
-        var request = memberService.updateCard(this.memberData._id, index, this.toBeSavedMembership);
-        request.done((data, textStatus, jqXHR) => {
-          this.$refs.messager.showSuccessMessage("会员卡更新成功");
-          Vue.set(this.memberData.membership, index, data.membership[index]);
-        });
-      } else {
-        var request = memberService.createCard(this.memberData._id, this.toBeSavedMembership);
-        request.done((data, textStatus, jqXHR) => {
-          this.$refs.messager.showSuccessMessage("会员卡创建成功");
-          this.memberData.membership = data.membership;
-        });
-      }
     },
     deactivateAlert: function(e) {
       if (this.memberData.status == 'inactive') {
