@@ -186,7 +186,7 @@ module.exports = {
           vm.showMyBooks();
         } else {
           // handle login fail, show error dialog
-          vm.errorMessage = '没有找到会员信息，请核对您的姓名和联系方式，如有问题请联系客服';
+          vm.errorMessage = '没有找到学员信息，请核对您的姓名和联系方式，如有问题请联系客服';
           vm.$refs.errorDlg.show();
         }
       });
@@ -219,4 +219,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>

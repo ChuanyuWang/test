@@ -208,7 +208,7 @@ module.exports = {
         if (!data) {
           // handle login fail
           vm.errorTitle = '登录失败';
-          vm.errorMessage = '没有找到会员信息，请核对您的姓名和联系方式，如有问题请联系客服';
+          vm.errorMessage = '没有找到学员信息，请核对您的姓名和联系方式，如有问题请联系客服';
           vm.$refs.errorDlg.show();
           return;
         }
@@ -368,6 +368,7 @@ module.exports = {
   min-width: 50px;
   text-align: center;
   line-height: 1;
+
   small {
     font-size: 12px;
     color: #808080;
@@ -389,14 +390,17 @@ module.exports = {
   float: right;
   width: 20%;
   max-width: 60px;
+
   .finish-btn {
     float: right;
     margin-top: 3px;
   }
+
   .cancel-btn {
     .finish-btn;
     opacity: 0.5;
   }
+
   .cls-status {
     text-align: center;
     font-weight: bold;

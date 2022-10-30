@@ -189,7 +189,7 @@ module.exports = {
     errors() {
       var errors = {};
       if (!this.memberData.id)
-        errors.memberId = "请选择会员";
+        errors.memberId = "请选择学员";
       if (this.comment.length > 256)
         errors.comment = "备注不超过256个字";
       if (!this.product.id)

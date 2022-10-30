@@ -58,7 +58,7 @@ module.exports = {
         formatter: this.statusFormatter
       }, {
         field: "name",
-        title: "会员",
+        title: "学员",
         formatter: this.memberFormatter
       }, {
         field: "contact",
@@ -235,4 +235,5 @@ module.exports = {
 }
 </script>
 <style lang="less">
+
 </style>

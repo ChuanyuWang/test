@@ -174,7 +174,7 @@ module.exports = {
       }
       bootbox.confirm({
         title: "确定删除课程吗？",
-        message: "只能删除没有会员预约的课程，如果有预约，请先取消预约",
+        message: "只能删除没有学员预约的课程，如果有预约，请先取消预约",
         buttons: {
           confirm: {
             className: "btn-danger"

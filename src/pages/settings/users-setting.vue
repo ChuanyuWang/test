@@ -4,7 +4,7 @@ div(style='padding:7px')
     thead
       tr
         th 操作权限
-        th 会员
+        th 学员
         th 店长
         th 管理员
     tbody

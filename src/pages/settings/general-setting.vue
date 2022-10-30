@@ -22,17 +22,17 @@ div(style='padding:7px')
       label.col-sm-2.control-label 客服电话:
       div.col-sm-10
         input.form-control(type='text',name='contact',v-model='contact')
-        span.help-block 客服电话，会员遇到问题时拨打咨询，设置后可以再次更改
+        span.help-block 客服电话，学员遇到问题时拨打咨询，设置后可以再次更改
     div.form-group(:class='{"has-error": errors.address}')
       label.col-sm-2.control-label 门店地址:
       div.col-sm-10
         input.form-control(type='text',name='address',v-model='address')
-        span.help-block 门店地址，会员遇到问题时可以前往咨询，设置后可以再次更改
+        span.help-block 门店地址，学员遇到问题时可以前往咨询，设置后可以再次更改
     div.form-group(:class='{"has-error": errors.mapLink}')
       label.col-sm-2.control-label 门店地图:
       div.col-sm-10
         input.form-control(type='text',name='mapLink',v-model='mapLink')
-        span.help-block 门店地图名片，会员遇到问题时可以前往咨询，设置后可以再次更改
+        span.help-block 门店地图名片，学员遇到问题时可以前往咨询，设置后可以再次更改
     div.form-group
       div.col-sm-offset-2.col-sm-10
         button.btn.btn-success(type='button',@click='save',:disabled='hasError') 保存
@@ -127,4 +127,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>

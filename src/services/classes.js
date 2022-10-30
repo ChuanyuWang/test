@@ -78,7 +78,7 @@ service.deleteReservation = function(classID, fields) {
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("取消会员预约失败", jqXHR);
+        util.showAlert("取消学员预约失败", jqXHR);
     });
     return request;
 };

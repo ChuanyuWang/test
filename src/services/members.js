@@ -17,7 +17,7 @@ service.update = function(memberID, fields) {
     });
 
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("更新会员失败", jqXHR);
+        util.showAlert("更新学员失败", jqXHR);
     })
     return request;
 }
@@ -30,7 +30,7 @@ service.addComment = function(memberID, fields) {
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("添加会员备忘失败", jqXHR);
+        util.showAlert("添加学员备忘失败", jqXHR);
     });
     return request;
 }
@@ -43,7 +43,7 @@ service.editComment = function(memberID, index, fields) {
         dataType: "json"
     });
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("修改会员备忘失败", jqXHR);
+        util.showAlert("修改学员备忘失败", jqXHR);
     });
     return request;
 }
@@ -78,7 +78,7 @@ service.updateCard = function(memberID, index, fields) {
 service.getMemberInfo = function(id) {
     var request = $.getJSON("/api/members/" + id, '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取会员信息失败", jqXHR);
+        util.showAlert("获取学员信息失败", jqXHR);
     });
     return request;
 }
@@ -86,7 +86,7 @@ service.getMemberInfo = function(id) {
 service.getMemberComments = function(id) {
     var request = $.getJSON("/api/members/" + id + '/comments', '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取会员备忘失败", jqXHR);
+        util.showAlert("获取学员备忘失败", jqXHR);
     });
     return request;
 }
@@ -94,7 +94,7 @@ service.getMemberComments = function(id) {
 service.getMemberSummary = function(id) {
     var request = $.getJSON("/api/members/" + id + '/summary', '');
     request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("获取会员参与的班级失败", jqXHR);
+        util.showAlert("获取学员参与的班级失败", jqXHR);
     });
     return request;
 }

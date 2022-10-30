@@ -124,7 +124,7 @@ div.container
   modal-dialog(ref='deleteBookDlg' buttonStyle="primary" buttons="confirm" @ok="removeBook") 确定删除绘本吗？
     template(v-slot:body="slotProps")
       p 从当前课程中删除绘本《{{ slotProps.param.title }}》
-  modal-dialog(ref='cancelReservationDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定取消会员预约吗？
+  modal-dialog(ref='cancelReservationDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定取消学员预约吗？
     template(v-slot:body="slotProps")
       p 取消会员的预约，并且返还扣除的课时，无法在课程开始后取消
   modal-dialog(ref='deleteCourseClassDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定删除班级中的课程吗？

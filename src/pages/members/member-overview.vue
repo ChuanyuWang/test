@@ -24,7 +24,7 @@ div
           button#jumpToButton.btn.btn-default(type="button",@click="jumpToPage") 跳转
   bootstrap-table.table-striped(ref='memberTable',:columns='tableColumns',:options='tableOptions')
 
-  modal-dialog(ref='createMemberDialog',buttons="confirm",@ok="addNewMember",:hasError="hasError") 添加会员
+  modal-dialog(ref='createMemberDialog',buttons="confirm",@ok="addNewMember",:hasError="hasError") 添加学员
     template(v-slot:body)
       form.form-horizontal
         div.form-group(:class='{"has-error": errors.name}')

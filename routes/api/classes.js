@@ -3,6 +3,7 @@ var router = express.Router();
 var mongojs = require('mongojs');
 const mongoist = require('mongoist');
 var helper = require('../../helper');
+const { BadRequestError, RuntimeError } = require('./lib/basis');
 
 /**
  * {
@@ -513,14 +514,10 @@ router.put('/:classID/checkin', function(req, res, next) {
             new: true
         }, function(err, doc, lastErrorObject) {
             if (err) {
-                var error = new Error("class check-in fails");
-                error.innerError = err;
-                return next(error);
+                return next(new RuntimeError("class check-in fails", err));
             }
             if (!doc) {
-                var error = new Error('签到失败，会员未参加此课程');
-                error.status = 400;
-                return next(error);
+                return next(BadRequestError('签到失败，学员未参加此课程'));
             }
             console.log("class %s check-in by member %s", req.params.classID, memberToCheckin.memberid);
             res.json(doc);

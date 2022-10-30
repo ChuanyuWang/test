@@ -3,7 +3,7 @@ var router = express.Router();
 
 router.get('/booking', function(req, res, next) {
     res.render('bqsq/booking', {
-        title: '会员约课'
+        title: '学员约课'
     });
 });
 
