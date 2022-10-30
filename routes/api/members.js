@@ -4,6 +4,7 @@ var mongojs = require('mongojs');
 var helper = require('../../helper');
 var db_utils = require('../../server/databaseManager');
 const { isEqual } = require('./lib/util');
+const { BadRequestError, ParamError, BaseError } = require('./lib/basis');
 
 /**
  * {
@@ -345,7 +346,7 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
         let doc = await addNewMember(req.tenant.name, req.body || {});
         return res.json(doc);
     } catch (err) {
-        if (err instanceof AddMemberError) {
+        if (err instanceof BaseError) {
             return next(err);
         } else {
             let error = new Error("Fail to add member");
@@ -355,18 +356,9 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     }
 });
 
-class AddMemberError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = "AddMemberError";
-    }
-}
-
 async function addNewMember(tenantName, data) {
     if (!data.name || !data.contact) {
-        var error = new AddMemberError("Missing param 'name' or 'contact'");
-        error.status = 400;
-        throw error;
+        throw new ParamError("Missing param 'name' or 'contact'");
     }
     // new member default status is 'active'
     if (!data.hasOwnProperty('status')) {
@@ -382,10 +374,7 @@ async function addNewMember(tenantName, data) {
     let members = tenantDB.collection("members");
     let doc = await members.findOne(query);
     if (doc) {
-        let error = new AddMemberError("会员已经存在");
-        error.status = 400;
-        error.code = 2007;
-        throw error;
+        throw new BadRequestError("会员已经存在", 2007);
     }
 
     convertDateObject(data);
@@ -511,6 +500,10 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
    }
  */
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
+    // membership card is not able to edit after Oct 31, 2022
+    if (new Date() > new Date(2022, 10, 1)) {
+        return next(new BadRequestError("会员卡功能已停用"));
+    }
     var members = req.db.collection("members");
     //'memo' is reserved field for passing the memo for history item
     if (req.body && req.body.hasOwnProperty('memo')) {
@@ -562,6 +555,10 @@ router.post('/:memberID/memberships', helper.requireRole('admin'), function(req,
 });
 
 router.patch('/:memberID/memberships/:cardIndex', function(req, res, next) {
+    // membership card is not able to edit after Oct 31, 2022
+    if (new Date() > new Date(2022, 10, 1)) {
+        return next(new BadRequestError("会员卡功能已停用"));
+    }
     var members = req.db.collection("members");
     //'memo' is reserved field for passing the memo for history item
     if (req.body && req.body.hasOwnProperty('memo')) {
