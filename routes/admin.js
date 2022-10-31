@@ -512,7 +512,20 @@ async function upgradeFromFive(req, res, next) {
 
         // step 3: create contract for all active members, which has remaining credit or classes
         let contracts = await createtDefaultContracts(tenant, defaultType);
-        //res.json("Tenant is updated to 6.0");
+
+        let config_datebase = await db_utils.connect('config');
+        let result = config_datebase.collection('tenants').findOneAndUpdate({
+            name: tenant.name,
+            version: 5
+        }, {
+            $set: { version: 6 }
+        });
+        if (result.value) {
+            console.log(`tenant ${tenant.name} is updated to version 6.0`);
+        } else {
+            console.error(`fail to update tenant ${tenant.name} to version 6.0`);
+        }
+
         res.json(contracts);
     } catch (error) {
         if (error instanceof BaseError)
