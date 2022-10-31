@@ -70,6 +70,7 @@ exports.createtDefaultContracts = async function(tenant, defaultType) {
         let consumedCredit = getConsumedCredit(m);
         let totalCredit = remainingCredit + consumedCredit;
         let defaultContract = {
+            _fromLegacyMemberCard: true,
             _id: new ObjectId(),
             serialNo: await generateContractNo(),
             status: "paid",

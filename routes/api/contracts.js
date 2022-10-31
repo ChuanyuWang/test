@@ -297,6 +297,11 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
         let historyItem = buildHistoryRecord(doc, newValueSet, remark);
         historyItem.user = req.user.username;
 
+        if (isFromLegacyMembership(doc) && newValueSet.hasOwnProperty("total")) {
+            // the legacy contract is always paid
+            newValueSet.received = newValueSet.total;
+        }
+
         let result = await contracts.findOneAndUpdate({
             _id: doc._id,
         }, {
@@ -478,6 +483,14 @@ function getUpdatedValueSet(oldDoc, newDoc) {
         newValueSet[key] = newItem[key];
     }
     return newValueSet;
+}
+
+function isFromLegacyMembership(contract) {
+    let item = contract || {};
+    if (item._fromLegacyMemberCard === true) return true;
+    // property "_fromLegacyMemberCard" is added since 20221101000278 contract
+    else if (parseInt(contract.serialNo) <= 20221101000278) return true;
+    return false;
 }
 
 module.exports = router;
