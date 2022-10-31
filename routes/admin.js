@@ -514,7 +514,7 @@ async function upgradeFromFive(req, res, next) {
         let contracts = await createtDefaultContracts(tenant, defaultType);
 
         let config_datebase = await db_utils.connect('config');
-        let result = config_datebase.collection('tenants').findOneAndUpdate({
+        let result = await config_datebase.collection('tenants').findOneAndUpdate({
             name: tenant.name,
             version: 5
         }, {
