@@ -8,11 +8,11 @@ div
     li(role='presentation')
       a(href="#teacher",role='tab',data-toggle='tab') {{$t('teacher')}}
     li(role='presentation')
-      a(href="#analytics",role='tab',data-toggle='tab') 会员卡(旧)
-    li(role='presentation')
       a(href="#contracts",role='tab',data-toggle='tab') {{$t('contracts')}}
     li(role='presentation')
       a(href="#member",role='tab',data-toggle='tab') 学员消课
+    li(role='presentation')
+      a(href="#analytics",role='tab',data-toggle='tab') 会员卡(旧)
   div.tab-content
     div.tab-pane.active(role="tabpanel",id="checkin")
       checkin-tab
