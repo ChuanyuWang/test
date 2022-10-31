@@ -1,3 +1,4 @@
+const moment = require('moment');
 const db_utils = require('./databaseManager');
 const { BadRequestError, InternalServerError, generateContractNo } = require("../routes/api/lib/basis");
 const { ObjectId } = require("mongodb");
@@ -152,7 +153,8 @@ function createUpgradeComment(member) {
 
     let credit = Math.round(cards[0].credit * 10) / 10;
     // "2012/12/20" without time
-    let expire = cards[0].expire instanceof Date ? cards[0].expire.toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' }) : cards[0].expire;
+    //let expire = cards[0].expire instanceof Date ? cards[0].expire.toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' }) : cards[0].expire;
+    let expire = cards[0].expire instanceof Date ? moment(cards[0].expire).format("YYYY/MM/DD") : cards[0].expire;
     let cardType = cards[0].type === "LIMITED" ? `卡片类型为限定卡 (可用教室: ${(cards[0].room || []).join(",")})` : "卡片类型为通用卡";
 
     return {
