@@ -133,8 +133,6 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 折扣直减:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ discountFee }}元
-              a(role="button" @click="openModifyDialog")
-                i.glyphicon.glyphicon-pencil.ms-3
   contract-comments(:contractId="contractId")
   div.page-header
     h3(style="display: inline-block") 缴费记录
