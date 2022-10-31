@@ -205,7 +205,7 @@ router.post('/api/upgrade',
     function(req, res, next) {
         // get the tenant to be upgraded
         let doc = req.tenant;
-        return next(new ParamError(`tenant version ${doc.version} is not valid`));
+        return next(new ParamError(`tenant with version ${doc.version} is up-to-date`));
     }
 );
 
