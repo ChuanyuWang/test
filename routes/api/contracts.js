@@ -294,6 +294,10 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
         // remove comment before further proceed
         delete req.body.comment;
         let newValueSet = getUpdatedValueSet(doc, req.body);
+        if (Object.keys(newValueSet).length === 0) {
+            // return the original document if nothing changed
+            return res.json(doc);
+        }
         let historyItem = buildHistoryRecord(doc, newValueSet, remark);
         historyItem.user = req.user.username;
 
