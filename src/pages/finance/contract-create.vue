@@ -105,6 +105,7 @@ div.container
               strong {{ receivable }} 元
   member-select-modal(ref="memberSelectDlg" @ok="selectMember")
   type-select-modal(ref="typeSelectDlg" @ok="selectType")
+  message-alert(ref="messager")
 </template>
 <script>
 
@@ -112,6 +113,8 @@ var member_select_modal = require("../../components/member-select-modal.vue").de
 var type_select_modal = require("../../components/type-select-modal.vue").default;
 var serviceUtil = require("../../services/util");
 var common = require('../../common/common');
+var messageAlert = require("../../components/message-alert.vue").default;
+
 
 module.exports = {
   name: "contract-create",
@@ -119,6 +122,7 @@ module.exports = {
   components: {
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
+    "message-alert": messageAlert,
     "date-picker": require('../../components/date-picker.vue').default
   },
   data() {
@@ -255,6 +259,9 @@ module.exports = {
         // data is generated ObjectId for the insert operation
         window.location.href = window.location.pathname + '/../' + data;
       });
+      request.fail((jqXHR, textStatus, errorThrown) => {
+        this.$refs.messager.showErrorMessage("创建合约失败");
+      });
     }
   },
   created() {
@@ -262,6 +269,8 @@ module.exports = {
   },
   mounted() {
     $('[data-toggle="tooltip"]').tooltip();
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     // default tab is classroom
     var memberId = common.getParam("memberId");
     if (memberId) {
