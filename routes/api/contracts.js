@@ -3,9 +3,50 @@ const router = express.Router();
 const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-const { RuntimeError, ParamError, BaseError, generateContractNo } = require('./lib/basis');
+const { RuntimeError, ParamError, BaseError, generateContractNo, BadRequestError } = require('./lib/basis');
 const { isEqual } = require('./lib/util');
 const moment = require('moment');
+const { SchemaValidator } = require("./lib/schema_validator");
+
+const ContractSchema = new SchemaValidator({
+    serialNo: String,
+    status: {
+        validator: value => {
+            return ["open", "outstanding", "paid", "closed", "deleted"].includes(value);
+        }
+    },
+    type: {
+        validator: value => {
+            return ["new", "renewal", "donate", "import", "export", "refund"].includes(value);
+        },
+        editable: true
+    },
+    goods: String,
+    goods_type: {
+        validator: value => {
+            return ["type", "package"].includes(value);
+        }
+    },
+    category: {
+        validator: value => {
+            return ["credit", "limited", "infinite"].includes(value);
+        }
+    },
+    memberId: { type: ObjectId, required: true },
+    credit: { type: Number, required: true, editable: true },
+    total: { type: Number, required: true, editable: true },
+    consumedCredit: Number,
+    expendedCredit: Number,
+    discount: Number,
+    received: Number,
+    createDate: { type: Date, required: true },
+    effectiveDate: { type: Date, required: true, editable: true },
+    expireDate: { type: Date, editable: true },
+    signDate: Date,
+    lastUpdate: Date,
+    comments: Array,
+    history: Array
+});
 
 /**
  * {
@@ -384,6 +425,9 @@ router.get('/:contractID/history', async function(req, res, next) {
 async function validateContract(req, res, next) {
     try {
         //TODO, validate all fields of contract
+        if (!ContractSchema.createVerify(req.body)) {
+            return next(new BadRequestError("Fail to create contract due to bad request body"));
+        }
         let query = { _id: ObjectId(req.body.memberId) };
 
         let tenantDB = await db_utils.connect(req.tenant.name);
