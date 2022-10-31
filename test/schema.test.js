@@ -36,7 +36,7 @@ describe('Signature Utility', function() {
 
     });
 
-    it.only('should pass verify creating', async function() {
+    it('should pass verify creating', async function() {
         let body = {
             "type": "new",
             "goods": "632961ecc04b056810a02fc4",
