@@ -156,11 +156,12 @@ exports.remove = function(memberOrMembers, classOrClasses) {
  */
 exports.findAvailableContract = function(class2Book, allContracts) {
     const now = moment();
+    // find the available contract, then return
     for (let index = 0; index < allContracts.length; index++) {
         const contract = allContracts[index];
         if (contract.status !== "paid") continue;
         if (contract.goods !== class2Book.type) continue;
-        if (moment(contract.effectiveDate).isValid() && moment(contract.effectiveDate).isAfter(now)) continue;
+        if (moment(contract.effectiveDate).isValid() && moment(contract.effectiveDate).isAfter(class2Book.date)) continue;
         if (moment(contract.expireDate).isValid() && moment(contract.expireDate).isBefore(now)) continue;
 
         // (0.1 + 0.2 <= 0.3) ==> false; (0.1 + 0.2 <= 0.3 + EPSILON) ==> true
