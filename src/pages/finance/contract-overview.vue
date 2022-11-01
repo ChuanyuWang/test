@@ -66,11 +66,12 @@ module.exports = {
         formatter: this.goodsFormatter
       }, {
         field: "credit",
-        title: "合约课时"
+        title: "合约课时",
+        formatter: value => { return Math.round(value * 10) / 10; }
       }, {
         field: "consumedCredit",
         title: "已消课时",
-        formatter: (value, row) => { return value + row.expendedCredit || 0 }
+        formatter: (value, row) => { return Math.round((value + row.expendedCredit || 0) * 10) / 10; }
       }, {
         field: "effectiveDate",
         title: "生效日期",
