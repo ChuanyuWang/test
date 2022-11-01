@@ -6,6 +6,8 @@ const { ObjectId } = require('mongodb');
 const moment = require('moment');
 const mongojs = require('mongojs');
 
+const EPSILON = 2e-10;
+
 /**
  * {
  *  contractID: ObjectId,
@@ -55,8 +57,10 @@ router.post('/', validate, async function(req, res, next) {
             return next(new ParamError(`contract ${req.body.contractId} doesn't exist`));
         }
 
-        // Update the status of contract is no outstanding
-        let status = contractItem.received + payment.amount < contractItem.total - contractItem.discount ? "outstanding" : "paid";
+        // Update the status of contract is no outstanding, e.g. 
+        // 0.3 < 0.1 + 0.2 ===> true
+        // 0.3 < 0.1 + 0.2 + EPSILON ===> false
+        let status = contractItem.received + payment.amount + EPSILON < contractItem.total - contractItem.discount - EPSILON ? "outstanding" : "paid";
 
         let updatedContractItem = await contracts.findOneAndUpdate({
             _id: payment.contractId,
@@ -231,7 +235,7 @@ router.delete('/:paymentID', helper.requireRole("admin"), async function(req, re
         }
 
         // Update the status of contract is no outstanding
-        let status = contractItem.received - payment.amount < contractItem.total - contractItem.discount ? "outstanding" : "paid";
+        let status = contractItem.received - payment.amount + EPSILON < contractItem.total - contractItem.discount - EPSILON ? "outstanding" : "paid";
         let updatedContractItem = await contracts.findOneAndUpdate({
             _id: payment.contractId,
             status: contractItem.status,
