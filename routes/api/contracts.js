@@ -8,6 +8,8 @@ const { isEqual } = require('./lib/util');
 const moment = require('moment');
 const { SchemaValidator } = require("./lib/schema_validator");
 
+const EPSILON = 2e-10;
+
 const ContractSchema = new SchemaValidator({
     serialNo: String,
     status: {
@@ -304,6 +306,20 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
         if (isFromLegacyMembership(doc) && newValueSet.hasOwnProperty("total")) {
             // the legacy contract is always paid
             newValueSet.received = newValueSet.total;
+        }
+
+        // update the contract status if total changed
+        if (newValueSet.hasOwnProperty("total")) {
+            if (isFromLegacyMembership(doc)) {
+                // the legacy contract is always paid
+                newValueSet.received = newValueSet.total;
+            }
+
+            if (newValueSet.total < EPSILON) {
+                newValueSet.status = "paid";
+            } else {
+                newValueSet.status = doc.received + doc.discount + EPSILON < newValueSet.total ? "outstanding" : "paid";
+            }
         }
 
         let result = await contracts.findOneAndUpdate({
