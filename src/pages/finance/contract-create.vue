@@ -74,13 +74,13 @@ div.container
           label.col-sm-4.col-md-3.control-label 课程单价:
           div.col-sm-6.col-md-5
             div.input-group
-              input.form-control(type="number" v-model.number="averageFee" min="1" step="1")
+              input.form-control(type="number" v-model.number="averageFee" min="0" step="1")
               span.input-group-addon 元
         div.form-group(:class="{ 'has-error': errors.total }")
           label.col-sm-4.col-md-3.control-label 课程金额:
           div.col-sm-6.col-md-5
             div.input-group
-              input.form-control(type="number" v-model.number="totalFee" min="1" step="1")
+              input.form-control(type="number" v-model.number="totalFee" min="0" step="1")
               span.input-group-addon 元
     div.col-sm-6
       form.form-horizontal
@@ -196,6 +196,8 @@ module.exports = {
         errors.memberId = "请选择学员";
       if (this.comment.length > 256)
         errors.comment = "备注不超过256个字";
+      if (this.comment.length < 1)
+        errors.comment = "备注不能为空";
       if (!this.product.id)
         errors.productId = "请选择课程";
       if (!moment(this.contract.effectiveDate).isValid())
