@@ -279,8 +279,8 @@ module.exports = {
         sortOrder: "desc",
         pageSize: 15,
         pageList: [15, 25, 50, 100],
-        pagination: true,
-        sidePagination: "server"
+        pagination: true
+        //sidePagination: "server"
       }
     }
   },
