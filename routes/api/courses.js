@@ -535,7 +535,7 @@ async function deductContracts(db, req, locals) {
                 continue
             }
 
-            console.log(`add booking successfuly to class ${c._id}`);
+            console.log(`add booking successfully to class ${c._id}`);
             // update booking for next check
             c.booking = result.value.booking;
         }

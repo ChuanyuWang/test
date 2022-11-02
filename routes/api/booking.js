@@ -141,7 +141,7 @@ router.post('/',
                 return next(new RuntimeError("class seems been deleted just before booking, but contract already been deduct!"));
             }
 
-            console.log(`add booking successfuly to class ${cls._id}`);
+            console.log(`add booking successfully to class ${cls._id}`);
             return res.json({
                 class: result.value,
                 member: member
