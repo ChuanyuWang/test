@@ -315,7 +315,7 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
                 newValueSet.received = newValueSet.total;
             }
 
-            if (newValueSet.total < EPSILON) {
+            if (newValueSet.total < EPSILON || isFromLegacyMembership(doc)) {
                 newValueSet.status = "paid";
             } else {
                 newValueSet.status = doc.received + doc.discount + EPSILON < newValueSet.total ? "outstanding" : "paid";
