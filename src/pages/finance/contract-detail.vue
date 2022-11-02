@@ -459,6 +459,9 @@ module.exports = {
         this.$refs.historySection.refresh();
         this.$refs.messager.showSuccessMessage("修改完成");
       });
+      request.fail((jqXHR, textStatus, errorThrown) => {
+        this.$refs.messager.showErrorMessage(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+      });
     },
     refresh() {
       if (this.contractId) {
