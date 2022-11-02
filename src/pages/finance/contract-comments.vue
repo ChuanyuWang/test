@@ -18,7 +18,7 @@ div
     div.col-sm-6
       form.form-horizontal
         div.form-group(:class="{ 'has-error': errors.comment }", :title="errors.comment")
-          label.control-label.col-sm-2 新备注:
+          label.control-label.col-sm-2(style="padding-right:0") 新备注:
           div.col-sm-10
             textarea.form-control.has-3-rows(rows="3" v-model.trim="comment" placeholder="合约备注, 添加后无法修改")
         div.form-group
