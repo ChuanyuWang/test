@@ -11,9 +11,10 @@ div.container
       span.label.label-danger.ms-3(style="font-size: 65%" v-if="isExpired") 已过期
       span.label.label-danger.ms-3(style="font-size: 65%" v-else-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
       span.label.label-success.ms-3(style="font-size: 65%" v-else) 已缴清
-    button.btn.btn-default(type="button" style="float: right" @click="notImplemented") 转课时
+    button.btn.btn-danger(type="button" style="float: right" @click="notImplemented") 删除
+    button.btn.btn-primary.me-3(type="button" style="float: right" @click="openModifyDialog") 修改
+    button.btn.btn-default.me-3(type="button" style="float: right" @click="notImplemented") 转课时
     button.btn.btn-default.me-3(type="button" style="float: right" @click="notImplemented") 退费
-    button.btn.btn-danger.me-3(type="button" style="float: right" @click="notImplemented") 删除
     button.btn.btn-primary.me-3(type="button" style="float: right" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
   div.row.form-condensed
     div.col-sm-4.col-xs-6
