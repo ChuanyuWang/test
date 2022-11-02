@@ -149,14 +149,14 @@ div.container
   div.page-header
     h3(style="display: inline-block") 消课记录
       a(name="classes-section")
-    button.btn.btn-default(type="button" @click="$refs.classesTable.refresh({url: '/api/classes'})" style="float: right; margin-top: 16px")
+    button.btn.btn-default(type="button" @click="showAndRefreshClassesSection" style="float: right; margin-top: 16px")
       span.glyphicon.glyphicon-refresh.me-3
       | 刷新
-  div.row(style="margin-bottom:20px")
+  div#classesSection.row(style="display:none")
     div.col-sm-12
       div#classesToolbar
       bootstrap-table.table-striped(ref="classesTable", :columns="classesTableColumns", :options="classesTableOptions")
-
+  div.row(style='height:20px')
   pay-dialog(ref="payDialog" buttons="confirm" @ok="pay", :outstandingFee="outstandingFee")
   modify-contract-dialog(ref="modifyDialog" @ok="modifyContract" :contract="contract")
   modal-dialog(ref="confirmDeletePaymentDialog" buttons="confirm" @ok="deletePayment") 删除缴费记录
@@ -471,6 +471,11 @@ module.exports = {
           this.contract = data || {};
         });
       }
+    },
+    showAndRefreshClassesSection(e) {
+      console.log(e);
+      $('#classesSection').show(600);
+      this.$refs.classesTable.refresh({ url: '/api/classes' });
     }
   },
   created() {
