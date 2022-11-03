@@ -10,19 +10,23 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
         label.col-sm-3.control-label 支付渠道:
         div.col-sm-8(style="height: 34px")
           label.radio-inline
-            input(type="radio" name="paymentType" value="wechat" disabled v-model="payment.type")
+            input(type="radio" name="paymentType" value="wechat" v-model="payment.type")
             | 微信支付
           label.radio-inline
             input(type="radio" name="paymentType" value="offline" v-model="payment.type")
             | 线下支付
-      div.form-group
+      div.form-group(v-if="payment.type=='wechat'")
+        div.col-sm-5.col-sm-offset-3
+          img.img-rounded.img-responsive(src="/img/demo-pay-QR-code.png")
+          span.help-block 请家长使用微信二维码进行付款
+      div.form-group(v-if="payment.type=='offline'")
         label.col-sm-3.control-label 支付方式:
         div.col-sm-5
           select.form-control(v-model="payment.method")
             option(value="cash") 现金
             option(value="bankcard") 银行卡
             option(value="mobilepayment") 移动支付
-      div.form-group(:class="{ 'has-error': errors.amount }")
+      div.form-group(v-if="payment.type=='offline'" :class="{ 'has-error': errors.amount }")
         label.col-sm-3.control-label 实收金额:
         div.col-sm-5
           div.input-group
@@ -30,15 +34,15 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
             span.input-group-addon 元
           span.help-block.ms-3.small(v-if="outstandingFee > payment.amount") 未缴费: {{ outstandingFee - payment.amount }}元
           span.help-block.ms-3.small(v-else) 已缴清
-      div.form-group(:class="{ 'has-error': errors.payDate }")
+      div.form-group(v-if="payment.type=='offline'" :class="{ 'has-error': errors.payDate }")
         label.col-sm-3.control-label 缴费日期:
         div.col-sm-5
           date-picker(v-model="payment.payDate")
-      div.form-group(:class="{ 'has-error': errors.comment }")
+      div.form-group(v-if="payment.type=='offline'" :class="{ 'has-error': errors.comment }")
         label.col-sm-3.control-label 缴费备注:
         div.col-sm-9
           textarea.form-control.has-3-rows(rows="3" placeholder="添加缴费备注" name="note" v-model.trim="payment.comment")
-          span.help-block.ms-3.small 最多256个字，缴费备注提交后无法修改
+          span.help-block.ms-3.small 最多256个字, 缴费备注提交后无法修改
 </template>
 
 <script>

@@ -1,10 +1,10 @@
 <template lang="pug">
 div
   div.row
-    div.col-xs-6
-      div.btn-group(role='group',style="margin:7px 0")
-        button.btn.btn-success(type='button',@click='beforeCreateType()') 添加
-      p.small.ms-3.mb-3 添加至少一种课程类型，用于创建对应的课程；开放预约的课程允许家长自助约课
+    div.col-xs-6.mt-7
+      div.btn-group.mb-7(role='group')
+        button.btn.btn-success(type='button',@click='beforeCreateType()') 添加课程
+      p.small.ms-3.mb-3 添加至少一种课程类型，用于创建对应的课程和套餐；开放预约的课程允许家长自助约课
       template(v-for='(type, index) in types')
         div.panel.panel-default(style="margin-bottom:7px")
           div.panel-heading {{type.name}} 
@@ -15,9 +15,19 @@ div
                 i.glyphicon.glyphicon-remove-circle.text-danger
             span.label.label-default(v-if="type.status === 'closed'") 已完结
             span.label.label-primary(v-else-if="type.visible === true") 开放预约
-    div.col-xs-6
-      ul.list-group
-        li.list-group-item(v-for='(product, index) in products') {{product.name}}
+    div.col-xs-6.mt-7
+      div.btn-group.mb-7(role='group')
+        button.btn.btn-success(type='button',@click='beforeCreateType()') 添加套餐
+      p.small.ms-3.mb-3 添加至少一种课程套餐，用于创建学员合约
+      template(v-for='(product, index) in products')
+        div.panel.panel-default.mb-7
+          div.panel-heading {{product.name}} 
+            div.btn-group.btn-group-xs.pull-right(role="group")
+              a.btn(role="button" @click='')
+                i.glyphicon.glyphicon-edit.text-primary
+              a.btn(role="button" @click='')
+                i.glyphicon.glyphicon-remove-circle.text-danger
+          div.panel-body.small {{product.description}} 
   modal-dialog(ref='createTypeDialog',buttons="confirm",@ok="createType()",:hasError="hasError") 创建课程
     template(v-slot:body)
       form.form-horizontal
@@ -86,7 +96,16 @@ module.exports = {
       visible: true,
       isEditing: false,
       types: [],
-      products: []
+      products: [{
+        name: "光影故事屋套餐A",
+        description: "课时卡 课程金额1980 含光影故事屋10课时, 赠送: 电影绘本2课时"
+      }, {
+        name: "光影故事屋套餐B",
+        description: "课时卡 课程金额3980 含光影故事屋20课时, 赠送: 电影绘本10课时"
+      }, {
+        name: "英文绘本套餐A",
+        description: "课时卡 课程金额4980 含英文角30课时, 赠送: 光影故事屋10课时"
+      }]
     };
   },
   components: {

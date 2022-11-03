@@ -59,29 +59,29 @@ div.container
     div.col-sm-6
       form.form-horizontal
         div.form-group(:class="{ 'has-error': errors.productId }")
-          label.col-sm-4.col-md-3.control-label 课程:
+          label.col-sm-4.col-md-3.control-label 套餐:
           div.col-sm-8.col-md-6
             div.input-group
-              input.form-control(type="text" readonly v-model="product.name")
+              input.form-control(type="text" v-model="product.name" readonly)
               span.input-group-btn
-                button.btn.btn-primary(type="button" @click="openTypeSelectDialog") 选择课程
+                button.btn.btn-primary(type="button" @click="openTypeSelectDialog") 选择套餐
         div.form-group(:class="{ 'has-error': errors.credit }")
           label.col-sm-4.col-md-3.control-label 课时数:
           div.col-sm-6.col-md-5
             div.input-group
-              input.form-control(type="number" v-model.number="contract.credit" min="1" step="1")
+              input.form-control(type="number" v-model.number="contract.credit" min="1" step="1" readonly)
               span.input-group-addon 课时
         div.form-group(:class="{ 'has-error': errors.averageFee }")
           label.col-sm-4.col-md-3.control-label 课程单价:
           div.col-sm-6.col-md-5
             div.input-group
-              input.form-control(type="number" v-model.number="averageFee" min="0" step="1")
+              input.form-control(type="number" v-model.number="averageFee" min="0" step="1" readonly)
               span.input-group-addon 元
         div.form-group(:class="{ 'has-error': errors.total }")
           label.col-sm-4.col-md-3.control-label 课程金额:
           div.col-sm-6.col-md-5
             div.input-group
-              input.form-control(type="number" v-model.number="totalFee" min="0" step="1")
+              input.form-control(type="number" v-model.number="totalFee" min="0" step="1" readonly)
               span.input-group-addon 元
     div.col-sm-6
       form.form-horizontal
@@ -134,7 +134,7 @@ module.exports = {
         id: "",
         name: "",
         contact: "",
-        status: "inactive"
+        status: ""
       },
       product: {
         id: "",
