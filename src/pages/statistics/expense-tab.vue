@@ -1,6 +1,6 @@
 <template lang="pug">
 div
-  div.row(style="margin-top:7px")
+  div.row(style="margin-top:15px")
     div.col-md-12
       div.d-flex.justify-content-end
         date-picker.me-7(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart" label="年份:" style="max-width:160px")
