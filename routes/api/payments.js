@@ -10,7 +10,7 @@ const EPSILON = 2e-10;
 
 /**
  * {
- *  contractID: ObjectId,
+ *  contractId: ObjectId,
  *  contractNo: String,
  *  memberId: ObjectId,
  *  type: "offline|wechat"
