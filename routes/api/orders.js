@@ -292,7 +292,7 @@ router.post('/:orderID/close', helper.requireRole("admin"), async function(req, 
             console.log(`Order ${doc.tradeno} is closed successfully`);
             return res.json(result.value);
         } else {
-            return next(new Error(`无法关闭订单${doc.tradeno}: ${closeResult.error_msg}`));
+            return next(new Error(`不能关闭订单${doc.tradeno}: ${closeResult.error_msg}`));
         }
     } catch (error) {
         let err = new Error("Close order fails");

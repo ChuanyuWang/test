@@ -205,7 +205,7 @@ router.delete('/:courseID', function(req, res, next) {
         }
 
         if (docs && docs.length > 0) {
-            var error = new Error(`无法删除班级，班级中包含已经预约的付费课程，请取消后再尝试删除`);
+            var error = new Error(`不能删除班级，班级中包含已经预约的付费课程，请取消后再尝试删除`);
             error.status = 400;
             return next(error);
         }

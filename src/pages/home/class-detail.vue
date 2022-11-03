@@ -130,7 +130,7 @@ div.container
       p 从当前课程中删除绘本《{{ slotProps.param.title }}》
   modal-dialog(ref='cancelReservationDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定取消学员预约吗？
     template(v-slot:body="slotProps")
-      p 取消会员的预约，并且返还扣除的课时，无法在课程开始后取消
+      p 取消会员的预约，并且返还扣除的课时，不能在课程开始后取消
   modal-dialog(ref='deleteCourseClassDlg' buttonStyle="danger" buttons="confirm" @ok="cancelReservation") 确定删除班级中的课程吗？
     template(v-slot:body="slotProps")
       p 课程<strong>{{cls.name}}</strong>是固定班的课程<br/>请先查看班级，并从班级管理界面中删除相关课程
