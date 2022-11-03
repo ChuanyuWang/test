@@ -470,12 +470,19 @@ async function deductContracts(db, req, locals) {
         const m = added_members[i];
 
         // sort result from old to new ['2022-9-29','2022-10-8']
-        let cursor = contracts.find({ memberId: m._id }, {
+        let cursor = contracts.find({
+            memberId: m._id,
+            status: "paid",
+            $or: [
+                { expireDate: { $gt: new Date() } },
+                { expireDate: null }
+            ]
+        }, {
             projection: { comments: 0, history: 0 },
             sort: [['effectiveDate', 1]]
         });
 
-        let all_contracts = await cursor.toArray();
+        let valid_contracts = await cursor.toArray();
 
         for (let j = 0; j < added_classes.length; j++) {
             const c = added_classes[j];
@@ -486,7 +493,7 @@ async function deductContracts(db, req, locals) {
                 continue;
             }
 
-            let contract2Deduct = findAvailableContract(c, all_contracts);
+            let contract2Deduct = findAvailableContract(c, valid_contracts);
             if (!contract2Deduct) {
                 errors.push(errorbuilder(m, c, "未购买课程或合约未生效"));
                 continue;

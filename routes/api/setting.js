@@ -370,7 +370,7 @@ function migrateFreeClass(room, database) {
 
 async function checkHasContractsOrClasses(db, req, locals) {
     let contracts = db.collection("contracts");
-    let doc = await contracts.findOne({ goods: req.params.typeId });
+    let doc = await contracts.findOne({ goods: req.params.typeId, status: { $ne: "deleted" } });
     if (doc) throw new RuntimeError("不能删除已产生合约的课程类型");
 
     let classes = db.collection("classes");

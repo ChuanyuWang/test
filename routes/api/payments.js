@@ -224,8 +224,8 @@ router.delete('/:paymentID', helper.requireRole("admin"), async function(req, re
         let contracts = tenantDB.collection("contracts");
 
         let contractItem = await contracts.findOne({
-            _id: payment.contractId
-            //status: { $in: ["outstanding", "paid"] }
+            _id: payment.contractId,
+            status: { $nin: ["closed", "deleted"] }
         }, { projection: { comments: 0 } });
 
         if (contractItem == null) {

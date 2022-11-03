@@ -109,7 +109,7 @@ router.post('/', validateContract, async function(req, res, next) {
         credit: req.body.credit,
         consumedCredit: 0,
         expendedCredit: req.body.expendedCredit || 0,
-        total: parseInt(req.body.total),
+        total: parseInt(req.body.total) || 0,
         discount: parseInt(req.body.discount) || 0,
         //receivable: parseInt(req.body.receivable), //not necessary
         received: 0,
@@ -193,6 +193,8 @@ router.get('/', async function(req, res, next) {
     let status = req.query.status || "";
     if (status) {
         query['status'] = status;
+    } else {
+        query['status'] = { $ne: "deleted" };
     }
 
     // query orders by member
@@ -285,7 +287,9 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
         let doc = await contracts.findOne({
-            _id: ObjectId(req.params.contractID)
+            _id: ObjectId(req.params.contractID),
+            // can't edit deleted and closed contract
+            status: { $in: ["open", "outstanding", "paid"] }
         }, { projection: NORMAL_FIELDS });
 
         if (!doc) {
@@ -351,6 +355,7 @@ router.delete('/:contractID', helper.requireRole("admin"), async function(req, r
             error.status = 400;
             return next(error);
         }
+        if (isFromLegacyMembership(doc)) return next(new BadRequestError("不能删除系统自动创建的合约"));
         let result = await contracts.deleteOne(query);
         // result.result is {"n":1,"ok":1}
         console.log(`Contract ${doc.tradeno} is deleted with result: %j`, result.result);

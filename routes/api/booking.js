@@ -359,7 +359,14 @@ async function findContract(db, req, locals) {
     let member = locals.member;
     let contracts = db.collection("contracts");
     // sort result from old to new ['2022-9-29','2022-10-8']
-    let cursor = contracts.find({ memberId: member._id }, {
+    let cursor = contracts.find({
+        memberId: member._id,
+        status: "paid",
+        $or: [
+            { expireDate: { $gt: new Date() } },
+            { expireDate: null }
+        ]
+    }, {
         projection: { comments: 0, history: 0 },
         sort: [['effectiveDate', 1]]
     });
