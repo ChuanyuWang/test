@@ -203,6 +203,10 @@ module.exports = {
           field: "cost",
           title: "课时"
         }, {
+          field: "booking",
+          title: "人数",
+          formatter: this.quantityFormatter
+        }, {
           field: "date",
           title: "课程日期",
           sortable: true,
@@ -424,6 +428,10 @@ module.exports = {
       } else {
         return '<span style="display:table-cell" class="text-muted glyphicon glyphicon-question-sign"></span>';
       }
+    },
+    quantityFormatter: function(value, row, index) {
+      var booking = this.getBooking(row && row.booking) || {};
+      return booking.quantity || 1;
     },
     flagFormatter: function(value, row, index) {
       var booking = this.getBooking(row && row.booking) || {};
