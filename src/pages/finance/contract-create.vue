@@ -134,7 +134,7 @@ module.exports = {
         id: "",
         name: "",
         contact: "",
-        status: "inactive"
+        status: ""
       },
       product: {
         id: "",
