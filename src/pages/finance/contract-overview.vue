@@ -13,6 +13,7 @@ div
           option(value="outstanding") 部分支付
           option(value="paid") 已支付
           option(value="closed") 完成
+          option(value="" disabled) ------
           option(value="deleted") 作废
       date-picker(v-model="from" placeholder="签约日期" style="width: 160px; margin-left: 4px")
       i.glyphicon.glyphicon-minus
