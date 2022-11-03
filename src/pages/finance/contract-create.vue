@@ -20,6 +20,7 @@ div.container
               input.form-control(type="text" readonly v-model="memberData.name")
               span.input-group-btn
                 button.btn.btn-primary(type="button" @click="openMemberSelectDialog") 选择学员
+            span.help-block.small(v-show="errors.memberId") {{errors.memberId}}
         div.form-group
           label.col-sm-4.col-md-3.control-label 联系方式:
           div.col-sm-8.col-md-9
@@ -132,7 +133,8 @@ module.exports = {
       memberData: {
         id: "",
         name: "",
-        contact: ""
+        contact: "",
+        status: "inactive"
       },
       product: {
         id: "",
@@ -194,6 +196,8 @@ module.exports = {
       var errors = {};
       if (!this.memberData.id)
         errors.memberId = "请选择学员";
+      if (this.memberData.status === "inactive")
+        errors.memberId = "过期学员不能创建合约";
       if (this.comment.length > 256)
         errors.comment = "备注不超过256个字";
       if (this.comment.length < 1)
@@ -242,6 +246,7 @@ module.exports = {
         this.memberData.id = member._id;
         this.memberData.name = member.name;
         this.memberData.contact = member.contact;
+        this.memberData.status = member.status;
       }
     },
     selectType(item) {
@@ -282,6 +287,7 @@ module.exports = {
           this.memberData.id = data._id;
           this.memberData.name = data.name;
           this.memberData.contact = data.contact;
+          this.memberData.status = data.status;
         }
       });
     }
