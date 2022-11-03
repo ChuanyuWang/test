@@ -61,9 +61,7 @@ var NORMAL_FIELDS = {
 
 router.post('/validate', async function(req, res, next) {
     if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("tenant is not defined"));
     }
 
     var query = {};
@@ -71,9 +69,7 @@ router.post('/validate', async function(req, res, next) {
         query['name'] = req.body.name;
         query['contact'] = req.body.contact;
     } else {
-        var err = new Error("Missing param 'name' or 'contact'");
-        err.status = 400;
-        return next(err);
+        return next(new ParamError("Missing param 'name' or 'contact'"));
     }
 
     try {
@@ -81,6 +77,21 @@ router.post('/validate', async function(req, res, next) {
         let members = tenantDB.collection("members");
         let doc = await members.findOne(query, { projection: NORMAL_FIELDS });
         console.log("validate member: %j", doc);
+
+        let contracts = tenantDB.collection("contracts");
+        if (doc) {
+            // return the valid contracts and the same time
+            let cursor = contracts.find({
+                memberId: doc._id,
+                status: "paid",
+                $or: [
+                    { expireDate: { $gt: new Date() } },
+                    { expireDate: null }
+                ]
+            }, { projection: { comments: 0, history: 0 } });
+            let validContracts = await cursor.toArray();
+            doc.contracts = validContracts;
+        }
         // return null if member doesn't exist
         res.json(doc);
     } catch (error) {

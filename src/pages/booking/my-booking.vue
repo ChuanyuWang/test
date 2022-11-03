@@ -22,7 +22,8 @@ div
         p.pull-left.col-xs-10 你好, 
           b {{user.name}}
           |小朋友<br>
-          small(style='color:#808080') 已预约课程共{{notStartedCredit}}课时，还有{{remainingCredit}}课时可用
+          small(style='color:#808080') 已预约课程共{{notStartedCredit}}课时
+          small(style='color:#808080' v-if="user.contracts.length > 0") , 未使用课时包括: {{remainingCredit}}
         div.col-xs-2(style='padding-right:9px')
           button.btn.btn-danger.btn-xs.pull-right(@click='logoff') 注销
       ul.nav.nav-tabs(role='tablist')
@@ -85,6 +86,7 @@ div
 
 var common = require("../../common/common");
 var class_service = require("../../services/classes");
+var serviceUtil = require("../../services/util");
 var modalDialog = require("../../components/modal-dialog.vue").default;
 
 module.exports = {
@@ -99,10 +101,12 @@ module.exports = {
         _id: 0,
         name: "",
         contact: "",
-        membership: []
+        membership: [],
+        contracts: []
       },
       tenantName: common.getTenantName(),
       tenantConfig: {},
+      types: [],
       loading: false,
       errorTitle: "",
       errorMessage: "",
@@ -115,16 +119,11 @@ module.exports = {
   },
   computed: {
     remainingCredit() {
-      var credit = 0;
-      //TODO, support multi membership card
-      if (this.user.membership && this.user.membership.length > 0) {
-        credit = this.user.membership[0].credit;
-      }
-      // A better way of 'toFixed(1)'
-      if (typeof (credit) == 'number') {
-        credit = Math.round(credit * 10) / 10;
-      }
-      return credit;
+      return this.user.contracts.map(value => {
+        var remaining = value.credit - value.expendedCredit - value.consumedCredit;
+        var typeName = this.getTypeName(value.goods);
+        return `${typeName}${remaining}课时`;
+      }).join(", ");
     },
     classesByDay() {
       var today = moment(0, "HH"); // today, 00:00:00.000
@@ -197,13 +196,7 @@ module.exports = {
         contact: this.contact
       };
 
-      var request = $.ajax("/api/members/validate", {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(userInfo),
-        dataType: "json"
-      });
-
+      var request = serviceUtil.postJSON("/api/members/validate", userInfo);
       request.done(function(data, textStatus, jqXHR) {
         if (!data) {
           // handle login fail
@@ -228,15 +221,15 @@ module.exports = {
           }
         }
       });
-      request.fail(function(jqXHR, textStatus, errorThrown) {
-        console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
-      });
     },
     logoff() {
       this.user._id = null;
       this.user.name = "";
       this.user.contact = "";
       this.items = [];
+    },
+    queryContracts() {
+
     },
     updateSchedule(showHistory) {
       var vm = this;
@@ -342,10 +335,17 @@ module.exports = {
         }
       }
       return value;
-    }
+    },
+    getTypeName(typeId) {
+      var item = this.types.find(value => {
+        return value.id === typeId;
+      });
+      return item && item.name || "未指定类型";
+    },
   },
   created: function() {
     this.tenantConfig = _getTenantConfig();
+    this.types = this.tenantConfig && this.tenantConfig.types || [];
     this.name = localStorage._name;
     this.contact = localStorage._contact;
   },
