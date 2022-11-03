@@ -620,6 +620,78 @@ router.get('/classexpense2', async function(req, res, next) {
     }
 });
 
+// analysis of remaining class sessions by type
+router.get('/remainingclasses', async function(req, res, next) {
+    try {
+        let pipelines = [{
+            $match: {
+                // array size >= 1
+                "booking.0": { $exists: true },
+                "date": { $gt: new Date() },
+                "cost": { $gt: 0 }
+            }
+        }, {
+            $project: {
+                type: 1,
+                cost: 1,
+                totalQuantity: {
+                    $sum: { $ifNull: ["$booking.quantity", 1] }
+                }
+            }
+        }, {
+            $group: {
+                _id: "$type", // group the cost by class type
+                total: {
+                    $sum: { $multiply: ["$cost", "$totalQuantity"] }
+                }
+            }
+        }];
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let classes = tenantDB.collection("classes");
+        let docs = await classes.aggregate(pipelines).toArray();
+
+        console.log("analyze remaining credit by type: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analyze remaining credit by type fails", error));
+    }
+});
+
+// analysis of remaining contracts by type
+router.get('/remainingcontracts', async function(req, res, next) {
+    try {
+        let pipelines = [{
+            $match: {
+                status: "paid",
+                $or: [
+                    { expireDate: { $gt: new Date() } },
+                    { expireDate: null }
+                ]
+            }
+        }, {
+            $project: {
+                goods: 1,
+                remaining: {
+                    $subtract: ["$credit", { $add: ["$consumedCredit", "$expendedCredit"] }]
+                }
+            }
+        }, {
+            $group: {
+                _id: "$goods", // group the cost by class type
+                total: { $sum: "$remaining" }
+            }
+        }];
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+        let docs = await contracts.aggregate(pipelines).toArray();
+
+        console.log("analyze remaining contracts by type: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analyze remaining contracts by type fails", error));
+    }
+});
+
 router.get('/incomingpayment', async function(req, res, next) {
     //[Default] get the current year consumption by month
     let year = (new Date()).getFullYear();

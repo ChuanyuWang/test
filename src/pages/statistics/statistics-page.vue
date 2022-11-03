@@ -29,7 +29,7 @@ div
     div.tab-pane(role="tabpanel",id="member")
       member-tab
     div.tab-pane(role="tabpanel",id="liabilities")
-      TBD
+      liabilities-tab(ref='liabilitiesChart')
 </template>
 
 <script>
@@ -44,6 +44,7 @@ var teacherTab = require("./teacher-tab.vue").default;
 var opportunityTab = require("./opportunity-tab.vue").default;
 var consumeTab = require("./consume-tab.vue").default;
 var expenseTab = require("./expense-tab.vue").default;
+var liabilitiesTab = require("./liabilities-tab.vue").default;
 var memberTab = require("./member-tab.vue").default;
 
 module.exports = {
@@ -59,6 +60,7 @@ module.exports = {
     "opportunity-tab": opportunityTab,
     "consume-tab": consumeTab,
     "expense-tab": expenseTab,
+    "liabilities-tab": liabilitiesTab,
     "member-tab": memberTab
   },
   computed: {},
@@ -86,6 +88,11 @@ module.exports = {
     // refresh the chart when user switch to teacher tab first time
     $(this.$el).find('a[href="#teacher"]').one('shown.bs.tab', function(e) {
       vm.$refs.teacherTab.refresh();
+    });
+
+    // refresh the chart when user switch to teacher tab first time
+    $(this.$el).find('a[href="#liabilities"]').one('shown.bs.tab', function(e) {
+      vm.$refs.liabilitiesChart.refresh();
     });
   }
 };
