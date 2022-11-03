@@ -12,6 +12,8 @@ div
     li(role='presentation')
       a(href="#member",role='tab',data-toggle='tab') 学员消课
     li(role='presentation')
+      a(href="#liabilities",role='tab',data-toggle='tab') 剩余课时
+    li(role='presentation')
       a(href="#analytics",role='tab',data-toggle='tab') 会员卡(旧)
   div.tab-content
     div.tab-pane.active(role="tabpanel",id="checkin")
@@ -26,6 +28,8 @@ div
       consume-tab(ref='consumeChart')
     div.tab-pane(role="tabpanel",id="member")
       member-tab
+    div.tab-pane(role="tabpanel",id="liabilities")
+      TBD
 </template>
 
 <script>
