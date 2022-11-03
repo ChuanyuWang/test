@@ -20,7 +20,7 @@ div.container
               input.form-control(type="text" readonly v-model="memberData.name")
               span.input-group-btn
                 button.btn.btn-primary(type="button" @click="openMemberSelectDialog") 选择学员
-            span.help-block.small(v-show="errors.memberId") {{errors.memberId}}
+            span.help-block.small.mb-3(v-show="errors.memberId") {{errors.memberId}}
         div.form-group
           label.col-sm-4.col-md-3.control-label 联系方式:
           div.col-sm-8.col-md-9
