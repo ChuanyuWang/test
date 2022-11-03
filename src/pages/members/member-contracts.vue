@@ -82,7 +82,7 @@ module.exports = {
     },
     contractLinkFormatter(value, row, index) {
       return [
-        ' <a href="../contract/' + row._id + '" target="_blank">',
+        `<a href="../contract/${row._id}">`,
         value,
         //'<i class="glyphicon glyphicon-search"></i>',
         '</a>',

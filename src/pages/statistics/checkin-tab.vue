@@ -141,15 +141,15 @@ module.exports = {
     },
     nameFormatter: function(value, row, index) {
       return [
-        '<a class="" target="_blank" href="./class/' + row._id + '">',
-        '  <i class="glyphicon glyphicon-calendar"/> ' + value,
+        `<a href="./class/${row._id}" target="_blank">`,
+        '<i class="glyphicon glyphicon-blackboard me-3"/>' + value,
         "</a>"
       ].join("");
     },
     memberFormatter: function(value, row, index) {
       return [
-        '<a class="" target="_blank" href="./member/' + row.member[0]._id + '">',
-        '  <i class="glyphicon glyphicon-user"/> ' + value,
+        '<a target="_blank" href="./member/' + row.member[0]._id + '">',
+        '<i class="glyphicon glyphicon-user me-3"/>' + value,
         "</a>"
       ].join("");
     },

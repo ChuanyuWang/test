@@ -118,8 +118,8 @@ module.exports = {
     nameFormatter: function(value, row, index) {
       var data = value && value[0];
       return [
-        '<a class="" target="_blank" href="./member/' + data._id + '">',
-        '  <i class="glyphicon glyphicon-user"/> ' + data.name,
+        `<a href="./member/${data._id}">`,
+        '<i class="glyphicon glyphicon-user me-3"/>' + data.name,
         "</a>"
       ].join("");
     },
@@ -146,4 +146,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>

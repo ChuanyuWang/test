@@ -140,18 +140,18 @@ module.exports = {
     },
     memberFormatter(value, row, index) {
       return [
+        `<a href="./member/${row.memberid}">`,
+        '<i class="glyphicon glyphicon-user me-3"/>',
         value,
-        ' <a href="./member/' + row.memberid + '" target="_blank">',
-        '<i class="glyphicon glyphicon-share-alt"></i>',
         '</a>'
       ].join('');
     },
     detailFormatter(value, row, index) {
       var goods = value && value.goods_detail || [];
       return [
+        `<a href="./class/${row.classid}">`,
+        '<i class="glyphicon glyphicon-blackboard me-3"/>',
         goods[0] && goods[0].goods_name,
-        ' <a href="./class/' + row.classid + '" target="_blank">',
-        '<i class="glyphicon glyphicon-share-alt"></i>',
         '</a>'
       ].join('');
     },

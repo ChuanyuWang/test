@@ -149,8 +149,8 @@ module.exports = {
     memberFormatter(value, row, index) {
       var members = row.member || [];
       return [
-        '<a href="./member/' + value + '" target="_blank">',
-        `<i class="glyphicon glyphicon-user"/> `,
+        `<a href="./member/${value}">`,
+        `<i class="glyphicon glyphicon-user me-3"/>`,
         members.length > 0 ? members[0].name : value,
         //'<i class="glyphicon glyphicon-search"></i>',
         '</a>'

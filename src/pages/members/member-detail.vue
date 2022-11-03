@@ -384,8 +384,8 @@ module.exports = {
     },
     linkNameFormatter: function(value, row, index) {
       return [
-        '<a href="../class/' + row._id + '" target="_blank">',
-        ' <i class="text-primary glyphicon glyphicon-calendar"></i>' + value,
+        `<a href="../class/${row._id}">`,
+        ' <i class="text-primary glyphicon glyphicon-blackboard me-3"></i>' + value,
         '</a>'
       ].join('');
     },

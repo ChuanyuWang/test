@@ -45,7 +45,7 @@ div.container
           li.list-group-item(v-for="member in memberList" :key='member.id')
             span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
             span.badge(style='background-color:#d9534f;cursor:pointer',@click='$refs.removeMemberDialog.show(member)') 移除
-            a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+            a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7') 查看
             | {{member.name}}
             div.small(style='color:#777') 学习进度
             div.participation-status.progress(style='margin-bottom:0px;display:flex',v-show='progressStatus[member.id].total')
@@ -80,11 +80,11 @@ div.container
             h4(style='margin: 3px 0') {{item.name}}
             small(style='position:absolute;right:15px;top:11px') {{item.cost}}课时
             p(style='margin: 3px 0', v-if='feature=="book"') 绘本: {{item.books | formatBooks}}
-            a(:href='"../class/" + item._id',style='margin-right:3px',target='_blank')
-              i.glyphicon.glyphicon-calendar
+            a(:href='"../class/" + item._id',style='margin-right:3px')
+              i.glyphicon.glyphicon-blackboard
             span.small {{item.date | formatDateTime}} - {{getClassroomName(item.classroom)}}
             span.badge(style='background-color:#d9534f;cursor:pointer',@click='$refs.removeClassDialog.show(item)') 删除
-            a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7',target='_blank') 查看
+            a.badge(:href='"../class/" + item._id',style='margin-right:3px;background-color:#337ab7') 查看
     div.col-sm-3.col-md-4.col-lg-5
       div
         small(style='color:#777') 共{{classesCount}}节

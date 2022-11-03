@@ -94,7 +94,7 @@ div.container
           div.col-xs-6.col-sm-7.col-md-8
             div.input-group
               p.form-control-static {{ memberData.name }}
-                a(:href="'../member/' + contract.memberId" target="_blank")
+                a(:href="'../member/' + contract.memberId")
                   i.glyphicon.glyphicon-search.ms-3
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 联系方式:
@@ -252,7 +252,7 @@ module.exports = {
         field: "name",
         title: "课程名称",
         formatter: (value, row) => {
-          return `<a href="../class/${row._id}" target="_blank">${value}<i class="glyphicon glyphicon-search ms-3"></i></a>`;
+          return `<a href="../class/${row._id}">${value}<i class="glyphicon glyphicon-search ms-3"></i></a>`;
         }
       }, {
         field: "cost",

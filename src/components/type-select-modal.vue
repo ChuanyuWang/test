@@ -1,7 +1,7 @@
 <template lang="pug">
 modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 选择课程
   template(v-slot:body)
-    a.btn.btn-sm.btn-success(href='../setting?activetab=types',target='_blank') 添加课程
+    a.btn.btn-sm.btn-success(href='../setting?activetab=types',target='_blank') 添加课程类型
     template(v-for='item in types')
       div.radio
         label

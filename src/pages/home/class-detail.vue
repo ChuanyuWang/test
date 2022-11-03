@@ -91,15 +91,19 @@ div.container
         ul.list-group(style='margin-bottom:0px')
           li.list-group-item(v-for="booking in bookings")
             div(style='display:flex')
-              span.glyphicon.glyphicon-ok.text-success(v-if='booking.status=="checkin"',style='margin-right:3px;font-size:large')
-              span.glyphicon.glyphicon-remove.text-danger(v-else-if='booking.status=="absent"',style='margin-right:3px;font-size:large')
-              span.glyphicon.glyphicon-question-sign.text-default(v-else,style='margin-right:3px;font-size:large')
-              div(style='flex-grow:2') {{booking.userName}} <small>({{booking.quantity}}人)</small>
-              button.btn.btn-danger.btn-xs(v-show='booking.status!=="absent"',type='button',style='margin-right:3px',@click='absent(booking.member)') 缺席
-              button.btn.btn-success.btn-xs(v-show='booking.status!=="checkin"',type='button',style='margin-right:3px',@click='checkin(booking.member)') 签到
-              a.btn.btn-xs.btn-primary(:href='"../member/" + booking.member',style='margin-right:3px',target='_blank') 查看
+              span.glyphicon.glyphicon-ok.text-success.me-3(v-if='booking.status=="checkin"',style='font-size:large')
+              span.glyphicon.glyphicon-remove.text-danger.me-3(v-else-if='booking.status=="absent"',style='font-size:large')
+              span.glyphicon.glyphicon-question-sign.text-default.me-3(v-else,style='font-size:large')
+              //div(style='flex-grow:2') {{booking.userName}} <small>({{booking.quantity}}人)</small>
+              a.ms-7(:href='"../member/" + booking.member') 
+                i.glyphicon.glyphicon-user.me-3
+                | {{booking.userName}}
+              div.flex-grow-1
+              button.btn.btn-danger.btn-xs.me-3(v-show='booking.status!=="absent"',type='button',@click='absent(booking.member)') 缺席
+              button.btn.btn-success.btn-xs.me-3(v-show='booking.status!=="checkin"',type='button',@click='checkin(booking.member)') 签到
+              //a.btn.btn-xs.btn-primary.me-3(:href='"../member/" + booking.member') 查看
               button.btn.btn-default.btn-xs(type='button',style='',@click='$refs.cancelReservationDlg.show(booking)') 取消
-            p.small(style='color:#777;margin:5px 3px 0px;text-align:right') 于{{booking.bookDate | formatDate}}预约
+            p.small(style='color:#777;margin:5px 3px 0px;text-align:right') 于{{booking.bookDate | formatDate}}预约 <small>({{booking.quantity}}人)</small>
         small(style='color:#777') 共{{membersCount}}人
   div.page-header(v-if='feature=="book"')
     h3 绘本
