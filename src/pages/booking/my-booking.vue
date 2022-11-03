@@ -341,7 +341,7 @@ module.exports = {
         return value.id === typeId;
       });
       return item && item.name || "未指定类型";
-    },
+    }
   },
   created: function() {
     this.tenantConfig = _getTenantConfig();

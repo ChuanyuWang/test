@@ -273,7 +273,7 @@ module.exports = {
       }, {
         field: "type",
         title: "课程类型",
-        formatter: this.goodsTypeFormatter
+        formatter: this.getTypeName
       }],
       classesTableOptions: {
         //toolbar: "#paymentToolbar",
@@ -344,20 +344,7 @@ module.exports = {
   },
   watch: {
     "contract.goods"(value, oldValue) {
-      var vm = this;
-      if (value) {
-        var request = serviceUtil.getJSON("/api/setting/types");
-        request.done(function(data, textStatus, jqXHR) {
-          vm.types = data || [];
-          for (let i = 0; i < vm.types.length; i++) {
-            var element = vm.types[i];
-            if (element.id === value) {
-              vm.productName = element.name;
-              break;
-            }
-          }
-        });
-      }
+      this.productName = this.getTypeName(value);
     },
     "contract.memberId"(value, oldValue) {
       var vm = this;
@@ -430,12 +417,6 @@ module.exports = {
         '</div>'
       ].join('');
     },
-    goodsTypeFormatter(value, row, index) {
-      var type = this.types.find(item => {
-        return item.id === value;
-      });
-      return type && type.name;
-    },
     confirmDeletePayment(e, value, row, index) {
       this.$refs.confirmDeletePaymentDialog.show(row._id);
     },
@@ -494,10 +475,17 @@ module.exports = {
         var errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
         this.$refs.messager.showErrorMessage(errorMsg);
       });
+    },
+    getTypeName(typeId) {
+      var item = this.types.find(value => {
+        return value.id === typeId;
+      });
+      return item && item.name || "<未设置>";
     }
   },
   created() {
     this.tenantConfig = _getTenantConfig();
+    this.types = this.tenantConfig && this.tenantConfig.types || [];
     this.refresh();
   },
   mounted() {
