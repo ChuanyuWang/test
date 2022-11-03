@@ -1,9 +1,9 @@
 <template lang="pug">
 div
   div#member_toolbar
-    form.form-inline
-      date-picker(v-model="targetYear", :config="datePickerConfig" @input="refresh", :label="$t('time')")
-      div.text-muted(style="display: inline-block; margin-left: 1rem") 统计学员每个月消费的课时数（单位：课时）
+    div.d-flex.align-items-center
+      date-picker(v-model="targetYear" :config="datePickerConfig" @input="refresh" label="年份:" style="width:170px")
+      div.text-muted(style="display: inline-block; margin-left: 1rem") 统计学员每个月完成的课时数（单位：课时）
   bootstrap-table.table-striped(ref="memberTable", :columns="columns", :options="options")
 </template>
 
