@@ -1,10 +1,9 @@
 <template lang="pug">
 div
   div#contracts_toolbar
-    div.form-inline(role="group")
-      div.btn-group(role="group" style="margin-right: 3px")
-        a.btn.btn-success(type="button" href="contract/create") 创建
-      div.input-group
+    div.d-flex.align-items-center.flex-wrap
+      a.btn.btn-success.btn-sm.me-3(type="button" href="contract/create") 创建
+      div.input-group.input-group-sm
         span.input-group-addon {{ $t('status') }}
         select.form-control(v-model="filter" @change="refresh")
           //"open|outstanding|paid|closed",
@@ -15,11 +14,11 @@ div
           option(value="closed") 完成
           option(value="" disabled) ------
           option(value="deleted") 作废
-      date-picker(v-model="from" placeholder="签约日期" style="width: 160px; margin-left: 4px")
+      date-picker.input-group-sm(v-model="from" placeholder="签约日期" style="width: 160px; margin-left: 4px")
       i.glyphicon.glyphicon-minus
-      date-picker(v-model="to" placeholder="结束" style="width: 160px", :class="{ 'has-error': errors.to }")
-      button.btn.btn-primary(type="button" style="margin-left: 4px" @click="refresh") 查询
-      button.btn.btn-default(type="button" style="margin-left: 4px" @click="clear") 清空
+      date-picker.input-group-sm(v-model="to" placeholder="结束" style="width: 160px", :class="{ 'has-error': errors.to }")
+      button.btn.btn-primary.btn-sm(type="button" style="margin-left: 4px" @click="refresh") 查询
+      button.btn.btn-default.btn-sm(type="button" style="margin-left: 4px" @click="clear") 清空
   bootstrap-table.table-striped(ref="contractTable", :columns="columns", :options="options")
   modal-dialog(ref="errorDialog" buttonStyle="danger") 出错了
     template(v-slot:body)
@@ -89,6 +88,7 @@ module.exports = {
       }],
       options: {
         toolbar: "#contracts_toolbar",
+        iconSize: "sm",
         locale: 'zh-CN',
         pagination: true,
         pageSize: 15,
