@@ -8,14 +8,16 @@ div.container
     li.active 查看合约
   div.page-header(style="margin-top: 15px")
     h3(style="margin-top: 0; display: inline-block") 合约状态
-      span.label.label-danger.ms-3(style="font-size: 65%" v-if="isExpired") 已过期
-      span.label.label-danger.ms-3(style="font-size: 65%" v-else-if="contract.status == 'open' || contract.status == 'outstanding'") 未缴清
-      span.label.label-success.ms-3(style="font-size: 65%" v-else) 已缴清
-    button.btn.btn-danger(type="button" style="float: right" @click="notImplemented") 删除
-    button.btn.btn-primary.me-3(type="button" style="float: right" @click="openModifyDialog") 修改
-    button.btn.btn-default.me-3(type="button" style="float: right" @click="notImplemented") 转课时
-    button.btn.btn-default.me-3(type="button" style="float: right" @click="notImplemented") 退费
-    button.btn.btn-primary.me-3(type="button" style="float: right" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
+      span.label.label-default.ms-3(style="font-size: 65%" v-if="contract.status == 'deleted'") 已作废
+      span.label.label-primary.ms-3(style="font-size: 65%" v-else-if="contract.status == 'closed'") 已完成
+      span.label.label-danger.ms-3(style="font-size: 65%" v-else-if="isExpired") 已过期
+      span.label.label-success.ms-3(style="font-size: 65%" v-else-if="contract.status == 'paid'") 已缴清
+      span.label.label-danger.ms-3(style="font-size: 65%" v-else) 未缴清
+    button.btn.btn-danger.pull-right(type="button" v-show="contract.status !== 'deleted'" @click="$refs.confirmDeleteDialog.show()") 删除
+    button.btn.btn-primary.pull-right.me-3(type="button" @click="openModifyDialog") 修改
+    button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 转课时
+    button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 退费
+    button.btn.btn-primary.pull-right.me-3(type="button" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
   div.row.form-condensed
     div.col-sm-4.col-xs-6
       form.form-horizontal
@@ -161,8 +163,13 @@ div.container
   modify-contract-dialog(ref="modifyDialog" @ok="modifyContract" :contract="contract")
   modal-dialog(ref="confirmDeletePaymentDialog" buttons="confirm" @ok="deletePayment") 删除缴费记录
     template(v-slot:body)
-      p 确认删除并撤销缴费吗？
+      p 确认删除并撤销缴费吗?
       p.small (撤销后合约的实收金额和欠费金额会发生变动)
+  modal-dialog(ref="confirmDeleteDialog" buttons="confirm" @ok="deleteContract") 删除合约
+    template(v-slot:body)
+      p 确认删除并作废合约吗?
+      p.small <b>注意: 删除操作无法恢复</b>, 删除后合约的状态变为作废
+      p.small (不能删除已缴费或已预课的合约)
   message-alert(ref="messager")
 </template>
 <script>
@@ -476,6 +483,17 @@ module.exports = {
       console.log(e);
       $('#classesSection').show(600);
       this.$refs.classesTable.refresh({ url: '/api/classes' });
+    },
+    deleteContract() {
+      var request = serviceUtil.deleteJSON("/api/contracts/" + this.contractId);
+      request.done((data, textStatus, jqXHR) => {
+        this.contract = data || {};
+        this.$refs.messager.showSuccessMessage("合约已经作废");
+      });
+      request.fail((jqXHR, textStatus, errorThrown) => {
+        var errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        this.$refs.messager.showErrorMessage(errorMsg);
+      });
     }
   },
   created() {

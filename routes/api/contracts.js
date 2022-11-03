@@ -283,6 +283,8 @@ router.get('/:contractID', async function(req, res, next) {
 
 router.patch('/:contractID', helper.requireRole("admin"), async function(req, res, next) {
     try {
+        if (!ObjectId.isValid(req.params.contractID)) return next(new BadRequestError(`contract ID ${req.params.contractID} is invalid`));
+
         //TODO, validate content body
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
@@ -293,7 +295,7 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
         }, { projection: NORMAL_FIELDS });
 
         if (!doc) {
-            return next(new ParamError("contract doesn't exist"));
+            return next(new ParamError("不能修改已经完成或作废的合约"));
         }
 
         let remark = req.body.comment || "";
@@ -343,23 +345,40 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
 });
 
 router.delete('/:contractID', helper.requireRole("admin"), async function(req, res, next) {
-    //TODO, only contract without payments or classes can be deleted.
     try {
+        if (!ObjectId.isValid(req.params.contractID)) return next(new BadRequestError(`contract ID ${req.params.contractID} is invalid`));
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
         // only open status could be deleted
-        let query = { _id: ObjectId(req.params.contractID), status: "open" };
+        let query = {
+            _id: ObjectId(req.params.contractID),
+            status: { $in: ["open", "outstanding", "paid"] }
+        };
         let doc = await contracts.findOne(query);
-        if (!doc) {
-            let error = new Error(`Contract doesn't exist or status is not "open"`);
-            error.status = 400;
-            return next(error);
-        }
+
+        if (!doc) return next(new BadRequestError("合约不存或已经完成"));
         if (isFromLegacyMembership(doc)) return next(new BadRequestError("不能删除系统自动创建的合约"));
-        let result = await contracts.deleteOne(query);
-        // result.result is {"n":1,"ok":1}
-        console.log(`Contract ${doc.tradeno} is deleted with result: %j`, result.result);
-        return res.json(result.result);
+
+        // only contract without payments or classes can be deleted.
+        let payments = tenantDB.collection("payments");
+        let p = await payments.findOne({ contractId: doc._id });
+        if (p) return next(new BadRequestError("不能删除已经缴费的合约"));
+
+        let classes = tenantDB.collection("classes");
+        let c = await classes.findOne({ "booking.contract": doc._id });
+        if (c) return next(new BadRequestError("不能删除已经预课的合约"));
+
+        let result = await contracts.findOneAndUpdate({
+            _id: doc._id,
+        }, {
+            $set: { status: "deleted" }
+        }, {
+            projection: NORMAL_FIELDS,
+            returnDocument: "after"
+        });
+
+        console.log(`Contract ${doc.tradeno} is deleted with result: %j`, result.lastErrorObject);
+        return res.json(result.value);
     } catch (error) {
         let err = new Error("Delete contract fails");
         err.innerError = error;
