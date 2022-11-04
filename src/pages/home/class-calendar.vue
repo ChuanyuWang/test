@@ -1,13 +1,14 @@
 <template lang="pug">
 div
   h5.visible-print-block 教室: {{classroomName}}
-  div.form-inline.hidden-print(role="group",style='margin:10px 0')
-    div.btn-group
+  div.d-flex.hidden-print.align-items-center(style='margin:10px 0')
+    div.btn-group.me-3
       button.btn.btn-primary(@click='previousWeek') {{$t('previous_week')}}
       button.btn.btn-primary(@click='thisWeek') {{$t('this_week')}}
       button.btn.btn-primary(@click='nextWeek') {{$t('next_week')}}
-    date-picker(v-model='date',style='margin-left:4px')
-    div.input-group.pull-right
+    date-picker(v-model='date',style="width:165px")
+    div.flex-grow-1
+    div.input-group
       span.input-group-addon 教室: 
       select.form-control(v-model='classroom',@change="updateSchedule")
         option(v-for='r in classrooms',:value='r.id') {{r.name}}
