@@ -366,7 +366,7 @@ router.delete('/:contractID', helper.requireRole("admin"), async function(req, r
 
         let classes = tenantDB.collection("classes");
         let c = await classes.findOne({ "booking.contract": doc._id });
-        if (c) return next(new BadRequestError("不能删除已经预课的合约"));
+        if (c) return next(new BadRequestError("不能删除已经约课的合约"));
 
         let result = await contracts.findOneAndUpdate({
             _id: doc._id,

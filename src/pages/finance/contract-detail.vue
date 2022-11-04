@@ -169,7 +169,7 @@ div.container
     template(v-slot:body)
       p 确认删除并作废合约吗?
       p.small <b>注意: 删除操作无法恢复</b>, 删除后合约的状态变为作废
-      p.small (不能删除已缴费或已预课的合约)
+      p.small (不能删除已缴费或已约课的合约)
   message-alert(ref="messager")
 </template>
 <script>
