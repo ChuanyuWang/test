@@ -118,8 +118,9 @@ module.exports = {
     },
     buildProgressBar(consume, total, symbol) {
       var remaining = total - consume;
-      if (symbol === "￥") remaining = Math.round(remaining * 100) / 100;
-      else remaining = Math.round(remaining * 10) / 10;
+      if (symbol === "￥") remaining = this.$toFixed2(remaining);
+      else remaining = this.$toFixed1(remaining);
+
       var percent = total == 0 ? 0 : consume / total;
       percent = Math.round(percent * 100);
       return [

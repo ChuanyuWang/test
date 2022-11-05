@@ -4,7 +4,8 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('../../locales/i18nextplugin');
+var i18nextPlugin = require('../../locales/i18nextplugin');
+var formatPlugin = require('../../common/format');
 var memberDetail = require('./member-detail.vue').default;
 
 // DOM Ready =============================================================
@@ -23,5 +24,6 @@ function init() {
     console.log("init view member ~~~");
     moment.locale('zh-CN');
     //bootbox.setLocale('zh_CN');
-    Vue.use(i18nextplugin);
+    Vue.use(i18nextPlugin);
+    Vue.use(formatPlugin);
 }
