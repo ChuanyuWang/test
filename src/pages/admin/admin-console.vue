@@ -1,6 +1,6 @@
 <template lang="pug">
-div
-  div.panel.col-sm-3(style='padding-top:15px',@add='addUnsaveOne')
+div.row(style="margin-top:15px")
+  div.panel.col-sm-3(style='padding-right:0;max-height:100vh',@add='addUnsaveOne')
     template(v-for='(tenant, index) in tenants')
       div.media.tenant-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-tenant" : ""]')
         div.media-left
@@ -12,7 +12,7 @@ div
     div(style='display:flex')
       button.btn.btn-default(v-on:click='addUnsaveOne()',style='margin:3px auto;border:none;color:#555',title='create tenant')
         span.glyphicon.glyphicon-plus
-  div.col-sm-9(style='padding-top:15px')
+  div.col-sm-9(style='padding-left:0')
     div.detail-tenant-border(style='min-height:300px')
       form.form-horizontal(v-show='hasData')
         div.form-group
@@ -329,9 +329,10 @@ module.exports = {
 
 <style lang='less'>
 .selected-tenant {
-  border-right: 2px solid #337ab7;
+  border-right: 4px solid #337ab7;
   color: #337ab7;
 }
+
 .tenant-list-item:hover {
   background-color: aliceblue;
   cursor: pointer;
