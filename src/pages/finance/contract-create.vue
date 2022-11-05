@@ -97,7 +97,7 @@ div.container
           label.col-sm-4.col-md-3.control-label 折扣直减:
           div.col-sm-7.col-md-5
             div.input-group
-              input.form-control(type="number" v-model.number="discountFee" min="1" step="1")
+              input.form-control(type="number" v-model.number="discountFee" min="0" step="1")
               span.input-group-addon 元
         div.form-group
           label.col-sm-4.col-md-3.control-label 应收金额:

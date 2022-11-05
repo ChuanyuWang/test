@@ -31,13 +31,13 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
         label.col-sm-3.control-label 课程金额:
         div.col-sm-5
           div.input-group
-            input.form-control(type="number" v-model.number="totalFee" min="1" step="1")
+            input.form-control(type="number" v-model.number="totalFee" min="0" step="1")
             span.input-group-addon 元
       div.form-group(:class="{ 'has-error': errors.discount }")
         label.col-sm-3.control-label 折扣直减:
         div.col-sm-5
           div.input-group
-            input.form-control(type="number" v-model.number="discount" min="1" step="1")
+            input.form-control(type="number" v-model.number="discount" min="0" step="1")
             span.input-group-addon 元
       div.form-group(:class="{ 'has-error': errors.comment }")
         label.col-sm-3.control-label 合约备注:
