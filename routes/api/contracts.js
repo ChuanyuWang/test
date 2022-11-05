@@ -23,7 +23,7 @@ const ContractSchema = new SchemaValidator({
         },
         editable: true
     },
-    goods: String,
+    goods: { type: String, required: true },
     goods_type: {
         validator: value => {
             return ["type", "package"].includes(value);

@@ -5,7 +5,7 @@ const { SchemaValidator } = require("../routes/api/lib/schema_validator");
 //enable assertion styles, include Assert, Expect and Should
 const assert = chai.assert;
 const expect = chai.expect;
-const should = chai.should(); //actually enable should style assertions
+chai.should(); //actually enable should style assertions
 
 const ContractSchema = new SchemaValidator({
     status: {
@@ -26,14 +26,37 @@ const ContractSchema = new SchemaValidator({
     comments: Array
 });
 
-describe('Signature Utility', function() {
+describe('Schema Validator', function() {
     before(async function() {
         // runs once before the first test in this block
-
+        assert.typeOf(ContractSchema, "Object");
     });
 
     after(async function() {
 
+    });
+
+    it('should verify number type', async function() {
+        let schema = new SchemaValidator({ field1: Number });
+        schema.createVerify({ field1: "0" }).should.equal(false);
+        schema.createVerify({ field1: 2 }).should.equal(true);
+        schema.createVerify({ field1: NaN }).should.equal(true);
+    });
+
+    it('should verify String type', async function() {
+        let schema = new SchemaValidator({ field1: String });
+        schema.createVerify({ field1: 0 }).should.equal(false);
+        schema.createVerify({ field1: true }).should.equal(false);
+        schema.createVerify({ field1: "false" }).should.equal(true);
+        schema.createVerify({ field1: [] }).should.equal(false);
+    });
+
+    it('should verify boolean type', async function() {
+        let schema = new SchemaValidator({ field1: Boolean });
+        schema.createVerify({ field1: "true" }).should.equal(false);
+        schema.createVerify({ field1: true }).should.equal(true);
+        schema.createVerify({ field1: "false" }).should.equal(false);
+        schema.createVerify({ field1: "F" }).should.equal(false);
     });
 
     it('should pass verify creating', async function() {
