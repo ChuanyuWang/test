@@ -59,6 +59,12 @@ describe('Schema Validator', function() {
         schema.createVerify({ field1: "F" }).should.equal(false);
     });
 
+    it('should verify Date type', async function() {
+        let schema = new SchemaValidator({ field1: Date });
+        schema.createVerify({ field1: null }).should.equal(true);
+        schema.createVerify({ field1: new Date() }).should.equal(true);
+    });
+
     it('should pass verify creating', async function() {
         let body = {
             "type": "new",
@@ -101,5 +107,13 @@ describe('Schema Validator', function() {
         };
         let result = ContractSchema.createVerify(body);
         expect(result).to.equal(false);
+    });
+
+    it('should modify editable fields', async function() {
+        let schema = new SchemaValidator({ field1: Boolean, field2: { type: Number, editable: true } });
+        schema.modifyVerify({ field1: "true" }).should.equal(false);
+        schema.modifyVerify({ field2: 1 }).should.equal(true);
+        schema.modifyVerify({ field2: "false" }).should.equal(false);
+        schema.modifyVerify({ field1: true, field2: 0 }).should.equal(false);
     });
 });

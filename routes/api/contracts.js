@@ -285,7 +285,16 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
     try {
         if (!ObjectId.isValid(req.params.contractID)) return next(new BadRequestError(`contract ID ${req.params.contractID} is invalid`));
 
+        let remark = req.body.comment || "";
+        if (remark.length === 0) return next(new BadRequestError(`缺少合约修改备注`));
+        // remove comment before further proceed
+        delete req.body.comment;
+
         //TODO, validate content body
+        if (!ContractSchema.modifyVerify(req.body)) {
+            return next(new BadRequestError("Fail to update contract due to bad request body"));
+        }
+
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
         let doc = await contracts.findOne({
@@ -298,9 +307,6 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
             return next(new ParamError("不能修改已经完成或作废的合约"));
         }
 
-        let remark = req.body.comment || "";
-        // remove comment before further proceed
-        delete req.body.comment;
         let newValueSet = getUpdatedValueSet(doc, req.body);
         if (Object.keys(newValueSet).length === 0) {
             // return the original document if nothing changed

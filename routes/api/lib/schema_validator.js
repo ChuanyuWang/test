@@ -7,6 +7,28 @@ class SchemaValidator {
         this.options = options || {};
     }
 
+    modifyVerify(body) {
+        // body is empty, return false
+        if (!body || Array.isArray(body)) return false;
+
+        for (const key in body) {
+            if (body.hasOwnProperty.call(body, key)) {
+                if (!this.isEditable(key)) {
+                    console.error(`${key} is not editable`);
+                    return false;
+                }
+
+                const element = body[key];
+                if (!this.isValid(key, element)) {
+                    console.error(`${key} is not valid`);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     createVerify(body) {
         // body is empty, return false
         if (!body || Array.isArray(body)) return false;
@@ -24,6 +46,12 @@ class SchemaValidator {
             }
         });
         return result === undefined;
+    }
+
+    isValid(key, value) {
+        let definition = this.obj[key];
+        if (!definition) return false;
+        else return this.checkType(definition, value);
     }
 
     checkType(definition, value) {
@@ -51,7 +79,7 @@ class SchemaValidator {
             case Object:
                 return typeof value === "object";
             case Date:
-                return !isNaN(Date.parse(value));
+                return value === null ? true : !isNaN(Date.parse(value));
             case ObjectId:
                 return ObjectId.isValid(value);
             default:
@@ -64,6 +92,14 @@ class SchemaValidator {
         if (typeof definition === "function") return false;
         else if (definition.required === true) return true;
         else return false;
+    }
+
+    isEditable(key) {
+        if (this.obj.hasOwnProperty(key)) {
+            let definition = this.obj[key];
+            if (definition.editable === true) return true;
+        }
+        return false;
     }
 }
 
