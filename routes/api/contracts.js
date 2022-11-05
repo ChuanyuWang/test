@@ -39,7 +39,7 @@ const ContractSchema = new SchemaValidator({
     total: { type: Number, required: true, editable: true },
     consumedCredit: Number,
     expendedCredit: Number,
-    discount: Number,
+    discount: { type: Number, editable: true },
     received: Number,
     createDate: { type: Date, required: true },
     effectiveDate: { type: Date, required: true, editable: true },

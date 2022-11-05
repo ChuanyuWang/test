@@ -33,6 +33,12 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
           div.input-group
             input.form-control(type="number" v-model.number="totalFee" min="1" step="1")
             span.input-group-addon 元
+      div.form-group(:class="{ 'has-error': errors.discount }")
+        label.col-sm-3.control-label 折扣直减:
+        div.col-sm-5
+          div.input-group
+            input.form-control(type="number" v-model.number="discount" min="1" step="1")
+            span.input-group-addon 元
       div.form-group(:class="{ 'has-error': errors.comment }")
         label.col-sm-3.control-label 合约备注:
         div.col-sm-9
@@ -77,6 +83,14 @@ module.exports = {
       },
       set(newValue) {
         this.item.total = Math.round(newValue * 100);
+      }
+    },
+    discount: {
+      get() {
+        return Math.round(this.item.discount) / 100;
+      },
+      set(newValue) {
+        this.item.discount = Math.round(newValue * 100);
       }
     },
     errors() {

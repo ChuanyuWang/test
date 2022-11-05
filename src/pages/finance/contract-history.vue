@@ -31,6 +31,9 @@ module.exports = {
         total: (o, n) => {
           return "课程金额由 <del>" + o / 100 + "</del> 更新为 <strong>" + n / 100 + "</strong>元";
         },
+        discount: (o, n) => {
+          return "折扣直减由 <del>" + o / 100 + "</del> 更新为 <strong>" + n / 100 + "</strong>元";
+        },
         credit: (o, n) => {
           return "合约课时由 <del>" + o + "</del> 更新为 <strong>" + n + "</strong>课时";
         },
