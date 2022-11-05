@@ -1,13 +1,13 @@
 <template lang="pug">
 modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 选择课程
   template(v-slot:body)
-    a.btn.btn-sm.btn-success(href='../setting?activetab=types',target='_blank') 添加课程类型
+    a.btn.btn-sm.btn-success.mb-7(href='../setting?activetab=types',target='_blank') 添加课程类型
     template(v-for='item in types')
       div.radio
         label
           input(type="radio",name="typeOptions",:value="item.id",v-model="selectedTypeId")
           |{{item.name}} 
-          span.label.label-primary(v-show="item.visible!==false") 开放预约
+          span.label.label-primary(v-show="item.visible!==false" style="opacity:0.8") 开放预约
 </template>
 
 <script>
