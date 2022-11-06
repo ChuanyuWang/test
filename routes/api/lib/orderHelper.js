@@ -86,7 +86,7 @@ function getRemaining(cls) {
     var booking = cls.booking || [];
     var reservation = 0
     booking.forEach(function(val, index, array) {
-        reservation += (val.quantity || 0);
+        reservation += (val.quantity || 1);
     })
     return cls.capacity - reservation;
 }

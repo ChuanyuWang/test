@@ -25,7 +25,7 @@ function validate(member, cls, quantity, error) {
     var booking = cls.booking || [];
     var reservation = 0, remaining = 0;
     booking.forEach(function(val, index, array) {
-        reservation += (val.quantity || 0);
+        reservation += (val.quantity || 1);
     })
     remaining = cls.capacity - reservation;
     if (remaining < quantity) {

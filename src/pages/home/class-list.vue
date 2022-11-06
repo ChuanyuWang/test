@@ -53,7 +53,7 @@ module.exports = {
           var reservation = 0;
           booking.forEach(function(val, index, array) {
             if (val.status === 'absent') return;
-            reservation += (val.quantity || 0);
+            reservation += (val.quantity || 1);
           });
           return reservation;
         }
@@ -75,6 +75,7 @@ module.exports = {
   padding: 8px;
   display: flex;
   flex-direction: column;
+
   p:hover {
     text-decoration: underline;
   }

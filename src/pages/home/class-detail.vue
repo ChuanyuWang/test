@@ -212,7 +212,7 @@ module.exports = {
       var count = 0;
       var all = this.bookings || [];
       all.forEach(function(value, index, array) {
-        count += value.quantity || 0;
+        count += value.quantity || 1;
       });
       return count;
     },

@@ -119,7 +119,7 @@ module.exports = {
             else {
                 var reservation = 0;
                 booking.forEach(function(val, index, array) {
-                    reservation += (val.quantity || 0);
+                    reservation += (val.quantity || 1);
                 });
                 return (cItem.capacity || 0) - reservation;
             }
