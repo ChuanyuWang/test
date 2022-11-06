@@ -262,7 +262,7 @@ module.exports = {
         field: "name",
         title: "课程名称",
         formatter: (value, row) => {
-          return `<a href="../class/${row._id}">${value}<i class="glyphicon glyphicon-search ms-3"></i></a>`;
+          return `<a href="../class/${row._id}"><i class="glyphicon glyphicon-blackboard me-3"/>${value}</a>`;
         }
       }, {
         field: "cost",
