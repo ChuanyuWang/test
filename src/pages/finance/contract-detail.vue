@@ -95,9 +95,10 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 学员:
           div.col-xs-6.col-sm-7.col-md-8
             div.input-group
-              p.form-control-static {{ memberData.name }}
+              p.form-control-static
                 a(:href="'../member/' + contract.memberId")
-                  i.glyphicon.glyphicon-search.ms-3
+                  i.glyphicon.glyphicon-user.me-3
+                  | {{ memberData.name }}
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 联系方式:
           div.col-xs-6.col-sm-7.col-md-8
