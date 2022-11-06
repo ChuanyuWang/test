@@ -1,6 +1,6 @@
 <template lang="pug">
 div.row(style="margin-top:15px")
-  div.panel.col-sm-3(style='padding-right:0;max-height:100vh',@add='addUnsaveOne')
+  div.panel.col-sm-3(style='padding-right:0;max-height:80vh;overflow:auto',@add='addUnsaveOne')
     template(v-for='(tenant, index) in tenants')
       div.media.tenant-list-item(@click='setSelectedIndex(index)',:class='[index === selectedIndex ? "selected-tenant" : ""]')
         div.media-left
