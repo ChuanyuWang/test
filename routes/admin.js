@@ -6,7 +6,7 @@ const { ParamError, InternalServerError, BaseError } = require("./api/lib/basis"
 var mongojs = require('mongojs');
 const { createDefaultClassType, setDefaultTypeForNotStartedClasses, createtDefaultContracts } = require("../server/upgradeFiveUtil");
 
-var VERSION = 5; // current tenant version
+var VERSION = 6; // current tenant version
 var config_db = null;
 // initialize the 'config' database for admin router
 router.use(async function(req, res, next) {
