@@ -1,6 +1,6 @@
 <template lang="pug">
 div.row
-  teach-list.panel.col-sm-3(:data='data',style='padding-top:15px',@selectedChange='selectionChangedListener',@add='addUnsaveOne',ref='teachList')
+  teach-list.col-sm-3(:data='data',style='padding-top:15px',@selectedChange='selectionChangedListener',@add='addUnsaveOne',ref='teachList')
   teach-detail.col-sm-9(:data='selectedTeacher',style='padding-top:15px',@update='saveChange',@create='addTeacher',@delete='removeTeacher')
 </template>
 
@@ -88,4 +88,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
