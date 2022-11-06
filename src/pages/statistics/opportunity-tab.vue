@@ -22,6 +22,7 @@ module.exports = {
         {
           field: "status",
           formatter: this.statusFormatter,
+          align: "center",
           events: { "click .phone": this.changePhone }
         }, {
           field: "name",
@@ -123,4 +124,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
