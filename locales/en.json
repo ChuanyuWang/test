@@ -11,5 +11,8 @@
     "settings": "Settings",
     "view_session": "View Session",
     "view_member": "View Member",
-    "orders": "Orders"
+    "orders": "Orders",
+    "constracts": "Contracts",
+    "constracts_create": "Create Contract",
+    "view_contract": "View Contract"
 }
