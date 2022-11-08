@@ -72,7 +72,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{remainingCredit}}课时
+            p.form-control-static {{contract.actualRemaining | toFixed1}}课时
               a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时=排+余; 是指可用课时和已经排课但尚未开始的课时")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
