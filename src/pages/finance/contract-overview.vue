@@ -104,6 +104,7 @@ module.exports = {
         //url: "/api/contracts",
         uniqueId: "_id",
         sidePagination: "server",
+        silentSort: false,
         search: false,
         showRefresh: true,
         sortName: "signDate",
