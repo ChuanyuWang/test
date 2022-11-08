@@ -18,6 +18,15 @@ div.container
     button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 转课时
     button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 退费
     button.btn.btn-primary.pull-right.me-3(type="button" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
+  div.row
+    div.col-xs-12.col-sm-6.col-sm-offset-3.col-md-4.col-md-offset-4.mb-7
+      div.progress(style="margin:0;height:10px")
+        div.progress-bar.progress-bar-primary(:style="consumedWidth")
+        div.progress-bar.progress-bar-success(:style="plannedWidth")
+      div.d-flex(style="justify-content:space-between")
+        span.text-primary 消{{contract.credit - contract.actualRemaining | toFixed1}}
+        span.text-success 排{{contract.actualRemaining - remainingCredit | toFixed1}}
+        span.text-muted 余{{remainingCredit | toFixed1}}
   div.row.form-condensed
     div.col-sm-4.col-xs-6
       form.form-horizontal
@@ -47,10 +56,10 @@ div.container
     div.col-sm-4.col-xs-6
       form.form-horizontal
         div.form-group
-          label.col-xs-6.col-sm-5.col-md-4.control-label 已消课时:
+          label.col-xs-6.col-sm-5.col-md-4.control-label 已用课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{consumedTotalCredit}}课时
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消课时是指所有已经排课课程的课时合计 (包括已经结束和尚未开始的课程)")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已用课时=消+排; 是指所有已经排课课程的课时合计 (包括已经结束和尚未开始的课程)")
                 i.glyphicon.glyphicon-info-sign
               a.small.ms-3(role="button" href="#classes-section") 消课记录
                 i.glyphicon.glyphicon-search.ms-3
@@ -58,19 +67,19 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 可用课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{remainingCredit}}课时
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="可用课时 = 合约课时 - 已消课时")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="可用课时(余) = 合约课时 - 已用课时")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{remainingCredit}}课时
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时 = 可用课时 + 已经排课但尚未开始的课时")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时=排+余; 是指可用课时和已经排课但尚未开始的课时")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{consumedFee}}元
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消金额 = 已消课时 * 课程单价")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消金额 = 已用课时 * 课程单价")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余金额:
@@ -346,6 +355,17 @@ module.exports = {
     consumedFee() {
       return Math.round(this.contract.total * this.consumedTotalCredit / this.contract.credit) / 100;
     },
+    consumedWidth() {
+      return {
+        width: (this.contract.credit - this.contract.actualRemaining) * 100 / this.contract.credit + "%",
+        "min-width": "1rem"
+      }
+    },
+    plannedWidth() {
+      return {
+        width: (this.contract.actualRemaining - this.remainingCredit) * 100 / this.contract.credit + "%"
+      }
+    },
     isExpired() {
       if (moment(this.contract.expireDate).isValid() && moment(this.contract.expireDate).isBefore())
         return true;
@@ -394,6 +414,9 @@ module.exports = {
       if (!value) return null;
       return moment(value).format('YYYY-MM-DD');
     },
+    toFixed1(value) {
+      return Vue.prototype.$toFixed1(value);
+    }
   },
   methods: {
     notImplemented() {
