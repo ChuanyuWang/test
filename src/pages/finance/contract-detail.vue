@@ -79,13 +79,13 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{consumedFee}}元
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消金额 = 已用课时 * 课程单价")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消金额 = 已用课时 * 折后课单价")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{remainingFee}}元
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余金额 = 课程金额 - 已消金额")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余金额 = 应收金额 - 已消金额")
                 i.glyphicon.glyphicon-info-sign
     div.col-sm-4.col-xs-6
       form.form-horizontal
@@ -166,6 +166,12 @@ div.container
             p.form-control-static {{ discountFee }}元
               a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
+        div.form-group
+          label.col-xs-6.col-sm-5.col-md-4.control-label 折后课单价:
+          div.col-xs-6.col-sm-7.col-md-8
+            p.form-control-static {{ receivable / contract.credit | toFixed2}}元
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="折后课单价 = 应收金额 / 合约课时")
+                i.glyphicon.glyphicon-info-sign
   contract-comments(:contractId="contractId")
   div.page-header
     h3(style="display: inline-block") 缴费记录
@@ -347,13 +353,13 @@ module.exports = {
       return this.contract.credit - this.consumedTotalCredit;
     },
     remainingFee() {
-      return Math.round(this.contract.total * this.remainingCredit / this.contract.credit) / 100;
+      return Math.round((this.contract.total - this.contract.discount) * this.remainingCredit / this.contract.credit) / 100;
     },
     consumedTotalCredit() {
       return this.contract.consumedCredit + this.contract.expendedCredit || 0;
     },
     consumedFee() {
-      return Math.round(this.contract.total * this.consumedTotalCredit / this.contract.credit) / 100;
+      return Math.round((this.contract.total - this.contract.discount) * this.consumedTotalCredit / this.contract.credit) / 100;
     },
     consumedWidth() {
       return {
@@ -416,6 +422,9 @@ module.exports = {
     },
     toFixed1(value) {
       return Vue.prototype.$toFixed1(value);
+    },
+    toFixed2(value) {
+      return Vue.prototype.$toFixed2(value);
     }
   },
   methods: {

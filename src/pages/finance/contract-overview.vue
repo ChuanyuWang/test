@@ -70,13 +70,13 @@ module.exports = {
         formatter: value => { return Math.round(value * 10) / 10; }
       }, {
         field: "remaining",
-        title: "可用课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        title: "可用课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
         titleTooltip: "可用课时是指还有多少课时可以使用 (合约中没有排课的课时)",
         sortable: true,
         formatter: (value) => { return Math.round(value * 10) / 10; }
       }, {
         field: "actualRemaining",
-        title: "剩余课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        title: "剩余课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
         titleTooltip: "剩余课时是指还有多少课时没有上课 (包括可用课时和已经排课但尚未开始的课时)",
         sortable: true,
         formatter: (value) => { return Math.round(value * 10) / 10; }

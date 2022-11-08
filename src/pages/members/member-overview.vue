@@ -99,7 +99,8 @@ module.exports = {
         visible: false
       }, {
         field: "contracts",
-        title: "课程合约 (已消/合约)",
+        title: "课程合约 (已用/合约)<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        titleTooltip: "已用课时=消+排\n是指所有已经排课课程的课时合计 (包括已经结束和尚未开始的课程)",
         sortable: false,
         formatter: this.contractsFormatter
       },/*{

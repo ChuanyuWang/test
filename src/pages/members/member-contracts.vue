@@ -14,8 +14,6 @@ div
 </template>
 <script>
 
-var serviceUtil = require("../../services/util");
-
 module.exports = {
   name: "member-contracts",
   props: {
@@ -49,14 +47,14 @@ module.exports = {
         formatter: this.dateFormatter
       }, {
         field: "credit",
-        title: "已消/可用课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        title: "消/排/余课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
         formatter: this.creditFormatter,
-        titleTooltip: "已消课时=已经完成的课程+已经排课但还没开始的课程\n剩余课时=没有使用的课时"
+        titleTooltip: "合约课时=消(已经排课并且结束的课程)+排(已经排课尚未开始的课时)+余(没有排课的课时)"
       }, {
         field: "total",
-        title: "已消/剩余金额<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        title: "消/排/余金额<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
         formatter: this.totalFormatter,
-        titleTooltip: "已消金额=已经完成的课程金额+已经排课但还没开始的课程金额\n剩余金额=没有使用的金额"
+        titleTooltip: "根据应收金额计算出消/排/余各部分对应的金额"
       }],
       contractTableOptions: {
         //toolbar: "#contractToolbar",
@@ -107,27 +105,40 @@ module.exports = {
     creditFormatter(value, row, index) {
       var consumedCredit = row.consumedCredit || 0;
       var expendedCredit = row.expendedCredit || 0;
-      return this.buildProgressBar(consumedCredit + expendedCredit, value);
+      var actualConsumed = row.credit - row.actualRemaining;
+      return this.buildProgressBar(this.$toFixed1(actualConsumed), consumedCredit + expendedCredit, value);
     },
     totalFormatter(value, row, index) {
       var consumedCredit = row.consumedCredit || 0;
       var expendedCredit = row.expendedCredit || 0;
+      var actualConsumed = row.credit - row.actualRemaining;
       var credit = row.credit || 0;
-      var percent = credit == 0 ? 0 : (consumedCredit + expendedCredit) / credit;
+      var percent = credit ? (consumedCredit + expendedCredit) / credit : 0;
       var total = row.total - row.discount;
-      return this.buildProgressBar(Math.round(total * percent) / 100, total / 100, "￥");
-    },
-    buildProgressBar(consume, total, symbol) {
-      var remaining = total - consume;
-      if (symbol === "￥") remaining = this.$toFixed2(remaining);
-      else remaining = this.$toFixed1(remaining);
 
-      var percent = total == 0 ? 0 : consume / total;
-      percent = Math.round(percent * 100);
+      var actualFee = (credit ? actualConsumed / credit : 0) * total;
+      return this.buildProgressBar(Math.round(actualFee) / 100, Math.round(total * percent) / 100, total / 100, "￥");
+    },
+    buildProgressBar(actual, consume, total, symbol) {
+      var remaining = total - consume;
+      remaining = symbol === "￥" ? this.$toFixed2(remaining) : this.$toFixed1(remaining);
+
+      var actualPercent = total ? actual / total : 0;
+      actualPercent = Math.round(actualPercent * 100);
+
+      var planned = consume - actual;
+      planned = symbol === "￥" ? this.$toFixed2(planned) : this.$toFixed1(planned);
+
+      var plannedPercent = total ? planned / total : 0;
+      plannedPercent = Math.round(plannedPercent * 100);
       return [
-        `<div><span>消${symbol || ""}${consume}</span><span style="float:right">剩${symbol || ""}${remaining}</span></div>`,
+        `<div class="small" style="display:flex;justify-content:space-between">`,
+        `<span class="text-primary">消${symbol || ""}${actual}</span>`,
+        `<span class="text-success">排${symbol || ""}${planned}</span>`,
+        `<span class="text-muted">余${symbol || ""}${remaining}</span></div>`,
         '<div class="progress" style="margin:0;height:10px">',
-        `<div class="progress-bar" role="progressbar" style="width:${percent}%">`,
+        `<div class="progress-bar" role="progressbar" style="width:${actualPercent}%"/>`,
+        `<div class="progress-bar progress-bar-success" role="progressbar" style="width:${plannedPercent}%"/>`,
         '</div>',
         '</div>'
       ].join('');
@@ -151,10 +162,8 @@ module.exports = {
     }
   },
   created() {
-    var request = serviceUtil.getJSON("/api/setting/types");
-    request.done((data, textStatus, jqXHR) => {
-      this.types = data || [];
-    });
+    var tenantConfig = _getTenantConfig();
+    this.types = tenantConfig && tenantConfig.types || [];
   },
   mounted() {
     // delay the refresh after types fetched
