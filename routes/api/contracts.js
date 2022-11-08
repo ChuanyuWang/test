@@ -164,8 +164,8 @@ router.get('/', async function(req, res, next) {
 
     // support sorting
     let sort = {};
-    let field = req.query.sort || "signDate"; // sort by "signDate" by default
-    sort[field] = req.query.order == 'asc' ? 1 : -1;
+    let sortField = req.query.sort || "signDate"; // sort by "signDate" by default
+    sort[sortField] = req.query.order == 'asc' ? 1 : -1;
 
     // query contracts by keyword, search 'serialNo', 'name' or 'contact'
     let search = req.query.search || "";
@@ -218,12 +218,6 @@ router.get('/', async function(req, res, next) {
     let pipelines = [{
         $match: query
     }, {
-        $sort: sort
-    }, {
-        $skip: skip
-    }, {
-        $limit: pageSize
-    }, {
         $project: NORMAL_FIELDS
     }, {
         $lookup: {
@@ -250,9 +244,47 @@ router.get('/', async function(req, res, next) {
             }, {
                 $project: { name: 1, cost: 1, date: 1, _id: 0 }
             }],
-            as: 'classes'
+            as: 'unStartedClass'
+        }
+    }, {
+        $addFields: {
+            unStartedClassCount: {
+                $size: "$unStartedClass"
+            },
+            unStartedClassCredit: {
+                $sum: "$unStartedClass.cost"
+            },
+            remaining: {
+                $subtract: ["$credit", { $add: ["$consumedCredit", "$expendedCredit"] }]
+            }
+        }
+    }, {
+        $addFields: {
+            actualRemaining: {
+                $add: ["$remaining", "$unStartedClassCredit"]
+            }
         }
     }];
+
+    if (['remaining', 'actualRemaining'].indexOf(sortField) > -1) {
+        // user sort on calculated field
+        pipelines.push({
+            $sort: sort
+        }, {
+            $skip: skip
+        }, {
+            $limit: pageSize
+        });
+    } else {
+        // put the $sort at the beginning for better performance
+        pipelines.splice(1, 0, {
+            $sort: sort
+        }, {
+            $skip: skip
+        }, {
+            $limit: pageSize
+        });
+    }
 
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
@@ -278,18 +310,52 @@ router.get('/:contractID', async function(req, res, next) {
     try {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
-        let doc = await contracts.findOne({
-            _id: ObjectId(req.params.contractID)
-        }, {
-            projection: NORMAL_FIELDS
-        });
 
-        if (!doc) {
+        let pipelines = [{
+            $match: { _id: ObjectId(req.params.contractID) }
+        }, {
+            $project: NORMAL_FIELDS
+        }, {
+            $lookup: {
+                from: 'classes',
+                let: { contractID: "$_id" },
+                pipeline: [{
+                    $match: {
+                        date: { $gte: new Date() },
+                        $expr: { $in: ["$$contractID", "$booking.contract"] }
+                    }
+                }, {
+                    $project: { name: 1, cost: 1, date: 1, _id: 0 }
+                }],
+                as: 'unStartedClass'
+            }
+        }, {
+            $addFields: {
+                unStartedClassCount: {
+                    $size: "$unStartedClass"
+                },
+                unStartedClassCredit: {
+                    $sum: "$unStartedClass.cost"
+                },
+                remaining: {
+                    $subtract: ["$credit", { $add: ["$consumedCredit", "$expendedCredit"] }]
+                }
+            }
+        }, {
+            $addFields: {
+                actualRemaining: {
+                    $add: ["$remaining", "$unStartedClassCredit"]
+                }
+            }
+        }];
+
+        let docs = await contracts.aggregate(pipelines).toArray();
+        if (docs.length !== 1) {
             return next(new ParamError("contract doesn't exist"));
         }
 
-        console.log("find contract %j", doc);
-        res.json(doc);
+        console.log("find contract %j", docs[0]);
+        res.json(docs[0]);
     } catch (error) {
         return next(new RuntimeError("get contract fails", error));
     }

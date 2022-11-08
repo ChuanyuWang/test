@@ -69,9 +69,17 @@ module.exports = {
         title: "合约课时",
         formatter: value => { return Math.round(value * 10) / 10; }
       }, {
-        field: "consumedCredit",
-        title: "已消课时",
-        formatter: (value, row) => { return Math.round((value + row.expendedCredit || 0) * 10) / 10; }
+        field: "remaining",
+        title: "可用课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        titleTooltip: "可用课时是指还有多少课时可以使用 (合约中没有排课的课时)",
+        sortable: true,
+        formatter: (value) => { return Math.round(value * 10) / 10; }
+      }, {
+        field: "actualRemaining",
+        title: "剩余课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        titleTooltip: "剩余课时是指还有多少课时没有上课 (包括可用课时和已经排课但尚未开始的课时)",
+        sortable: true,
+        formatter: (value) => { return Math.round(value * 10) / 10; }
       }, {
         field: "effectiveDate",
         title: "生效日期",

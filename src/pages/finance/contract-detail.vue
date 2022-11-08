@@ -47,31 +47,45 @@ div.container
     div.col-sm-4.col-xs-6
       form.form-horizontal
         div.form-group
+          label.col-xs-6.col-sm-5.col-md-4.control-label 已消课时:
+          div.col-xs-6.col-sm-7.col-md-8
+            p.form-control-static {{consumedTotalCredit}}课时
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消课时是指所有已经排课课程的课时合计 (包括已经结束和尚未开始的课程)")
+                i.glyphicon.glyphicon-info-sign
+              a.small.ms-3(role="button" href="#classes-section") 消课记录
+                i.glyphicon.glyphicon-search.ms-3
+        div.form-group
+          label.col-xs-6.col-sm-5.col-md-4.control-label 可用课时:
+          div.col-xs-6.col-sm-7.col-md-8
+            p.form-control-static {{remainingCredit}}课时
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="可用课时 = 合约课时 - 已消课时")
+                i.glyphicon.glyphicon-info-sign
+        div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{remainingCredit}}课时
-              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时是未排课的课时")
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时 = 可用课时 + 已经排课但尚未开始的课时")
+                i.glyphicon.glyphicon-info-sign
+        div.form-group
+          label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
+          div.col-xs-6.col-sm-7.col-md-8
+            p.form-control-static {{consumedFee}}元
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已消金额 = 已消课时 * 课程单价")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{remainingFee}}元
-        div.form-group
-          label.col-xs-6.col-sm-5.col-md-4.control-label 已消课时:
-          div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{consumedTotalCredit}}课时
-              a.small.ms-3(role="button" href="#classes-section") 消课记录
-                i.glyphicon.glyphicon-search.ms-3
-        div.form-group
-          label.col-xs-6.col-sm-5.col-md-4.control-label 已消金额:
-          div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{consumedFee}}元
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余金额 = 课程金额 - 已消金额")
+                i.glyphicon.glyphicon-info-sign
     div.col-sm-4.col-xs-6
       form.form-horizontal
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 应收金额:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ receivable }}元
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="应收金额 = 课程金额 - 折扣直减")
+                i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 实收金额:
           div.col-xs-6.col-sm-7.col-md-8
@@ -82,6 +96,8 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 欠费金额:
           div.col-xs-6.col-sm-7.col-md-8(:class="{ 'text-danger': outstandingFee }")
             p.form-control-static {{ outstandingFee }}元
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="欠费金额 = 应收金额 - 实收金额 (负数表示多缴)")
+                i.glyphicon.glyphicon-info-sign
   div.page-header
     h3 合约课程
   div.row.form-condensed
@@ -119,6 +135,8 @@ div.container
           label.col-xs-6.col-sm-5.col-md-4.control-label 课程单价:
           div.col-xs-6.col-sm-7.col-md-8
             p.form-control-static {{ averageFee }}元
+              a.small.ms-3(style="color: #777" data-toggle="tooltip" title="课程单价 = 课程金额 / 合约课时")
+                i.glyphicon.glyphicon-info-sign
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 课程金额:
           div.col-xs-6.col-sm-7.col-md-8

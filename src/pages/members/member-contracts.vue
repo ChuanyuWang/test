@@ -8,6 +8,7 @@ div
     a.btn.btn-success.me-3(:href="'../contract/create?memberId='+ memberId" style="float: right; margin-top: 16px") 购课
   div.row
     div.col-sm-12
+      span.help-block.small.text-right(style="margin:3px") *当学员拥有一个课程的多个合约时, 会按照合约生效日期的先后顺序进行课时扣除
       div#contractToolbar
       bootstrap-table.table-striped(ref="contractsTable" :columns="contractTableColumns" :options="contractTableOptions")
 </template>
@@ -48,7 +49,7 @@ module.exports = {
         formatter: this.dateFormatter
       }, {
         field: "credit",
-        title: "已消/剩余课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        title: "已消/可用课时<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
         formatter: this.creditFormatter,
         titleTooltip: "已消课时=已经完成的课程+已经排课但还没开始的课程\n剩余课时=没有使用的课时"
       }, {
