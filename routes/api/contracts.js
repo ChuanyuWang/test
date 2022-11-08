@@ -167,7 +167,7 @@ router.get('/', async function(req, res, next) {
     let field = req.query.sort || "signDate"; // sort by "signDate" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
 
-    // query orders by keyword, search 'serialNo', 'name' or 'contact'
+    // query contracts by keyword, search 'serialNo', 'name' or 'contact'
     let search = req.query.search || "";
     if (search) {
         // search both name and contact
@@ -189,7 +189,7 @@ router.get('/', async function(req, res, next) {
         query.signDate = { $lt: new Date(req.query.to) };
     }
 
-    // query orders by status
+    // query contracts by status
     let status = req.query.status || "";
     if (status) {
         query['status'] = status;
@@ -197,7 +197,7 @@ router.get('/', async function(req, res, next) {
         query['status'] = { $ne: "deleted" };
     }
 
-    // query orders by member
+    // query contracts by member
     let memberId = req.query.memberId || "";
     if (memberId && ObjectId.isValid(memberId)) {
         query['memberId'] = ObjectId(memberId);
@@ -237,6 +237,20 @@ router.get('/', async function(req, res, next) {
                 $project: { name: 1, contact: 1, _id: 0 }
             }],
             as: 'member'
+        }
+    }, {
+        $lookup: {
+            from: 'classes',
+            let: { contractID: "$_id" },
+            pipeline: [{
+                $match: {
+                    date: { $gte: new Date() },
+                    $expr: { $in: ["$$contractID", "$booking.contract"] }
+                }
+            }, {
+                $project: { name: 1, cost: 1, date: 1, _id: 0 }
+            }],
+            as: 'classes'
         }
     }];
 
