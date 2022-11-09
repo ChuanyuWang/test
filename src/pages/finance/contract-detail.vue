@@ -480,6 +480,7 @@ module.exports = {
     },
     pay(payment) {
       payment.contractId = this.contractId;
+      payment.contractNo = this.contract.serialNo;
       payment.memberId = this.memberData._id;
       var request = serviceUtil.postJSON("/api/payments", payment);
       request.done((data, textStatus, jqXHR) => {
