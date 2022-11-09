@@ -35,7 +35,7 @@ router.post('/', validate, async function(req, res, next) {
         memberId: ObjectId(req.body.memberId),
         type: req.body.type,
         method: req.body.method,
-        amount: req.body.amount,
+        amount: parseInt(req.body.amount),
         payDate: new Date(req.body.payDate),
         comment: req.body.comment
     };
