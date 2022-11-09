@@ -347,7 +347,8 @@ module.exports = {
       return Math.round(this.contract.discount) / 100;
     },
     outstandingFee() {
-      return (this.contract.total - this.contract.discount - this.contract.received) / 100;
+      var value = Math.round(this.contract.total - this.contract.discount - this.contract.received) / 100;
+      return value === 0 ? 0 : value;
     },
     remainingCredit() {
       return this.contract.credit - this.consumedTotalCredit;
