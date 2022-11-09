@@ -58,7 +58,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 已用课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{consumedTotalCredit}}课时
+            p.form-control-static {{consumedTotalCredit | toFixed1}}课时
               a.small.ms-3(style="color: #777" data-toggle="tooltip" title="已用课时=消+排; 是指所有已经排课课程的课时合计 (包括已经结束和尚未开始的课程)")
                 i.glyphicon.glyphicon-info-sign
               a.small.ms-3(role="button" href="#classes-section") 消课记录
@@ -66,7 +66,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 可用课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{remainingCredit}}课时
+            p.form-control-static {{remainingCredit | toFixed1}}课时
               a.small.ms-3(style="color: #777" data-toggle="tooltip" title="可用课时(余) = 合约课时 - 已用课时")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
