@@ -25,7 +25,7 @@ div.container
         div.progress-bar.progress-bar-success(:style="plannedWidth")
       div.d-flex(style="justify-content:space-between")
         span.text-primary 消{{contract.credit - contract.actualRemaining | toFixed1}}
-        span.text-success 排{{contract.actualRemaining - remainingCredit | toFixed1}}
+        span.text-success 排{{contract.unStartedClassCredit | toFixed1}}
         span.text-muted 余{{remainingCredit | toFixed1}}
   div.row.form-condensed
     div.col-sm-4.col-xs-6
