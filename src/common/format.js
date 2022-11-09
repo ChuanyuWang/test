@@ -5,11 +5,15 @@
  */
 
 function toFixed1(value) {
-    return Math.round(value * 10) / 10;
+    var result = Math.round(value * 10);
+    // in case result is '-0', e.g. Math.round(-1.4551915228366852e-11)
+    return result === 0 ? 0 : result / 10;
 }
 
 function toFixed2(value) {
-    return Math.round(value * 100) / 100;
+    var result = Math.round(value * 100);
+    // in case result is '-0', e.g. Math.round(-1.4551915228366852e-11)
+    return result === 0 ? 0 : result / 100;
 }
 
 module.exports = {
