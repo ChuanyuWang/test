@@ -25,7 +25,6 @@ div
       p {{ errorMessage }}
 </template>
 <script>
-var serviceUtil = require("../../services/util");
 
 module.exports = {
   name: "contract-overview",
@@ -209,16 +208,12 @@ module.exports = {
     }
   },
   created() {
-    var vm = this;
     this.tenantConfig = _getTenantConfig();
-    var request = serviceUtil.getJSON("/api/setting/types");
-    request.done((data, textStatus, jqXHR) => {
-      vm.types = data || [];
-      // delay the refresh after types fetched
-      this.refresh();
-    });
+    this.types = this.tenantConfig && this.tenantConfig.types || [];
   },
-  mounted() { }
+  mounted() {
+    this.refresh();
+  }
 }
 </script>
 <style lang="less">

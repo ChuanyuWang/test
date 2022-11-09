@@ -156,7 +156,6 @@ var member_select_modal = require("../../components/member-select-modal.vue").de
 var add_book_modal = require("./add-book-modal.vue").default;
 var messageAlert = require("../../components/message-alert.vue").default;
 var modalDialog = require("../../components/modal-dialog.vue").default;
-var serviceUtil = require("../../services/util");
 
 module.exports = {
   name: "class-detail",
@@ -411,10 +410,6 @@ module.exports = {
     }
   },
   created: function() {
-    var request = serviceUtil.getJSON("/api/setting/types");
-    request.done((data, textStatus, jqXHR) => {
-      this.types = data || [];
-    });
     // Load all teachers for selection
     var vm = this;
     var request = teacher_service.getAll({ status: "active" });
@@ -426,6 +421,7 @@ module.exports = {
     });
     this.tenantConfig = _getTenantConfig();
     this.feature = this.tenantConfig.feature;
+    this.types = this.tenantConfig && this.tenantConfig.types || [];
 
     // load class object
     if (this.classId) {
