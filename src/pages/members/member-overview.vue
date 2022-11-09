@@ -231,7 +231,7 @@ module.exports = {
       contracts.forEach((element, i) => {
         result += this.types[element.goods] + `: ${element.consumedCredit || 0}/${element.credit}课时`;
         if (element.status !== "paid") {
-          result += "<span class='label label-danger' style='font-size: 50%''>欠费</span>"
+          result += "<span class='label label-danger' style='font-size: 60%''>欠费</span>"
         }
         if (i < contracts.length - 1) result += "; "
       });
