@@ -239,6 +239,7 @@ router.get('/', async function(req, res, next) {
             pipeline: [{
                 $match: {
                     date: { $gte: new Date() },
+                    "booking.0": { $exists: true }, // to make sure "$booking.contract" is an array
                     $expr: { $in: ["$$contractID", "$booking.contract"] }
                 }
             }, {
@@ -322,6 +323,7 @@ router.get('/:contractID', async function(req, res, next) {
                 pipeline: [{
                     $match: {
                         date: { $gte: new Date() },
+                        "booking.0": { $exists: true }, // to make sure "$booking.contract" is an array
                         $expr: { $in: ["$$contractID", "$booking.contract"] }
                     }
                 }, {
