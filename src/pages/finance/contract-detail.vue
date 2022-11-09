@@ -15,8 +15,9 @@ div.container
       span.label.label-danger.ms-3(style="font-size: 65%" v-else) 未缴清
     button.btn.btn-danger.pull-right(type="button" v-show="contract.status !== 'deleted'" @click="$refs.confirmDeleteDialog.show()") 删除
     button.btn.btn-primary.pull-right.me-3(type="button" @click="openModifyDialog") 修改
-    button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 转课时
-    button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 退费
+    //button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 转课时
+    //button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 退费
+    button.btn.btn-default.pull-right.me-3(type="button" @click="notImplemented") 结束合约
     button.btn.btn-primary.pull-right.me-3(type="button" v-show="contract.status == 'open' || contract.status == 'outstanding'" @click="openPayDialog") 缴费
   div.row
     div.col-xs-12.col-sm-6.col-sm-offset-3.col-md-4.col-md-offset-4.mb-7
