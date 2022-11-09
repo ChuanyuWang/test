@@ -176,10 +176,11 @@ module.exports = {
       }
     },
     totalFormatter(value, row, index) {
-      return (row.total - row.discount) / 100 + "元";
+      return Math.round(row.total - row.discount) / 100 + "元";
     },
     outstandingFormatter(value, row, index) {
-      return (row.total - row.discount - value) / 100 + "元";
+      var result = Math.round(row.total - row.discount - value) / 100;
+      return result === 0 ? 0 : result + "元";
     },
     outstandingStyle(value, row, index, field) {
       var outstanding = row.total - row.discount - value;
