@@ -31,5 +31,8 @@ module.exports = {
     install(Vue, options) {
         Vue.prototype.$toFixed1 = toFixed1;
         Vue.prototype.$toFixed2 = toFixed2;
+
+        Vue.filter('toFixed1', toFixed1);
+        Vue.filter('toFixed2', toFixed2);
     }
 };

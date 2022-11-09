@@ -419,12 +419,6 @@ module.exports = {
     dateFilter(value) {
       if (!value) return null;
       return moment(value).format('YYYY-MM-DD');
-    },
-    toFixed1(value) {
-      return Vue.prototype.$toFixed1(value);
-    },
-    toFixed2(value) {
-      return Vue.prototype.$toFixed2(value);
     }
   },
   methods: {
