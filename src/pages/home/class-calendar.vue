@@ -6,7 +6,7 @@ div
       button.btn.btn-primary(@click='previousWeek') {{$t('previous_week')}}
       button.btn.btn-primary(@click='thisWeek') {{$t('this_week')}}
       button.btn.btn-primary(@click='nextWeek') {{$t('next_week')}}
-    date-picker(v-model='date',style="width:165px")
+    date-picker(v-model='date',style="width:170px")
     div.flex-grow-1
     div.input-group
       span.input-group-addon 教室: 
