@@ -154,3 +154,27 @@ textarea.has-3-rows {
     transform: translateX(400px);
   }
 }
+
+.system-warning-message {
+  position: fixed;
+  left: 10%;
+  top: 10%;
+  z-index: 100;
+  transform: translateX(-50%);
+  opacity: 0.9;
+  animation-name: systemWarning;
+  animation-duration: 10s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes systemWarning {
+  from {
+    left: 20%;
+  }
+
+  to {
+    left: 80%;
+  }
+}

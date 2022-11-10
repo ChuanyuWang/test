@@ -6,8 +6,14 @@ script.
             contact: "#{tenant_contact}",
             address: "#{tenant_address}",
             addressLink: "#{tenant_addressLink}",
-            classrooms: !{JSON.stringify(classrooms || [])},
-            types: !{JSON.stringify(types || [])},
+            classrooms: !{JSON.stringify(classrooms)},
+            types: !{JSON.stringify(types)},
             feature: "#{tenant_feature}"
         };
     };
+
+if logoPath1
+    div.alert.alert-danger.system-warning-message
+        button.close(type="button" data-dismiss="alert") &times;
+        span.glyphicon.glyphicon-exclamation-sign
+        = logoPath
