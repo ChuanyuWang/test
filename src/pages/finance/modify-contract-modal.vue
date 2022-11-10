@@ -23,6 +23,7 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
           div.input-group
             input.form-control(type="number" v-model.number="item.credit" min="1" step="1")
             span.input-group-addon 课时
+          span.help-block.small(style="margin:0") {{errors.credit}}
       div.form-group
         label.col-sm-3.control-label 课程单价:
         div.col-sm-5
