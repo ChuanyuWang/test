@@ -99,7 +99,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 实收金额:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{ contract.received / 100 }}元
+            p.form-control-static {{ contract.received / 100 | toFixed2 }}元
               a.small.ms-3(role="button" href="#payments-section") 缴费记录
                 i.glyphicon.glyphicon-search.ms-3
         div.form-group
