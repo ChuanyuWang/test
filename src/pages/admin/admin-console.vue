@@ -13,7 +13,7 @@ div.row(style="margin-top:15px")
       button.btn.btn-default(v-on:click='addUnsaveOne()',style='margin:3px auto;border:none;color:#555',title='create tenant')
         span.glyphicon.glyphicon-plus
   div.col-sm-9(style='padding-left:0')
-    div.detail-tenant-border(style='min-height:300px')
+    div.detail-tenant-border.form-condensed(style='min-height:300px')
       form.form-horizontal(v-show='hasData')
         div.form-group
           label.col-sm-3.control-label {{$t('status')}}:
