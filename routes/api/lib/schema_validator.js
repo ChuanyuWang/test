@@ -7,6 +7,11 @@ class SchemaValidator {
         this.options = options || {};
     }
 
+    /**
+     * Check if the body content is compliant with update schema
+     * @param {Object} body 
+     * @returns true - it's OK to update; otherwise return false
+     */
     modifyVerify(body) {
         // body is empty, return false
         if (!body || Array.isArray(body)) return false;

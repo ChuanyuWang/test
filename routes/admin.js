@@ -2,9 +2,34 @@ var express = require('express');
 var router = express.Router();
 var Account = require('../account');
 const db_utils = require('../server/databaseManager');
-const { ParamError, InternalServerError, BaseError } = require("./api/lib/basis");
+const { ParamError, InternalServerError, BaseError, BadRequestError } = require("./api/lib/basis");
 var mongojs = require('mongojs');
+const { SchemaValidator } = require("./api/lib/schema_validator");
 const { createDefaultClassType, setDefaultTypeForNotStartedClasses, createtDefaultContracts } = require("../server/upgradeFiveUtil");
+
+const TenantSchema = new SchemaValidator({
+    status: {
+        validator: value => {
+            return ["active", "inactive"].includes(value);
+        },
+        editable: true
+    },
+    feature: {
+        validator: value => {
+            return ["common", "book"].includes(value);
+        }
+    },
+    name: { type: String, required: true },
+    displayName: { type: String, required: true },
+    systemMessage: { type: String, editable: true },
+    version: Number,
+    contact: String,
+    address: String,
+    addressLink: String,
+    logoPath: String,
+    types: Array,
+    groups: Array
+});
 
 var VERSION = 6; // current tenant version
 var config_db = null;
@@ -25,7 +50,10 @@ router.get('/home', checkTenantUser, function(req, res) {
     res.render('admin', {
         title: '控制台',
         user: req.user,
-        navTitle: "控制台"
+        navTitle: "控制台",
+        classrooms: [],
+        types: [],
+        groups: []
     });
 });
 
@@ -163,12 +191,13 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
 
 // update the tenant
 router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
-    // Only tenant status will be updated by admin
-    if (!req.body.status) {
-        var error = new Error("tenant status is not defined");
-        error.status = 400;
-        return next(error);
+    if (!TenantSchema.modifyVerify(req.body)) {
+        return next(BadRequestError(`Invalid Request to update tenant`))
     }
+
+    let updateSet = {};
+    if (req.body.hasOwnProperty("status")) updateSet.status = req.body.status;
+    if (req.body.hasOwnProperty("systemMessage")) updateSet.systemMessage = req.body.systemMessage;
 
     var tenants = config_db.collection('tenants');
     tenants.findAndModify({
@@ -176,7 +205,7 @@ router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
             name: req.params.name
         },
         update: {
-            $set: { status: req.body.status === "inactive" ? "inactive" : "active" }
+            $set: updateSet
         },
         new: true
     }, function(err, doc, lastErrorObject) {
