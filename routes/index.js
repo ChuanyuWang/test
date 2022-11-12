@@ -126,6 +126,7 @@ async function getTenantInfo(req, res, next) {
         res.locals.tenant_address = tenant.address || "";
         res.locals.tenant_addressLink = tenant.addressLink || '#';
         res.locals.tenant_contact = tenant.contact || "";
+        res.locals.tenant_systemMessage = tenant.systemMessage || "";
         return next();
     } catch (err) {
         let error = new Error("get tenant fails");

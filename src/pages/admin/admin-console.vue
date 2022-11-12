@@ -17,9 +17,10 @@ div.row(style="margin-top:15px")
       form.form-horizontal(v-show='hasData')
         div.form-group
           label.col-sm-3.control-label {{$t('status')}}:
-          select.col-sm-5.form-control(v-model='selectedTenant.status',style='margin-left:15px;width:auto', @change='changeStatus()')
-            option.text-success(value='active') active
-            option.text-danger(value='inactive') inactive
+          div.col-sm-3
+            select.form-control(v-model='selectedTenant.status' @change='changeStatus()')
+              option.text-success(value='active') active
+              option.text-danger(value='inactive') inactive
         div.form-group(:class='{"has-error": errors.name}')
           label.col-sm-3.control-label Name:
           div.col-sm-5(data-toggle="tooltip",data-placement="right",:title="errors.name")
@@ -46,6 +47,13 @@ div.row(style="margin-top:15px")
               option(value='common') 早教
               option(value='book') 绘本
             p.form-control-static(v-else) {{selectedTenant.feature}}
+        div.form-group
+          label.col-sm-3.control-label System Message:
+          div.col-sm-6
+            div.input-group
+              input.form-control(type="text" v-model.trim="selectedTenant.systemMessage")
+              span.input-group-btn
+                button.btn.btn-success(type="button" @click="updateSystemMessage") Save
         div.form-group
           label.col-sm-3.control-label Classroom:
           div.col-sm-5
@@ -104,6 +112,7 @@ div.row(style="margin-top:15px")
  */
 
 var createUserDlg = require("./create-user-modal.vue").default;
+var serviceUtil = require("../../services/util");
 
 module.exports = {
   name: "admin-console",
@@ -175,8 +184,9 @@ module.exports = {
       request.fail(function(jqXHR, textStatus, errorThrown) {
         console.error("change tenant fails", jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
-      request.done(function(data, textStatus, jqXHR) {
-        // TODO
+      request.done((data, textStatus, jqXHR) => {
+        Vue.set(this.tenants, this.selectedIndex, data || {});
+        alert("Set tenant status successfully");
       });
     },
     setSelectedIndex: function(index) {
@@ -258,6 +268,15 @@ module.exports = {
       request.done(function(data, textStatus, jqXHR) {
         console.log(data);
         alert("Set user status successfully");
+      });
+    },
+    updateSystemMessage() {
+      var request = serviceUtil.patchJSON("/admin/api/tenant/" + this.selectedTenant.name, {
+        systemMessage: this.selectedTenant.systemMessage
+      });
+      request.done((data, textStatus, jqXHR) => {
+        Vue.set(this.tenants, this.selectedIndex, data || {});
+        alert("Set system message successfully");
       });
     },
     createTenant: function() {
