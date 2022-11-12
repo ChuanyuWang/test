@@ -157,7 +157,7 @@ textarea.has-3-rows {
 
 .system-warning-message {
   position: fixed;
-  left: 10%;
+  left: 50%;
   top: 10%;
   z-index: 100;
   transform: translateX(-50%);
@@ -171,10 +171,12 @@ textarea.has-3-rows {
 
 @keyframes systemWarning {
   from {
-    left: 20%;
+    //left: 20%;
+    transform: translateX(-100%);
   }
 
   to {
-    left: 80%;
+    //left: 80%;
+    transform: translateX(0%);
   }
 }
