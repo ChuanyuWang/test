@@ -15,5 +15,6 @@ script.
 if tenant_systemMessage
     div.alert.alert-danger.system-warning-message
         button.close(type="button" data-dismiss="alert") &times;
-        span.glyphicon.glyphicon-exclamation-sign
-        = tenant_systemMessage
+        span.glyphicon.glyphicon-exclamation-sign.me-3
+        strong 系统消息
+        h3.text-center(style="margin:20px 7px;line-height:2em") !{tenant_systemMessage}
