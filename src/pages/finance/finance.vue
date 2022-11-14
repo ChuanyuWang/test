@@ -13,7 +13,7 @@ div
 </template>
 <script>
 var common = require('../../common/common');
-var ordersPage = require('./orders.vue').default;
+var ordersPage = require('./orders-overview.vue').default;
 var contractsPage = require('./contract-overview.vue').default;
 
 module.exports = {
