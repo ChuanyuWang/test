@@ -4,7 +4,7 @@ div
     li(role="presentation")
       a(href="#orders" role="tab" data-toggle="tab") 订单
     li(role="presentation")
-      a(href="#contracts" role="tab" data-toggle="tab") 合约
+      a(href="#contracts" role="tab" data-toggle="tab") {{$t("contracts")}}
   div.tab-content
     div#contracts.tab-pane(role="tabpanel")
       contracts-page
@@ -36,4 +36,5 @@ module.exports = {
 </script>
 
 <style>
+
 </style>
