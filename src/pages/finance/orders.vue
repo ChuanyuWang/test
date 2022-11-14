@@ -92,7 +92,7 @@ module.exports = {
         pagination: true,
         pageSize: 15,
         pageList: [15, 25, 50, 110],
-        url: "/api/orders",
+        //url: "/api/orders",
         uniqueId: "_id",
         sidePagination: "server",
         search: true,
@@ -185,7 +185,7 @@ module.exports = {
       this.to = null;
     },
     refresh() {
-      this.$refs.orderTable.refresh();
+      this.$refs.orderTable.refresh({ url: "/api/orders" });
     },
     refundingOrder(e, value, row, index) {
       if (row.status === "success") {

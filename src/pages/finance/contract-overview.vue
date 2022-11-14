@@ -212,9 +212,7 @@ module.exports = {
     this.tenantConfig = _getTenantConfig();
     this.types = this.tenantConfig && this.tenantConfig.types || [];
   },
-  mounted() {
-    this.refresh();
-  }
+  mounted() { }
 }
 </script>
 <style lang="less">
