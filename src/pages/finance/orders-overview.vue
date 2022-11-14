@@ -1,8 +1,8 @@
 <template lang="pug">
 div
   div#orders_toolbar
-    div.form-inline(role="group")
-      div.input-group
+    div.d-flex.align-items-center.flex-wrap
+      div.input-group.input-group-sm.me-3
         span.input-group-addon {{$t("status")}}: 
         select.form-control(v-model="filter",@change="refresh")
           option(value="") {{$t("all")}}
@@ -11,11 +11,11 @@ div
           option(value="success") {{$t("order_success")}}
           option(value="closed") {{$t("order_closed")}}
           option(value="refund") {{$t("order_refund")}}
-      date-picker(v-model='from',placeholder="开始",style="width:160px;margin-left:4px")
+      date-picker.input-group-sm(v-model='from',placeholder="开始",style="width:160px")
       i.glyphicon.glyphicon-minus
-      date-picker(v-model='to',placeholder="结束",style="width:160px",:class='{"has-error": errors.to}')
-      button.btn.btn-primary(type="button",style="margin-left:4px",@click="refresh") 查询
-      button.btn.btn-default(type="button",style="margin-left:4px",@click="clear") 清空
+      date-picker.input-group-sm.me-3(v-model='to',placeholder="结束",style="width:160px",:class='{"has-error": errors.to}')
+      button.btn.btn-primary.btn-sm.me-3(type="button" @click="refresh") 查询
+      button.btn.btn-default.btn-sm(type="button" @click="clear") 清空
   bootstrap-table.table-striped(ref='orderTable',:columns='columns',:options='options')
   modal-dialog(ref='confirmDelete',buttons="confirm",buttonStyle="danger",@ok="deleteOrder") 删除订单
     template(v-slot:body)
@@ -88,6 +88,7 @@ module.exports = {
       }],
       options: {
         toolbar: "#orders_toolbar",
+        iconSize: "sm",
         locale: 'zh-CN',
         pagination: true,
         pageSize: 15,
@@ -96,6 +97,7 @@ module.exports = {
         uniqueId: "_id",
         sidePagination: "server",
         search: true,
+        showRefresh: true,
         sortName: "tradeno",
         sortOrder: "desc",
         queryParams: this.customQuery
