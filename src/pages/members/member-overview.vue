@@ -314,6 +314,7 @@ module.exports = {
   mounted: function() {
     // set message for global usage
     Vue.prototype.$messager = this.$refs.messager;
+    this.$refs.memberTable.updateFormatText("formatSearch", "查询姓名或联系方式");
   }
 }
 </script>

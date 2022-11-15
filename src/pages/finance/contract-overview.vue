@@ -104,7 +104,7 @@ module.exports = {
         uniqueId: "_id",
         sidePagination: "server",
         silentSort: false,
-        search: false,
+        search: true,
         showRefresh: true,
         sortName: "signDate",
         sortOrder: "desc",
@@ -212,7 +212,9 @@ module.exports = {
     this.tenantConfig = _getTenantConfig();
     this.types = this.tenantConfig && this.tenantConfig.types || [];
   },
-  mounted() { }
+  mounted() {
+    this.$refs.contractTable.updateFormatText("formatSearch", "查询合约编号");
+  }
 }
 </script>
 <style lang="less">
