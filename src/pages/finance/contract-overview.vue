@@ -20,9 +20,6 @@ div
       button.btn.btn-primary.btn-sm(type="button" style="margin-left: 4px" @click="refresh") 查询
       button.btn.btn-default.btn-sm(type="button" style="margin-left: 4px" @click="clear") 清空
   bootstrap-table.table-striped(ref="contractTable", :columns="columns", :options="options")
-  modal-dialog(ref="errorDialog" buttonStyle="danger") 出错了
-    template(v-slot:body)
-      p {{ errorMessage }}
 </template>
 <script>
 
@@ -38,8 +35,6 @@ module.exports = {
     return {
       tenantConfig: {},
       types: [],
-      actionOrder: "",
-      errorMessage: "",
       filter: "",
       from: null,
       to: null,

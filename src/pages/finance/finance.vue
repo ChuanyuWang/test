@@ -5,16 +5,21 @@ div
       a(href="#orders" role="tab" data-toggle="tab") 订单
     li(role="presentation")
       a(href="#contracts" role="tab" data-toggle="tab") {{$t("contracts")}}
+    li(role="presentation")
+      a(href="#payments" role="tab" data-toggle="tab") 缴费
   div.tab-content
     div#contracts.tab-pane(role="tabpanel")
       contracts-page(ref="contractsTab")
     div#orders.tab-pane(role="tabpanel")
       orders-page(ref="ordersTab")
+    div#payments.tab-pane(role="tabpanel")
+      payments-page(ref="paymentsTab")
 </template>
 <script>
 var common = require('../../common/common');
 var ordersPage = require('./orders-overview.vue').default;
 var contractsPage = require('./contract-overview.vue').default;
+var paymentsPage = require('./payments-overview.vue').default;
 
 module.exports = {
   name: "finance",
@@ -24,6 +29,7 @@ module.exports = {
   },
   components: {
     "orders-page": ordersPage,
+    "payments-page": paymentsPage,
     "contracts-page": contractsPage
   },
   created() { },
@@ -35,6 +41,10 @@ module.exports = {
 
     $(this.$el).find('a[href="#orders"]').one('shown.bs.tab', e => {
       this.$refs.ordersTab.refresh();
+    });
+
+    $(this.$el).find('a[href="#payments"]').one('shown.bs.tab', e => {
+      this.$refs.paymentsTab.refresh();
     });
 
     // default tab is contract overview
