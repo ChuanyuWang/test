@@ -138,7 +138,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 合约课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{ contract.credit }}课时
+            p.form-control-static {{ contract.credit | toFixed1 }}课时
               a(role="button" @click="openModifyDialog")
                 i.glyphicon.glyphicon-pencil.ms-3
         div.form-group
