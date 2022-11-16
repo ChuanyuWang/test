@@ -29,13 +29,13 @@ module.exports = {
     return {
       fieldNames: {
         total: (o, n) => {
-          return "课程金额由 <del>" + o / 100 + "</del> 更新为 <strong>" + n / 100 + "</strong>元";
+          return "课程金额由 <del>" + Math.round(o) / 100 + "</del> 更新为 <strong>" + Math.round(n) / 100 + "</strong>元";
         },
         discount: (o, n) => {
-          return "折扣直减由 <del>" + o / 100 + "</del> 更新为 <strong>" + n / 100 + "</strong>元";
+          return "折扣直减由 <del>" + Math.round(o) / 100 + "</del> 更新为 <strong>" + Math.round(n) / 100 + "</strong>元";
         },
         credit: (o, n) => {
-          return "合约课时由 <del>" + o + "</del> 更新为 <strong>" + n + "</strong>课时";
+          return "合约课时由 <del>" + this.$toFixed1(o) + "</del> 更新为 <strong>" + this.$toFixed1(n) + "</strong>课时";
         },
         effectiveDate: (o, n) => {
           return "生效日期由 <del>" + this.dateFormatter(o) + "</del> 更新为 <strong>" + this.dateFormatter(n) + "</strong>";
