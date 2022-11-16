@@ -274,7 +274,7 @@ router.post('/api/upgrade',
             let bulk = payments.initializeOrderedBulkOp();
             docs.forEach(doc => {
                 let contracts = doc.contracts || [];
-                if (contracts.length === 0) {
+                if (contracts.length !== 1) {
                     return console.error(`Can't find the contract of payment ${doc._id}`);
                 }
                 let serialNo = contracts[0].serialNo || null;
