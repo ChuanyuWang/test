@@ -97,10 +97,10 @@ div.row(style="margin-top:15px")
                     input(type='checkbox',v-model='user.active',style="margin:0",@change='updateStatus(user)')
         div.form-group
           div.col-sm-offset-3.col-sm-9
-            button.btn.btn-primary(type='button',v-if='selectedTenant._id',@click='upgradeTenant(selectedTenant.name)') Upgrade
-            button.btn.btn-success(type='button',v-else,@click='createTenant',:disabled='hasError') Create
-            button.btn.btn-danger(type='button',@click='deleteListener',style='margin-left:5px') Delete
-            button.btn.btn-success(type='button',v-show='selectedTenant._id',@click='$refs.createUserDlg.show(selectedTenant.name)',style='margin-left:5px') Add User
+            button.btn.btn-primary.me-3(type='button',v-if='selectedTenant._id',@click='upgradeTenant(selectedTenant.name)') Upgrade
+            button.btn.btn-success.me-3(type='button',v-else,@click='createTenant',:disabled='hasError') Create
+            button.btn.btn-danger.me-3(type='button',@click='deleteListener') Delete
+            button.btn.btn-success(type='button',v-show='selectedTenant._id',@click='$refs.createUserDlg.show(selectedTenant.name)') Add User
   create-user-modal(ref='createUserDlg',@ok='createUser')
 </template>
 
@@ -301,22 +301,15 @@ module.exports = {
       });
     },
     upgradeTenant: function(name) {
-      $.ajax("api/upgrade", {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({
-          tenant: name // tenant.name
-        }),
-        success: function(data) {
-          //TODO, refresh the tenant table
-          alert(name + " is upgraded successfully");
-        },
-        error: function(jqXHR, status, err) {
-          alert(
-            jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText
-          );
-        },
-        dataType: "json"
+      var request = serviceUtil.postJSON("api/upgrade", {
+        tenant: name // tenant.name
+      });
+      request.done((data, textStatus, jqXHR) => {
+        alert(name + " is upgraded successfully");
+      });
+      request.fail((jqXHR, textStatus, errorThrown) => {
+        var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText;
+        alert(errorMessage);
       });
     },
     deleteListener: function() {
