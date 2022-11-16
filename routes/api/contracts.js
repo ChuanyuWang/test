@@ -291,6 +291,7 @@ router.get('/', async function(req, res, next) {
         let tenantDB = await db_utils.connect(req.tenant.name);
         let contracts = tenantDB.collection("contracts");
         // get the total of all matched contracts
+        // TODO, use collection.countDocuments() instead
         let cursor = contracts.find(query, { projection: NORMAL_FIELDS });
         let total = await cursor.count();
         let docs = await contracts.aggregate(pipelines).toArray();
