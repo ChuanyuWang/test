@@ -231,67 +231,68 @@ router.post('/api/upgrade',
     getTenantInfo,
     legacyUpgrade,
     upgradeFromFive,
-    async function(req, res, next) {
+    function(req, res, next) {
         // get the tenant to be upgraded
-        //let doc = req.tenant;
-        //return next(new ParamError(`tenant with version ${doc.version} is up-to-date`));
-
-
-        // check payments with null contractNo
-        let tenant = req.tenant;
-        if (tenant.version > 6) return next(new ParamError(`tenant with version ${tenant.version} is up-to-date`));
-
-        try {
-            // get all payments without contractNo field
-            let db = await db_utils.connect(tenant.name);
-            let payments = db.collection('payments');
-            let pipelines = [{
-                $match: { contractNo: null }
-            }, {
-                $project: { contractId: 1, contractNo: 1 }
-            }, {
-                $lookup: {
-                    from: "contracts",
-                    let: { contractID: "$contractId" },
-                    pipeline: [{
-                        $match: {
-                            $expr: { $eq: ["$$contractID", "$_id"] }
-                        }
-                    }, {
-                        $project: { serialNo: 1 }
-                    }],
-                    as: "contracts"
-                }
-            }];
-
-            let docs = await payments.aggregate(pipelines).toArray();
-            if (docs.length === 0) {
-                console.log(`all payments have "contractNo" field in tenant ${tenant.name}`);
-                return res.json("all payments are good");
-            }
-
-            console.log(`find ${docs.length} payments without contractNo in tenant ${tenant.name}`);
-            let bulk = payments.initializeOrderedBulkOp();
-            docs.forEach(doc => {
-                let contracts = doc.contracts || [];
-                if (contracts.length !== 1) {
-                    return console.error(`Can't find the contract of payment ${doc._id}`);
-                }
-                let serialNo = contracts[0].serialNo || null;
-                bulk.find({ _id: doc._id }).updateOne({ $set: { contractNo: serialNo } });
-            });
-            let result = await bulk.execute();
-            console.log("fix payments with result: %j", result.result);
-
-            res.json(`${docs.length} payments are fixed with contractNo`);
-        } catch (error) {
-            if (error instanceof BaseError)
-                return next(error);
-            else
-                return next(new InternalServerError("fail to check payments", error));
-        }
+        let doc = req.tenant;
+        return next(new ParamError(`tenant with version ${doc.version} is up-to-date`));
     }
 );
+
+async function fixPayment(req, res, next) { // eslint-disable-line
+    // check payments with null contractNo
+    let tenant = req.tenant;
+    if (tenant.version !== 6) return next();
+
+    try {
+        // get all payments without contractNo field
+        let db = await db_utils.connect(tenant.name);
+        let payments = db.collection('payments');
+        let pipelines = [{
+            $match: { contractNo: null }
+        }, {
+            $project: { contractId: 1, contractNo: 1 }
+        }, {
+            $lookup: {
+                from: "contracts",
+                let: { contractID: "$contractId" },
+                pipeline: [{
+                    $match: {
+                        $expr: { $eq: ["$$contractID", "$_id"] }
+                    }
+                }, {
+                    $project: { serialNo: 1 }
+                }],
+                as: "contracts"
+            }
+        }];
+
+        let docs = await payments.aggregate(pipelines).toArray();
+        if (docs.length === 0) {
+            console.log(`all payments have "contractNo" field in tenant ${tenant.name}`);
+            return res.json("all payments are good");
+        }
+
+        console.log(`find ${docs.length} payments without contractNo in tenant ${tenant.name}`);
+        let bulk = payments.initializeOrderedBulkOp();
+        docs.forEach(doc => {
+            let contracts = doc.contracts || [];
+            if (contracts.length !== 1) {
+                return console.error(`Can't find the contract of payment ${doc._id}`);
+            }
+            let serialNo = contracts[0].serialNo || null;
+            bulk.find({ _id: doc._id }).updateOne({ $set: { contractNo: serialNo } });
+        });
+        let result = await bulk.execute();
+        console.log("fix payments with result: %j", result.result);
+
+        res.json(`${docs.length} payments are fixed with contractNo`);
+    } catch (error) {
+        if (error instanceof BaseError)
+            return next(error);
+        else
+            return next(new InternalServerError("fail to check payments", error));
+    }
+}
 
 async function getTenantInfo(req, res, next) {
     try {
