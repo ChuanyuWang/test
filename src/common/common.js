@@ -102,7 +102,7 @@ module.exports = {
      */
     CNYFormatter: function(value, row, index) {
         if (value) {
-            return value / 100 + "元";
+            return Math.round(value) / 100 + "元";
         } else {
             return "0元";
         }
