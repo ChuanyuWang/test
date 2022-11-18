@@ -5,8 +5,30 @@ const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const moment = require('moment');
 const mongojs = require('mongojs');
+const { SchemaValidator } = require("./lib/schema_validator");
+const { BadRequestError } = require("./lib/basis");
 
 const EPSILON = 2e-10;
+
+const PaymentSchema = new SchemaValidator({
+    type: {
+        validator: value => {
+            return ["offline", "wechat"].includes(value);
+        },
+        required: true
+    },
+    method: {
+        validator: value => {
+            return ["bankcard", "cash", "mobilepayment"].includes(value);
+        },
+        required: true
+    },
+    contractId: { type: ObjectId, required: true },
+    contractNo: { type: String, required: true },
+    memberId: { type: ObjectId, required: true },
+    payDate: { type: Date, required: true },
+    comment: String
+});
 
 /**
  * {
@@ -22,13 +44,17 @@ const EPSILON = 2e-10;
  * 
  */
 
-var NORMAL_FIELDS = {
+const NORMAL_FIELDS = {
 
 };
 
 router.use(helper.isAuthenticated);
 
-router.post('/', validate, async function(req, res, next) {
+router.post('/', async function(req, res, next) {
+    if (!PaymentSchema.createVerify(req.body)) {
+        return next(new BadRequestError(`Fail to create payment due to invalid parameters`));
+    }
+
     let payment = {
         contractId: ObjectId(req.body.contractId),
         contractNo: req.body.contractNo,
@@ -264,18 +290,6 @@ router.delete('/:paymentID', helper.requireRole("admin"), async function(req, re
         return next(err);
     }
 });
-
-async function validate(req, res, next) {
-    try {
-        //TODO, validate all fields of contract
-
-        return next();
-    } catch (error) {
-        let err = new Error("validate peymant request body fails");
-        err.innerError = error;
-        return next(err);
-    }
-}
 
 class ParamError extends Error {
     constructor(message) {
