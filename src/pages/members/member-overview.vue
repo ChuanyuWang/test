@@ -27,11 +27,16 @@ div
   modal-dialog(ref='createMemberDialog',buttons="confirm",@ok="addNewMember",:hasError="hasError") 添加学员
     template(v-slot:body)
       form.form-horizontal
+        div.form-group
+          div.col-sm-10.col-sm-offset-2
+            span.help-block.small(style="margin:0")
+              i.glyphicon.glyphicon-exclamation-sign.text-danger.me-3
+              | <b>学员姓名</b>和<b>联系方式</b>是家长登录移动端进行约课的账号, 请谨慎填写并告知学员家长
         div.form-group(:class='{"has-error": errors.name}')
           label.control-label.col-sm-2(for='name') 姓名:
           div.col-sm-4
             input.form-control(type='text',name='name',placeholder='学员姓名',v-model.trim='name')
-          div.col-sm-4
+          div.col-sm-2
             p.form-control-static(style='color:#808080')
               small 必填
         div.form-group(:class='{"has-error": errors.contact}')
