@@ -43,6 +43,7 @@ router.get('/getOpenID', async function(req, res, next) {
             err.status = 400;
             return next(err);
         }
+        // Offical document https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
         //TODO, get AppID and AppSecret from tenant config
         let accessToken = await getAccessToken(`?appid=${credentials.AppID}&secret=${credentials.AppSecret}&code=${req.query.code}&grant_type=authorization_code`) || {};
         /**
