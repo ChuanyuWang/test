@@ -22,13 +22,14 @@ modal-dialog(ref="dialog" buttons="confirm" @ok="clickOK", :hasError="hasError")
             option(value="cash") 现金
             option(value="bankcard") 银行卡
             option(value="mobilepayment") 移动支付
-      div.form-group(:class="{ 'has-error': errors.amount }")
+      div.form-group(:class="{ 'has-error': errors.amount, 'has-warning': warnings.amount }")
         label.col-sm-3.control-label 实收金额:
         div.col-sm-5
           div.input-group
             input.form-control(type="number" min="1" step="1" v-model.number="payment.amount")
             span.input-group-addon 元
           span.help-block.ms-3.small(v-if="outstandingFee > payment.amount") 未缴费: {{ outstandingFee - payment.amount }}元
+          span.help-block.ms-3.small(v-else-if="outstandingFee < payment.amount") 多缴了
           span.help-block.ms-3.small(v-else) 已缴清
       div.form-group(:class="{ 'has-error': errors.payDate }")
         label.col-sm-3.control-label 缴费日期:
@@ -63,6 +64,12 @@ module.exports = {
     };
   },
   computed: {
+    warnings() {
+      var warnings = {};
+      if (this.payment.amount > this.outstandingFee)
+        warnings.amount = "缴费金额超出应收金额";
+      return warnings;
+    },
     errors() {
       var errors = {};
       if (!moment(this.payment.payDate).isValid())
