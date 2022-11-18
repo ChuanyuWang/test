@@ -47,6 +47,7 @@ describe('Schema Validator', function() {
         let schema = new SchemaValidator({ field1: String });
         schema.createVerify({ field1: 0 }).should.equal(false);
         schema.createVerify({ field1: true }).should.equal(false);
+        schema.createVerify({ field1: undefined }).should.equal(false);
         schema.createVerify({ field1: "false" }).should.equal(true);
         schema.createVerify({ field1: [] }).should.equal(false);
     });
@@ -65,7 +66,7 @@ describe('Schema Validator', function() {
         schema.createVerify({ field1: new Date() }).should.equal(true);
     });
 
-    it.only('should verify validator type', async function() {
+    it('should verify validator type', async function() {
         let schema = new SchemaValidator({
             field1: {
                 validator: value => {
@@ -77,6 +78,19 @@ describe('Schema Validator', function() {
         schema.createVerify({ field1: null }).should.equal(false);
         schema.createVerify({ field1: undefined }).should.equal(false);
         schema.createVerify({ field1: "common" }).should.equal(false);
+        schema.createVerify({ field1: "active" }).should.equal(true);
+    });
+
+    it('should verify required field', async function() {
+        let schema = new SchemaValidator({
+            field1: {
+                type: String,
+                required: true
+            },
+        });
+        schema.createVerify({ field2: "abc" }).should.equal(false);
+        schema.createVerify({ field1: undefined }).should.equal(false);
+        schema.createVerify({ field1: null }).should.equal(false);
         schema.createVerify({ field1: "active" }).should.equal(true);
     });
 

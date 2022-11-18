@@ -47,7 +47,7 @@ class SchemaValidator {
                 }
                 if (this.checkType(def, body[key]) === false) return true;
             } else if (required) {
-                result = true;
+                return true;
             }
         });
         return result === undefined;
