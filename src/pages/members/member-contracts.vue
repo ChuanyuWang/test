@@ -82,8 +82,8 @@ module.exports = {
     contractLinkFormatter(value, row, index) {
       return [
         `<a href="../contract/${row._id}">`,
+        '<i class="glyphicon glyphicon-list-alt me-3"></i>',
         value,
-        //'<i class="glyphicon glyphicon-search"></i>',
         '</a>',
         row.status === "open" || row.status === "outstanding" ? '<span class="label label-danger ms-3">欠费</span>' : '',
         row.status === "paid" ? '<span class="label label-success ms-3">缴清</span>' : ''
