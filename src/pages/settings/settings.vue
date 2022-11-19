@@ -26,9 +26,9 @@ div
       classroom-setting
     div.tab-pane(role="tabpanel",id="entry")
       div.page-header(style='margin-top:0')
-        h3 微信入口Url
+        h3 微信入口URL
       form.form-horizontal
-        span.help-block 请根据业务需要选择不同的功能入口Url, 然后设置在微信公共号的自定义菜单中, 并将 <b>{{hostname}}</b> 添加到公共号的三个业务域名的任一个, 参见
+        span.help-block 请根据业务需要选择不同的功能入口URL, 然后设置在微信公共号的自定义菜单中, 并将 <b>{{hostname}}</b> 添加到公共号的三个业务域名的任一个, 参见
           a(href='http://kf.qq.com/faq/120911VrYVrA150323ZJfURJ.html',target='_blank') 腾讯帮助文档
           |中《域名设置》部分
         div.form-group

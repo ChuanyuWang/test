@@ -9,7 +9,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
       div.modal-body
         form.form-horizontal
           div.form-group(:class='{"has-error": errors.type}',:title='errors.type')
-            label.control-label.col-sm-3 类型:
+            label.control-label.col-sm-3 课程类型:
             div.col-sm-3
               select.form-control(v-model="type")
                 option.text-default(v-for="item in types" :value="item.id") {{item.name}}

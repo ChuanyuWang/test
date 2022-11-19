@@ -2,11 +2,11 @@
 div.container(style='padding-left:7px;padding-right:7px')
   form.form-horizontal(style='margin-top:15px;padding-left:8px;padding-right:8px',v-show='!user._id')
     div.form-group.form-group-sm
-      div.col-xs-12(style='color:#808080;text-align:center') 请输入小朋友姓名和联系方式查看阅读过的绘本
+      div.col-xs-12(style='color:#808080;text-align:center') 请输入学员姓名和联系方式查看阅读过的绘本
     div.form-group.form-group-sm(:class='{"has-error": errors.name}')
-      label.control-label-sm.col-xs-3(for='cls_name') 小朋友姓名:
+      label.control-label-sm.col-xs-3(for='cls_name') 学员姓名:
       div.col-xs-9
-        input.form-control(type='text',placeholder='小朋友注册时用的姓名',name='name',v-model='name')
+        input.form-control(type='text',placeholder='学员注册时的姓名',name='name',v-model='name')
     div.form-group.form-group-sm(:class='{"has-error": errors.contact}')
       label.control-label-sm.col-xs-3(for='cls_name') 联系方式:
       div.col-xs-9

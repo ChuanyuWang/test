@@ -41,7 +41,7 @@ function validate(member, cls, quantity, error) {
         oldest.setMonth(oldest.getMonth() - cls.age.max);
         if (member.birthday < oldest) { // if the member is older than the oldest one
             // child is too old
-            error.cause = new Error("小朋友年龄超出指定要求，无法预约，如有问题，欢迎来电或到店咨询");
+            error.cause = new Error("学员年龄超出指定要求，无法预约，如有问题，欢迎来电或到店咨询");
             return false;
         }
     }
@@ -53,7 +53,7 @@ function validate(member, cls, quantity, error) {
         youngest.setMonth(youngest.getMonth() - cls.age.min);
         if (member.birthday > youngest) { // if the member is younger than the youngest one
             // child is too young
-            error.cause = new Error("小朋友年龄不到指定要求，无法预约，如有问题，欢迎来电或到店咨询");
+            error.cause = new Error("学员年龄不到指定要求，无法预约，如有问题，欢迎来电或到店咨询");
             return false;
         }
     }

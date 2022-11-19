@@ -26,7 +26,7 @@ module.exports = {
           events: { "click .phone": this.changePhone }
         }, {
           field: "name",
-          title: "小朋友姓名",
+          title: "学员姓名",
           sortable: false
         }, {
           field: "contact",

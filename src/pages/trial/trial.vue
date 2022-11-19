@@ -7,8 +7,8 @@ div.container
         small(v-else) 请填写小朋友的姓名和联系方式，客服会在收到申请后第一时间联系您，为您开通账号，咨询电话:
           a(href='tel:15000359159') 15000359159
     div.form-group(:class='{"has-error": errors.name}')
-      label.control-label 小朋友姓名:
-      input.form-control(type='text',v-model.trim='name',placeholder='小朋友姓名',autofocus)
+      label.control-label 学员姓名:
+      input.form-control(type='text',v-model.trim='name',placeholder='学员姓名',autofocus)
     div.form-group(:class='{"has-error": errors.contact}')
       label.control-label 手机号:
       input.form-control(type='tel',v-model.trim='contact',placeholder='135xxx')
@@ -19,7 +19,7 @@ div.container
         span.input-group-btn
           button.btn.btn-success(type="button", @click='showNoCaptcha', :disabled="errors.contact") 发送验证码
     div.form-group(:class='{"has-error": errors.birthday}')
-      label.control-label 小朋友生日:
+      label.control-label 生日:
       input.form-control(type='date',v-model='birthday')
     div.form-group
       label.control-label 感兴趣的内容:
@@ -240,4 +240,5 @@ module.exports = {
 </script>
 
 <style lang='less'>
+
 </style>
