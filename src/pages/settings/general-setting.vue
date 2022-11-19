@@ -83,7 +83,6 @@ module.exports = {
   filters: {},
   methods: {
     save: function(event) {
-      var vm = this;
       var request = $.ajax("/api/setting/basic", {
         type: "PATCH",
         contentType: "application/json; charset=utf-8",
@@ -99,9 +98,9 @@ module.exports = {
       request.fail(function(jqXHR, textStatus, errorThrown) {
         util.showAlert("更新基础设置失败", jqXHR);
       });
-      request.done(function(data, textStatus, jqXHR) {
-        vm.update(data || {});
-        bootbox.alert("保存成功");
+      request.done((data, textStatus, jqXHR) => {
+        this.update(data || {});
+        this.$messager.showSuccessMessage("保存成功");
       });
     },
     update: function(setting) {
