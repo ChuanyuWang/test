@@ -2,7 +2,7 @@
 div
   ul.nav.nav-tabs(role='tablist')
     li(role='presentation')
-      a(href="#general",role='tab',data-toggle='tab') 综合
+      a(href="#general",role='tab',data-toggle='tab') 基础
     li(role='presentation')
       a(href="#entry",role='tab',data-toggle='tab') 入口
     li(role='presentation')

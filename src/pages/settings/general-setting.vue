@@ -97,7 +97,7 @@ module.exports = {
         dataType: "json"
       });
       request.fail(function(jqXHR, textStatus, errorThrown) {
-        util.showAlert("更新综合设置失败", jqXHR);
+        util.showAlert("更新基础设置失败", jqXHR);
       });
       request.done(function(data, textStatus, jqXHR) {
         vm.update(data || {});

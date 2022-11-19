@@ -48,7 +48,7 @@ module.exports = {
         { name: "删除老师", role: "admin" },
         { name: "修改老师", role: "admin" },
 
-        { name: "综合设置", role: "admin" },
+        { name: "基础设置", role: "admin" },
 
         { name: "查看课程", role: "guest" },
         { name: "添加课程类型", role: "admin" },
