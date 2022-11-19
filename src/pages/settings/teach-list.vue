@@ -1,7 +1,7 @@
 <template lang="pug">
 div(style="padding-right:0")
   div.input-group.mb-7
-    span.input-group-addon 显示:
+    span.input-group-addon 状态:
     select.form-control(v-model='filter',style="width:100px")
       option(value='active') {{$t('status_active')}}
       option(value='inactive') {{$t('status_inactive')}}

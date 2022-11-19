@@ -20,7 +20,7 @@
   "booking_summary_description": "当添加新课程或成员到班级时，自动分配未开始课程于所有班级成员，请确认分配结果并处理相关失败",
   "booking_successful_summary": "成功预约课程",
   "booking_fail_summary": "失败会员",
-  "member_select_title": "选择会员",
+  "member_select_title": "选择学员",
   "status_active": "激活",
   "status_inactive": "未激活",
   "status_deleted": "已删除",

@@ -12,13 +12,13 @@ div
               a.btn(role="button" @click='beforeEditType(type)')
                 i.glyphicon.glyphicon-edit.text-primary
               a.btn(role="button" @click='$refs.deleteTypeDialog.show(type)')
-                i.glyphicon.glyphicon-remove-circle.text-danger
+                i.glyphicon.glyphicon-remove-sign.text-danger
             span.label.label-default(v-if="type.status === 'closed'") 已完结
             span.label.label-primary(v-else-if="type.visible === true") 开放预约
     div.col-xs-6
       ul.list-group
         li.list-group-item(v-for='(product, index) in products') {{product.name}}
-  modal-dialog(ref='createTypeDialog',buttons="confirm",@ok="createType()",:hasError="hasError") 创建课程
+  modal-dialog(ref='createTypeDialog',buttons="confirm",@ok="createType()",:hasError="hasError") 添加课程类型
     template(v-slot:body)
       form.form-horizontal
         div.form-group
@@ -26,9 +26,9 @@ div
           div.col-sm-10
             p.form-control-static {{status | statusFilter}}
         div.form-group(:class='{"has-error": errors.name}')
-          label.control-label.col-sm-2 课程名称:
+          label.control-label.col-sm-2 课程类型:
           div.col-sm-8
-            input.form-control(type='text',placeholder='课程名称',v-model='name')
+            input.form-control(type='text',placeholder='课程类型',v-model='name')
         div.form-group
           div.col-sm-offset-2.col-sm-10
             div.checkbox
@@ -36,7 +36,7 @@ div
                 input(type='checkbox',v-model='visible')
                 |开放预约
                 span.help-block.small 开放预约的课程类型允许家长自助约课
-  modal-dialog(ref='editTypeDialog',buttons="confirm") 修改课程
+  modal-dialog(ref='editTypeDialog',buttons="confirm") 修改课程类型
     template(v-slot:body)
       form.form-horizontal
         div.form-group
@@ -44,9 +44,9 @@ div
           div.col-sm-10
             p.form-control-static {{status | statusFilter}}
         div.form-group(:class='{"has-error": errors.name}')
-          label.control-label.col-sm-2 课程名称:
+          label.control-label.col-sm-2 课程类型:
           div.col-sm-8
-            input.form-control(type='text',placeholder='课程名称',v-model='name')
+            input.form-control(type='text',placeholder='课程类型',v-model='name')
         div.form-group
           div.col-sm-offset-2.col-sm-10
             div.checkbox
