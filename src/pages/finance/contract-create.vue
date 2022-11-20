@@ -7,7 +7,7 @@ div.container
       a(href="../finance") 合约列表
     li.active 创建合约
   div.page-header
-    h3(style="margin-top: 0; display: inline-block") 合约信息
+    h3(style="margin-top: 0; display: inline-block") 学员信息
     button.btn.btn-success(type="button" style="float: right", :disabled="hasError" @click="createContract") 确定
     a.btn.btn-default.me-3(type="button" style="float: right" href="../finance") 取消
   div.row
@@ -54,7 +54,7 @@ div.container
           div.col-sm-7.col-md-5
             date-picker(v-model="contract.signDate")
   div.page-header
-    h3 选择课程
+    h3 课程信息
   div.row
     div.col-sm-6
       form.form-horizontal
