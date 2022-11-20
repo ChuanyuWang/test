@@ -154,7 +154,7 @@ module.exports = {
         discount: 0,
         received: 0,
         createDate: new Date(),
-        effectiveDate: new Date(),
+        effectiveDate: moment().startOf('day'),
         expireDate: null,
         signDate: new Date(),
         comments: []
