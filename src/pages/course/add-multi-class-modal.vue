@@ -18,7 +18,7 @@ modal-dialog(ref='dialog' buttons="confirm" @ok="handleOK" :hasError="hasError" 
       div.form-group(:class='{"has-error": errors.cost}')
         label.control-label.col-sm-2 所须课时:
         div.col-sm-3(:title="errors.cost")
-          input.form-control(type='number',name='cost',min='0',step='0.1',value=0,v-model.number='cost')
+          input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
       div.form-group
         label.control-label.col-sm-2 教室:
         div.col-sm-3
@@ -87,7 +87,7 @@ module.exports = {
       begin: moment(),
       end: moment().add(1, 'week'),
       room: '',
-      cost: 0,
+      cost: 1,
       weekdays: [],
       isRepeated: false,
       teacher: null, // selected teacher
