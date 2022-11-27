@@ -20,7 +20,8 @@ div
         div.form-group(:class="{ 'has-error': errors.comment }", :title="errors.comment")
           label.control-label.col-sm-2(style="padding-right:0") 新备注:
           div.col-sm-10
-            textarea.form-control.has-3-rows(rows="3" v-model.trim="comment" placeholder="合约备注, 添加后无法修改")
+            textarea.form-control.has-3-rows(rows="3" v-model.trim="comment" placeholder="添加合约备注")
+            span.help-block.small.ms-3.mb-3 最多256个字，添加后无法修改
         div.form-group
           div.col-sm-offset-2.col-sm-10
             button.btn.btn-primary(type="button" @click="addComment", :disabled="!comment || hasError") 添加备注
