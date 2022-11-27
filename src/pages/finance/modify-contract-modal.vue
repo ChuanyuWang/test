@@ -41,7 +41,7 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
             input.form-control(type="number" v-model.number="discount" min="0" step="1")
             span.input-group-addon 元
       div.form-group(:class="{ 'has-error': errors.comment }")
-        label.col-sm-3.control-label 合约备注:
+        label.col-sm-3.control-label 修改备注:
         div.col-sm-9
           textarea.form-control.has-3-rows(rows="3" placeholder="添加合约备注" v-model.trim="item.comment")
           span.help-block.ms-3.small 最多256个字，提交后无法修改
