@@ -26,13 +26,13 @@ div
       classroom-setting
     div.tab-pane(role="tabpanel",id="entry")
       div.page-header(style='margin-top:0')
-        h3 微信入口URL
+        h3 家长端功能入口
       form.form-horizontal
-        span.help-block 请根据业务需要选择不同的功能入口URL, 然后设置在微信公共号的自定义菜单中, 并将 <b>{{hostname}}</b> 添加到公共号的三个业务域名的任一个, 参见
+        span.help-block 根据业务需要选择不同的家长端功能入口, 并设置在微信公共号的自定义菜单中, 请将 <b>{{hostname}}</b> 添加到公共号的三个业务域名的任一个, 参见
           a(href='http://kf.qq.com/faq/120911VrYVrA150323ZJfURJ.html',target='_blank') 腾讯帮助文档
           |中《域名设置》部分
         div.form-group
-          label.col-sm-2.control-label 在线预约
+          label.col-sm-2.control-label 预约课程
           div.col-sm-10
             p.form-control-static {{tenantUrl + '/booking'}}
             span.help-block 预约入口, 访问用户可以查看本周全部课程, 并根据注册信息进行课程预约; 未开始课程, 会员可以提前24小时取消。
