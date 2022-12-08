@@ -72,10 +72,20 @@ morgan.token('pid', function getPid(req) {
     return process.pid;
 });
 
+morgan.token('remote-user', function getRemoteUserToken(req) {
+    // return username
+    return req.user ? req.user.username : "-";
+});
+
+morgan.token('tenant', function getRemoteUserToken(req) {
+    // return tenant name
+    return req.tenant ? req.tenant.name : "-";
+});
+
 if (app.locals.ENV_DEVELOPMENT) {
     app.use(morgan('dev'));
 } else {
-    app.use(morgan('[:date[iso]] [:pid] :remote-addr - :remote-user :method :url :status :res[content-length] - :response-time ms'));
+    app.use(morgan('[:date[iso]] [:pid] :remote-addr - :tenant :method :url :status :res[content-length] - :response-time ms'));
 }
 
 // Use gzip compression
