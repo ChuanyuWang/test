@@ -80,7 +80,7 @@ function getOpenId(code) {
             app.openID = data.openid;
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert(JSON.stringify(jqXHR.responseJSON));
+            console.error("getOpenId fails", jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
         },
         dataType: "json"
     });
