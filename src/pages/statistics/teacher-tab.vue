@@ -8,7 +8,7 @@ div
         select.form-control(v-model="typeFilter" @change="refresh")
           option(value="") {{ $t('all') }}
           option(v-for="item in types" :value="item.id") {{item.name}}
-  bootstrap-table.table-striped(ref='checkinTable',:columns='columns',:options='options')
+  bootstrap-table.table-striped(ref='teacherSummaryTable',:columns='columns',:options='options')
 </template>
 
 <script>
@@ -115,7 +115,7 @@ module.exports = {
   methods: {
     refresh: function() {
       // refresh the table when user changes the status filter
-      this.$refs.checkinTable.refresh({
+      this.$refs.teacherSummaryTable.refresh({
         url: "/api/analytics/teacherAnalysis",
       });
     },
