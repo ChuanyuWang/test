@@ -28,7 +28,9 @@ module.exports = {
      */
     toFixed2,
     /**
-     * Add method $toFixed1 and $toFixed2 to Vue instances
+     * Add method $toFixed1 and $toFixed2 to Vue instances, E.g.
+     * in <tempalte> tag, span.text-muted {{remainingCredit | toFixed1}}
+     * in <script> tag, "合约课时由 <del>" + this.$toFixed1(o);
      * @param {*} Vue 
      * @param {*} options 
      */
