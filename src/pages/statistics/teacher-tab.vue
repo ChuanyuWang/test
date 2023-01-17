@@ -44,37 +44,67 @@ module.exports = {
         }, {
           title: this.$t("time"),
           sortable: false,
-          formatter: this.timeFormatter
+          formatter: value => { return this.targetMonth.format("YYYY-MM"); }
         }, {
           title: this.$t("status"),
           sortable: false,
-          formatter: this.statusFormatter
+          formatter: this.statusFormatter,
+          footerFormatter: value => { return "总计"; }
         }, {
           field: "counter",
           title: "完成课次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
           sortable: false,
           formatter: value => { return (value || []).length; },
+          footerFormatter: function(data) {
+            return (data || []).map(row => { return row.counter || []; }).reduce((sum, v) => {
+              return sum + v.length;
+            }, 0);
+          },
           titleTooltip: "每上一次课计一次, 与课时无关"
         }, {
           field: "counter",
           title: "完成课节<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
           sortable: false,
           formatter: this.counterFormatter,
-          titleTooltip: "完成课节=完成课次*每节课时, 例如: 完成两次课, 课时分别为1课时和2课时, 则完成课节为3 (1+2)"
+          titleTooltip: "完成课节=完成课次*每节课时, 例如: 完成两次课, 课时分别为1课时和2课时, 则完成课节为3 (1+2)",
+          footerFormatter: data => {
+            var result = (data || []).map(row => { return row.counter || []; }).reduce((sum, v) => {
+              return sum + v.reduce((s, i) => { return s + i.cost; }, 0);
+            }, 0);
+            return this.$toFixed1(result);
+          }
         }, {
           title: "实际完成课时",
           sortable: false,
-          formatter: this.actualFormatter
+          formatter: this.actualFormatter,
+          footerFormatter: data => {
+            var result = (data || []).map(row => { return row.total - row.absent || 0; }).reduce((sum, v) => {
+              return sum + v;
+            }, 0);
+            return this.$toFixed1(result);
+          }
         }, {
           field: "absent",
           title: "缺席课时",
           sortable: true,
-          formatter: this.numberFormatter
+          formatter: this.$toFixed1,
+          footerFormatter: data => {
+            var result = (data || []).map(row => { return row.absent; }).reduce((sum, v) => {
+              return sum + v;
+            }, 0);
+            return this.$toFixed1(result);
+          }
         }, {
           field: "total",
           title: "完成课时",
           sortable: true,
-          formatter: this.numberFormatter
+          formatter: this.$toFixed1,
+          footerFormatter: data => {
+            var result = (data || []).map(row => { return row.total; }).reduce((sum, v) => {
+              return sum + v;
+            }, 0);
+            return this.$toFixed1(result);
+          }
         }
       ],
       options: {
@@ -82,6 +112,7 @@ module.exports = {
         sortName: 'total',
         sortOrder: "desc",
         toolbar: '#teacher_toolbar',
+        showFooter: true,
         queryParams: this.statusQuery,
         //url: "/api/classes/checkin",
         //sidePagination: "server",
@@ -120,17 +151,12 @@ module.exports = {
       });
     },
     counterFormatter: function(value, row, index) {
-      var sum = 0;
-      (value || []).forEach(value => {
-        sum += value.cost;
-      });
-      return sum;
+      return (value || []).reduce((sum, i) => {
+        return sum + i.cost;
+      }, 0);
     },
     nameFormatter: function(value, row, index) {
       return value ? this.teachers[value].name : "<未指定>";
-    },
-    timeFormatter: function(value, row, index) {
-      return this.targetMonth.format("YYYY-MM");
     },
     statusFormatter: function(value, row, index) {
       var status = row._id && this.teachers[row._id].status;
@@ -145,12 +171,9 @@ module.exports = {
           return null;
       }
     },
-    numberFormatter: function(value, row, index) {
-      return value;
-    },
     actualFormatter: function(value, row, index) {
       var res = row.total - row.absent || 0;
-      return Math.round(res * 10) / 10;
+      return this.$toFixed1(res);
     },
     statusQuery: function(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
