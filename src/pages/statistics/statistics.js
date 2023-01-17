@@ -4,6 +4,7 @@
  * --------------------------------------------------------------------------
  */
 var i18nextplugin = require('../../locales/i18nextplugin');
+var formatPlugin = require('../../common/format');
 var statisticsPage = require('./statistics-page.vue').default;
 
 // DOM Ready =============================================================
@@ -24,6 +25,7 @@ function init() {
     console.log("statistics page...");
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
+    Vue.use(formatPlugin);
 
     moment.locale('zh-CN');
     bootbox.setLocale('zh_CN');
