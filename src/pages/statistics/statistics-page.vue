@@ -72,7 +72,7 @@ module.exports = {
 
     // refresh the chart when user switch to consume tab first time, otherwise width is 0
     $(this.$el).find('a[href="#analytics"]').one('shown.bs.tab', function(e) {
-      vm.$refs.consumeChart.refreshChart();
+      vm.$refs.consumeChart.firstLoad();
     });
 
     // refresh the chart when user switch to contracts tab first time, otherwise width is 0

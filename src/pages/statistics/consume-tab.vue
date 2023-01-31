@@ -63,6 +63,24 @@ module.exports = {
   },
   filters: {},
   methods: {
+    firstLoad() {
+      this.consumeChart = echarts.init(
+        $(this.$el).find("#consume_chart")[0],
+        "vintage"
+      );
+
+      this.orderChart = echarts.init(
+        $(this.$el).find("#orders_chart")[0],
+        "vintage"
+      );
+
+      window.onresize = () => {
+        this.consumeChart.resize();
+        this.orderChart.resize();
+      };
+
+      this.refreshChart();
+    },
     refreshChart: function() {
       var vm = this;
 
@@ -303,16 +321,6 @@ module.exports = {
         color: colorPalette
       }
     });
-
-    this.consumeChart = echarts.init(
-      $(this.$el).find("#consume_chart")[0],
-      "vintage"
-    );
-
-    this.orderChart = echarts.init(
-      $(this.$el).find("#orders_chart")[0],
-      "vintage"
-    );
   }
 };
 </script>
