@@ -85,7 +85,34 @@ module.exports = {
   },
   filters: {},
   methods: {
-    refresh() {
+    firstLoad() {
+      this.chart1 = echarts.init(
+        $(this.$el).find("#chart1")[0],
+        "westeros"
+      );
+
+      this.chart2 = echarts.init(
+        $(this.$el).find("#chart2")[0],
+        "walden"
+      );
+
+      this.chart3 = echarts.init(
+        $(this.$el).find("#chart3")[0],
+        "westeros"
+      );
+
+      this.chart4 = echarts.init(
+        $(this.$el).find("#chart4")[0],
+        "walden"
+      );
+
+      window.onresize = () => {
+        this.chart1.resize();
+        this.chart2.resize();
+        this.chart3.resize();
+        this.chart4.resize();
+      };
+
       this.refreshChart();
       this.refreshChart3();
       this.refreshChart4();
@@ -439,33 +466,6 @@ module.exports = {
   mounted: function() {
     echarts.registerTheme("walden", waldenTheme);
     echarts.registerTheme("westeros", westerosTheme);
-
-    this.chart1 = echarts.init(
-      $(this.$el).find("#chart1")[0],
-      "westeros"
-    );
-
-    this.chart2 = echarts.init(
-      $(this.$el).find("#chart2")[0],
-      "walden"
-    );
-
-    this.chart3 = echarts.init(
-      $(this.$el).find("#chart3")[0],
-      "westeros"
-    );
-
-    this.chart4 = echarts.init(
-      $(this.$el).find("#chart4")[0],
-      "walden"
-    );
-
-    window.onresize = () => {
-      this.chart1.resize();
-      this.chart2.resize();
-      this.chart3.resize();
-      this.chart4.resize();
-    };
   }
 };
 </script>

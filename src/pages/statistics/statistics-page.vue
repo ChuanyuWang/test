@@ -77,7 +77,7 @@ module.exports = {
 
     // refresh the chart when user switch to contracts tab first time, otherwise width is 0
     $(this.$el).find('a[href="#contracts"]').one('shown.bs.tab', function(e) {
-      vm.$refs.expenseChart.refresh();
+      vm.$refs.expenseChart.firstLoad();
     });
 
     // refresh the chart when user switch to hint tab first time
