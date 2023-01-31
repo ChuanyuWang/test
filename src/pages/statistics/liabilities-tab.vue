@@ -3,12 +3,13 @@ div
   div.row(style="margin-top:15px")
     div.col-sm-12.col-md-6
       div.d-flex.justify-content-end.align-items-center(style="margin-bottom:15px")
-        div.me-7 合约总计剩余: <strong>{{notStartedContracts | creditFilter}}</strong>课时
+        div.me-7 有效学员总计: <strong>{{effectiveMembersCount}}</strong>人
+        div.me-7 合约总计剩余: <strong>{{notStartedContracts | toFixed1}}</strong>课时
         button.btn.btn-primary(type="button",@click='refreshChart3') 刷新
       div#chart3(style="height:400px")
     div.col-sm-12.col-md-6
       div.d-flex.justify-content-end.align-items-center(style="margin-bottom:15px")
-        div.me-7 课程总计剩余: <strong>{{notStartedTotal | creditFilter}}</strong>课时
+        div.me-7 课程总计剩余: <strong>{{notStartedTotal | toFixed1}}</strong>课时
         button.btn.btn-primary(type="button",@click='refreshChart4') 刷新
       div#chart4(style="height:400px")
 </template>
@@ -24,6 +25,7 @@ var util = require('../../services/util');
 var date_picker = require('../../components/date-picker.vue').default;
 var waldenTheme = require("./walden.json");
 var westerosTheme = require("./westeros.json");
+var request1 = null;
 var request3 = null;
 var request4 = null;
 
@@ -37,6 +39,7 @@ module.exports = {
       chart4: null,
       notStartedTotal: 0,
       notStartedContracts: 0,
+      effectiveMembersCount: 0
     };
   },
   watch: {},
@@ -44,11 +47,7 @@ module.exports = {
     'date-picker': date_picker
   },
   computed: {},
-  filters: {
-    creditFilter(value) {
-      return Math.round(value * 10) / 10;
-    }
-  },
+  filters: {},
   methods: {
     getTypeName(typeId) {
       var item = this.types.find(value => {
@@ -60,7 +59,24 @@ module.exports = {
       this.refreshChart3();
       this.refreshChart4();
     },
+    refreshEffectiveMembers() {
+      // load data for effective members
+      if (request1) request1.abort("abort by user");
+
+      request1 = util.getJSON("/api/analytics/effectivemembers");
+      request1.fail(jqXHR => {
+        util.showAlert("刷新有效学员失败", jqXHR);
+      });
+      request1.done((data, textStatus, jqXHR) => {
+        var result = (data || []).length === 1 ? data[0] : null;
+        this.effectiveMembersCount = result ? result.count : "error";
+      });
+      request1.always(() => {
+        request1 = null;
+      });
+    },
     refreshChart3() {
+      this.refreshEffectiveMembers();
       // load data for chart3
       if (request3) request3.abort("abort by user");
       // resize the chart according to its parent dom size

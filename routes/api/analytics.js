@@ -692,6 +692,47 @@ router.get('/remainingcontracts', async function(req, res, next) {
     }
 });
 
+// analysis of effective members
+router.get('/effectivemembers', async function(req, res, next) {
+    try {
+        let pipelines = [{
+            $match: {
+                status: "paid",
+                $or: [
+                    { expireDate: { $gt: new Date() } },
+                    { expireDate: null }
+                ]
+            }
+        }, {
+            $project: {
+                memberId: 1,
+                remaining: {
+                    $subtract: ["$credit", { $add: ["$consumedCredit", "$expendedCredit"] }]
+                }
+            }
+        }, {
+            $group: {
+                _id: "$memberId", // group the remaining credit by member
+                total: { $sum: "$remaining" }
+            }
+        }, {
+            $group: {
+                _id: null,
+                count: { $sum: 1 },
+                totalRemaining: { $sum: "$total" }
+            }
+        }];
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+        let docs = await contracts.aggregate(pipelines).toArray();
+
+        console.log("analyze members with effective contracts: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analyze members with effective contracts fails", error));
+    }
+});
+
 router.get('/incomingpayment', async function(req, res, next) {
     //[Default] get the current year consumption by month
     let year = (new Date()).getFullYear();
