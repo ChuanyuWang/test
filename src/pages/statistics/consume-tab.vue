@@ -30,6 +30,7 @@ div
 
 var util = require('../../services/util');
 var date_picker = require('../../components/date-picker.vue').default;
+var vintageTheme = require("./vintage.json");
 
 module.exports = {
   name: "consume-tab",
@@ -302,25 +303,7 @@ module.exports = {
   created: function() { },
   mounted: function() {
     // register vintage Theme for echarts
-    var colorPalette = [
-      "#d87c7c",
-      "#919e8b",
-      "#d7ab82",
-      "#6e7074",
-      "#61a0a8",
-      "#efa18d",
-      "#787464",
-      "#cc7e63",
-      "#724e58",
-      "#4b565b"
-    ];
-    echarts.registerTheme("vintage", {
-      color: colorPalette,
-      backgroundColor: "#ffffff",
-      graph: {
-        color: colorPalette
-      }
-    });
+    echarts.registerTheme("vintage", vintageTheme);
   }
 };
 </script>
