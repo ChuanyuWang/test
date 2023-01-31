@@ -55,7 +55,22 @@ module.exports = {
       });
       return item && item.name || "未指定类型";
     },
-    refresh() {
+    firstLoad() {
+      this.chart3 = echarts.init(
+        $(this.$el).find("#chart3")[0],
+        "westeros"
+      );
+
+      this.chart4 = echarts.init(
+        $(this.$el).find("#chart4")[0],
+        "walden"
+      );
+
+      window.onresize = () => {
+        this.chart3.resize();
+        this.chart4.resize();
+      };
+
       this.refreshChart3();
       this.refreshChart4();
     },
@@ -236,21 +251,6 @@ module.exports = {
   mounted: function() {
     echarts.registerTheme("walden", waldenTheme);
     echarts.registerTheme("westeros", westerosTheme);
-
-    this.chart3 = echarts.init(
-      $(this.$el).find("#chart3")[0],
-      "westeros"
-    );
-
-    this.chart4 = echarts.init(
-      $(this.$el).find("#chart4")[0],
-      "walden"
-    );
-
-    window.onresize = () => {
-      this.chart3.resize();
-      this.chart4.resize();
-    };
   }
 };
 </script>

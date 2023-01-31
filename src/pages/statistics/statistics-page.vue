@@ -75,7 +75,7 @@ module.exports = {
       vm.$refs.consumeChart.refreshChart();
     });
 
-    // refresh the chart when user switch to consume tab first time, otherwise width is 0
+    // refresh the chart when user switch to contracts tab first time, otherwise width is 0
     $(this.$el).find('a[href="#contracts"]').one('shown.bs.tab', function(e) {
       vm.$refs.expenseChart.refresh();
     });
@@ -90,9 +90,9 @@ module.exports = {
       vm.$refs.teacherTab.refresh();
     });
 
-    // refresh the chart when user switch to teacher tab first time
+    // refresh the chart when user switch to liabilities tab first time
     $(this.$el).find('a[href="#liabilities"]').one('shown.bs.tab', function(e) {
-      vm.$refs.liabilitiesChart.refresh();
+      vm.$refs.liabilitiesChart.firstLoad();
     });
   }
 };
