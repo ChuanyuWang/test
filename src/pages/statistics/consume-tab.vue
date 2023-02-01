@@ -1,18 +1,16 @@
 <template lang="pug">
 div
-  div.row(style="margin-top:7px")
-    div.col-md-1.pull-right(style="display:inline-flex")
-      button.btn.btn-primary(type="button",@click='refreshChart') 刷新
-    div.col-md-3.pull-right(style="display:inline-flex")
-      p.form-control-static.text-nowrap(style="display:inline-table") 单位：
-      select.form-control(v-model='unit',@change='refreshChart')
-        option(value='year') 年
-        option(value='month') 月
-        option(value='week') 周
-    div.col-md-3.pull-right(style="display:inline-flex")
-      p.form-control-static.text-nowrap(style="display:inline-table") 年份：
-      div
-        date-picker(v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart")
+  div.row(style="margin-top:15px")
+    div.col-md-12
+      div.d-flex.justify-content-end
+        date-picker.me-7(label='年份:', v-model='year', :disabled='unit=="year"', :config='yearPickerConfig', @input="refreshChart" style="max-width:160px")
+        div.input-group.me-7
+          span.input-group-addon 单位:
+          select.form-control(v-model='unit',@change='refreshChart')
+            option(value='year') 年
+            option(value='month') 月
+            option(value='week') 周
+        button.btn.btn-primary(type="button",@click='refreshChart') 刷新
   div.row(style="margin-top:15px")
     div.col-xs-12
       div#consume_chart(style="height:400px")
