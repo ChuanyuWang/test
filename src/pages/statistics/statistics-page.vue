@@ -30,6 +30,7 @@ div
       member-tab
     div.tab-pane(role="tabpanel",id="liabilities")
       liabilities-tab(ref='liabilitiesChart')
+  message-alert(ref="messager")
 </template>
 
 <script>
@@ -46,6 +47,7 @@ var consumeTab = require("./consume-tab.vue").default;
 var expenseTab = require("./expense-tab.vue").default;
 var liabilitiesTab = require("./liabilities-tab.vue").default;
 var memberTab = require("./member-tab.vue").default;
+var messageAlert = require("../../components/message-alert.vue").default;
 
 module.exports = {
   name: "statistics-page",
@@ -61,13 +63,16 @@ module.exports = {
     "consume-tab": consumeTab,
     "expense-tab": expenseTab,
     "liabilities-tab": liabilitiesTab,
-    "member-tab": memberTab
+    "member-tab": memberTab,
+    "message-alert": messageAlert
   },
   computed: {},
   filters: {},
   methods: {},
   created: function() { },
   mounted: function() {
+    // set message for global usage
+    Vue.prototype.$messager = this.$refs.messager;
     var vm = this;
 
     // refresh the chart when user switch to consume tab first time, otherwise width is 0
