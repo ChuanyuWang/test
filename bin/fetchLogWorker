@@ -1,0 +1,36 @@
+const config = require('../config');
+
+// under development if NODE_ENV is not defined as "production".
+const env = process.env;
+const IS_DEVELOPMENT = env.NODE_ENV !== 'production';
+
+// set the main logging by log4js
+const log4js = require('log4js');
+// Configuration should take place immediately after requiring log4js for the first time in your application.
+log4js.configure(config.log4js);
+const logger = IS_DEVELOPMENT ? log4js.getLogger() : log4js.getLogger('production');
+// Console replacement
+console.log = logger.info.bind(logger);
+console.debug = logger.debug.bind(logger);
+console.error = logger.error.bind(logger);
+
+console.log("worker start...");
+
+let intervalID = setInterval(() => {
+    console.log(`fetching log...`);
+}, 2000);
+
+// intercept the SIGINT signal (emitted by pm2 stop) for Graceful Shutdown
+// By default, pm2 waits 1600ms before sending SIGKILL signal if the applications doesn’t exit itself.
+// pm2 will try to kill the old process by every 100ms until sending SIGKILL signal
+// Change the default value by option "kill_timeout: 1600"
+process.on('SIGINT', function() {
+    console.info('SIGINT signal received in the worker.')
+
+    // stop the loop
+    clearInterval(intervalID);
+
+    // close database connection and exit with success (0 code)
+    console.log("...worker end");
+})
+

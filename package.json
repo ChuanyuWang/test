@@ -9,7 +9,8 @@
     "lint": "eslint . --ext .js,.vue",
     "build": "webpack --config webpack.config.prod.js",
     "start": "node ./bin/www",
-    "test": "mocha --require ./test/hooks.cjs --recursive"
+    "test": "mocha --require ./test/hooks.cjs --recursive",
+    "worker": "node ./bin/fetchLogWorker"
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.7",
