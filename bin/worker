@@ -1,9 +1,8 @@
 const util = require('util');
 const config = require('../config');
 const credentials = require('../config.db');
+const loggerFetcher = require('../server/logFetcher');
 const { MongoClient } = require('mongodb');
-
-const LOGS_SCHEMA = "dlketang_logs";
 
 // under development if NODE_ENV is not defined as "production".
 const env = process.env;
@@ -21,7 +20,7 @@ console.error = logger.error.bind(logger);
 
 console.log("worker start...");
 
-let mongoClient = new MongoClient(connectionURI(LOGS_SCHEMA, credentials), {
+let mongoClient = new MongoClient(connectionURI(loggerFetcher.LOGS_SCHEMA, credentials), {
     authSource: 'admin',
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -29,14 +28,14 @@ let mongoClient = new MongoClient(connectionURI(LOGS_SCHEMA, credentials), {
 });
 
 console.log("worker connecting database...");
-
 mongoClient.connect(error => {
     if (error) return console.error(error);
-    console.log(`connect to database ${LOGS_SCHEMA}`);
+    console.log(`connect to database ${loggerFetcher.LOGS_SCHEMA}`);
 });
 
+loggerFetcher.checkYesterdayLog(mongoClient);
 let intervalID = setInterval(() => {
-    console.log(`fetching log...`);
+    loggerFetcher.startNextTask(mongoClient);
 }, 2000);
 
 // intercept the SIGINT signal (emitted by pm2 stop) for Graceful Shutdown
