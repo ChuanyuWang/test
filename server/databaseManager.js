@@ -1,5 +1,4 @@
-var util = require('util');
-var config = require('../config.db');
+const util = require('util');
 const mongojs = require('mongojs');
 const { MongoClient } = require('mongodb');
 const mongoose = require('mongoose');
@@ -20,6 +19,7 @@ const dbCache = new Map();
 const manager = {};
 
 function connectionURI(database) {
+    const config = require('../config.db');
     //https://docs.mongodb.com/manual/reference/connection-string/#standard-connection-string-format
     if (config.user) {
         return util.format("mongodb://%s:%s@%s:27017/%s", config.user, config.pass, config.host, database);
