@@ -70,5 +70,3 @@ function connectionURI(database, config) {
         return util.format("mongodb://%s:27017/%s", config.host, database);
     }
 }
-
-
