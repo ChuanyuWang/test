@@ -154,7 +154,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         return next(error);
     }
 
-    if (['config', 'chuanyu', 'admin', 'setting', 'settings', 'api', 'local'].indexOf(req.body.name) > -1) {
+    if (['config', 'chuanyu', 'admin', 'setting', 'settings', 'api', 'local', 'dlketang_logs'].indexOf(req.body.name) > -1) {
         var error = new Error("tenant name is illegal");
         error.status = 400;
         return next(error);
