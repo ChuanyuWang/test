@@ -1,7 +1,7 @@
 const util = require('util');
 const config = require('../config');
 const credentials = require('../config.db');
-const loggerFetcher = require('../server/logFetcher');
+const logFetcher = require('../server/logFetcher');
 const { MongoClient } = require('mongodb');
 
 // under development if NODE_ENV is not defined as "production".
@@ -20,7 +20,7 @@ console.error = logger.error.bind(logger);
 
 console.log("worker start...");
 
-let mongoClient = new MongoClient(connectionURI(loggerFetcher.LOGS_SCHEMA, credentials), {
+let mongoClient = new MongoClient(connectionURI(logFetcher.LOGS_SCHEMA, credentials), {
     authSource: 'admin',
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -30,13 +30,37 @@ let mongoClient = new MongoClient(connectionURI(loggerFetcher.LOGS_SCHEMA, crede
 console.log("worker connecting database...");
 mongoClient.connect(error => {
     if (error) return console.error(error);
-    console.log(`connect to database ${loggerFetcher.LOGS_SCHEMA}`);
+    console.log(`connect to database ${logFetcher.LOGS_SCHEMA}`);
 });
 
-loggerFetcher.checkYesterdayLog(mongoClient);
-let intervalID = setInterval(() => {
-    loggerFetcher.startNextTask(mongoClient);
-}, 2000);
+// worker will check next task by every 5 minutes in slient model
+let slientModel = false;
+logFetcher.checkYesterdayLog(mongoClient);
+async function processTask() {
+    if (logFetcher.isWorking()) {
+        // skip current interval task due to ensure no concurrent tasks running
+        console.warn("skip task as log fetcher is staill working")
+        return;
+    }
+    try {
+        let hasNext = await logFetcher.startNextTask(mongoClient);
+        if (hasNext && slientModel) {
+            clearInterval(intervalID);
+            intervalID = setInterval(processTask, 3000); // repeat task in 3 second
+            slientModel = false;
+        }
+        // increase the interval time if no more task
+        if (!hasNext && !slientModel) {
+            clearInterval(intervalID);
+            intervalID = setInterval(processTask, 300000); // heartbeat check in 5 minutes
+            slientModel = true;
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+// start the first task in 3 seconds for checkYesterdayLog complete
+let intervalID = setInterval(processTask, 3000);
 
 // intercept the SIGINT signal (emitted by pm2 stop) for Graceful Shutdown
 // By default, pm2 waits 1600ms before sending SIGKILL signal if the applications doesn’t exit itself.
