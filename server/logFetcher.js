@@ -33,11 +33,15 @@ exports.checkYesterdayLog = async function(mongoClient) {
 
 exports.startNextTask = async function(mongoClient) {
     isWorking = true;
-    console.log(`fetching log...`);
 
     let log_db = await mongoClient.db(LOGS_SCHEMA);
     let tasks = log_db.collection("tasks");
     let doc = await tasks.findOne({ status: "in_progress" });
+    if (!doc) {
+        console.log(`no task to proceed`);
+        isWorking = false;
+        return false; // no more task to proceed
+    }
 
     let startTime = moment(doc.date).format('YYYY-MM-DD');
     let pageNo = doc.pageNo;
@@ -52,24 +56,32 @@ exports.startNextTask = async function(mongoClient) {
         timestamp: header.timestamp,
         nonce: header.nonce,
         startTime,
-        //endTime: "2023-01-02",
+        endTime: startTime,
         pageNo
     });
 
     try {
-        console.log(`fetch listLog with "startTime=${startTime}&pageNo=${pageNo}"`);
-        let res = await listLog(`?startTime=${startTime}&pageNo=${pageNo}`, null, header);
+        console.log(`fetch listLog with "startTime=${startTime}&endTime=${startTime}&pageNo=${pageNo}"`);
+        let res = await listLog(`?startTime=${startTime}&endTime=${startTime}&pageNo=${pageNo}`, null, header);
+        res = res || {};
+        if (res.code !== 0 || res.msg !== "success") {
+            console.log(`receive error respond: code is ${res.code}, msg is ${res.msg}`);
+            if (doc.error_count >= 9) {
+                // stop the task when error count reach to 10
+                await tasks.findOneAndUpdate({ _id: doc._id }, {
+                    $inc: { error_count: 1 },
+                    $set: { status: "error" }
+                });
+            } else {
+                await tasks.findOneAndUpdate({ _id: doc._id }, {
+                    $inc: { error_count: 1 }
+                });
+            }
+            isWorking = false;
+            return true;
+        }
 
-        // if success, pump up the pageNo by 1
-        //TODO
-
-        // if error, try in next task (10 times at most)
-        //TODO
-
-        // if no more data returned, mark task as completed
-        //TODO
-
-        console.log(res);
+        await proceedData(mongoClient, doc, res);
     } catch (error) {
         console.error(error);
     }
@@ -78,8 +90,44 @@ exports.startNextTask = async function(mongoClient) {
     return true;
 }
 
-exports.repeatTask = async function(mongoClient, date) { }
+async function proceedData(mongoClient, task, data) {
+    let log_db = await mongoClient.db(LOGS_SCHEMA);
+    let tasks = log_db.collection("tasks");
 
+    let logItems = data.logList || [];
+    // TODO, filter out needed logs
+    if (logItems.length > 0) {
+        try {
+            let logList = log_db.collection("logList");
+            let result = await logList.insertMany(logItems, { ordered: false });
+            console.log(`insert log items with result %j`, result.result);
+        } catch (error) {
+            if (error.code === 11000) {
+                // BulkWriteError: E11000 duplicate key error collection
+                // reach to the page with duplicate data, stop task
+                console.warn(`find duplicate log items at page ${task.pageNo}, stop task`);
+                await tasks.findOneAndUpdate({ _id: task._id }, {
+                    $set: { status: "duplicate" }
+                });
+                return;
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    if (logItems.length === 0 || logItems.length < 50) {
+        // reach to the last page with no data, complete task
+        await tasks.findOneAndUpdate({ _id: task._id }, {
+            $set: { status: "completed" }
+        });
+    } else {
+        // need to fetch more log, pump up the page No
+        await tasks.findOneAndUpdate({ _id: task._id }, {
+            $inc: { pageNo: 1 }
+        });
+    }
+}
 
 function generateNonceString(length) {
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
