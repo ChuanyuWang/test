@@ -28,9 +28,13 @@ let mongoClient = new MongoClient(connectionURI(logFetcher.LOGS_SCHEMA, credenti
 });
 
 console.log("worker connecting database...");
-mongoClient.connect(error => {
+mongoClient.connect(async (error, client) => {
     if (error) return console.error(error);
     console.log(`connect to database ${logFetcher.LOGS_SCHEMA}`);
+    let log_db = await client.db(logFetcher.LOGS_SCHEMA);
+    let logs = log_db.collection("logList");
+    let result = await logs.createIndex({ requestId: 1 }, { unique: 1 });
+    console.log(`create index to field "requestId" with result: %j`, result);
 });
 
 // worker will check next task by every 5 minutes in slient model
