@@ -96,6 +96,7 @@ async function proceedData(mongoClient, task, data) {
 
     let logItems = data.logList || [];
     let bqsqLogs = logItems.filter(item => {
+        item._timestamp = new Date(item.behaviorTime);
         // filter logs from 光影 client and behavior type is 3 (stands for open)
         return item.clientAppId && item.bhvType === 3;
     });
