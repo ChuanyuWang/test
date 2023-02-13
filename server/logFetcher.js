@@ -95,11 +95,14 @@ async function proceedData(mongoClient, task, data) {
     let tasks = log_db.collection("tasks");
 
     let logItems = data.logList || [];
-    // TODO, filter out needed logs
-    if (logItems.length > 0) {
+    let bqsqLogs = logItems.filter(item => {
+        // filter logs from 光影 client and behavior type is 3 (stands for open)
+        return item.clientAppId && item.bhvType === 3;
+    });
+    if (bqsqLogs.length > 0) {
         try {
             let logList = log_db.collection("logList");
-            let result = await logList.insertMany(logItems, { ordered: false });
+            let result = await logList.insertMany(bqsqLogs, { ordered: false });
             console.log(`insert log items with result %j`, result.result);
         } catch (error) {
             if (error.code === 11000) {
