@@ -18,7 +18,7 @@ exports.checkYesterdayLog = async function(mongoClient) {
     let log_db = await mongoClient.db(LOGS_SCHEMA);
     let tasks = log_db.collection("tasks");
 
-    let yesterday = moment().subtract(1, 'days').startOf('day').toDate(); // set to 12:00 am today
+    let yesterday = moment().subtract(1, 'days').startOf('day').toDate(); // set to 12:00am
     let doc = await tasks.findOne({ date: yesterday });
     if (doc) return;
 
@@ -66,8 +66,8 @@ exports.startNextTask = async function(mongoClient) {
         res = res || {};
         if (res.code !== 0 || res.msg !== "success") {
             console.log(`receive error respond: code is ${res.code}, msg is ${res.msg}`);
-            if (doc.error_count >= 9) {
-                // stop the task when error count reach to 10
+            if (doc.error_count % 10 === 9) {
+                // stop the task when error occurred every 10 times
                 await tasks.findOneAndUpdate({ _id: doc._id }, {
                     $inc: { error_count: 1 },
                     $set: { status: "error" }
@@ -108,17 +108,20 @@ async function proceedData(mongoClient, task, data) {
             if (error.code === 11000) {
                 // BulkWriteError: E11000 duplicate key error collection
                 // reach to the page with duplicate data, stop task
-                console.warn(`find duplicate log items at page ${task.pageNo}, stop task`);
+                console.warn(`find duplicate log items at page ${task.pageNo}, next page`);
+                /*
                 await tasks.findOneAndUpdate({ _id: task._id }, {
                     $set: { status: "duplicate" }
                 });
                 return;
+                */
             } else {
                 throw error;
             }
         }
     }
 
+    // page size is 50 by default
     if (logItems.length === 0 || logItems.length < 50) {
         // reach to the last page with no data, complete task
         await tasks.findOneAndUpdate({ _id: task._id }, {
