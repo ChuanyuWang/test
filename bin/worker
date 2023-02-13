@@ -43,7 +43,7 @@ logFetcher.checkYesterdayLog(mongoClient);
 async function processTask() {
     if (logFetcher.isWorking()) {
         // skip current interval task due to ensure no concurrent tasks running
-        console.warn("skip task as log fetcher is staill working")
+        console.warn("skip task as log fetcher is still working")
         return;
     }
     try {
