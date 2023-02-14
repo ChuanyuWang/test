@@ -49,6 +49,9 @@ async function processTask() {
     }
     try {
         let hasNext = await logFetcher.startNextTask(mongoClient);
+        if (!hasNext) {
+            await logFetcher.checkYesterdayLog(mongoClient);
+        }
         if (hasNext && slientModel) {
             clearInterval(intervalID);
             intervalID = setInterval(processTask, 3000); // repeat task in 3 second
