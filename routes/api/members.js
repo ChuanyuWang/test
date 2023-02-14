@@ -143,14 +143,15 @@ router.get('/', async function(req, res, next) {
     // query members by keyword, search 'name' or 'contact'
     let search = req.query.search || "";
     if (search) {
-        // search both name and contact
         try {
             query['$or'] = [
                 { 'name': new RegExp(search, 'i') },
                 { 'contact': new RegExp(search, 'i') }
             ];
         } catch (error) {
+            // e.g. search is "Ying\/:"
             console.warn(error.message);
+            // query a dummy field "error" to ensure no result found
             query["error"] = error.message;
         }
     }
