@@ -144,10 +144,15 @@ router.get('/', async function(req, res, next) {
     let search = req.query.search || "";
     if (search) {
         // search both name and contact
-        query['$or'] = [
-            { 'name': new RegExp(search, 'i') },
-            { 'contact': new RegExp(search, 'i') }
-        ];
+        try {
+            query['$or'] = [
+                { 'name': new RegExp(search, 'i') },
+                { 'contact': new RegExp(search, 'i') }
+            ];
+        } catch (error) {
+            console.warn(error.message);
+            query["error"] = error.message;
+        }
     }
 
     // support sorting
