@@ -481,7 +481,7 @@ function upgradeFromTwo(req, res, next) {
         if (err) {
             console.error(err);
         } else {
-            console.info('Upgrade from version 2 successfully');
+            console.log('Upgrade from version 2 successfully');
             // e.g. { ok: 1, nModified: 3, n: 3 }
             console.debug(result);
         }

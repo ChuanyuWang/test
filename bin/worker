@@ -75,7 +75,7 @@ let intervalID = setInterval(processTask, 3000);
 // pm2 will try to kill the old process by every 100ms until sending SIGKILL signal
 // Change the default value by option "kill_timeout: 1600"
 process.on('SIGINT', function() {
-    console.info('SIGINT signal received in the worker.')
+    console.log('SIGINT signal received in the worker.')
 
     // stop the loop
     clearInterval(intervalID);
