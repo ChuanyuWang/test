@@ -244,7 +244,7 @@ router.delete('/:classID', async function(req, res, next) {
                 console.error(`Fail to return expense to contract ${bookingInfo.contract}`);
             }
         } else if (doc.cost > 0) {
-            console.error(`Can't find the contract of session ${req.params.classID} (name:${doc.name}/cost:${doc.cost}) on ${doc.date}`);
+            console.error(`Can't find the contract of session ${req.params.classID} (name:${doc.name}/cost:${doc.cost}/member:${req.body.memberid}) on ${doc.date}`);
         }
 
         return res.json(doc);
