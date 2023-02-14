@@ -34,6 +34,7 @@ const logger = app.locals.ENV_DEVELOPMENT ? log4js.getLogger() : log4js.getLogge
 console.log = logger.info.bind(logger);
 console.debug = logger.debug.bind(logger);
 console.error = logger.error.bind(logger);
+console.warn = logger.warn.bind(logger);
 
 //setting various HTTP headers.
 app.use(helmet({
