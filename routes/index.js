@@ -59,6 +59,9 @@ router.use('/api', require('./api'));
 // administrator page
 router.use('/admin', require("./admin"));
 
+// cockpit page
+router.use('/cockpit', require("./cockpit"));
+
 // route different tenant
 router.use('/mygirl', require('./mygirl')); // load customize tenant before others
 router.use('/t/:tenantName/', getTenantInfo, require("./tenant"));
