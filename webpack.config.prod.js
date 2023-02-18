@@ -28,6 +28,7 @@ module.exports = {
         trial: './pages/trial/trial.js',
         portal: './pages/app/mobileportal.js',
         poster: './pages/poster/poster.js',
+        cockpit: './pages/cockpit/cockpit.js',
         course: './pages/course/course.js',
         course_view: './pages/course/course_view.js',
         setting: './pages/settings/setting.js',
