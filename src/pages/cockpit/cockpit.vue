@@ -1,6 +1,6 @@
 <template lang="pug">
 v-app
-  v-navigation-drawer(app permanent)
+  v-navigation-drawer(app permanent v-model="drawer")
     v-img.mt-1(src="/img/bqsq-logo-2x.png")
     v-divider
     v-list-item
@@ -14,6 +14,12 @@ v-app
           v-icon(color="primary") mdi-view-dashboard
         v-list-item-content
           v-list-item-title 片源统计
+  v-app-bar(app dense color="primary" elevation="1")
+    v-app-bar-nav-icon(@click="drawer = !drawer")
+    v-toolbar-title Title
+    v-spacer
+    form(action='/logout',method='get')
+      v-btn(color="white" text type="submit") 退出登录
   v-main
     //v-container(fluid)
     router-view
@@ -33,7 +39,8 @@ module.exports = {
     return {
       // when open url https://...#/trial
       // update the bottom navigator status
-      value: this.$route.path
+      value: this.$route.path,
+      drawer: true
     }
   },
   methods: {
