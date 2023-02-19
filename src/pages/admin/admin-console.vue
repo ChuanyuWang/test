@@ -362,4 +362,8 @@ module.exports = {
 .detail-tenant-border {
   border-left: 2px solid #eee;
 }
+
+.form-condensed .form-group {
+  margin-bottom: 3px;
+}
 </style>
