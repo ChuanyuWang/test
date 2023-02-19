@@ -50,6 +50,7 @@ router.get('/logout', function(req, res) {
 function navigateToUserHome(req, res) {
     // handle administrator login, then navigate to admin home page
     if (req.user.tenant == 'admin') res.redirect('/admin/home');
+    else if (req.user.tenant == 'bqsq-admin') res.redirect('/cockpit/bqsq');
     else res.redirect('/t/' + req.user.tenant + '/home');
 }
 
@@ -67,10 +68,11 @@ router.use('/mygirl', require('./mygirl')); // load customize tenant before othe
 router.use('/t/:tenantName/', getTenantInfo, require("./tenant"));
 
 async function getTenantInfo(req, res, next) {
-    if (['config', 'chuanyu', 'admin', 'setting', 'settings', 'api'].indexOf(req.params.tenantName) > -1) {
-        var error = new Error("tenant name is illegal");
-        error.status = 400;
-        return next(error);
+    if (['config', 'chuanyu', 'admin', 'setting', 'settings', 'api', 'bqsq-admin'].indexOf(req.params.tenantName) > -1) {
+        //let error = new Error("tenant name is illegal");
+        //error.status = 400;
+        //return next(error);
+        return next('router'); // jump out of the current router.
     }
     // cache the tenant object in request, e.g.
     /* tenant object
