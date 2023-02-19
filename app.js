@@ -173,6 +173,7 @@ i18n.configure({
 app.use(i18n.init);
 
 // Initialize Passport and restore authentication state, if any, from the session.
+// besides, passport adds additional functions to req object, e.g. isUnauthenticated, isAuthenticated
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash()); //flash() requires sessions

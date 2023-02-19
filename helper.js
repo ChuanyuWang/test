@@ -22,9 +22,22 @@ module.exports.checkTenantUser = function(req, res, next) {
         res.redirect('/');
     } else if (req.user.tenant != req.tenant.name) {
         if (req.user.tenant == 'admin') res.redirect('/admin/home');
-        else res.redirect('/t/' + req.user.tenant + '/home');
+        else res.redirect('/');
     } else {
         next();
+    }
+};
+
+module.exports.checkUser = function(userName) {
+    return function(req, res, next) {
+        if (req.isUnauthenticated()) {
+            req.flash('error', '用户未登录或连接超时');
+            res.redirect('/');
+        } else if (req.user.username !== userName) {
+            res.redirect('/');
+        } else {
+            next();
+        }
     }
 };
 
