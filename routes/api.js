@@ -22,6 +22,7 @@ router.use(limiter);
 
 // API routers ===========================================================
 
+router.use('/dlktlogs', require('./api/dlktlogs'));
 router.use(getTenantInfo);
 router.use('/classes', require('./api/classes'));
 router.use('/courses', require('./api/courses'));
