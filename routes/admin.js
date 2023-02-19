@@ -160,7 +160,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         return next(error);
     }
 
-    var namePattern = /^[a-z0-9]+$/; // only letter or number
+    var namePattern = /^[a-z0-9-]+$/; // only letter or number or "-"
     if (!namePattern.test(req.body.name)) {
         var error = new Error("tenant name supports only letter and number");
         error.status = 400;
