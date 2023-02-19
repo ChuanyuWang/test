@@ -9,11 +9,12 @@ v-app
         v-list-item-subtitle 叮聆课堂光影片源分析
     v-divider
     v-list(dense nav)
-      v-list-item(link)
-        v-list-item-icon
-          v-icon(color="primary") mdi-view-dashboard
-        v-list-item-content
-          v-list-item-title 片源统计
+      v-list-item-group(v-model="selectedItem" mandatory)
+        v-list-item(link)
+          v-list-item-icon
+            v-icon(color="primary") mdi-view-dashboard
+          v-list-item-content
+            v-list-item-title 片源统计
   v-app-bar(app dense color="primary" elevation="1")
     v-app-bar-nav-icon(@click="drawer = !drawer")
     v-toolbar-title Title
@@ -37,9 +38,7 @@ module.exports = {
   name: "cockpit",
   data() {
     return {
-      // when open url https://...#/trial
-      // update the bottom navigator status
-      value: this.$route.path,
+      selectedItem: 0,
       drawer: true
     }
   },
