@@ -4,6 +4,7 @@ var Account = require('../account');
 const db_utils = require('../server/databaseManager');
 const { ParamError, InternalServerError, BaseError, BadRequestError } = require("./api/lib/basis");
 var mongojs = require('mongojs');
+const helper = require('../helper');
 const { SchemaValidator } = require("./api/lib/schema_validator");
 const { createDefaultClassType, setDefaultTypeForNotStartedClasses, createtDefaultContracts } = require("../server/upgradeFiveUtil");
 
@@ -46,7 +47,7 @@ router.use(async function(req, res, next) {
 });
 
 /* GET users listing. */
-router.get('/home', checkTenantUser, function(req, res) {
+router.get('/home', helper.checkUser('chuanyu'), function(req, res) {
     res.render('admin', {
         title: '控制台',
         user: req.user,
@@ -617,17 +618,6 @@ async function upgradeFromFive(req, res, next) {
             return next(error);
         else
             return next(new InternalServerError("fail to upgrade from version 5", error));
-    }
-}
-
-function checkTenantUser(req, res, next) {
-    if (!req.user) {
-        req.flash('error', '用户未登录或连接超时');
-        res.redirect('/');
-    } else if (req.user.tenant != 'admin') {
-        res.redirect('/t/' + req.user.tenant + '/home');
-    } else {
-        next();
     }
 }
 
