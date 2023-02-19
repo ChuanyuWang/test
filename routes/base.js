@@ -61,6 +61,12 @@ router.get('/setting', helper.checkTenantUser, function(req, res) {
     });
 });
 
+router.get('/booking', function(req, res, next) {
+    res.render('bqsq/booking', {
+        title: '学员约课'
+    });
+});
+
 router.get('/mybooking', function(req, res) {
     res.render('bqsq/mybooking', {
         title: '我的课程'
