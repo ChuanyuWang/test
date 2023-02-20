@@ -52,7 +52,7 @@ module.exports = {
       this.menu = false;
       this.isLoading = true;
       // refresh table data
-      var request = serviceUtil.getJSON("/api/dlktlogs/bytenant", { month: this.selectedMonth });
+      var request = serviceUtil.getJSON("/api/dlktlogs/bycontent", { month: this.selectedMonth });
       request.done((data, textStatus, jqXHR) => {
         this.rawData = data || [];
       });

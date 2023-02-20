@@ -44,7 +44,7 @@ router.use(function(req, res, next) {
     }
 });
 
-router.get('/bytenant', async function(req, res, next) {
+router.get('/bycontent', async function(req, res, next) {
     //[Default] get the current year by month
     let this_month = moment().format("YYYY-MM");
     let startOfMonth, endOfMonth;
