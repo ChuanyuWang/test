@@ -111,10 +111,78 @@ router.get('/bycontent', async function(req, res, next) {
 
         let docs = combineData(m_result, y_result);
 
-        console.log("analyze dlketang logs: ", docs ? docs.length : 0);
+        console.log("analyze dlketang logs by content: ", docs ? docs.length : 0);
         res.json(docs);
     } catch (error) {
-        return next(new InternalServerError("analyze dlketang logs fails", error));
+        return next(new InternalServerError("analyze dlketang logs by content fails", error));
+    }
+});
+
+router.get('/bytenant', async function(req, res, next) {
+    //[Default] get the current year by month
+    let this_month = moment().format("YYYY-MM");
+    let startOfMonth, endOfMonth;
+    if (req.query.hasOwnProperty("month")) {
+        this_month = req.query.month;
+    }
+    startOfMonth = moment(this_month);
+    endOfMonth = moment(this_month).endOf("month");
+
+    try {
+        let tenantDB = await db_utils.connect(LOGS_SCHEMA);
+        let logs = tenantDB.collection("logList");
+
+        let pipelines = [{
+            $match: {
+                "_timestamp": { // query one month
+                    $gte: startOfMonth.toDate(),
+                    $lte: endOfMonth.toDate()
+                },
+                "fromContentId": { $exists: true }
+            }
+        }, {
+            $project: {
+                //week: { $week: "$_timestamp" },
+                //month: { $month: "$_timestamp" },
+                //year: { $year: "$_timestamp" },
+                tenantId: 1,
+                tenantName: 1
+            }
+        }, {
+            $group: {
+                _id: { id: "$tenantId", name: "$tenantName" },
+                total: { $sum: 1 }
+            }
+        }];
+        let m_result = await logs.aggregate(pipelines).toArray();
+
+        pipelines = [{
+            $match: {
+                "_timestamp": { // query whole year
+                    $gte: startOfMonth.startOf("year").toDate(),
+                    $lte: endOfMonth.endOf("year").toDate()
+                },
+                "fromContentId": { $exists: true }
+            }
+        }, {
+            $project: {
+                tenantId: 1,
+                tenantName: 1,
+            }
+        }, {
+            $group: {
+                _id: { id: "$tenantId", name: "$tenantName" },
+                total: { $sum: 1 }
+            }
+        }];
+        let y_result = await logs.aggregate(pipelines).toArray();
+
+        let docs = combineData(m_result, y_result);
+
+        console.log("analyze dlketang logs by tenant: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analyze dlketang logs by tenant fails", error));
     }
 });
 

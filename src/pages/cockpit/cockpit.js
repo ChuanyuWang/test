@@ -6,13 +6,15 @@
 var i18nextplugin = require('../../locales/i18nextplugin');
 var cockpit = require('./cockpit.vue').default;
 var home = require('./home.vue').default;
+var store = require('./store.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
 
     var routes = [
-        { path: '/', component: home, meta: { title: '大Q小q门店和片源统计' } }
+        { path: '/', component: home, meta: { title: '光影故事屋片源统计' } },
+        { path: '/store', component: store, meta: { title: '光影故事屋门店统计' } }
     ];
     var router = new VueRouter({
         routes // short for `routes: routes`

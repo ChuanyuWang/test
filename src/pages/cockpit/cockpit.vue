@@ -10,7 +10,7 @@ v-app
     v-divider
     v-list(dense nav)
       v-list-item-group(v-model="selectedItem" mandatory)
-        v-list-item(link v-for="item in menuItems" :key="item.name")
+        v-list-item(link v-for="item in menuItems" :key="item.name" @click="open(item.value)")
           v-list-item-icon
             v-icon(color="primary") {{item.icon}}
           v-list-item-content
@@ -39,14 +39,17 @@ module.exports = {
   data() {
     return {
       selectedItem: 0,
-      menuItems: [{ name: "片源统计", icon: "mdi-view-dashboard" }],
+      menuItems: [
+        { name: "片源统计", icon: "mdi-movie-open", value: "/" },
+        { name: "门店统计", icon: "mdi-store", value: "/store" }
+      ],
       drawer: true
     }
   },
   methods: {
-    test() {
+    open(value) {
       // load another route view
-      //this.$router.push(this.value);
+      this.$router.push(value);
     }
   }
 }
