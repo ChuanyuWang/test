@@ -6,7 +6,7 @@ v-app
     v-list-item
       v-list-item-content
         v-list-item-title.text-h6 门店运营数据中心
-        v-list-item-subtitle 光影片源分析
+        v-list-item-subtitle 光影故事屋数据分析
     v-divider
     v-list(dense nav)
       v-list-item-group(v-model="selectedItem" mandatory)
@@ -16,8 +16,8 @@ v-app
           v-list-item-content
             v-list-item-title {{item.name}}
   v-app-bar(app dense color="primary" elevation="1")
-    v-app-bar-nav-icon(@click="drawer = !drawer")
-    v-toolbar-title {{menuItems[selectedItem].name}}
+    v-app-bar-nav-icon(@click="drawer = !drawer" color="secondary")
+    v-app-bar-title {{menuItems[selectedItem].name}}
     v-spacer
     form(action='/logout',method='get')
       v-btn(color="white" text type="submit") 退出登录

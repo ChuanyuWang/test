@@ -46,14 +46,13 @@ router.use(function(req, res, next) {
 
 router.get('/bytenant', async function(req, res, next) {
     //[Default] get the current year by month
-    let year = (new Date()).getFullYear();
-    let unit = 'month';
-    if (req.query.hasOwnProperty("year")) {
-        year = parseInt(req.query.year);
+    let this_month = moment().format("YYYY-MM");
+    let startOfMonth, endOfMonth;
+    if (req.query.hasOwnProperty("month")) {
+        this_month = req.query.month;
     }
-    if (req.query.hasOwnProperty("unit")) {
-        unit = req.query.unit;
-    }
+    startOfMonth = moment(this_month);
+    endOfMonth = moment(this_month).endOf("month");
 
     try {
         let tenantDB = await db_utils.connect(LOGS_SCHEMA);
@@ -61,17 +60,17 @@ router.get('/bytenant', async function(req, res, next) {
 
         let pipelines = [{
             $match: {
-                "_timestamp": {
-                    $gte: unit === 'year' ? new Date(0) : new Date(year, 0),
-                    $lt: unit === 'year' ? new Date(9999, 0) : new Date(year + 1, 0)
+                "_timestamp": { // query one month
+                    $gte: startOfMonth.toDate(),
+                    $lte: endOfMonth.toDate()
                 },
                 "fromContentId": { $exists: true }
             }
         }, {
             $project: {
                 //week: { $week: "$_timestamp" },
-                month: { $month: "$_timestamp" },
-                year: { $year: "$_timestamp" },
+                //month: { $month: "$_timestamp" },
+                //year: { $year: "$_timestamp" },
                 duration: 1,
                 tenantName: 1,
                 fromContentId: 1,
@@ -85,7 +84,32 @@ router.get('/bytenant', async function(req, res, next) {
                 }
             }
         }];
-        let docs = await logs.aggregate(pipelines).toArray();
+        let m_result = await logs.aggregate(pipelines).toArray();
+
+        pipelines = [{
+            $match: {
+                "_timestamp": { // query whole year
+                    $gte: startOfMonth.startOf("year").toDate(),
+                    $lte: endOfMonth.endOf("year").toDate()
+                },
+                "fromContentId": { $exists: true }
+            }
+        }, {
+            $project: {
+                fromContentId: 1,
+                itemName: 1
+            }
+        }, {
+            $group: {
+                _id: { id: "$fromContentId", name: "$itemName" },
+                total: {
+                    $sum: 1
+                }
+            }
+        }];
+        let y_result = await logs.aggregate(pipelines).toArray();
+
+        let docs = combineData(m_result, y_result);
 
         console.log("analyze dlketang logs: ", docs ? docs.length : 0);
         res.json(docs);
@@ -93,5 +117,25 @@ router.get('/bytenant', async function(req, res, next) {
         return next(new InternalServerError("analyze dlketang logs fails", error));
     }
 });
+
+// combine data of year and month
+function combineData(m_result, y_result) {
+    let data = {};
+    y_result.forEach(element => {
+        data[element._id.id] = {
+            name: element._id.name,
+            year_total: element.total,
+            month_total: 0
+        };
+    });
+    m_result.forEach(element => {
+        data[element._id.id].month_total = element.total;
+    });
+    let docs = [];
+    for (let id in data) {
+        docs.push(data[id]);
+    }
+    return docs;
+}
 
 module.exports = router;
