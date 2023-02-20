@@ -1,117 +1,77 @@
 <template lang="pug">
-v-container.pb-16
+v-container
   v-subheader Title
-  v-data-table(:headers="headers" :items="desserts" :item-per-page="5")
+  v-row(dense align="center" justify="end")
+    v-col(cols="auto")
+      v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
+        template(v-slot:activator="{ on, attrs }")
+          v-text-field(solo dense readonly v-model="selectedMonth" hide-details prepend-icon="mdi-calendar" v-bind="attrs" v-on="on")
+        v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh")
+    v-spacer
+    span 选择时间单位
+    v-col(cols="auto")
+      v-select(solo dense :items="units" v-model="select" hide-details)
+    v-btn(color='primary') 刷新
+  v-data-table(:headers="headers" :items="data" :items-per-page="10" :loading="isLoading")
 </template>
 
 <script>
 
+var serviceUtil = require("../../services/util");
+
 module.exports = {
-  name: "schedule",
+  name: "home",
   data() {
     return {
+      menu: false,
+      selectedMonth: moment().format("YYYY-MM"),
+      isLoading: true,
+      select: "year",
+      units: [
+        { text: "年", value: "year" },
+        { text: "月", value: "month" }
+      ],
       headers: [
         {
-          text: 'Dessert (100g serving)',
+          text: '片源名称',
           align: 'start',
           sortable: false,
           value: 'name',
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' },
+        { text: '播放次数', value: 'total' }
       ],
-      desserts: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: 1,
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: 1,
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: 7,
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: 8,
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: 16,
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: 0,
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: 2,
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: 45,
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: 22,
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: 6,
-        },
-      ],
+      rawData: []
+    }
+  },
+  computed: {
+    data() {
+      return this.rawData.map(value => {
+        return { name: value._id.name, total: value.total };
+      })
     }
   },
   methods: {
-    test() {
+    refresh() {
+      // close menu
+      this.menu = false;
+      // TODO, refresh table data
     }
   },
   mounted() {
+    var request = serviceUtil.getJSON("/api/dlktlogs/bytenant");
+    request.done((data, textStatus, jqXHR) => {
+      this.rawData = data || [];
+    });
+    request.always(() => {
+      this.isLoading = false;
+    })
   }
 }
 </script>
+
+<style lang="less">
+.v-select__selections input {
+  width: 0 !important;
+  min-width: 0 !important;
+}
+</style>
