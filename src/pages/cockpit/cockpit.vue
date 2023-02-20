@@ -1,23 +1,23 @@
 <template lang="pug">
 v-app
-  v-navigation-drawer(app permanent v-model="drawer")
+  v-navigation-drawer(app v-model="drawer")
     v-img.mt-1(src="/img/bqsq-logo-2x.png")
     v-divider
     v-list-item
       v-list-item-content
         v-list-item-title.text-h6 门店运营数据中心
-        v-list-item-subtitle 叮聆课堂光影片源分析
+        v-list-item-subtitle 光影片源分析
     v-divider
     v-list(dense nav)
       v-list-item-group(v-model="selectedItem" mandatory)
-        v-list-item(link)
+        v-list-item(link v-for="item in menuItems" :key="item.name")
           v-list-item-icon
-            v-icon(color="primary") mdi-view-dashboard
+            v-icon(color="primary") {{item.icon}}
           v-list-item-content
-            v-list-item-title 片源统计
+            v-list-item-title {{item.name}}
   v-app-bar(app dense color="primary" elevation="1")
     v-app-bar-nav-icon(@click="drawer = !drawer")
-    v-toolbar-title Title
+    v-toolbar-title {{menuItems[selectedItem].name}}
     v-spacer
     form(action='/logout',method='get')
       v-btn(color="white" text type="submit") 退出登录
@@ -39,12 +39,13 @@ module.exports = {
   data() {
     return {
       selectedItem: 0,
+      menuItems: [{ name: "片源统计", icon: "mdi-view-dashboard" }],
       drawer: true
     }
   },
   methods: {
     test() {
-      //console.log("we are in test function....");
+      // load another route view
       //this.$router.push(this.value);
     }
   }
