@@ -39,7 +39,7 @@ module.exports = {
           sortable: false,
           value: 'name',
         },
-        { text: '当月累计播放次数', value: 'month_total' },
+        { text: '当月累计播放次数 (可选择月份)', value: 'month_total' },
         { text: '当年累计播放次数', value: 'year_total' }
       ],
       rawData: []
