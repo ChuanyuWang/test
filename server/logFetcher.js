@@ -96,7 +96,7 @@ async function proceedData(mongoClient, task, data) {
 
     let logItems = data.logList || [];
     let bqsqLogs = logItems.filter(item => {
-        // take the value of itemID if fromContentId missing
+        // take the value of itemId if fromContentId missing
         // it occurred when playing from direct store
         if (!item.fromContentId) {
             item.fromContentId = item.itemId;
