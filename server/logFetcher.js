@@ -96,6 +96,11 @@ async function proceedData(mongoClient, task, data) {
 
     let logItems = data.logList || [];
     let bqsqLogs = logItems.filter(item => {
+        // take the value of itemID if fromContentId missing
+        // it occurred when playing from direct store
+        if (!item.fromContentId) {
+            item.fromContentId = item.itemID;
+        }
         item._timestamp = new Date(item.behaviorTime);
         // filter logs from 光影 client and behavior type is 3 (stands for open)
         return item.clientAppId && item.bhvType === 3;
