@@ -186,6 +186,35 @@ router.get('/bytenant', async function(req, res, next) {
     }
 });
 
+router.get('/query', async function(req, res, next) {
+    //[Default] query the data from yesterday
+    let this_date = moment().subtract(1, 'day').format("YYYY-MM-DD");
+    let startOfDay, endOfDay;
+    if (req.query.hasOwnProperty("date")) {
+        this_date = req.query.date;
+    }
+    startOfDay = moment(this_date);
+    endOfDay = moment(this_date).endOf("day");
+
+    try {
+        let tenantDB = await db_utils.connect(LOGS_SCHEMA);
+        let logs = tenantDB.collection("logList");
+
+        let cursor = logs.find({
+            "_timestamp": { // query one day
+                $gte: startOfDay.toDate(),
+                $lte: endOfDay.toDate()
+            }
+        });
+        let docs = await cursor.toArray();
+
+        console.log("query dlketang logs: ", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("query dlketang logs fails", error));
+    }
+});
+
 // combine data of year and month
 function combineData(m_result, y_result) {
     let data = {};

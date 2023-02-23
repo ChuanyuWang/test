@@ -7,6 +7,7 @@ var i18nextplugin = require('../../locales/i18nextplugin');
 var cockpit = require('./cockpit.vue').default;
 var home = require('./home.vue').default;
 var store = require('./store.vue').default;
+var query = require('./query.vue').default;
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -14,7 +15,8 @@ $(document).ready(function() {
 
     var routes = [
         { path: '/', component: home, meta: { title: '光影故事屋片源统计' } },
-        { path: '/store', component: store, meta: { title: '光影故事屋门店统计' } }
+        { path: '/store', component: store, meta: { title: '光影故事屋门店统计' } },
+        { path: '/query', component: query, meta: { title: '光影故事屋数据查询' } }
     ];
     var router = new VueRouter({
         routes // short for `routes: routes`
