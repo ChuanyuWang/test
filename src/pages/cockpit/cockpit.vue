@@ -52,6 +52,15 @@ module.exports = {
       // load another route view
       this.$router.push(value);
     }
+  },
+  mounted() {
+    this.$route.path
+    this.menuItems.some((element, index) => {
+      if (element.value == this.$route.path) {
+        this.selectedItem = index;
+        return true;
+      }
+    });
   }
 }
 </script>
