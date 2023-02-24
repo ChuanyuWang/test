@@ -6,10 +6,7 @@ const moment = require('moment');
 const { LOGS_SCHEMA } = require('../../server/logFetcher');
 
 /** log item sample from dlketang logs
- * {
-  "_id": {
-    "$oid": "63ea60bb9c59c504f89d8b35"
-  },
+ * 
   "tenantId": 135219,
   "tenantName": "佛山Bella",
   "userId": 185755,
@@ -26,12 +23,7 @@ const { LOGS_SCHEMA } = require('../../server/logFetcher');
   "addressDesc": "广东省佛山市南海区灯湖东路20号 113.70.216.7",
   "macAddress": "74:86:E2:14:E2:3F",
   "clientAppId": "75145625871",
-  "requestId": "10e116ee-a42d-4b82-8386-9007d5f09478",
-  "_timestamp": {
-    "$date": {
-      "$numberLong": "1676285360000"
-    }
-  }
+  "requestId": "10e116ee-a42d-4b82-8386-9007d5f09478"
  * 
  */
 
