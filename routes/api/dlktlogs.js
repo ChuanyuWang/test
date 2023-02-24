@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db_utils = require('../../server/databaseManager');
-const { InternalServerError } = require('./lib/basis');
+const { InternalServerError, ParamError } = require('./lib/basis');
 const moment = require('moment');
 const { LOGS_SCHEMA } = require('../../server/logFetcher');
 
@@ -55,8 +55,8 @@ router.get('/bycontent', async function(req, res, next) {
     endOfMonth = moment(this_month).endOf("month");
 
     try {
-        let tenantDB = await db_utils.connect(LOGS_SCHEMA);
-        let logs = tenantDB.collection("logList");
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
 
         let pipelines = [{
             $match: {
@@ -111,7 +111,7 @@ router.get('/bycontent', async function(req, res, next) {
 
         let docs = combineData(m_result, y_result);
 
-        console.log("analyze dlketang logs by content: ", docs ? docs.length : 0);
+        console.log("analyze dlketang logs by content: %s", docs ? docs.length : 0);
         res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analyze dlketang logs by content fails", error));
@@ -129,8 +129,8 @@ router.get('/bytenant', async function(req, res, next) {
     endOfMonth = moment(this_month).endOf("month");
 
     try {
-        let tenantDB = await db_utils.connect(LOGS_SCHEMA);
-        let logs = tenantDB.collection("logList");
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
 
         let pipelines = [{
             $match: {
@@ -179,7 +179,7 @@ router.get('/bytenant', async function(req, res, next) {
 
         let docs = combineData(m_result, y_result);
 
-        console.log("analyze dlketang logs by tenant: ", docs ? docs.length : 0);
+        console.log("analyze dlketang logs by tenant: %s", docs ? docs.length : 0);
         res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analyze dlketang logs by tenant fails", error));
@@ -197,8 +197,8 @@ router.get('/query', async function(req, res, next) {
     endOfDay = moment(this_date).endOf("day");
 
     try {
-        let tenantDB = await db_utils.connect(LOGS_SCHEMA);
-        let logs = tenantDB.collection("logList");
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
 
         let cursor = logs.find({
             "_timestamp": { // query one day
@@ -208,10 +208,45 @@ router.get('/query', async function(req, res, next) {
         });
         let docs = await cursor.toArray();
 
-        console.log("query dlketang logs: ", docs ? docs.length : 0);
+        console.log("query dlketang logs: %s", docs ? docs.length : 0);
         res.json(docs);
     } catch (error) {
         return next(new InternalServerError("query dlketang logs fails", error));
+    }
+});
+
+router.patch('/tasks', async function(req, res, next) {
+    let this_date = moment().subtract(1, 'day').startOf('day');
+    if (!req.body.hasOwnProperty("date")) {
+        return next(new ParamError());
+    } else {
+        this_date = moment(req.body.date).startOf('day');
+    }
+
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let tasks = logs_db.collection("tasks");
+
+        let task = await tasks.findOneAndUpdate({
+            date: this_date.toDate(),
+        }, {
+            $set: {
+                status: "in_progress",
+                pageNo: 1
+            },
+            $setOnInsert: {
+                error_count: 0
+            }
+        }, {
+            projection: { _id: 0 },
+            returnDocument: "after",
+            upsert: true
+        });
+
+        console.log("update fetch logs task: %j", task.value);
+        res.json(task.value);
+    } catch (error) {
+        return next(new InternalServerError("update fetch logs task:", error));
     }
 });
 

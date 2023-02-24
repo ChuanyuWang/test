@@ -4,6 +4,7 @@ v-container
     p 光影故事屋浏览日志查询，选择日期并查看当天的播放记录（含全国门店）。
       |所有数据来源于叮聆课堂浏览日志，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
   v-row.mt-1(dense align="center" justify="end")
+    v-btn.ml-2(@click="reload") 重新提取当天日志
     v-spacer
     span 选择日期:
     v-col(cols="auto")
@@ -55,6 +56,14 @@ module.exports = {
         this.isLoading = false;
       });
     },
+    reload() {
+      // refresh table data
+      var request = serviceUtil.patchJSON("/api/dlktlogs/tasks", { date: this.selectedDate });
+      request.done((data, textStatus, jqXHR) => {
+        // TODO, inform user to wait 5 mins
+        console.log(data);
+      });
+    },
     humanize(value) {
       var units = [
         { unit: 'y', key: 'yy' },
@@ -91,4 +100,5 @@ module.exports = {
 </script>
 
 <style lang="less">
+
 </style>
