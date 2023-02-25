@@ -16,6 +16,9 @@ v-container
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="当日无数据")
     template(v-slot:item._timestamp="{ item }") {{ new Date(item._timestamp).toLocaleString() }}
     template(v-slot:item.duration="{ item }") {{ humanize(item.duration) }}
+  v-snackbar.mb-12(v-model="snackbar") {{ message }}
+    template(v-slot:action="{ attrs }")
+      v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
 </template>
 
 <script>
@@ -26,6 +29,8 @@ module.exports = {
   name: "query",
   data() {
     return {
+      snackbar: false,
+      message: "重新提取当天日志，请等待5分钟，不要重复刷新",
       yesterday: moment().subtract(1, 'day').toDate(),
       menu: false,
       selectedDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
@@ -57,6 +62,7 @@ module.exports = {
       });
     },
     reload() {
+      this.snackbar = true;
       // refresh table data
       var request = serviceUtil.patchJSON("/api/dlktlogs/tasks", { date: this.selectedDate });
       request.done((data, textStatus, jqXHR) => {
@@ -100,5 +106,4 @@ module.exports = {
 </script>
 
 <style lang="less">
-
 </style>
