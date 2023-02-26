@@ -9,6 +9,7 @@ div.container
   div.page-header
     h3(style='margin-top:0;display:inline-block') 基本信息
     button.btn.btn-danger(type='button',style='float:right',:disabled='!cls._id',@click='confirmDeleteClass') 删除课程
+    a.btn.btn-default.me-3(role='button',style='float:right',:disabled='!cls._id',:href='cls._id+"/printcheckin"' target='_blank') 打印签到表
   div.row
     div.col-sm-6
       form.form-horizontal

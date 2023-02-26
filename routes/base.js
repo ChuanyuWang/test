@@ -1,7 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var helper = require('../helper');
+const express = require('express');
+const router = express.Router();
+const helper = require('../helper');
 const { ObjectId } = require('mongodb');
+const { getCheckinPage } = require('../server/renderCheckinPage');
 
 router.get('/home', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/home', {
@@ -21,6 +22,8 @@ router.get('/class/:classID', helper.checkTenantUser, function(req, res, next) {
         user: req.user
     });
 });
+
+router.get('/class/:classID/printcheckin', getCheckinPage);
 
 router.get('/member', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/member', {
