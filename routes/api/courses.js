@@ -293,10 +293,14 @@ async function removeClasses(db, req, locals) {
         }
         let c = result.value;
 
-        console.log(`delete classes ${id} from course ${req.params.courseID}`);
+        console.log(`delete classes ${id} (${c.name}/${c.date.toDateString()}) from course ${req.params.courseID}`);
         let booking = c.booking || [];
 
+        // no one book
         if (booking.length === 0) continue;
+
+        // no cost to return
+        if (c.cost <= 0) continue;
 
         let restoreContracts = booking.map(value => {
             return ObjectId.isValid(value.contract) ? value.contract : null;
