@@ -2,24 +2,24 @@ extends ../../layout
 
 block append css
   if ENV_DEVELOPMENT
-    link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+    link(rel="stylesheet", href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css")
   else
-    link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
+    link(rel="stylesheet", href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css")
 
 block append js
   if ENV_DEVELOPMENT
-    script(src=CDN_FILES.bootstrap_dev)
+    script(src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.js")
   else
-    script(src=CDN_FILES.bootstrap)
+    script(src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.min.js")
 
 block content
-  p.hidden-print(style="position:fixed;top:10px;left:10px") 打印说明:请在电脑上打印此页面，打印时隐藏页眉和页脚效果更佳
+  p.d-print-none(style="position:fixed;top:10px;left:10px") 打印说明:请在电脑上打印此页面，打印时隐藏页眉和页脚效果更佳
   img(src=logoPath style="position:fixed;width:200px;right:10px;top:10px")
   div.container-fluid
-    h2.text-center(style="padding-top:58px") 上课签到表
+    h3.text-center(style="padding-top:58px") 上课签到表
     h4.text-center #{navTitle}
-    h4 课程名称:<strong>#{class_name}</strong> <br>
-    address.text-muted
+    h5 课程名称:<strong>#{class_name}</strong> <br>
+    address.text-secondary.small
       | 教室: #{classroom.name} <br>
       | 时间: #{class_date} <br>
       | 课时: <b>#{class_cost}</b> <br>
@@ -48,7 +48,7 @@ block content
             th 
             th 
             th 
-    address.small.text-muted.text-right
+    address.text-secondary.text-end(style="font-size:50%")
       | <strong>#{navTitle}</strong> <br>
       | #{tenant_address} <br>
       | <abbr title="电话">P:</abbr> #{tenant_contact} <br>
