@@ -5,17 +5,12 @@ block append css
     link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
   else
     link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
-  link(rel="stylesheet",href=CDN_FILES.bootstrap_table_css)
 
 block append js
   if ENV_DEVELOPMENT
-    script(src=CDN_FILES.jquery_dev)
     script(src=CDN_FILES.bootstrap_dev)
   else
-    script(src=CDN_FILES.jquery)
     script(src=CDN_FILES.bootstrap)
-  script(src=CDN_FILES.bootstrap_table)
-  script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
 
 block content
   p.hidden-print(style="position:fixed;top:10px;left:10px") 打印说明:请在电脑上打印此页面，打印时隐藏页眉和页脚效果更佳
