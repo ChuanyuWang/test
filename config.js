@@ -76,6 +76,8 @@ module.exports = {
         bootbox: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootbox.js/4.4.0/bootbox.min.js',
         echarts: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.min.js',
         echarts_dev: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.js',
-        blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js'
+        blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js',
+        axios: 'https://cdn.jsdelivr.net/npm/axios@1.3.4/dist/axios.min.js',
+        axios_dev: 'https://cdn.jsdelivr.net/npm/axios@1.3.4/dist/axios.js'
     }
 };
