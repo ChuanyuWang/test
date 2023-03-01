@@ -178,6 +178,7 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
         }
 
         req.body.version = VERSION;
+        req.body.createdDate = new Date();
         tenants.insert(req.body, function(err, doc) {
             if (err) {
                 var error = new Error("create tenant fails");
