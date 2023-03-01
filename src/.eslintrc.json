@@ -38,5 +38,11 @@
             "error",
             "kebab-case"
         ]
+    },
+    "settings": {
+        "polyfills": [
+            // Example of API with no property (i.e. a function)
+            "fetch"
+        ]
     }
 }
