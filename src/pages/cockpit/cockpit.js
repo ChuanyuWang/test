@@ -9,8 +9,21 @@ var home = require('./home.vue').default;
 var store = require('./store.vue').default;
 var query = require('./query.vue').default;
 
+// copy from https://youmightnotneedjquery.com/?support=ie11
+function ready(fn) {
+    if (
+        document.attachEvent
+            ? document.readyState === 'complete'
+            : document.readyState !== 'loading'
+    ) {
+        fn();
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+
 // DOM Ready =============================================================
-$(document).ready(function() {
+ready(function() {
     init();
 
     var routes = [
@@ -71,5 +84,25 @@ $(document).ready(function() {
 function init() {
     console.log("welcome~~~");
     moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
+
+    // Add a response interceptor
+    axios.interceptors.response.use(function(response) {
+        // Any status code that lie within the range of 2xx cause this function to trigger
+        // Do something with response data
+        return response;
+    }, function(error) {
+        // Any status codes that falls outside the range of 2xx cause this function to trigger
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // the returned json body should have a message property to indicate the error
+            console.error(error.response.data.message);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error(error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error("Error", error.message);
+        }
+        return Promise.reject(error);
+    });
 }

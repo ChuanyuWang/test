@@ -17,8 +17,6 @@ v-container
 
 <script>
 
-var serviceUtil = require("../../services/util");
-
 module.exports = {
   name: "home",
   data() {
@@ -52,11 +50,11 @@ module.exports = {
       this.menu = false;
       this.isLoading = true;
       // refresh table data
-      var request = serviceUtil.getJSON("/api/dlktlogs/bycontent", { month: this.selectedMonth });
-      request.done((data, textStatus, jqXHR) => {
-        this.rawData = data || [];
+      var request = axios.get("/api/dlktlogs/bycontent", { params: { month: this.selectedMonth } });
+      request.then((response) => {
+        this.rawData = response.data || [];
       });
-      request.always(() => {
+      request.finally(() => {
         this.isLoading = false;
       });
     }

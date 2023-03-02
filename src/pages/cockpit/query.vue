@@ -23,8 +23,6 @@ v-container
 
 <script>
 
-var serviceUtil = require("../../services/util");
-
 module.exports = {
   name: "query",
   data() {
@@ -53,21 +51,20 @@ module.exports = {
       this.menu = false;
       this.isLoading = true;
       // refresh table data
-      var request = serviceUtil.getJSON("/api/dlktlogs/query", { date: this.selectedDate });
-      request.done((data, textStatus, jqXHR) => {
-        this.rawData = data || [];
+      var request = axios.get("/api/dlktlogs/query", { params: { date: this.selectedDate } });
+      request.then((response) => {
+        this.rawData = response.data || [];
       });
-      request.always(() => {
+      request.finally(() => {
         this.isLoading = false;
       });
     },
     reload() {
-      this.snackbar = true;
       // refresh table data
-      var request = serviceUtil.patchJSON("/api/dlktlogs/tasks", { date: this.selectedDate });
-      request.done((data, textStatus, jqXHR) => {
-        // TODO, inform user to wait 5 mins
-        console.log(data);
+      var request = axios.patch("/api/dlktlogs/tasks", { date: this.selectedDate });
+      request.then((response) => {
+        this.snackbar = true;
+        console.log(response.data);
       });
     },
     humanize(value) {

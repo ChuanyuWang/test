@@ -12,14 +12,14 @@ block append css
 
 block append js
   if ENV_DEVELOPMENT
-    script(src=CDN_FILES.jquery_dev)
+    script(src=CDN_FILES.axios_dev)
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
     script(src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.js")
     script(src="https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.js")
     script(src=CDN_FILES.momentjs_dev)
   else
-    script(src=CDN_FILES.jquery)
+    script(src=CDN_FILES.axios)
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
     script(src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.min.js")
