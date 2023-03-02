@@ -85,6 +85,10 @@ function init() {
     console.log("welcome~~~");
     moment.locale('zh-CN');
 
+    // backend needs this flag to distinguish ajax request from request by req.xhr
+    // but makes the request "unsafe" (as defined by CORS), and will trigger a preflight request, which may not be desirable.
+    // See https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests for more details
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     // Add a response interceptor
     axios.interceptors.response.use(function(response) {
         // Any status code that lie within the range of 2xx cause this function to trigger
