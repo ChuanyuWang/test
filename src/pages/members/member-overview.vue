@@ -1,27 +1,25 @@
 <template lang="pug">
 div
-  div#toolbar
-    div.form-inline
-      div.btn-group(role='group')
-        button.btn.btn-success(type='button',@click='beforeAddNewMember') 添加
-        //button.btn.btn-default(type='button',data-toggle='modal',data-target='#filter_dlg', data-action='filter')
-          span.glyphicon.glyphicon-filter
-      div.input-group.source-filter(style="margin-left:3px")
+  div#members_toolbar
+    div.d-flex.align-items-center.flex-wrap
+      button.btn.btn-success.btn-sm(type='button',@click='beforeAddNewMember') 添加
+      div.input-group.input-group-sm.source-filter.ms-3
         span.input-group-addon 来源:
         select.form-control(@change="refresh",v-model="sourceFilter")
           option(value="manual") 手动添加
           option(value="book") 扫码预约
           option(value="") 全部
-      div.input-group.status-filter(style="margin-left:3px")
+      div.input-group.input-group-sm.status-filter.ms-3
         span.input-group-addon 状态:
         select.form-control(@change="refresh",v-model="statusFilter")
           option(value="active") 在读
           option(value="inactive") 过期
           option(value="") 全部
-      div.input-group(style="margin-left:3px")
+      div.input-group.input-group-sm.ms-3
         input.form-control(type="number",style="width:70px",placeholder="页码",v-model="pageNumber")
         span.input-group-btn
           button#jumpToButton.btn.btn-default(type="button",@click="jumpToPage") 跳转
+      button.btn.btn-primary.btn-sm.ms-3(type='button',@click='displayOutOfCredit') 临期学员
   bootstrap-table.table-striped(ref='memberTable',:columns='tableColumns',:options='tableOptions')
 
   modal-dialog(ref='createMemberDialog',buttons="confirm",@ok="addNewMember",:hasError="hasError") 添加学员
@@ -138,7 +136,8 @@ module.exports = {
         visible: false
       }],
       tableOptions: {
-        toolbar: "#toolbar",
+        toolbar: "#members_toolbar",
+        iconSize: "sm",
         locale: "zh-CN",
         showRefresh: true,
         search: true,
@@ -311,6 +310,9 @@ module.exports = {
     },
     refresh(params) {
       this.$refs.memberTable.refresh(params);
+    },
+    displayOutOfCredit() {
+      this.$refs.messager.showInfoMessage('此功能未开放，等待系统更新');
     }
   },
   created: function() {
@@ -319,11 +321,10 @@ module.exports = {
   mounted: function() {
     // set message for global usage
     Vue.prototype.$messager = this.$refs.messager;
-    this.$refs.memberTable.updateFormatText("formatSearch", "查询姓名或联系方式");
+    this.$refs.memberTable.updateFormatText("formatSearch", "搜索姓名或联系方式");
   }
 }
 </script>
 
 <style lang='less'>
-
 </style>
