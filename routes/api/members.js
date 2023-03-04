@@ -839,18 +839,4 @@ function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery
     }
 }
 
-/*
-function getMemberBookQuantity(class_doc, member_id) {
-    if (!class_doc || !class_doc.booking) {
-        return NaN;
-    }
-    // find the booking quantity of member
-    for (var i = 0; i < class_doc.booking.length; i++) {
-        if (class_doc.booking[i].member == member_id) {
-            return class_doc.booking[i].quantity;
-        }
-    }
-    return NaN;
-}*/
-
 module.exports = router;

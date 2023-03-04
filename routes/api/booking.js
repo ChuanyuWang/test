@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var mongojs = require('mongojs');
+const express = require('express');
+const router = express.Router();
+const mongojs = require('mongojs');
 const { check, findAvailableContract } = require('./lib/reservation');
-var helper = require('../../helper');
+const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { ParamError, asyncMiddlewareWrapper, RuntimeError } = require("./lib/basis");
@@ -39,9 +39,7 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
             },
             pipeline: [{
                 $match: {
-                    $expr: {
-                        $in: ["$_id", "$$memberList"]
-                    }
+                    $expr: { $in: ["$_id", "$$memberList"] }
                 }
             }, {
                 $project: {

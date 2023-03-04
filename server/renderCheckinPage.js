@@ -29,9 +29,7 @@ exports.getCheckinPage = async function(req, res, next) {
             },
             pipeline: [{
                 $match: {
-                    $expr: {
-                        $in: ["$_id", "$$memberList"]
-                    }
+                    $expr: { $in: ["$_id", "$$memberList"] }
                 }
             }, {
                 $project: { name: 1, contact: 1, _id: 0 }
