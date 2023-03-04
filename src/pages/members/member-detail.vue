@@ -94,7 +94,7 @@ div.container
     a(role='button',title='点击加载',@click='loadHistory')
       span.glyphicon.glyphicon-refresh(style='font-size:large;margin-left:5px')
   div#loadHistory_mask(style='display:none')
-    p.help-block 会员卡(旧)的充值记录，包括每次课时的变更(增加)，不包括课时消耗的记录，如果需要查询课时的销课记录，请查询“上课记录”
+    p.help-block.small.text-right 会员卡(旧)的充值记录，包括每次课时的变更(增加)，不包括课时消耗的记录，如果需要查询课时的销课记录，请查询“上课记录”
     bootstrap-table.table-striped(ref='historyTable',:columns='changeHistory.columns',:options='changeHistory.options')
   div.page-header
     h3(style='margin-top:0;display:inline-block') 上课记录
