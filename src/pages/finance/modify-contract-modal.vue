@@ -1,6 +1,7 @@
 <template lang="pug">
 modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasError="hasError") 修改合约
   template(v-slot:body)
+    div.alert.alert-warning <b>注意:</b> 如果学员续课，请创建新合约，不要修改已有合约
     form.form-horizontal
       div.form-group
         label.col-sm-3.control-label 类型:
