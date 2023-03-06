@@ -5,7 +5,7 @@ div
     button.btn.btn-default(type="button" @click="refresh" style="float: right; margin-top: 16px")
       span.glyphicon.glyphicon-refresh.me-3
       | 刷新
-    a.btn.btn-success.me-3(:href="'../contract/create?memberId='+ memberId" style="float: right; margin-top: 16px") 购课
+    a.btn.btn-success.me-3(:href="'../contract/create?memberId='+ memberId" style="float: right; margin-top: 16px") 购课/续课
   div.row
     div.col-sm-12
       span.help-block.small.text-right(style="margin:3px") *当学员拥有一个课程的多个合约时, 会按照合约生效日期的先后顺序进行课时扣除
@@ -91,7 +91,13 @@ module.exports = {
     },
     dateFormatter(value, row, index) {
       var start = moment(value).format('YYYY-MM-DD');
-      var end = row.expireDate ? moment(row.expireDate).format('YYYY-MM-DD') : "<未指定>";
+      var end = "<未指定>";
+      if (row.expireDate) {
+        end = moment(row.expireDate).format('YYYY-MM-DD');
+        if (moment(row.expireDate).isBefore(moment())) {
+          return [start, '~', end, '<span class="label label-danger ms-3">过期</span>'].join('');
+        }
+      }
       return [start, '~', end].join('');
     },
     goodsFormatter(value, row, index) {
@@ -172,5 +178,4 @@ module.exports = {
 }
 </script>
 <style lang="less">
-
 </style>
