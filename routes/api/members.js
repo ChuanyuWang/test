@@ -1,9 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var mongojs = require('mongojs');
-var helper = require('../../helper');
-var db_utils = require('../../server/databaseManager');
-const { isEqual } = require('./lib/util');
+const express = require('express');
+const router = express.Router();
+const mongojs = require('mongojs');
+const helper = require('../../helper');
+const db_utils = require('../../server/databaseManager');
 const { BadRequestError, ParamError, BaseError } = require('./lib/basis');
 
 /**
@@ -46,7 +45,7 @@ const { BadRequestError, ParamError, BaseError } = require('./lib/basis');
  * 
  */
 
-var NORMAL_FIELDS = {
+const NORMAL_FIELDS = {
     status: 1,
     since: 1,
     name: 1,
@@ -104,15 +103,15 @@ router.post('/validate', async function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', async function(req, res, next) {
-    var query = {};
+router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async function(req, res, next) {
+    let query = {};
     if (req.query.name) {
         query['name'] = req.query.name;
     }
     if (req.query.contact) {
         query['contact'] = req.query.contact;
     }
-    // "null" is the keyword indicate display all members
+    // "null" is the keyword indicate display all classrooms
     if (req.query.filter && req.query.filter != "null") {
         //TODO, support multi membership card
         query["membership"] = { $size: 1 };
@@ -507,143 +506,15 @@ router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
         res.json(doc);
     });
 });
-/**
- * @description req.body
- * {
-    "type": "ALL",
-    "room": ["wucai", "a", "bb"],
-    "expire": "2014-03-12T16:00:00.000Z",
-    "credit": 10
-   }
- */
+
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
     // membership card is not able to edit after Oct 31, 2022
-    if (new Date() > new Date(2022, 10, 1)) {
-        return next(new BadRequestError("会员卡功能已停用"));
-    }
-    var members = req.db.collection("members");
-    //'memo' is reserved field for passing the memo for history item
-    if (req.body && req.body.hasOwnProperty('memo')) {
-        var memo = req.body.memo;
-        delete req.body.memo;
-    }
-    convertDateObject(req.body);
-    convertNumberValue(req.body);
-    members.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.memberID),
-            // it's only allowed to create one membership card
-            $or: [{ membership: { $size: 0 } }, { membership: { $exists: false } }]
-        },
-        update: {
-            $push: { membership: req.body }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Create membership fails");
-            error.innerError = err;
-            return next(error);
-        }
-        if (!doc) {
-            var error = new Error("创建会员卡失败，请核对会员状态，勿重复创建会员卡");
-            error.status = 400;
-            return next(error);
-        }
-        console.log("membership card %j is created by %s", req.body, req.user.username);
-        // update the history when a new membership card is added
-        var setQuery = {}, historyItems = [];
-        genMembershipSetQueries(req.user.username, doc.membership.length - 1, {}, req.body, setQuery, historyItems, memo);
-        members.update({
-            _id: mongojs.ObjectId(req.params.memberID)
-        }, {
-            $push: {
-                history: {
-                    $each: historyItems
-                }
-            }
-        }, function(err, result) {
-            if (err) console.error(err);
-            console.log('update history by creating new card %j', result);
-        });
-        res.json(doc);
-    });
+    return next(new BadRequestError("会员卡功能已停用"));
 });
 
 router.patch('/:memberID/memberships/:cardIndex', function(req, res, next) {
     // membership card is not able to edit after Oct 31, 2022
-    if (new Date() > new Date(2022, 10, 1)) {
-        return next(new BadRequestError("会员卡功能已停用"));
-    }
-    var members = req.db.collection("members");
-    //'memo' is reserved field for passing the memo for history item
-    if (req.body && req.body.hasOwnProperty('memo')) {
-        var memo = req.body.memo;
-        delete req.body.memo;
-    }
-    convertDateObject(req.body);
-    convertNumberValue(req.body);
-
-    members.findOne({
-        _id: mongojs.ObjectId(req.params.memberID)
-    }, { membership: 1 }, function(err, doc) {
-        if (err) {
-            var error = new Error("find member fails");
-            error.innerError = err;
-            return next(error);
-        }
-        if (!doc) {
-            var error = new Error("用户不存在");
-            error.status = 400;
-            return next(error);
-        }
-        if (!doc.membership || !doc.membership[req.params.cardIndex]) {
-            var error = new Error("没有找到指定会员卡，请先建立会员卡");
-            error.status = 400;
-            return next(error);
-        }
-        var membershipCard = doc.membership[req.params.cardIndex];
-
-        var setQuery = {}, historyItems = [];
-        genMembershipSetQueries(req.user.username, req.params.cardIndex, membershipCard, req.body, setQuery, historyItems, memo);
-
-        //nothing changed, just return the original member object
-        if (Object.keys(setQuery).length === 0) {
-            return res.json(doc);
-        }
-
-        // user can only modify the expire
-        if (!helper.hasRole(req, 'admin')) {
-            for (const key in setQuery) {
-                if (setQuery.hasOwnProperty(key) && !key.endsWith(".expire")) {
-                    var err = new Error("没有权限执行此操作");
-                    err.status = 403;
-                    return next(err);
-                }
-            }
-        }
-
-        members.findAndModify({
-            query: {
-                _id: mongojs.ObjectId(req.params.memberID)
-            },
-            update: {
-                $set: setQuery,
-                $push: { history: { $each: historyItems } }
-            },
-            fields: NORMAL_FIELDS,
-            new: true
-        }, function(err, doc, lastErrorObject) {
-            if (err) {
-                var error = new Error("update membership card fails");
-                error.innerError = err;
-                return next(error);
-            }
-            console.log("update membership card %j by %s", setQuery, req.user.username);
-            res.json(doc);
-        });
-    });
+    return next(new BadRequestError("会员卡功能已停用"));
 });
 
 router.get('/:memberID/summary', function(req, res, next) {
@@ -712,19 +583,6 @@ router.get('/:memberID/summary', function(req, res, next) {
 router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
     return next(new Error("Not Supported"));
 });
-
-/**
- * make sure the Number field is stored as Number
- * @param {Object} doc 
- */
-function convertNumberValue(doc) {
-    if (!doc) {
-        return doc;
-    }
-    if (doc.hasOwnProperty('credit')) {
-        doc['credit'] = parseFloat(doc['credit']);
-    }
-}
 
 /**
  * make sure the datetime object is stored as ISODate
@@ -808,35 +666,13 @@ function checkDuplicate(collection, id, query, callback) {
     }
 }
 
-/**
- * 
- * @param {String} username - The user name who did the modification
- * @param {Number} cardIndex - The membership card index 0 based
- * @param {Object} current - The current membership card
- * @param {Object} newItem - The fields with new value
- * @param {Array} setQuery - The generated array of set query
- * @param {Array} historyItems - The generated array of history items to be pushed
- * @param {String} memo - The memo for this change if there is any
- */
-function genMembershipSetQueries(username, cardIndex, current, newItem, setQuery, historyItems, memo) {
-    for (var key in newItem) {
-        if (current.hasOwnProperty(key) && isEqual(current[key], newItem[key])) {
-            // skip update of this field when it's the same
-            continue;
-        }
-        var targetField = 'membership.' + cardIndex + '.' + key;
-        setQuery[targetField] = newItem[key];
-        // skip null value update
-        if (!current.hasOwnProperty(key) && newItem[key] === null) continue;
-        historyItems.push({
-            date: new Date(),
-            user: username,
-            target: targetField,
-            old: current.hasOwnProperty(key) ? current[key] : null,
-            new: newItem[key],
-            remark: memo
-        });
-    }
+async function queryMembersHasContracts(req, res, next) {
+
+    return next();
+}
+
+async function queryMembersHasNoContracts(req, res, next) {
+    return next();
 }
 
 module.exports = router;
