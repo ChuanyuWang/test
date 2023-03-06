@@ -68,6 +68,8 @@ module.exports = {
       });
     },
     humanize(value) {
+      if (value === 0) return moment.localeData().relativeTime(0, true, 'ss', true);
+
       var units = [
         { unit: 'y', key: 'yy' },
         { unit: 'M', key: 'MM' },
