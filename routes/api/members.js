@@ -667,8 +667,119 @@ function checkDuplicate(collection, id, query, callback) {
 }
 
 async function queryMembersHasContracts(req, res, next) {
+    if (!req.query.hasContracts) return next();
 
-    return next();
+    // support sorting
+    let sort = {};
+    let field = req.query.sort || "total"; // sort by "total" by default
+    sort[field] = req.query.order == 'asc' ? 1 : -1;
+
+    // support paginzation
+    let skip = parseInt(req.query.offset) || 0;
+    if (skip < 0) {
+        console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);
+        skip = 0;
+    }
+    let pageSize = parseInt(req.query.limit) || 100;
+    if (pageSize > 100 || pageSize < 0) {
+        console.warn(`page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
+        pageSize = 100;
+    }
+
+    let pipelines = [{
+        $match: { // query active contracts only
+            status: 'paid',
+            $or: [{
+                expireDate: { $gt: new Date() }
+            }, {
+                expireDate: null
+            }]
+        }
+    }, {
+        $project: {
+            memberId: 1,
+            credit: 1,
+            consumedCredit: 1,
+            expendedCredit: 1
+        }
+    }, {
+        $lookup: {
+            from: 'classes',
+            let: { contractID: '$_id' },
+            pipeline: [{
+                $match: { // query classes with at least one booking
+                    date: { $gte: new Date() },
+                    'booking.0': { $exists: true },
+                    $expr: { $in: ['$$contractID', '$booking.contract'] }
+                }
+            }, {
+                $project: { name: 1, cost: 1, date: 1, _id: 0 }
+            }],
+            as: 'unStartedClass'
+        }
+    }, {
+        $addFields: {
+            plan: { $sum: '$unStartedClass.cost' },
+            remaining: {
+                $subtract: ['$credit', { $add: ['$consumedCredit', '$expendedCredit'] }]
+            }
+        }
+    }, {
+        $group: {
+            _id: '$memberId',
+            total: {
+                $sum: { $add: ['$plan', '$remaining'] }
+            },
+            plan: { $sum: "$plan", },
+            remaining: { $sum: "$remaining", }
+        }
+    }, {
+        $lookup: {
+            from: 'members',
+            let: { 'memberId': '$_id' },
+            pipeline: [{
+                $match: { // query active members only
+                    status: 'active',
+                    $expr: { $eq: ['$$memberId', '$_id'] }
+                }
+            }, {
+                $project: { name: 1, contact: 1, _id: 0 }
+            }],
+            as: 'members'
+        }
+    }, {
+        $project: {
+            total: 1,
+            plan: 1,
+            remaining: 1,
+            member: { $arrayElemAt: ['$members', 0] }
+        }
+    }, {
+        $facet: {
+            metadata: [{ $count: "total" }], // get the total of all matched members
+            data: [{ $sort: sort }, { $skip: skip }, { $limit: pageSize }], // sort and pagination
+        }
+    }];
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let contracts = tenantDB.collection("contracts");
+
+        // [ { metadata: [{total:24}], data: [{x}, {y} ...] } ]
+        // [ { metadata: [], data: [] } ] when no data found
+        let docs = await contracts.aggregate(pipelines).toArray();
+        let result = docs[0];
+        let total = result.metadata.length > 0 ? result.metadata[0].total : 0;
+        console.log(`find ${result.data.length} members has active contracts from ${total} in total`);
+        return res.json({
+            total: total,
+            rows: result.data
+        });
+    } catch (error) {
+        let err = new Error("Get member with active contracts fails");
+        error.innerError = err;
+        return next(error);
+    }
 }
 
 async function queryMembersHasNoContracts(req, res, next) {
