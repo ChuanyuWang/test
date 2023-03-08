@@ -770,7 +770,7 @@ async function queryMembersHasContracts(req, res, next) {
         let docs = await contracts.aggregate(pipelines).toArray();
         let result = docs[0];
         let total = result.metadata.length > 0 ? result.metadata[0].total : 0;
-        console.log(`find ${result.data.length} members has active contracts from ${total} in total`);
+        console.log(`find ${result.data.length} members with active contracts from ${total} in total`);
         return res.json({
             total: total,
             rows: result.data
