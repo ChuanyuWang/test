@@ -22,6 +22,12 @@ div
       button.btn.btn-primary.btn-sm.ms-3(type='button',@click='displayOutOfCredit') 临期学员
   bootstrap-table.table-striped(ref='memberTable',:columns='tableColumns',:options='tableOptions')
 
+  modal-dialog(ref='expireMemberDialog',buttons="ok",@ok="") 临期学员
+    template(v-slot:body)
+      span.help-block.small 显示在读学员的剩余课时，统计所有合约中可用课时和已经排课但尚未开始的课时
+      bootstrap-table.table-striped(ref='expireTable',:columns='expireTableColumns',:options='expireTableOptions')
+    template(v-slot:helpText)
+      span.help-block.small(style='float:left') *过期学员和过期合约不在统计之中
   modal-dialog(ref='createMemberDialog',buttons="confirm",@ok="addNewMember",:hasError="hasError") 添加学员
     template(v-slot:body)
       form.form-horizontal
@@ -62,6 +68,7 @@ div
  * --------------------------------------------------------------------------
  */
 var common = require('../../common/common');
+var format = require('../../common/format');
 var serviceUtil = require('../../services/util');
 var messageAlert = require("../../components/message-alert.vue").default;
 
@@ -149,6 +156,37 @@ module.exports = {
         showColumns: true,
         pageSize: 15,
         pageList: [15, 25, 50, 100],
+        pagination: true,
+        sidePagination: "server"
+      },
+      expireTableColumns: [{
+        field: "member.name",
+        title: "姓名",
+        formatter: this.memberFormatter,
+        sortable: true
+      }, {
+        field: "member.contact",
+        title: "联系方式"
+      }, {
+        field: "total",
+        title: "剩余课时*<i class='ms-3 small glyphicon glyphicon-info-sign' style='color:#777'/>",
+        titleTooltip: "合约中可用课时和已经排课但尚未开始的课时",
+        sortable: true,
+        //formatter: format.toFixed1
+        formatter: (value, row) => {
+          return `<b>${format.toFixed1(value)}</b> <small>(可用${format.toFixed1(row.remaining)}/未开始${format.toFixed1(row.plan)})</small>`;
+        }
+      }],
+      expireTableOptions: {
+        locale: "zh-CN",
+        showRefresh: false,
+        //queryParams: this.customQuery,
+        //url: "/api/members?hasContracts=true",
+        uniqueId: "_id",
+        sortName: "total",
+        sortOrder: "asc",
+        pageSize: 10,
+        pageList: [10, 15, 20, 50],
         pagination: true,
         sidePagination: "server"
       }
@@ -312,8 +350,17 @@ module.exports = {
       this.$refs.memberTable.refresh(params);
     },
     displayOutOfCredit() {
-      this.$refs.messager.showInfoMessage('此功能未开放，等待系统更新');
-    }
+      this.$refs.expireMemberDialog.show();
+      this.$refs.expireTable.refresh({ url: "/api/members?hasContracts=true" });
+    },
+    memberFormatter(value, row, index) {
+      return [
+        `<a href="./member/${row._id}" target="blank">`,
+        `<i class="glyphicon glyphicon-user me-3"/>`,
+        value,
+        '</a>'
+      ].join('');
+    },
   },
   created: function() {
     this.tenantConfig = _getTenantConfig();

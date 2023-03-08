@@ -6,6 +6,7 @@
 
 var i18nextplugin = require('../../locales/i18nextplugin');
 var membersPage = require('./member-overview.vue').default;
+var formatPlugin = require('../../common/format');
 
 // DOM Ready =============================================================
 $(document).ready(function() {
@@ -24,4 +25,5 @@ function init() {
     moment.locale('zh-CN');
     //bootbox.setLocale('zh_CN');
     Vue.use(i18nextplugin);
+    Vue.use(formatPlugin);
 }
