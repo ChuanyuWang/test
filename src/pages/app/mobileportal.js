@@ -60,8 +60,7 @@ $(document).ready(function() {
     */
     new Vue({
         el: '#app',
-        components: { mobilePortal },
-        template: '<mobile-portal/>',
+        components: { app: mobilePortal },
         router,
         vuetify
     });
