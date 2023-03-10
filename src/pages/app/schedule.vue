@@ -72,7 +72,7 @@ module.exports = {
     var vm = this;
     var today = moment();
     //set the time to the very beginning of day
-    var begin = today.hours(0).minutes(0).seconds(0).milliseconds(0);
+    var begin = today.startOf('day');
     var end = moment(begin).add(1, 'days');
     var request = classesService.getClasses({
       from: begin.toISOString(),

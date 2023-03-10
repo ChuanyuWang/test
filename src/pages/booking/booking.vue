@@ -373,8 +373,7 @@ module.exports = {
         _date.day(1);
       }
       //set the time to the very beginning of day
-      _date.hours(0).minutes(0).seconds(0).milliseconds(0);
-      return _date;
+      return _date.startOf('day');
     },
     isCompletedClass(cls) {
       return moment().isAfter(moment(cls.date).subtract(1, 'hours'));
