@@ -9,8 +9,21 @@ var schedule = require('./schedule.vue').default;
 var appointment = require('./myappointments.vue').default;
 var trial = require('./trial.vue').default;
 
+// copy from https://youmightnotneedjquery.com/?support=ie11
+function ready(fn) {
+    if (
+        document.attachEvent
+            ? document.readyState === 'complete'
+            : document.readyState !== 'loading'
+    ) {
+        fn();
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+
 // DOM Ready =============================================================
-$(document).ready(function() {
+ready(function() {
     init();
 
     var routes = [
