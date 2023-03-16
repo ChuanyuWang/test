@@ -22,9 +22,9 @@ module.exports = {
      */
     getTenantSetting: function() {
         var settings = {};
-        var el = $('tenant-setting');
+        var el = document.querySelector('tenant-setting');
         if (el.length > 0) {
-            settings.feature = el.attr('feature') || 'common' // default is 'common'
+            settings.feature = el.getAttribute('feature') || 'common' // default is 'common'
         }
         return settings;
     },
