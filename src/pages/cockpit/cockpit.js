@@ -56,9 +56,6 @@ ready(function() {
         },
     })
 
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-
     // Invalid way to mount root vue component
     // Refer to https://github.com/yinxin630/blog/issues/1
     //new Vue({ el: '#app', extends: cockpit, router, vuetify });
@@ -83,10 +80,13 @@ ready(function() {
 
 function init() {
     console.log("welcome~~~");
+    // MUST listen to the "languageChanged" event before loading i18nextplugin
     i18next.on('languageChanged', lng => {
         console.log(`language changed to ${lng}`);
         moment.locale(lng);
-    })
+    });
+    // load the i18next plugin to Vue, and detect the language of browser
+    Vue.use(i18nextplugin);
 
     // backend needs this flag to distinguish ajax request from request by req.xhr
     // but makes the request "unsafe" (as defined by CORS), and will trigger a preflight request, which may not be desirable.

@@ -36,9 +36,6 @@ ready(function() {
         },
     })
 
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-
     // Invalid way to mount root vue component
     // Refer to https://github.com/yinxin630/blog/issues/1
     //new Vue({ el: '#app', extends: mobilePortal, router, vuetify });
@@ -62,8 +59,11 @@ ready(function() {
 
 function init() {
     console.log("welcome~~~");
+    // MUST listen to the "languageChanged" event before loading i18nextplugin
     i18next.on('languageChanged', lng => {
         console.log(`language changed to ${lng}`);
         moment.locale(lng);
-    })
+    });
+    // load the i18next plugin to Vue, and detect the language of browser
+    Vue.use(i18nextplugin);
 }
