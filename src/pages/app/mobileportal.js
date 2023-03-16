@@ -83,6 +83,8 @@ ready(function() {
 
 function init() {
     console.log("welcome~~~");
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
+    i18next.on('languageChanged', lng => {
+        console.log(`language changed to ${lng}`);
+        moment.locale(lng);
+    })
 }

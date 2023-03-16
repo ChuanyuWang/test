@@ -83,7 +83,10 @@ ready(function() {
 
 function init() {
     console.log("welcome~~~");
-    moment.locale('zh-CN');
+    i18next.on('languageChanged', lng => {
+        console.log(`language changed to ${lng}`);
+        moment.locale(lng);
+    })
 
     // backend needs this flag to distinguish ajax request from request by req.xhr
     // but makes the request "unsafe" (as defined by CORS), and will trigger a preflight request, which may not be desirable.
