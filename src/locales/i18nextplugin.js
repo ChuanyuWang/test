@@ -11,7 +11,7 @@ var resources = {
     'zh': { translation: require('./zh_CN') }
 };
 
-var i18nextPlugin = {
+module.exports = {
     install: function(Vue, options) {
         if (i18next) {
             // more options refer to https://www.i18next.com/configuration-options.html
@@ -30,5 +30,3 @@ var i18nextPlugin = {
         }
     }
 };
-
-module.exports = i18nextPlugin;
