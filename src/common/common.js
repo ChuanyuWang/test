@@ -18,7 +18,7 @@ module.exports = {
         return pathname.split('/')[0];
     },
     /**
-     * get the tenant setting, e.g. {feature: 'book'}
+     * [Deprecated] Get the tenant setting, e.g. {feature: 'book'}
      */
     getTenantSetting: function() {
         var settings = {};
