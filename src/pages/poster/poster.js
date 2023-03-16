@@ -6,8 +6,21 @@
 var i18nextplugin = require('../../locales/i18nextplugin');
 var poster = require('./poster.vue').default;
 
+// copy from https://youmightnotneedjquery.com/?support=ie11
+function ready(fn) {
+    if (
+        document.attachEvent
+            ? document.readyState === 'complete'
+            : document.readyState !== 'loading'
+    ) {
+        fn();
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+
 // DOM Ready =============================================================
-$(document).ready(function() {
+ready(function() {
     init();
 
     var vuetify = new Vuetify({
