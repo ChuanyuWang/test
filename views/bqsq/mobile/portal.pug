@@ -1,30 +1,6 @@
-extends ../../layout
-
-block append css
-  link(href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900",rel="stylesheet")
-  link(href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css",rel="stylesheet")
-  if ENV_DEVELOPMENT
-    link(rel="stylesheet", href=CDN_FILES.vuetify_css_dev)
-  else
-    link(rel="stylesheet", href=CDN_FILES.vuetify_css)
+extends ../../vuetifylayout
 
 block append js
-  if ENV_DEVELOPMENT
-    script(src=CDN_FILES.axios_dev)
-    script(src=CDN_FILES.jquery_dev)
-    script(src=CDN_FILES.i18next_dev)
-    script(src=CDN_FILES.vue_dev)
-    script(src=CDN_FILES.vue_router_dev)
-    script(src=CDN_FILES.vuetify_dev)
-    script(src=CDN_FILES.momentjs_dev)
-  else
-    script(src=CDN_FILES.axios)
-    script(src=CDN_FILES.jquery)
-    script(src=CDN_FILES.i18next)
-    script(src=CDN_FILES.vue)
-    script(src=CDN_FILES.vue_router)
-    script(src=CDN_FILES.vuetify)
-    script(src=CDN_FILES.momentjs)
   script(src='/js/portal.js')
 
 block content
