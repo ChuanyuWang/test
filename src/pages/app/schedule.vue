@@ -12,7 +12,6 @@ v-container.pb-16
 </template>
 
 <script>
-var classesService = require("../../services/classes");
 var commonUtil = require("../../common/common");
 
 module.exports = {
@@ -69,23 +68,21 @@ module.exports = {
     }
   },
   mounted() {
-    var vm = this;
     var today = moment();
     //set the time to the very beginning of day
     var begin = today.startOf('day');
     var end = moment(begin).add(1, 'days');
-    var request = classesService.getClasses({
-      from: begin.toISOString(),
-      to: end.toISOString(),
-      // 'undefined' field will not append to the URL
-      classroom: commonUtil.getPublicClassroom() || undefined,
-      tenant: commonUtil.getTenantName()
+    var request = axios.get('/api/classes', {
+      params: {
+        from: begin.toISOString(),
+        to: end.toISOString(),
+        // 'undefined' field will not append to the URL
+        classroom: commonUtil.getPublicClassroom() || undefined,
+        tenant: commonUtil.getTenantName()
+      }
     });
-    request.fail(function(jqXHR, textStatus, errorThrown) {
-      console.error("get classes fails", jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
-    });
-    request.done(function(data, textStatus, jqXHR) {
-      vm.classes = data || [];
+    request.then((response) => {
+      this.classes = response.data || [];
     });
   }
 }

@@ -10,6 +10,7 @@ block append css
 
 block append js
   if ENV_DEVELOPMENT
+    script(src=CDN_FILES.axios_dev)
     script(src=CDN_FILES.jquery_dev)
     script(src=CDN_FILES.i18next_dev)
     script(src=CDN_FILES.vue_dev)
@@ -17,6 +18,7 @@ block append js
     script(src=CDN_FILES.vuetify_dev)
     script(src=CDN_FILES.momentjs_dev)
   else
+    script(src=CDN_FILES.axios)
     script(src=CDN_FILES.jquery)
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
