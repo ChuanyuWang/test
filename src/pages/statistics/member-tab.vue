@@ -15,19 +15,15 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
 var date_picker = require('../../components/date-picker.vue').default;
 
 module.exports = {
   name: "member-tab",
   props: {},
   data: function() {
-    // load the setting of tenant from html root-level elements
-    var setting = common.getTenantSetting();
     return {
       targetYear: moment().startOf('year'),
       datePickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
-      feature: setting.feature,
       columns: [
         {
           field: "_id",
@@ -147,5 +143,4 @@ module.exports = {
 </script>
 
 <style lang='less'>
-
 </style>

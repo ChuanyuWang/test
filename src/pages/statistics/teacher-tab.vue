@@ -18,7 +18,6 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
 var date_picker = require('../../components/date-picker.vue').default;
 var teacher_service = require("../../services/teachers");
 
@@ -26,14 +25,11 @@ module.exports = {
   name: "teacher-tab",
   props: {},
   data: function() {
-    // load the setting of tenant from html root-level elements
-    var setting = common.getTenantSetting();
     return {
       tenantSettings: {},
       typeFilter: "",
       targetMonth: moment().startOf('month'),
       datePickerConfig: { "format": "YYYY-MM", "locale": "zh-CN", "viewMode": "months" },
-      feature: setting.feature,
       teacherData: [],
       columns: [
         {
@@ -195,5 +191,4 @@ module.exports = {
 </script>
 
 <style lang='less'>
-
 </style>
