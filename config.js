@@ -78,6 +78,12 @@ module.exports = {
         echarts_dev: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.js',
         blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js',
         axios: 'https://cdn.jsdelivr.net/npm/axios@1.3.4/dist/axios.min.js',
-        axios_dev: 'https://cdn.jsdelivr.net/npm/axios@1.3.4/dist/axios.js'
+        axios_dev: 'https://cdn.jsdelivr.net/npm/axios@1.3.4/dist/axios.js',
+        vuetify: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.min.js',
+        vuetify_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.js',
+        vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.min.css',
+        vuetify_css_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.css',
+        vue_router: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.min.js',
+        vue_router_dev: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.js'
     }
 };
