@@ -70,7 +70,7 @@ module.exports = {
     };
   },
   computed: {
-    monday: function name() {
+    monday: function() {
       // Get the Monday of specific date, each week starts from Monday
       var _date = moment(this.date);
       var dayofweek = _date.day();
@@ -82,11 +82,7 @@ module.exports = {
         _date.day(1);
       }
       //set the time to the very beginning of day
-      _date.hours(0)
-        .minutes(0)
-        .seconds(0)
-        .milliseconds(0);
-      return _date;
+      return _date.startOf('day');
     },
     sortedClasses: function() {
       return this.classes.sort(function(a, b) {
