@@ -90,20 +90,7 @@ if (app.locals.ENV_DEVELOPMENT) {
 }
 
 // Use gzip compression
-app.use(compression())
-
-app.use(express.json());
-app.use(express.text());
-app.use(bodyParser.xml({
-    xmlParseOptions: {
-        trim: true, // Trim the whitespace at the beginning and end of text nodes.
-        explicitRoot: false, // remove root node
-        explicitArray: false // Only put nodes in array if >1
-    }
-}));
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use(compression());
 
 // Load the webpack-dev-middleware to support hot reload if it's enabled
 if (app.locals.ENV_DEVELOPMENT && process.env.HOTRELOAD === "true") {
@@ -177,6 +164,21 @@ app.use(i18n.init);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash()); //flash() requires sessions
+
+// all kinds of parser
+app.use(express.json());
+app.use(express.text());
+app.use(bodyParser.xml({
+    xmlParseOptions: {
+        trim: true, // Trim the whitespace at the beginning and end of text nodes.
+        explicitRoot: false, // remove root node
+        explicitArray: false // Only put nodes in array if >1
+    }
+}));
+
+app.use(express.urlencoded({
+    extended: true
+}));
 
 // add router
 var routes = require('./routes/index');
