@@ -49,8 +49,8 @@ module.exports = {
      * 8. https://www.staticaly.com
      */
     cdnlibs: {
-        jquery: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.4.1/jquery.min.js',
-        jquery_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.4.1/jquery.js',
+        jquery: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.5.1/jquery.min.js',
+        jquery_dev: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.5.1/jquery.js',
         bootstrap: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
         bootstrap_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
         bootstrap_dev: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/js/bootstrap.js',
