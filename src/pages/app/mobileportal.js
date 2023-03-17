@@ -3,28 +3,14 @@
  * portal.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var mobilePortal = require('./portal.vue').default;
 var schedule = require('./schedule.vue').default;
 var appointment = require('./myappointments.vue').default;
 var trial = require('./trial.vue').default;
 
-// copy from https://youmightnotneedjquery.com/?support=ie11
-function ready(fn) {
-    if (
-        document.attachEvent
-            ? document.readyState === 'complete'
-            : document.readyState !== 'loading'
-    ) {
-        fn();
-    } else {
-        document.addEventListener('DOMContentLoaded', fn);
-    }
-}
-
 // DOM Ready =============================================================
-ready(function() {
-    init();
+init(function() {
 
     var routes = [
         { path: '/', component: schedule, meta: { title: '课程表' } },
@@ -75,16 +61,3 @@ ready(function() {
         vuetify
     });
 });
-
-// Functions =============================================================
-
-function init() {
-    console.log("welcome~~~");
-    // MUST listen to the "languageChanged" event before loading i18nextplugin
-    i18next.on('languageChanged', lng => {
-        console.log(`language changed to ${lng}`);
-        moment.locale(lng);
-    });
-    // load the i18next plugin to Vue, and detect the language of browser
-    Vue.use(i18nextplugin);
-}

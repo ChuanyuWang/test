@@ -3,25 +3,11 @@
  * poster.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var poster = require('./poster.vue').default;
 
-// copy from https://youmightnotneedjquery.com/?support=ie11
-function ready(fn) {
-    if (
-        document.attachEvent
-            ? document.readyState === 'complete'
-            : document.readyState !== 'loading'
-    ) {
-        fn();
-    } else {
-        document.addEventListener('DOMContentLoaded', fn);
-    }
-}
-
 // DOM Ready =============================================================
-ready(function() {
-    init();
+init(function() {
 
     var vuetify = new Vuetify({
         // https://material.io/resources/color/#!/?view.left=0&view.right=1&primary.color=2196F3&secondary.color=FFEE58
@@ -54,16 +40,3 @@ ready(function() {
         vuetify
     });
 });
-
-// Functions =============================================================
-
-function init() {
-    console.log("welcome~~~");
-    // MUST listen to the "languageChanged" event before loading i18nextplugin
-    i18next.on('languageChanged', lng => {
-        console.log(`language changed to ${lng}`);
-        moment.locale(lng);
-    });
-    // load the i18next plugin to Vue, and detect the language of browser
-    Vue.use(i18nextplugin);
-}

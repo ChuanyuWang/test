@@ -3,28 +3,14 @@
  * cockpit.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var cockpit = require('./cockpit.vue').default;
 var home = require('./home.vue').default;
 var store = require('./store.vue').default;
 var query = require('./query.vue').default;
 
-// copy from https://youmightnotneedjquery.com/?support=ie11
-function ready(fn) {
-    if (
-        document.attachEvent
-            ? document.readyState === 'complete'
-            : document.readyState !== 'loading'
-    ) {
-        fn();
-    } else {
-        document.addEventListener('DOMContentLoaded', fn);
-    }
-}
-
 // DOM Ready =============================================================
-ready(function() {
-    init();
+init(function() {
 
     var routes = [
         { path: '/', component: home, meta: { title: '光影故事屋片源统计' } },
@@ -75,41 +61,3 @@ ready(function() {
         vuetify
     });
 });
-
-// Functions =============================================================
-
-function init() {
-    console.log("welcome~~~");
-    // MUST listen to the "languageChanged" event before loading i18nextplugin
-    i18next.on('languageChanged', lng => {
-        console.log(`language changed to ${lng}`);
-        moment.locale(lng);
-    });
-    // load the i18next plugin to Vue, and detect the language of browser
-    Vue.use(i18nextplugin);
-
-    // backend needs this flag to distinguish ajax request from request by req.xhr
-    // but makes the request "unsafe" (as defined by CORS), and will trigger a preflight request, which may not be desirable.
-    // See https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests for more details
-    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    // Add a response interceptor
-    axios.interceptors.response.use(function(response) {
-        // Any status code that lie within the range of 2xx cause this function to trigger
-        // Do something with response data
-        return response;
-    }, function(error) {
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        if (error.response) {
-            // The request was made and the server responded with a status code
-            // the returned json body should have a message property to indicate the error
-            console.error(error.response.data.message);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.error(error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.error("Error", error.message);
-        }
-        return Promise.reject(error);
-    });
-}
