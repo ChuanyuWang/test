@@ -400,7 +400,8 @@ async function addMembers2Course(db, req, locals) {
         _id: ObjectId(req.params.courseID),
         status: { $ne: "closed" }
     }, {
-        $push: {
+        // {id: 1, name: "a"} and {name: "a", id: 1} will be treated as two different objectsby addToSet
+        $addToSet: { // avoid duplicate member, {id, name}, id must be the first field
             members: { $each: course_added_members }
         }
     }, {
