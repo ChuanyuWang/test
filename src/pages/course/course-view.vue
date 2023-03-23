@@ -43,7 +43,8 @@ div.container
       ul.list-group(style='margin-bottom:0px')
         transition-group(name="list")
           li.list-group-item(v-for="member in memberList" :key='member.id')
-            span.glyphicon.glyphicon-user.text-primary(style='margin-right:3px')
+            span.glyphicon.glyphicon-user.text-primary.me-3
+            span.badge(style='background-color:#5cb85c;cursor:pointer' @click='autoBook(member)') 自动预约
             span.badge(style='background-color:#d9534f;cursor:pointer',@click='$refs.removeMemberDialog.show(member)') 移除
             a.badge(:href='"../member/" + member.id',style='margin-right:3px;background-color:#337ab7') 查看
             | {{member.name}}
@@ -102,9 +103,10 @@ div.container
           |仅参加尚未开始的课程
   modal-dialog(ref='resultDialog',buttonStyle="primary",buttons="ok",@ok="") 自动预约课程出错
     template(v-slot:body="slotProps")
-      p 当添加学员或课程到班级时，系统会为学员自动预约尚未开始的课程，无法自动预约的情况如下：
+      p.help-block 当进行自动预约，或添加学员和课程到班级时，系统会自动预约尚未开始的课程，预约成功后会显示在学员的学习进度条中
+      | 以下课程预约失败：
       ul.list-group
-        li.list-group-item.list-group-item-danger.small(v-for="item in slotProps.param") {{item}}
+        li.list-group-item.list-group-item-danger.small.pt-3(v-for="item in slotProps.param") {{item}}
   modal-dialog(ref='removeClassDialog' buttonStyle="danger" buttons="confirm" @ok="removeClass") 删除课程
     template(v-slot:body="slotProps")
       p 删除{{slotProps.param.date | formatDetailDate}}的"{{slotProps.param.name}}"课程吗?<br><small>同时返还消费课时</small>
@@ -518,6 +520,20 @@ module.exports = {
       if (this.course.status == "closed") {
         this.$refs.messager.showWarningMessage("请在<strong>保存</strong>前确认全部课程已结束");
       }
+    },
+    autoBook(member) {
+      var request = course_service.addCourseMembers(
+        this.course._id,
+        [{ id: member.id, name: member.name }]
+      );
+      request.done((data, textStatus, jqXHR) => {
+        this.refreshClasses();
+        var updatedClasses = data.updatedClasses || [];
+        var errors = data.errors || [];
+        this.$refs.messager.showSuccessMessage(`班级成员${member.name}自动预约${updatedClasses.length - errors.length}节课程`, errors.length > 0 ? false : true);
+        if (errors.length > 0)
+          this.$refs.resultDialog.show(errors);
+      });
     }
   },
   created() {
