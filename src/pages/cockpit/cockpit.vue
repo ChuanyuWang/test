@@ -9,8 +9,8 @@ v-app
         v-list-item-subtitle 光影故事屋数据分析
     v-divider
     v-list(dense nav)
-      v-list-item-group(v-model="selectedItem" mandatory)
-        v-list-item(link v-for="item in menuItems" :key="item.name" @click="open(item.value)")
+      v-list-item-group(v-model="selectedItem" mandatory @change="open")
+        v-list-item(link v-for="item in menuItems" :key="item.name")
           v-list-item-icon
             v-icon(color="primary") {{item.icon}}
           v-list-item-content
@@ -49,8 +49,8 @@ module.exports = {
   },
   methods: {
     open(value) {
-      // load another route view
-      this.$router.push(value);
+      // load route view
+      this.$router.push(this.menuItems[value].value);
     }
   },
   mounted() {
