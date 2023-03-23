@@ -51,7 +51,7 @@ module.exports = function(fn) {
         }
 
         // execute callback after all initialization
-        fn();
+        if (typeof fn === 'function') fn();
     }
 
     /**
