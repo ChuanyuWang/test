@@ -103,16 +103,16 @@ div.container
           |仅参加尚未开始的课程
   modal-dialog(ref='resultDialog',buttonStyle="primary",buttons="ok",@ok="") 自动预约课程出错
     template(v-slot:body="slotProps")
-      p.help-block 当进行自动预约，或添加学员和课程到班级时，系统会自动预约尚未开始的课程，预约成功后会显示在学员的学习进度条中
+      p.help-block 当进行自动预约，或添加学员和课程到班级时，系统会自动预约尚未开始的课程，课程预约成功后，会显示在学员的学习进度条中，同时会从学员合约中扣除相应的课时
       | 以下课程预约失败：
       ul.list-group
         li.list-group-item.list-group-item-danger.small.pt-3(v-for="item in slotProps.param") {{item}}
   modal-dialog(ref='removeClassDialog' buttonStyle="danger" buttons="confirm" @ok="removeClass") 删除课程
     template(v-slot:body="slotProps")
-      p 删除{{slotProps.param.date | formatDetailDate}}的"{{slotProps.param.name}}"课程吗?<br><small>同时返还消费课时</small>
+      p 删除{{slotProps.param.date | formatDetailDate}}的"{{slotProps.param.name}}"课程吗?<br><small>如果有学员预约，同时退还相应的课时到学员合约中</small>
   modal-dialog(ref='removeMemberDialog' buttonStyle="danger" buttons="confirm" @ok="removeMember") 移除班级成员
     template(v-slot:body="slotProps")
-      p 从班级中移除<strong>{{slotProps.param.name}}</strong>学员, 并取消此成员所有未开始的课程吗?<br><small>同时返还消费课时</small>
+      p 从班级中移除<strong>{{slotProps.param.name}}</strong>学员, 并取消此成员所有未开始的课程吗?<br><small>如果学员有未开始的课程，同时退还课时到合约中</small>
 </template>
 
 <script>
