@@ -23,7 +23,7 @@ module.exports = {
     getTenantSetting: function() {
         var settings = {};
         var el = document.querySelector('tenant-setting');
-        if (el.length > 0) {
+        if (el) {
             settings.feature = el.getAttribute('feature') || 'common' // default is 'common'
         }
         return settings;
