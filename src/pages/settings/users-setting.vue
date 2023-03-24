@@ -83,6 +83,7 @@ module.exports = {
         { name: "添加班级", role: "user" },
         { name: "删除班级", role: "admin" },
         { name: "修改班级", role: "admin" },
+        { name: "自动预约", role: "user" },
         { name: "添加班级成员", role: "user" },
         { name: "删除班级成员", role: "user" },
         { name: "添加班级课程", role: "user" },
@@ -109,5 +110,4 @@ module.exports = {
 </script>
 
 <style lang='less'>
-
 </style>
