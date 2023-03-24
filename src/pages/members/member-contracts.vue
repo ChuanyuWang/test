@@ -8,7 +8,7 @@ div
     a.btn.btn-success.me-3(:href="'../contract/create?memberId='+ memberId" style="float: right; margin-top: 16px") 购课/续课
   div.row
     div.col-sm-12
-      span.help-block.small.text-right(style="margin:3px") *当学员拥有一个课程的多个合约时, 会按照合约生效日期的先后顺序进行课时扣除
+      span.help-block.small.text-right(style="margin:3px") *当学员拥有一个课程的多个合约时, 会根据合约的生效日期，从最早生效的合约扣除课时
       div#contractToolbar
       bootstrap-table.table-striped(ref="contractsTable" :columns="contractTableColumns" :options="contractTableOptions")
 </template>

@@ -1,7 +1,7 @@
 <template lang="pug">
 modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasError="hasError") 修改合约
   template(v-slot:body)
-    div.alert.alert-warning <b>注意:</b> 如果学员续课，请创建新合约，不要修改已有合约
+    div.alert.alert-warning <b>注意:</b> 学员续课时，请创建新合约，不要修改已有合约
     form.form-horizontal
       div.form-group
         label.col-sm-3.control-label 类型:
@@ -10,6 +10,9 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
             option.text-default(value="new") 新签
             option.text-default(value="renewal") 续费
             option.text-default(value="donate") 赠送
+        div.col-sm-4
+          p.form-control-static(style="color: #808080")
+            small 课时卡
       div.form-group(:class="{ 'has-error': errors.effectiveDate }")
         label.col-sm-3.control-label 生效日期:
         div.col-sm-5
@@ -44,7 +47,7 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
       div.form-group(:class="{ 'has-error': errors.comment }")
         label.col-sm-3.control-label 修改备注:
         div.col-sm-9
-          textarea.form-control.has-3-rows(rows="3" placeholder="添加合约备注" v-model.trim="item.comment")
+          textarea.form-control.has-3-rows(rows="3" placeholder="修改合约的事由和原因（必填）" v-model.trim="item.comment")
           span.help-block.ms-3.small 最多256个字，提交后无法修改
 </template>
 
