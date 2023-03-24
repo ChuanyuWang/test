@@ -17,7 +17,7 @@ const NORMAL_FIELDS = {
 
 // Below APIs are visible to anonymous users
 
-/// Below APIs are visible to authenticated users only
+// Below APIs are visible to authenticated users only
 router.use(isAuthenticated);
 
 /**
