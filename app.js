@@ -1,27 +1,27 @@
-var express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
-var compression = require('compression')
-var path = require('path');
+const compression = require('compression')
+const path = require('path');
 const mongoose = require('mongoose');
 const connectionManager = require('./server/databaseManager');
-//var favicon = require('serve-favicon');
-var morgan = require('morgan');
-//var cookieParser = require('cookie-parser');
+//const favicon = require('serve-favicon');
+const morgan = require('morgan');
+//const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-var flash = require('connect-flash');
-var passport = require('passport');
-var config = require('./config');
-var i18n = require('i18n');
+const flash = require('connect-flash');
+const passport = require('passport');
+const config = require('./config');
+const i18n = require('i18n');
 const helmet = require('helmet');
 
 // main application
-var app = express();
+const app = express();
 app.locals.CDN_FILES = config.cdnlibs;
 
 // app.get('env') returns 'development' if NODE_ENV is not defined. 
-var env = app.get('env');
+const env = app.get('env');
 app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
@@ -181,7 +181,7 @@ app.use(express.urlencoded({
 }));
 
 // add router
-var routes = require('./routes/index');
+const routes = require('./routes/index');
 app.use('/', routes);
 
 /// catch 404 if no router match
