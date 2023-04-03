@@ -69,5 +69,6 @@
   "order_success": "已支付",
   "order_closed": "关闭",
   "order_refund": "退款",
-  "contracts": "合约"
+  "contracts": "合约",
+  "internal_classroom_description": "内部教室不对外开放，安排在内部教室的课程不支持学员自助预约"
 }

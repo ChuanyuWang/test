@@ -4,7 +4,7 @@ div
     button.btn.btn-success(type='button',@click='addClassroom()') 添加
   bootstrap-table.table-striped(ref='classroomTable',:columns='columns',:options='options')
   p.small(style='margin-top:14px') 
-    |*内部教室不对外开放，会员在自助预约时不能选择内部教室
+    |*{{$t('internal_classroom_description')}}
   modal-dialog(ref='classroomEditDlg',buttonStyle="success") {{newClassroom ? "添加教室" : "修改教室"}}
     template(v-slot:body)
       form.form-horizontal
@@ -22,7 +22,7 @@ div
                 input(type='checkbox',name='visibility',value='internal',v-model='internal')
                 |内部教室*
     template(v-slot:footer)
-      p.small(style='color:#777;float:left;margin-top:7px') *内部教室不对外开放，学员在自助预约时不能选择内部教室
+      p.small(style='color:#777;float:left;margin-top:7px') *{{$t('internal_classroom_description')}}
       button.btn.btn-default(type="button",data-dismiss="modal") 取消
       button.btn.btn-success(type="button",:disabled='hasError',v-if='newClassroom',@click='addNewClassroom') 添加
       button.btn.btn-primary(type="button",:disabled='hasError',v-else,@click='editClassroom') 修改
@@ -213,5 +213,4 @@ module.exports = {
 </script>
 
 <style lang="less">
-
 </style>
