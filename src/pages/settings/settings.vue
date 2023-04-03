@@ -35,12 +35,12 @@ div
           label.col-sm-2.control-label 预约课程
           div.col-sm-10
             p.form-control-static {{tenantUrl + '/booking'}}
-            span.help-block 预约入口, 访问用户可以查看本周全部课程, 并根据注册信息进行课程预约; 未开始课程, 会员可以提前24小时取消。
+            span.help-block 预约入口, 访问用户可以查看本周放开预约的课程（课程类型为开放预约，并且课程所在教室为非内部教室）, 并根据注册信息进行课程预约; 未开始课程, 可以提前24小时取消。
         div.form-group
           label.col-sm-2.control-label 我的课程
           div.col-sm-10
             p.form-control-static {{tenantUrl + '/mybooking'}}
-            span.help-block 我的课程入口，访问用户可以根据注册信息查看所有历史课程，包括已经结束的和预约中的。
+            span.help-block 我的课程入口，访问用户可以根据注册信息查看学员历史课程，包括已经结束的和预约中的。
         div.form-group
           label.col-sm-2.control-label 试听
           div.col-sm-10
@@ -98,5 +98,4 @@ module.exports = {
 </script>
 
 <style>
-
 </style>
