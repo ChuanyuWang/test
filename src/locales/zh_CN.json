@@ -65,7 +65,7 @@
   "deleted_course": "<班级被删除>",
   "course_summary_title": "所在班级",
   "order_open": "新建",
-  "order_notpay": "未支付",
+  "order_unpaid": "未支付",
   "order_success": "已支付",
   "order_closed": "关闭",
   "order_refund": "退款",

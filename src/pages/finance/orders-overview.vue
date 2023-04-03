@@ -7,7 +7,7 @@ div
         select.form-control(v-model="filter",@change="refresh")
           option(value="") {{$t("all")}}
           option(value="open") {{$t("order_open")}}
-          option(value="notpay") {{$t("order_notpay")}}
+          option(value="notpay") {{$t("order_unpaid")}}
           option(value="success") {{$t("order_success")}}
           option(value="closed") {{$t("order_closed")}}
           option(value="refund") {{$t("order_refund")}}
@@ -135,7 +135,7 @@ module.exports = {
         case "open":
           return this.$t("order_open");
         case "notpay":
-          return this.$t("order_notpay");
+          return this.$t("order_unpaid");
         default:
           return null;
       }
@@ -237,5 +237,4 @@ module.exports = {
 }
 </script>
 <style lang="less">
-
 </style>
