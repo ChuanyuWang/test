@@ -34,7 +34,7 @@ jobs:
       with:
         mongodb-version: ${{ matrix.mongodb-version }}
 
-    - name: create db config file
+    - name: Create db config file
       run: echo module.exports={host:\"localhost\"} > config.db.js
 
     - run: npm i
