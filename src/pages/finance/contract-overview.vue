@@ -154,7 +154,7 @@ module.exports = {
       var members = row.member || [];
       return [
         `<a href="./member/${value}">`,
-        `<i class="glyphicon glyphicon-user me-3"/>`,
+        `<i class="glyphicon glyphicon-user me-3"></i>`,
         members.length > 0 ? members[0].name : value,
         //'<i class="glyphicon glyphicon-search"></i>',
         '</a>'
@@ -213,5 +213,4 @@ module.exports = {
 }
 </script>
 <style lang="less">
-
 </style>
