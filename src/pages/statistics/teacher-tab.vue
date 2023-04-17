@@ -147,9 +147,10 @@ module.exports = {
       });
     },
     counterFormatter: function(value, row, index) {
-      return (value || []).reduce((sum, i) => {
+      var result = (value || []).reduce((sum, i) => {
         return sum + i.cost;
       }, 0);
+      return this.$toFixed1(result);
     },
     nameFormatter: function(value, row, index) {
       return value ? this.teachers[value].name : "<未指定>";
