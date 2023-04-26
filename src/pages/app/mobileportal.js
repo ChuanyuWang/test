@@ -13,7 +13,7 @@ var trial = require('./trial.vue').default;
 init(function() {
 
     var routes = [
-        { path: '/', component: schedule, meta: { title: '课程表' } },
+        { path: '/', component: schedule, meta: { title: '预约课程' } },
         { path: '/trial', component: trial, meta: { title: '报名试听' } },
         { path: '/appointment', component: appointment, meta: { title: '我的预约' } }
     ];

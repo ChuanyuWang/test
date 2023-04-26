@@ -18,13 +18,13 @@ v-app
     router-view
   v-bottom-navigation(app,v-model='value',color='primary',@change="$router.push(value)")
     v-btn(value='/')
-      span 查看课表
+      span 预约
       v-icon mdi-calendar-month
     v-btn(value='/trial')
-      span 报名试听
+      span 试听
       v-icon mdi-seal
     v-btn(value='/appointment')
-      span 我的预约
+      span 我的
       v-icon mdi-heart
 </template>
 
