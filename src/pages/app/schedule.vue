@@ -1,6 +1,27 @@
 <template lang="pug">
 v-container.pb-16
-  v-card.mb-1(v-for="item in classes",:key="item._id")
+  v-list(three-line)
+    v-subheader Today
+    template(v-for="(item, index) in classes")
+      v-divider(:key="index" insert)
+      v-list-item
+        v-list-item-avatar
+          v-img(v-if="item.mediaUrl" :src="item.mediaUrl")
+          v-img(v-else src="/img/class-ghost.png")
+        v-list-item-content
+          v-list-item-title.font-weight-bold {{item.name + " "}}
+            v-chip.font-weight-regular.px-1(x-small label) 光影课
+          v-list-item-subtitle.text-caption(v-show="item.description") {{item.description}}
+            //v-chip.px-1(x-small label) 光影课
+          div
+            //v-chip.px-1.font-italic.me-1(color="secondary" text-color="primary" x-small) 1课时
+            v-chip.px-1.font-italic.me-1(color="amber darken-1" text-color="white" x-small) 1课时
+            v-chip.px-1.font-italic(color="amber darken-1" text-color="white" x-small) 98元
+        v-list-item-action
+          v-list-item-action-text {{item.date | timeFilter}}
+          v-btn(color="primary" x-small rounded) 预约
+
+  //v-card.mb-1(v-for="item in classes",:key="item._id")
     v-img(v-if="item.mediaUrl",max-height="180",:src="item.mediaUrl")
     v-img(v-else, max-height="180",src="/img/bqsq-logo-2x.png")
     v-card-title.py-1 {{item.name}}
@@ -65,6 +86,11 @@ module.exports = {
   },
   methods: {
     test() {
+    }
+  },
+  filters: {
+    timeFilter(date) {
+      return moment(date).format("LT");
     }
   },
   mounted() {
