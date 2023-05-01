@@ -62,7 +62,7 @@ module.exports = {
           title: "完成课节<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
           sortable: false,
           formatter: this.counterFormatter,
-          titleTooltip: "完成课节=完成课次*每节课时, 例如: 完成两次课, 课时分别为1课时和2课时, 则完成课节为3 (1+2)",
+          titleTooltip: "完成课节=每次课程的课时总和, 例如: 完成两次课, 课时分别为1课时和2课时, 则完成课节为3 (1+2)",
           footerFormatter: data => {
             var result = (data || []).map(row => { return row.counter || []; }).reduce((sum, v) => {
               return sum + v.reduce((s, i) => { return s + i.cost; }, 0);
@@ -113,6 +113,8 @@ module.exports = {
         //url: "/api/classes/checkin",
         //sidePagination: "server",
         showRefresh: true,
+        detailView: true,
+        detailFormatter: this.detailViewFormatter,
         pagination: true,
         pageSize: 15,
         pageList: [10, 15, 20, 50, 100],
@@ -171,6 +173,15 @@ module.exports = {
     actualFormatter: function(value, row, index) {
       var res = row.total - row.absent || 0;
       return this.$toFixed1(res);
+    },
+    detailViewFormatter: function(index, row, element) {
+      var detailCell = "";
+      var items = row.counter || [];
+      for (let i = 0; i < items.length; i++) {
+        var cls = items[i];
+        detailCell += `<a class="me-3" href="./class/${cls.id}" target="_blank">课程${i + 1}</a>`;
+      }
+      return detailCell;
     },
     statusQuery: function(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
