@@ -48,7 +48,7 @@ module.exports = {
           footerFormatter: value => { return "总计"; }
         }, {
           field: "counter",
-          title: "完成课次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          title: "课次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
           sortable: false,
           formatter: value => { return (value || []).length; },
           footerFormatter: function(data) {
@@ -56,7 +56,18 @@ module.exports = {
               return sum + v.length;
             }, 0);
           },
-          titleTooltip: "每上一次课计一次, 与课时无关"
+          titleTooltip: "一共上了多少节课, 与课时无关"
+        }, {
+          field: "quantity",
+          title: "人次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          sortable: false,
+          //formatter: value => { return (value || []).length; },
+          footerFormatter: function(data) {
+            return (data || []).map(row => { return row.quantity || 0; }).reduce((sum, v) => {
+              return sum + v;
+            }, 0);
+          },
+          titleTooltip: "每次课程参与的学员人数总和"
         }, {
           field: "counter",
           title: "完成课节<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
