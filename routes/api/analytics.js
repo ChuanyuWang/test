@@ -281,6 +281,11 @@ router.get("/teacherAnalysis", async function(req, res, next) {
                     $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }]
                 }
             },
+            quantity: {
+                $sum: {
+                    $ifNull: ["$booking.quantity", 1]
+                }
+            },
             absent: {
                 $sum: {
                     $cond: [{ $eq: ["$booking.status", "absent"] }, { $multiply: [{ $ifNull: ["$cost", 0] }, { $ifNull: ["$booking.quantity", 1] }] }, 0]
