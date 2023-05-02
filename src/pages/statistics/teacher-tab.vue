@@ -81,7 +81,7 @@ module.exports = {
             return this.$toFixed1(result);
           }
         }, {
-          title: "实际完成课时",
+          title: "实际完成课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
           sortable: false,
           formatter: this.actualFormatter,
           footerFormatter: data => {
@@ -89,7 +89,8 @@ module.exports = {
               return sum + v;
             }, 0);
             return this.$toFixed1(result);
-          }
+          },
+          titleTooltip: "实际完成课时=完成课时-缺席课时, 其中完成课时为人次*课时的累加",
         }, {
           field: "absent",
           title: "缺席课时",
