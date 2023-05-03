@@ -101,15 +101,15 @@ module.exports = {
     statusFormatter: function(value, row, index) {
       if (value == "open") {
         return [
-          '<a class="phone text-success" href="javascript:void(0)" title="未联系">',
+          '<button type="button" class="phone btn btn-success btn-xs" title="未联系">',
           '<i class="glyphicon glyphicon-earphone"></i>',
-          "</a>"
+          "</button>"
         ].join("");
       } else {
         return [
-          '<a class="phone text-danger" href="javascript:void(0)" title="已联系">',
+          '<button type="button" class="phone btn btn-danger btn-xs" title="已联系">',
           '<i class="glyphicon glyphicon-earphone"></i>',
-          "</a>"
+          "</button>"
         ].join("");
       }
     },
@@ -124,5 +124,4 @@ module.exports = {
 </script>
 
 <style lang='less'>
-
 </style>
