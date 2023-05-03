@@ -48,7 +48,7 @@ module.exports = {
           footerFormatter: value => { return "总计"; }
         }, {
           field: "counter",
-          title: "课次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          title: "课次�",
           sortable: false,
           formatter: value => { return (value || []).length; },
           footerFormatter: function(data) {
@@ -59,7 +59,8 @@ module.exports = {
           titleTooltip: "一共上了多少节课, 与课时无关"
         }, {
           field: "quantity",
-          title: "人次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          //title: "人次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          title: "人次�",
           sortable: false,
           //formatter: value => { return (value || []).length; },
           footerFormatter: function(data) {
@@ -70,7 +71,7 @@ module.exports = {
           titleTooltip: "每次课程参与的学员人数总和"
         }, {
           field: "counter",
-          title: "完成课节<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          title: "完成课节�",
           sortable: false,
           formatter: this.counterFormatter,
           titleTooltip: "完成课节=每次课程的课时总和, 例如: 完成两次课, 课时分别为1课时和2课时, 则完成课节为3 (1+2)",
@@ -81,7 +82,7 @@ module.exports = {
             return this.$toFixed1(result);
           }
         }, {
-          title: "实际完成课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
+          title: "实际完成课时�",
           sortable: false,
           formatter: this.actualFormatter,
           footerFormatter: data => {
