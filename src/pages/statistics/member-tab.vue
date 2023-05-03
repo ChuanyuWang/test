@@ -116,7 +116,7 @@ module.exports = {
       var data = value && value[0];
       return [
         `<a href="./member/${data._id}">`,
-        '<i class="glyphicon glyphicon-user me-3"/>' + data.name,
+        '<i class="glyphicon glyphicon-user me-3"></i>' + data.name,
         "</a>"
       ].join("");
     },
