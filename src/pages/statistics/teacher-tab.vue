@@ -91,7 +91,7 @@ module.exports = {
             }, 0);
             return this.$toFixed1(result);
           },
-          titleTooltip: "实际完成课时=完成课时-缺席课时, 其中完成课时为人次*课时的累加",
+          titleTooltip: "实际完成课时=完成课时-缺席课时",
         }, {
           field: "absent",
           title: "缺席课时",
