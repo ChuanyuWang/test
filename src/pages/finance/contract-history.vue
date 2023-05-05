@@ -107,6 +107,7 @@ module.exports = {
     changeFormatter(value, row, index) {
       var change = "<small>";
       for (var key in value) {
+        //TODO, handle error if key not defined in this.fieldNames
         change += this.fieldNames[key](value[key], row.new[key]) + "<br>";
       }
       return change + "</small>";
