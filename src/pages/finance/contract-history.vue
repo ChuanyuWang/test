@@ -42,6 +42,9 @@ module.exports = {
         },
         expireDate: (o, n) => {
           return "截止日期由 <del>" + this.dateFormatter(o) + "</del> 更新为 <strong>" + this.dateFormatter(n) + "</strong>";
+        },
+        type: (o, n) => {
+          return "合约类型由 <del>" + this.typeFormatter(o) + "</del> 更新为 <strong>" + this.typeFormatter(n) + "</strong>";
         }
       },
       historyTableColumns: [{
@@ -89,6 +92,18 @@ module.exports = {
         return "<未指定>";
       }
     },
+    typeFormatter(value) {
+      switch (value) {
+        case "new":
+          return "新签";
+        case "renewal":
+          return "续费";
+        case "donate":
+          return "赠送";
+        default:
+          return null;
+      }
+    },
     changeFormatter(value, row, index) {
       var change = "<small>";
       for (var key in value) {
@@ -102,5 +117,4 @@ module.exports = {
 }
 </script>
 <style lang="less">
-
 </style>
