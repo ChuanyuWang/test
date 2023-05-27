@@ -42,7 +42,8 @@ module.exports = {
       menuItems: [
         { name: "片源统计", icon: "mdi-movie-open", value: "/" },
         { name: "门店统计", icon: "mdi-store", value: "/store" },
-        { name: "数据查询", icon: "mdi-database-search", value: "/query" }
+        { name: "数据查询", icon: "mdi-database-search", value: "/query" },
+        { name: "公告管理", icon: "mdi-bullhorn-variant", value: "/notice" }
       ],
       drawer: true
     }

@@ -8,6 +8,7 @@ var cockpit = require('./cockpit.vue').default;
 var home = require('./home.vue').default;
 var store = require('./store.vue').default;
 var query = require('./query.vue').default;
+var notice = require('./notice.vue').default;
 
 // DOM Ready =============================================================
 init(function() {
@@ -15,7 +16,8 @@ init(function() {
     var routes = [
         { path: '/', component: home, meta: { title: '光影故事屋片源统计' } },
         { path: '/store', component: store, meta: { title: '光影故事屋门店统计' } },
-        { path: '/query', component: query, meta: { title: '光影故事屋数据查询' } }
+        { path: '/query', component: query, meta: { title: '光影故事屋数据查询' } },
+        { path: '/notice', component: notice, meta: { title: '公告管理' } }
     ];
     var router = new VueRouter({
         routes // short for `routes: routes`
