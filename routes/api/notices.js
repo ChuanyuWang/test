@@ -10,7 +10,8 @@ const NoticeSchema = new SchemaValidator({
     status: {
         validator: value => {
             return ["open", "publish", "deleted"].includes(value);
-        }
+        },
+        editable: true
     },
     title: { type: String, required: true, editable: true },
     content: { type: String, required: true, editable: true },
@@ -167,6 +168,14 @@ router.patch('/:noticeID', async function(req, res, next) {
 
         if (!doc) {
             return next(new ParamError("不能修改已经发布或作废的公告"));
+        }
+
+        // update modify_by field
+        req.body.modify_by = req.user.username;
+
+        if (req.body.status === "publish" && doc.status === "open") {
+            // update issue_time field when publishing
+            req.body.issue_time = new Date();
         }
 
         let result = await notices.findOneAndUpdate({
