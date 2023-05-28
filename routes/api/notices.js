@@ -16,6 +16,7 @@ const NoticeSchema = new SchemaValidator({
     content: { type: String, required: true, editable: true },
     issue_time: { type: Date },
     create_time: { type: Date },
+    modify_by: { type: String }
 });
 
 
