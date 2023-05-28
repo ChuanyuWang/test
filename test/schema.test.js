@@ -91,6 +91,7 @@ describe('Schema Validator', function() {
         schema.createVerify({ field2: "abc" }).should.equal(false);
         schema.createVerify({ field1: undefined }).should.equal(false);
         schema.createVerify({ field1: null }).should.equal(false);
+        schema.createVerify({ field1: "" }).should.equal(false);
         schema.createVerify({ field1: "active" }).should.equal(true);
     });
 

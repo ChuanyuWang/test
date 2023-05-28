@@ -37,17 +37,24 @@ class SchemaValidator {
     createVerify(body) {
         // body is empty, return false
         if (!body || Array.isArray(body)) return false;
+        // loop all defined field to find invalid or missing property (return true if found)
         let result = Object.keys(this.obj).find(key => {
             let def = this.obj[key];
             let required = this.isRequired(def);
             if (body.hasOwnProperty(key)) {
-                // handle null value, but not required
+                // null value is ok if not required
                 if (body[key] === null && !required) {
                     return false;
                 }
                 if (this.checkType(def, body[key]) === false) return true;
+                // the field is required, but value is empty or null
+                if (required && !this.hasValue(def, body[key])) return true;
             } else if (required) {
+                // field is required but not found
                 return true;
+            } else {
+                // field is not required
+                return false;
             }
         });
         return result === undefined;
@@ -56,7 +63,10 @@ class SchemaValidator {
     isValid(key, value) {
         let definition = this.obj[key];
         if (!definition) return false;
-        else return this.checkType(definition, value);
+        if (!this.checkType(definition, value)) return false;
+        let required = this.isRequired(definition);
+        if (required && !this.hasValue(definition, value)) return false;
+        return true;
     }
 
     checkType(definition, value) {
@@ -91,6 +101,34 @@ class SchemaValidator {
                 console.error("fatal error: unknown type %j", t);
                 return false;
         }
+    }
+
+    hasValue(definition, value) {
+        if (value === null || value === undefined) return false;
+        if (typeof definition.type === "function") {
+            let t = definition.type;
+            switch (t) {
+                case String:
+                    return value !== "";
+                case Number:
+                    return !isNaN(value);
+                case Boolean:
+                    return typeof value === "boolean";
+                case Array:
+                    return Array.isArray(value) && value.length > 0;
+                case Object:
+                    return typeof value === "object";
+                case Date:
+                    return !isNaN(Date.parse(value));
+                case ObjectId:
+                    return ObjectId.isValid(value);
+                default:
+                    console.error("fatal error: unknown type %j", t);
+                    return false;
+            }
+        }
+        // assume the value always existed in other cases
+        return true;
     }
 
     isRequired(definition) {
