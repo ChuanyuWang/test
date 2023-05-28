@@ -63,7 +63,7 @@ v-container
     v-card
       v-card-title
         span.text-h5 发布公告
-      v-card-text 确定发布该公告吗？
+      v-card-text 确定发布该公告吗？发布后无法进行编辑
       v-card-actions
         v-spacer
         v-btn(text @click="publishNoticeDialog = false") 取消
@@ -72,7 +72,7 @@ v-container
     v-card
       v-card-title
         span.text-h5 删除公告
-      v-card-text 确定删除该公告吗？
+      v-card-text 确定删除该公告吗？删除操作无法撤销
       v-card-actions
         v-spacer
         v-btn(text @click="deleteNoticeDialog = false") 取消
