@@ -114,7 +114,6 @@ module.exports = {
   watch: {
     options: {
       handler() {
-        this.isLoading = true;
         this.refresh();
       },
       deep: true
