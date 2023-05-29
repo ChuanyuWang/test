@@ -2,6 +2,7 @@
 const md5 = require('md5');
 const HmacSHA256 = require("crypto-js/hmac-sha256");
 const Hex = require('crypto-js/enc-hex');
+const config = require('../../../config.db');
 
 exports.generateNonceString = function(length) {
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -58,4 +59,9 @@ exports.isEqual = function(a, b) {
         });
     }
     return a == b;
+}
+
+exports.getKey = function(user_id) {
+    let api_users = config.api_users || {}
+    return api_users[user_id] || null;
 }
