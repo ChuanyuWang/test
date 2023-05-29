@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb');
 const { RuntimeError, ParamError, BaseError, BadRequestError } = require('./lib/basis');
 const moment = require('moment');
 const { SchemaValidator } = require("./lib/schema_validator");
+const util = require('./lib/util');
 
 const NoticeSchema = new SchemaValidator({
     status: {
@@ -25,6 +26,66 @@ var NORMAL_FIELDS = {
     dummy: 0
 };
 
+// query publish notices for clients
+router.post('/query', validateSign, async function(req, res, next) {
+    let query = {};
+
+    // support sorting
+    let sort = {};
+    let sortField = req.body.sort || "issue_time"; // sort by "issue_time" by default
+    sort[sortField] = req.body.order == 'asc' ? 1 : -1;
+
+    // query with date filter 'issue_time'
+    // CAUTION: moment(undefined).isValid() return true
+    if (moment(req.body.issue_time || "").isValid()) {
+        query.issue_time = { $gte: new Date(req.body.issue_time) };
+    }
+
+    // query notices by status
+    query['status'] = "publish";
+
+    // support paginzation
+    let skip = parseInt(req.body.offset) || 0;
+    if (skip < 0) {
+        console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);
+        skip = 0;
+    }
+    let pageSize = parseInt(req.body.limit) || 100;
+    if (pageSize > 100 || pageSize < 0) {
+        console.warn(`Page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
+        pageSize = 100;
+    }
+
+    let pipelines = [
+        { $match: query },
+        { $sort: sort },
+        { $skip: skip },
+        { $limit: pageSize },
+        { $project: NORMAL_FIELDS }
+    ];
+
+    try {
+        let config_db = await db_utils.connect("config");
+        let notices = config_db.collection("notices");
+        let cursor = notices.find(query, { projection: NORMAL_FIELDS });
+        let total = await cursor.count();
+        let docs = await notices.aggregate(pipelines).toArray();
+
+        console.log(`Find ${docs.length} publish notices from ${total} in total`);
+        return res.json({
+            code: 0,
+            message: "success",
+            total: total,
+            rows: docs
+        });
+    } catch (error) {
+        let err = new Error("Query publish notice fails");
+        err.innerError = error;
+        return next(err);
+    }
+});
+
+// below API are avaiable to internal user
 router.use(function(req, res, next) {
     // only accessible to user admin@bqsq
     if (req.isAuthenticated() && req.user.username === "admin@bqsq") {
@@ -233,6 +294,24 @@ async function validateNotice(req, res, next) {
         return next();
     } catch (error) {
         return next(new RuntimeError("find member fails", error));
+    }
+}
+
+async function validateSign(req, res, next) {
+    try {
+        let query = req.body || {};
+        if (!query.nonce_str) return next(new BadRequestError("缺少随机字符串", 1002));
+        if (!query.user_id) return next(new BadRequestError("缺少调用者ID", 1003));
+        if (!query.sign) return next(new BadRequestError("缺少签名", 1004));
+        let key = util.getKey(query.user_id);
+        if (!key) return next(new BadRequestError("缺少密钥", 1005));
+        let sign = query.sign;
+        delete query.sign;
+        if (sign !== util.sign(query, key)) return next(new BadRequestError("签名不一致", 1001));
+
+        return next();
+    } catch (error) {
+        return next(new RuntimeError("Fail to validate sign", error));
     }
 }
 
