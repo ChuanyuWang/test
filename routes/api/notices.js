@@ -262,11 +262,11 @@ router.delete('/:noticeID', async function(req, res, next) {
         // only open status could be deleted
         let query = {
             _id: ObjectId(req.params.noticeID),
-            status: { $in: ["open", "publish"] }
+            status: { $in: ["open"] }
         };
         let doc = await notices.findOne(query);
 
-        if (!doc) return next(new BadRequestError("公告不存或已经删除"));
+        if (!doc) return next(new BadRequestError("公告不存或已经发布"));
 
         let result = await notices.findOneAndUpdate({
             _id: doc._id,

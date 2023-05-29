@@ -16,7 +16,7 @@ v-container
       v-chip(small v-if="item.status === 'deleted'" color="error") 已删除
     template(v-slot:item.actions="{ item }")
       v-btn.me-1(x-small elevation="0" v-if="item.status==='open'" @click.stop="openEditNoticeDialog(item)") 编辑
-      v-btn.me-1(x-small elevation="0" @click.stop="noticeID=item._id,deleteNoticeDialog=true") 删除
+      v-btn.me-1(x-small elevation="0" v-if="item.status==='open'" @click.stop="noticeID=item._id,deleteNoticeDialog=true") 删除
       v-btn(x-small elevation="0" v-if="item.status==='open'" @click.stop="noticeID=item._id,publishNoticeDialog=true") 发布
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
