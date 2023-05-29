@@ -305,6 +305,12 @@ async function validateSign(req, res, next) {
         if (!query.sign) return next(new BadRequestError("缺少签名", 1004));
         let key = util.getKey(query.user_id);
         if (!key) return next(new BadRequestError("缺少密钥", 1005));
+
+        if (req.app.locals.ENV_DEVELOPMENT) {
+            // skip verify sign if it's development mode
+            return next();
+        }
+
         let sign = query.sign;
         delete query.sign;
         if (sign !== util.sign(query, key)) return next(new BadRequestError("签名不一致", 1001));
