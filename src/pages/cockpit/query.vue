@@ -64,7 +64,6 @@ module.exports = {
       var request = axios.patch("/api/dlktlogs/tasks", { date: this.selectedDate });
       request.then((response) => {
         this.snackbar = true;
-        console.log(response.data);
       });
     },
     humanize(value) {
