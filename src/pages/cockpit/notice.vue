@@ -97,7 +97,7 @@ module.exports = {
       title: "",
       content: "",
       snackbar: false,
-      message: "公告创建成功",
+      message: "",
       isLoading: true,
       headers: [
         { text: '标题', value: 'title', },
