@@ -5,6 +5,10 @@ v-container
       |所有数据来源于叮聆课堂浏览日志，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
   v-row.mt-1(dense align="center" justify="end")
     v-spacer
+    v-slider.align-center.me-3(v-model="duration" step="1" min="0" max="180" thumb-label="always" thumb-size="24" 
+      dense label="播放时长" hide-details)
+      template(v-slot:append)
+        v-text-field(v-model="duration" type="number" style="width: 60px" suffix="分")
     span 选择月份:
     v-col(cols="auto")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
@@ -23,6 +27,7 @@ module.exports = {
     return {
       yesterday: moment().subtract(1, 'day').toDate(),
       menu: false,
+      duration: 0,
       selectedMonth: moment().format("YYYY-MM"),
       isLoading: true,
       select: "year",
@@ -50,7 +55,7 @@ module.exports = {
       this.menu = false;
       this.isLoading = true;
       // refresh table data
-      var request = axios.get("/api/dlktlogs/bytenant", { params: { month: this.selectedMonth } });
+      var request = axios.get("/api/dlktlogs/bytenant", { params: { month: this.selectedMonth, duration: this.duration } });
       request.then((response) => {
         this.rawData = response.data || [];
       });

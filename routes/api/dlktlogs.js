@@ -39,13 +39,17 @@ router.use(function(req, res, next) {
 router.get('/bycontent', async function(req, res, next) {
     //[Default] get the current year by month
     let this_month = moment().format("YYYY-MM");
-    let startOfMonth, endOfMonth;
+    let startOfMonth, endOfMonth, duration = 0;
     if (req.query.hasOwnProperty("month")) {
         this_month = req.query.month;
+    }
+    if (req.query.hasOwnProperty("duration")) {
+        duration = parseInt(req.query.duration || 0);
     }
     startOfMonth = moment(this_month);
     endOfMonth = moment(this_month).endOf("month");
 
+    console.log(`duration is ${duration}`);
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let logs = logs_db.collection("logList");
@@ -55,6 +59,9 @@ router.get('/bycontent', async function(req, res, next) {
                 "_timestamp": { // query one month
                     $gte: startOfMonth.toDate(),
                     $lte: endOfMonth.toDate()
+                },
+                "duration": {
+                    $gte: duration * 60, // convert to seconds
                 },
                 "fromContentId": { $exists: true }
             }
@@ -83,6 +90,9 @@ router.get('/bycontent', async function(req, res, next) {
                 "_timestamp": { // query whole year
                     $gte: startOfMonth.startOf("year").toDate(),
                     $lte: endOfMonth.endOf("year").toDate()
+                },
+                "duration": {
+                    $gte: duration * 60, // convert to seconds
                 },
                 "fromContentId": { $exists: true }
             }
@@ -113,12 +123,16 @@ router.get('/bycontent', async function(req, res, next) {
 router.get('/bytenant', async function(req, res, next) {
     //[Default] get the current year by month
     let this_month = moment().format("YYYY-MM");
-    let startOfMonth, endOfMonth;
+    let startOfMonth, endOfMonth, duration = 0;
     if (req.query.hasOwnProperty("month")) {
         this_month = req.query.month;
     }
     startOfMonth = moment(this_month);
     endOfMonth = moment(this_month).endOf("month");
+
+    if (req.query.hasOwnProperty("duration")) {
+        duration = parseInt(req.query.duration || 0);
+    }
 
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
@@ -129,6 +143,9 @@ router.get('/bytenant', async function(req, res, next) {
                 "_timestamp": { // query one month
                     $gte: startOfMonth.toDate(),
                     $lte: endOfMonth.toDate()
+                },
+                "duration": {
+                    $gte: duration * 60, // convert to seconds
                 },
                 "fromContentId": { $exists: true }
             }
@@ -153,6 +170,9 @@ router.get('/bytenant', async function(req, res, next) {
                 "_timestamp": { // query whole year
                     $gte: startOfMonth.startOf("year").toDate(),
                     $lte: endOfMonth.endOf("year").toDate()
+                },
+                "duration": {
+                    $gte: duration * 60, // convert to seconds
                 },
                 "fromContentId": { $exists: true }
             }
