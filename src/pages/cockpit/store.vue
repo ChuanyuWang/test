@@ -45,7 +45,8 @@ module.exports = {
         { text: '当月累计播放次数 (可选择月份)', value: 'month_total' },
         { text: '当年累计播放次数', value: 'year_total' }
       ],
-      rawData: []
+      rawData: [],
+      contentList: []
     }
   },
   computed: {},
@@ -58,13 +59,18 @@ module.exports = {
       var request = axios.get("/api/dlktlogs/bytenant", { params: { month: this.selectedMonth, duration: this.duration } });
       request.then((response) => {
         this.rawData = response.data || [];
-      });
-      request.finally(() => {
+      }).catch((error) => {
+        console.error(error);
+      }).finally(() => {
         this.isLoading = false;
       });
     }
   },
   mounted() {
+    var request = axios.get("/api/dlktlogs/content/list");
+    request.then((response) => {
+      this.contentList = response.data || [];
+    });
     this.refresh();
   }
 }
