@@ -36,6 +36,52 @@ router.use(function(req, res, next) {
     }
 });
 
+router.get('/content/list', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let pipelines = [{
+            $match: {
+                "fromContentId": { $exists: true }
+            }
+        }, {
+            $group: {
+                _id: { fromContentId: "$fromContentId", itemName: "$itemName" }
+            }
+        }];
+        let docs = await logs.aggregate(pipelines).toArray();
+
+        console.log("get list of content from dlketang logs: %s", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("fail to get list of content from dlketang logs", error));
+    }
+});
+
+router.get('/tenant/list', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let pipelines = [{
+            $match: {
+                "fromContentId": { $exists: true }
+            }
+        }, {
+            $group: {
+                _id: { tenantId: "$tenantId", tenantName: "$tenantName" }
+            }
+        }];
+        let docs = await logs.aggregate(pipelines).toArray();
+
+        console.log("get list of tenant from dlketang logs: %s", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("fail to get list of tenant from dlketang logs", error));
+    }
+});
+
 router.get('/bycontent', async function(req, res, next) {
     //[Default] get the current year by month
     let this_month = moment().format("YYYY-MM");
