@@ -43,6 +43,9 @@ router.get('/content/list', async function(req, res, next) {
 
         let pipelines = [{
             $match: {
+                "_timestamp": {
+                    $gte: new Date("2023-03-01") // exclude dirty data before 2023-03-01
+                },
                 "fromContentId": { $exists: true }
             }
         }, {
@@ -134,7 +137,8 @@ router.get('/bycontent', async function(req, res, next) {
         pipelines = [{
             $match: {
                 "_timestamp": { // query whole year
-                    $gte: startOfMonth.startOf("year").toDate(),
+                    // exclude dirty data before 2023-03-01
+                    $gte: startOfMonth.year() === 2023 ? new Date("2023-03-01") : startOfMonth.startOf("year").toDate(),
                     $lte: endOfMonth.endOf("year").toDate()
                 },
                 "duration": {
@@ -214,7 +218,8 @@ router.get('/bytenant', async function(req, res, next) {
         pipelines = [{
             $match: {
                 "_timestamp": { // query whole year
-                    $gte: startOfMonth.startOf("year").toDate(),
+                    // exclude dirty data before 2023-03-01
+                    $gte: startOfMonth.year() === 2023 ? new Date("2023-03-01") : startOfMonth.startOf("year").toDate(),
                     $lte: endOfMonth.endOf("year").toDate()
                 },
                 "duration": {
