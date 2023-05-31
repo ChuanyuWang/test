@@ -324,7 +324,8 @@ function combineData(m_result, y_result) {
         };
     });
     m_result.forEach(element => {
-        data[element._id.id].month_total = element.total;
+        if (data[element._id.id])
+            data[element._id.id].month_total = element.total;
     });
     let docs = [];
     for (let id in data) {
