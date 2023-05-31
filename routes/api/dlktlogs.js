@@ -95,25 +95,31 @@ router.get('/bycontent', async function(req, res, next) {
     if (req.query.hasOwnProperty("duration")) {
         duration = parseInt(req.query.duration || 0);
     }
+
     startOfMonth = moment(this_month);
     endOfMonth = moment(this_month).endOf("month");
 
-    console.log(`duration is ${duration}`);
+    let query = {
+        "_timestamp": { // query one month
+            $gte: startOfMonth.toDate(),
+            $lte: endOfMonth.toDate()
+        },
+        "duration": {
+            $gte: duration * 60, // convert to seconds
+        },
+        "fromContentId": { $exists: true }
+    };
+
+    if (req.query.tenantId) {
+        query.tenantId = parseInt(req.query.tenantId);
+    }
+
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let logs = logs_db.collection("logList");
 
         let pipelines = [{
-            $match: {
-                "_timestamp": { // query one month
-                    $gte: startOfMonth.toDate(),
-                    $lte: endOfMonth.toDate()
-                },
-                "duration": {
-                    $gte: duration * 60, // convert to seconds
-                },
-                "fromContentId": { $exists: true }
-            }
+            $match: query
         }, {
             $project: {
                 //week: { $week: "$_timestamp" },
@@ -134,18 +140,13 @@ router.get('/bycontent', async function(req, res, next) {
         }];
         let m_result = await logs.aggregate(pipelines).toArray();
 
+        query["_timestamp"] = { // query whole year
+            // exclude dirty data before 2023-03-01
+            $gte: startOfMonth.year() === 2023 ? new Date("2023-03-01") : startOfMonth.startOf("year").toDate(),
+            $lte: endOfMonth.endOf("year").toDate()
+        };
         pipelines = [{
-            $match: {
-                "_timestamp": { // query whole year
-                    // exclude dirty data before 2023-03-01
-                    $gte: startOfMonth.year() === 2023 ? new Date("2023-03-01") : startOfMonth.startOf("year").toDate(),
-                    $lte: endOfMonth.endOf("year").toDate()
-                },
-                "duration": {
-                    $gte: duration * 60, // convert to seconds
-                },
-                "fromContentId": { $exists: true }
-            }
+            $match: query
         }, {
             $project: {
                 fromContentId: 1,
