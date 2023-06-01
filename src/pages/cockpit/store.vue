@@ -5,6 +5,10 @@ v-container
       |所有数据来源于叮聆课堂浏览日志，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
   v-row.mt-1(dense align="center" justify="end")
     v-spacer
+    span 选择片源:
+    v-col(cols="auto")
+      v-select.fit(:items="contentList" item-text="itemName" item-value="contentId"
+        @click.once="fetchContentList" v-model="selectedContent" @change="refresh")
     v-slider.align-center.me-3(v-model="duration" step="1" min="0" max="180" thumb-label="always" thumb-size="24" 
       dense label="播放时长" hide-details)
       template(v-slot:append)
@@ -46,7 +50,8 @@ module.exports = {
         { text: '当年累计播放次数', value: 'year_total' }
       ],
       rawData: [],
-      contentList: []
+      contentList: [],
+      selectedContent: ""
     }
   },
   computed: {},
@@ -56,7 +61,9 @@ module.exports = {
       this.menu = false;
       this.isLoading = true;
       // refresh table data
-      var request = axios.get("/api/dlktlogs/bytenant", { params: { month: this.selectedMonth, duration: this.duration } });
+      var request = axios.get("/api/dlktlogs/bytenant", {
+        params: { month: this.selectedMonth, duration: this.duration, contentId: this.selectedContent }
+      });
       request.then((response) => {
         this.rawData = response.data || [];
       }).catch((error) => {
@@ -64,13 +71,21 @@ module.exports = {
       }).finally(() => {
         this.isLoading = false;
       });
+    },
+    fetchContentList() {
+      var request = axios.get("/api/dlktlogs/content/list");
+      request.then((response) => {
+        this.contentList = (response.data || []).map((value, index, array) => {
+          return {
+            itemName: value._id.itemName,
+            contentId: value._id.fromContentId
+          }
+        });
+        this.contentList.push({ itemName: "全部", contentId: "" })
+      });
     }
   },
   mounted() {
-    var request = axios.get("/api/dlktlogs/content/list");
-    request.then((response) => {
-      this.contentList = response.data || [];
-    });
     this.refresh();
   }
 }
