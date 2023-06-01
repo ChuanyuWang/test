@@ -2,7 +2,7 @@
 v-container
   v-subheader
     p 光影故事屋片源统计分析，选择月份并查看每个门店的当月累计播放次数和当年累计播放次数。
-      |所有数据来源于叮聆课堂浏览日志，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
+      |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，每日数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
   v-row.mt-1(dense align="center" justify="end")
     v-spacer
     span 选择片源:
@@ -18,7 +18,7 @@ v-container
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(solo dense readonly v-model="selectedMonth" hide-details prepend-icon="mdi-calendar" v-bind="attrs" v-on="on")
-        v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh")
+        v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh" min="2023-03")
     v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading")
 </template>
