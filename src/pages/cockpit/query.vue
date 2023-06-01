@@ -2,7 +2,7 @@
 v-container
   v-subheader
     p 光影故事屋浏览日志查询，选择日期并查看当天的播放记录（含全国门店）。
-      |所有数据来源于叮聆课堂浏览日志，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
+      |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
   v-row.mt-1(dense align="center" justify="end")
     v-btn.ml-2(@click="reload") 重新提取当天日志
     v-spacer
@@ -11,7 +11,7 @@ v-container
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(solo dense readonly v-model="selectedDate" hide-details prepend-icon="mdi-calendar" v-bind="attrs" v-on="on")
-        v-date-picker(v-model="selectedDate" type="date" locale="zh" @change="refresh")
+        v-date-picker(v-model="selectedDate" type="date" locale="zh" @change="refresh" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
     v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="当日无数据")
     template(v-slot:item._timestamp="{ item }") {{ new Date(item._timestamp).toLocaleString() }}
@@ -29,7 +29,7 @@ module.exports = {
     return {
       snackbar: false,
       message: "重新提取当天日志，请等待5分钟，不要重复刷新",
-      yesterday: moment().subtract(1, 'day').toDate(),
+      yesterday: moment().subtract(1, 'day'),
       menu: false,
       selectedDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
       isLoading: true,

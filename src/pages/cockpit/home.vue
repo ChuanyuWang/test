@@ -2,7 +2,7 @@
 v-container
   v-subheader
     p 光影故事屋片源统计分析，选择月份并查看每个片源的当月累计播放次数和当年累计播放次数。
-      |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，每日数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.toLocaleDateString() }}</b>
+      |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，每日数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
   v-row.mt-1(dense align="center" justify="end")
     v-spacer
     span 选择门店:
@@ -29,7 +29,7 @@ module.exports = {
   name: "home",
   data() {
     return {
-      yesterday: moment().subtract(1, 'day').toDate(),
+      yesterday: moment().subtract(1, 'day'),
       menu: false,
       duration: 0,
       selectedMonth: moment().format("YYYY-MM"),
