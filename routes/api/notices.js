@@ -271,7 +271,7 @@ router.delete('/:noticeID', async function(req, res, next) {
         let result = await notices.findOneAndUpdate({
             _id: doc._id,
         }, {
-            $set: { status: "deleted" }
+            $set: { status: "deleted", modify_by: req.user.username }
         }, {
             projection: NORMAL_FIELDS,
             returnDocument: "after"
