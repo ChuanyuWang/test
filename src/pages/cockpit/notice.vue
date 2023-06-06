@@ -16,7 +16,7 @@ v-container
       v-chip(small v-if="item.status === 'deleted'" color="error") 已删除
     template(v-slot:item.actions="{ item }")
       v-btn.me-1(x-small elevation="0" v-if="item.status==='open'" @click.stop="openEditNoticeDialog(item)") 编辑
-      v-btn.me-1(x-small elevation="0" v-if="item.status==='open'" @click.stop="noticeID=item._id,deleteNoticeDialog=true") 删除
+      v-btn.me-1(x-small elevation="0" @click.stop="noticeID=item._id,deleteNoticeDialog=true") 删除
       v-btn(x-small elevation="0" v-if="item.status==='open'" @click.stop="noticeID=item._id,publishNoticeDialog=true") 发布
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
@@ -36,7 +36,7 @@ v-container
               v-col(cols="12")
                 v-textarea(label="内容" rows="3" outlined required v-model="content" counter="512"
                   :rules="[() => !!content || '内容必填']")
-            div.caption 公告创建后默认状态为“未发布”，点击“发布”按钮进行发布，发布后无法编辑或删除
+            div.caption 公告创建后默认状态为“未发布”，点击“发布”按钮进行发布，发布后无法编辑
       v-card-actions
         v-spacer
         v-btn(text @click="createNoticeDialog = false") 取消
@@ -56,7 +56,7 @@ v-container
               v-col(cols="12")
                 v-textarea(label="内容" rows="3" outlined required v-model="content" counter="512"
                   :rules="[() => !!content || '内容必填']")
-            div.caption 公告发布前可以无限次编辑修改，发布后无法编辑或删除
+            div.caption 公告发布前可以无限次编辑修改，发布后无法编辑
       v-card-actions
         v-spacer
         v-btn(text @click="editNoticeDialog = false") 取消
@@ -65,7 +65,7 @@ v-container
     v-card
       v-card-title
         span.text-h5 发布公告
-      v-card-text 确定发布该公告吗？发布后无法编辑或删除
+      v-card-text 确定发布该公告吗？发布后无法编辑
       v-card-actions
         v-spacer
         v-btn(text @click="publishNoticeDialog = false") 取消

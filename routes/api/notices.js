@@ -44,7 +44,7 @@ router.post('/query', validateSign, async function(req, res, next) {
     // query notices by status
     query['status'] = "publish";
 
-    // support paginzation
+    // support pagination
     let skip = parseInt(req.body.offset) || 0;
     if (skip < 0) {
         console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);
@@ -171,7 +171,7 @@ router.get('/', async function(req, res, next) {
         query['status'] = { $ne: "deleted" };
     }
 
-    // support paginzation
+    // support pagination
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
         console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);
@@ -262,11 +262,11 @@ router.delete('/:noticeID', async function(req, res, next) {
         // only open status could be deleted
         let query = {
             _id: ObjectId(req.params.noticeID),
-            status: { $in: ["open"] }
+            status: { $in: ["open", "publish"] }
         };
         let doc = await notices.findOne(query);
 
-        if (!doc) return next(new BadRequestError("公告不存或已经发布"));
+        if (!doc) return next(new BadRequestError("公告不存或已经删除"));
 
         let result = await notices.findOneAndUpdate({
             _id: doc._id,
@@ -277,7 +277,7 @@ router.delete('/:noticeID', async function(req, res, next) {
             returnDocument: "after"
         });
 
-        console.log(`notice ${doc.tradeno} is deleted with result: %j`, result.lastErrorObject);
+        console.log(`notice ${doc._id} is deleted with result: %j`, result.lastErrorObject);
         return res.json(result.value);
     } catch (error) {
         let err = new Error("Delete notice fails");
