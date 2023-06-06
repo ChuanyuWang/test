@@ -203,7 +203,7 @@ router.get('/', async function(req, res, next) {
         query['status'] = status;
     }
 
-    // support paginzation
+    // support pagination
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
         console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);

@@ -203,7 +203,7 @@ router.get('/checkin', function(req, res, next) {
     var sort = req.query.order == 'asc' ? 1 : -1;
 
     var classes = req.db.collection("classes");
-    // support paginzation
+    // support pagination
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
         console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);

@@ -160,7 +160,7 @@ router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async func
     let field = req.query.sort || "since"; // sort by "since" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
 
-    // support paginzation
+    // support pagination
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
         console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);
@@ -674,7 +674,7 @@ async function queryMembersHasContracts(req, res, next) {
     let field = req.query.sort || "total"; // sort by "total" by default
     sort[field] = req.query.order == 'asc' ? 1 : -1;
 
-    // support paginzation
+    // support pagination
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
         console.warn(`page "offset" should be a positive integer, but get ${skip} in run-time`);
