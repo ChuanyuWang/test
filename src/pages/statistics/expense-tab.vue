@@ -7,7 +7,7 @@ div
         div.input-group.me-7
           span.input-group-addon 单位:
           select.form-control(v-model='unit',@change='refreshChart')
-            //option(value='year') 年
+            option(value='year') 年
             option(value='month') 月
             option(value='week') 周
         button.btn.btn-primary(type="button",@click='refreshChart') 刷新
@@ -471,5 +471,4 @@ module.exports = {
 </script>
 
 <style lang='less'>
-
 </style>
