@@ -482,7 +482,7 @@ router.get('/classexpense', async function(req, res, next) {
 
         let pipelines = [{
             $match: {
-                "booking.0": { // array size >= 1
+                "booking.contract": { // the booking array has at least one embedded document that contains the field "contract"
                     $exists: true
                 },
                 "date": {
