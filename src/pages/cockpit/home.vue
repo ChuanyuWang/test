@@ -51,7 +51,7 @@ module.exports = {
       ],
       rawData: [],
       tenantList: [],
-      selectedTenant: null
+      selectedTenant: ""
     }
   },
   computed: {},
