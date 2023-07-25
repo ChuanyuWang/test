@@ -21,13 +21,12 @@ const NoticeSchema = new SchemaValidator({
     modify_by: { type: String }
 });
 
-
 var NORMAL_FIELDS = {
     dummy: 0
 };
 
 // query publish notices for clients
-router.post('/query', validateSign, async function(req, res, next) {
+router.post('/query', util.validateSign, async function(req, res, next) {
     let query = {};
 
     // support sorting
@@ -286,7 +285,7 @@ router.delete('/:noticeID', async function(req, res, next) {
     }
 });
 
-async function validateNotice(req, res, next) {
+function validateNotice(req, res, next) {
     try {
         if (!NoticeSchema.createVerify(req.body)) {
             return next(new BadRequestError("Fail to create notice due to bad request body"));
@@ -294,30 +293,6 @@ async function validateNotice(req, res, next) {
         return next();
     } catch (error) {
         return next(new RuntimeError("find member fails", error));
-    }
-}
-
-async function validateSign(req, res, next) {
-    try {
-        let query = req.body || {};
-        if (!query.nonce_str) return next(new BadRequestError("缺少随机字符串", 1002));
-        if (!query.user_id) return next(new BadRequestError("缺少调用者ID", 1003));
-        if (!query.sign) return next(new BadRequestError("缺少签名", 1004));
-        let key = util.getKey(query.user_id);
-        if (!key) return next(new BadRequestError("缺少密钥", 1005));
-
-        if (req.app.locals.ENV_DEVELOPMENT) {
-            // skip verify sign if it's development mode
-            return next();
-        }
-
-        let sign = query.sign;
-        delete query.sign;
-        if (sign !== util.sign(query, key)) return next(new BadRequestError("签名不一致", 1001));
-
-        return next();
-    } catch (error) {
-        return next(new RuntimeError("Fail to validate sign", error));
     }
 }
 
