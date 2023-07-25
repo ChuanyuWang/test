@@ -4,6 +4,7 @@ const db_utils = require('../../server/databaseManager');
 const { InternalServerError, ParamError } = require('./lib/basis');
 const moment = require('moment');
 const { LOGS_SCHEMA } = require('../../server/logFetcher');
+const util = require('./lib/util');
 
 /** log item sample from dlketang logs
  * 
@@ -13,7 +14,7 @@ const { LOGS_SCHEMA } = require('../../server/logFetcher');
   "nickname": "麦雪仪",
   "behaviorTime": "2023-02-13 18:49:20",
   "platform": "客户端",
-  "bhvType": 3,
+  "bhvType": 3, // 行为类型:1-打开页面，3-上课，4-备课
   "itemType": 1,
   "fromContentId": 50561932,
   "itemId": 50572381,
@@ -27,6 +28,89 @@ const { LOGS_SCHEMA } = require('../../server/logFetcher');
  * 
  */
 
+router.post('/play/query', util.validateSign, async function(req, res, next) {
+    //[Default] get the current year by month
+    let start_date = moment();
+    let startOfDate, endOfDate, duration = 10; // default 10 minutes
+    if (req.body.hasOwnProperty("query_date")) {
+        if (!moment(req.body.query_date).isValid()) {
+            return next(new ParamError("查询日期格式不正确", 1102));
+        }
+        start_date = moment(req.body.query_date);
+    }
+    if (req.body.hasOwnProperty("duration")) {
+        duration = parseInt(req.body.duration || 10);
+    }
+    if (!req.body.hasOwnProperty("tenantId")) {
+        return next(new ParamError("缺少参数tenantId", 1103));
+    }
+
+    startOfDate = moment(start_date).startOf("month");
+    endOfDate = moment(start_date).endOf("month");
+
+    if (req.body.hasOwnProperty("query_type")) {
+        if (req.body.query_type === "quarter") {
+            startOfDate = moment(start_date).startOf("quarter");
+            endOfDate = moment(start_date).endOf("quarter");
+        } else if (req.body.query_type === "month") {
+            // skip
+        } else {
+            return next(new ParamError("参数query_type不正确", 1104));
+        }
+    }
+
+    let query = {
+        "_timestamp": {
+            $gte: startOfDate.toDate(),
+            $lte: endOfDate.toDate()
+        },
+        "duration": {
+            $gte: duration * 60, // convert to seconds
+        },
+        "fromContentId": { $exists: true },
+        tenantId: req.body.tenantId || null
+    };
+
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let pipelines = [{
+            $match: query
+        }, {
+            $project: {
+                //week: { $week: "$_timestamp" },
+                //month: { $month: "$_timestamp" },
+                //year: { $year: "$_timestamp" },
+                duration: 1,
+                tenantId: 1,
+                tenantName: 1,
+                fromContentId: 1,
+                itemName: 1
+            }
+        }, {
+            $group: {
+                _id: "$tenantId",
+                total: {
+                    $sum: 1
+                }
+            }
+        }];
+        let result = await logs.aggregate(pipelines).toArray();
+        let total = result.length > 0 ? result[0].total : 0;
+        console.log("query tenant %s play times: %s", req.body.tenantId, total);
+        res.json({
+            code: 0,
+            message: "success",
+            total: total
+        });
+
+    } catch (error) {
+        return next(new InternalServerError(`query play time of tenant ${req.body.tenantId} fails`, error));
+    }
+});
+
+// below API are avaiable to internal user
 router.use(function(req, res, next) {
     // only accessible to user admin@bqsq
     if (req.isAuthenticated() && req.user.username === "admin@bqsq") {
