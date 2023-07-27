@@ -48,10 +48,12 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
     startOfDate = moment(start_date).startOf("month");
     endOfDate = moment(start_date).endOf("month");
 
+    let formatted_date = startOfDate.format("YYYY-MM");
     if (req.body.hasOwnProperty("query_type")) {
         if (req.body.query_type === "quarter") {
             startOfDate = moment(start_date).startOf("quarter");
             endOfDate = moment(start_date).endOf("quarter");
+            formatted_date = startOfDate.format("YYYY/[Q]Q");
         } else if (req.body.query_type === "month") {
             // skip
         } else {
@@ -93,12 +95,16 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
                 _id: "$tenantId",
                 total: {
                     $sum: 1
+                },
+                tenantName: {
+                    $first: "$tenantName"
                 }
             }
         }];
         let result = await logs.aggregate(pipelines).toArray();
         let total = result.length > 0 ? result[0].total : 0;
-        console.log("query tenant %s play times: %s", req.body.tenantId, total);
+        let tenantName = result.length > 0 ? result[0].tenantName : null;
+        console.log("tenant %s[%s] play %s times in %s", tenantName, query.tenantId, total, formatted_date);
         res.json({
             code: 0,
             message: "success",
@@ -106,7 +112,7 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
         });
 
     } catch (error) {
-        return next(new InternalServerError(`query play time of tenant ${req.body.tenantId} fails`, error));
+        return next(new InternalServerError(`query times of play of tenant ${req.body.tenantId} fails`, error));
     }
 });
 
