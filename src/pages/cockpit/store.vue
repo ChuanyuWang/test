@@ -31,7 +31,7 @@ module.exports = {
     return {
       yesterday: moment().subtract(1, 'day'),
       menu: false,
-      duration: 0,
+      duration: 10,
       selectedMonth: moment().format("YYYY-MM"),
       isLoading: true,
       select: "year",
