@@ -306,7 +306,11 @@ router.get('/bytenant', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { id: "$tenantId", name: "$tenantName" },
+                _id: { id: "$tenantId", name: "$tenantName" }, //TODO, group only by "$tenantId"
+                /* TODO, get tenant name from the first element from group
+                tenantName: {
+                    $first: "$tenantName" // TODO, maybe the $last element
+                },*/
                 total: { $sum: 1 }
             }
         }];
