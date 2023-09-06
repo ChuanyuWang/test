@@ -39,7 +39,8 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
         start_date = moment(req.body.query_date);
     }
     if (req.body.hasOwnProperty("duration")) {
-        duration = parseInt(req.body.duration || 10);
+        // default is 10 mins
+        duration = parseInt(req.body.duration || 10); // unit of duration is minutes
     }
     if (!req.body.hasOwnProperty("tenantId")) {
         return next(new ParamError("缺少参数tenantId", 1103));
@@ -97,7 +98,7 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
                     $sum: 1
                 },
                 tenantName: {
-                    $first: "$tenantName"
+                    $last: "$tenantName" // only get the last tenant name to display
                 }
             }
         }];
@@ -163,7 +164,11 @@ router.get('/tenant/list', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { tenantId: "$tenantId", tenantName: "$tenantName" }
+                _id: { tenantId: "$tenantId", tenantName: "$tenantName" } //TODO, group only by "$tenantId"
+                /* TODO, get tenant name from the last element from group
+                tenantName: {
+                    $last: "$tenantName"
+                },*/
             }
         }];
         let docs = await logs.aggregate(pipelines).toArray();
@@ -307,9 +312,9 @@ router.get('/bytenant', async function(req, res, next) {
         }, {
             $group: {
                 _id: { id: "$tenantId", name: "$tenantName" }, //TODO, group only by "$tenantId"
-                /* TODO, get tenant name from the first element from group
+                /* TODO, get tenant name from the last element from group
                 tenantName: {
-                    $first: "$tenantName" // TODO, maybe the $last element
+                    $last: "$tenantName" // TODO, maybe the $last element
                 },*/
                 total: { $sum: 1 }
             }
@@ -330,7 +335,11 @@ router.get('/bytenant', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { id: "$tenantId", name: "$tenantName" },
+                _id: { id: "$tenantId", name: "$tenantName" },//TODO, group only by "$tenantId"
+                /* TODO, get tenant name from the last element from group
+                tenantName: {
+                    $last: "$tenantName"
+                },*/
                 total: { $sum: 1 }
             }
         }];
