@@ -166,9 +166,7 @@ router.get('/tenant/list', async function(req, res, next) {
             $group: {
                 _id: "$tenantId",
                 // get tenant name from the last element from group
-                tenantName: {
-                    $last: "$tenantName"
-                }
+                tenantName: { $last: "$tenantName" }
             }
         }];
         let docs = await logs.aggregate(pipelines).toArray();
@@ -227,10 +225,9 @@ router.get('/bycontent', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { id: "$fromContentId", name: "$itemName" },
-                total: {
-                    $sum: 1
-                }
+                _id: { id: "$fromContentId", name: "$itemName" },// TODO, group only by "$fromContentId"
+                itemName: { $last: "$itemName" },
+                total: { $sum: 1 }
             }
         }];
         let m_result = await logs.aggregate(pipelines).toArray();
@@ -249,15 +246,14 @@ router.get('/bycontent', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { id: "$fromContentId", name: "$itemName" },
-                total: {
-                    $sum: 1
-                }
+                _id: { id: "$fromContentId", name: "$itemName" }, // TODO, group only by "$fromContentId"
+                itemName: { $last: "$itemName" },
+                total: { $sum: 1 }
             }
         }];
         let y_result = await logs.aggregate(pipelines).toArray();
 
-        let docs = combineData(m_result, y_result);
+        let docs = combineContentData(m_result, y_result);
 
         console.log("analyze dlketang logs by content: %s", docs ? docs.length : 0);
         res.json(docs);
@@ -313,9 +309,7 @@ router.get('/bytenant', async function(req, res, next) {
             $group: {
                 _id: "$tenantId",
                 // get tenant name from the last element from group
-                tenantName: {
-                    $last: "$tenantName"
-                },
+                tenantName: { $last: "$tenantName" },
                 total: { $sum: 1 }
             }
         }];
@@ -337,15 +331,13 @@ router.get('/bytenant', async function(req, res, next) {
             $group: {
                 _id: "$tenantId",
                 // get tenant name from the last element from group
-                tenantName: {
-                    $last: "$tenantName"
-                },
+                tenantName: { $last: "$tenantName" },
                 total: { $sum: 1 }
             }
         }];
         let y_result = await logs.aggregate(pipelines).toArray();
 
-        let docs = combineData(m_result, y_result);
+        let docs = combineTenantData(m_result, y_result);
 
         console.log("analyze dlketang logs by tenant: %s", docs ? docs.length : 0);
         res.json(docs);
@@ -425,7 +417,7 @@ router.patch('/tasks', async function(req, res, next) {
  * @param {*} y_result 
  * @returns {Object} the combined data with structure [{id: integer, name:String, year_total: integer, month_total:integer}]
  */
-function combineData(m_result, y_result) {
+function combineTenantData(m_result, y_result) {
     let data = {};
     y_result.forEach(element => {
         data[element._id] = {
@@ -438,6 +430,26 @@ function combineData(m_result, y_result) {
     m_result.forEach(element => {
         if (data[element._id])
             data[element._id].month_total = element.total;
+    });
+    let docs = [];
+    for (let id in data) {
+        docs.push(data[id]);
+    }
+    return docs;
+}
+
+function combineContentData(m_result, y_result) {
+    let data = {};
+    y_result.forEach(element => {
+        data[element._id.id] = {
+            name: element._id.name,
+            year_total: element.total,
+            month_total: 0
+        };
+    });
+    m_result.forEach(element => {
+        if (data[element._id.id])
+            data[element._id.id].month_total = element.total;
     });
     let docs = [];
     for (let id in data) {
