@@ -77,8 +77,8 @@ module.exports = {
       request.then((response) => {
         this.tenantList = (response.data || []).map((value, index, array) => {
           return {
-            tenantName: value._id.tenantName,
-            tenantId: value._id.tenantId
+            tenantName: value.tenantName,
+            tenantId: value._id
           }
         });
         this.tenantList.push({ tenantName: "全部", tenantId: "" })

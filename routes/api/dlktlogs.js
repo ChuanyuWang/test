@@ -164,11 +164,11 @@ router.get('/tenant/list', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { tenantId: "$tenantId", tenantName: "$tenantName" } //TODO, group only by "$tenantId"
-                /* TODO, get tenant name from the last element from group
+                _id: "$tenantId",
+                // get tenant name from the last element from group
                 tenantName: {
                     $last: "$tenantName"
-                },*/
+                }
             }
         }];
         let docs = await logs.aggregate(pipelines).toArray();
