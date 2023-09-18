@@ -29,7 +29,8 @@ const TenantSchema = new SchemaValidator({
     addressLink: String,
     logoPath: String,
     types: Array,
-    groups: Array
+    groups: Array,
+    wechat: Object
 });
 
 var VERSION = 6; // current tenant version
@@ -179,6 +180,12 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
 
         req.body.version = VERSION;
         req.body.createdDate = new Date();
+        req.body.wechat = {
+            app_id: "",
+            app_secret: "",
+            mch_id: "",
+            api_key: ""
+        };
         tenants.insert(req.body, function(err, doc) {
             if (err) {
                 var error = new Error("create tenant fails");
@@ -200,6 +207,7 @@ router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
     let updateSet = {};
     if (req.body.hasOwnProperty("status")) updateSet.status = req.body.status;
     if (req.body.hasOwnProperty("systemMessage")) updateSet.systemMessage = req.body.systemMessage;
+    if (req.body.hasOwnProperty("wechat")) updateSet.wechat = req.body.wechat;
 
     var tenants = config_db.collection('tenants');
     tenants.findAndModify({
