@@ -1,17 +1,4 @@
 tenant-setting(style='display:none' feature=tenant_feature)
-script.
-    function _getTenantConfig() {
-        return {
-            logoPath: "#{logoPath}",
-            contact: "#{tenant_contact}",
-            address: "#{tenant_address}",
-            addressLink: "#{tenant_addressLink}",
-            classrooms: !{JSON.stringify(classrooms||[])},
-            types: !{JSON.stringify(types||[])},
-            feature: "#{tenant_feature}",
-            wechat_appId: "#{wechat_appId}"
-        };
-    };
 
 if tenant_systemMessage
     div.alert.alert-danger.system-warning-message
