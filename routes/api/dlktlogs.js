@@ -225,7 +225,7 @@ router.get('/bycontent', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { id: "$fromContentId", name: "$itemName" },// TODO, group only by "$fromContentId"
+                _id: "$fromContentId",
                 itemName: { $last: "$itemName" },
                 total: { $sum: 1 }
             }
@@ -246,7 +246,7 @@ router.get('/bycontent', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { id: "$fromContentId", name: "$itemName" }, // TODO, group only by "$fromContentId"
+                _id: "$fromContentId",
                 itemName: { $last: "$itemName" },
                 total: { $sum: 1 }
             }
@@ -441,15 +441,16 @@ function combineTenantData(m_result, y_result) {
 function combineContentData(m_result, y_result) {
     let data = {};
     y_result.forEach(element => {
-        data[element._id.id] = {
-            name: element._id.name,
+        data[element._id] = {
+            contentId: element._id,
+            name: element.itemName,
             year_total: element.total,
             month_total: 0
         };
     });
     m_result.forEach(element => {
-        if (data[element._id.id])
-            data[element._id.id].month_total = element.total;
+        if (data[element._id])
+            data[element._id].month_total = element.total;
     });
     let docs = [];
     for (let id in data) {
