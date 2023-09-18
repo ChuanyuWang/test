@@ -141,7 +141,8 @@ router.get('/content/list', async function(req, res, next) {
             }
         }, {
             $group: {
-                _id: { fromContentId: "$fromContentId", itemName: "$itemName" }
+                _id: "$fromContentId",
+                itemName: { $last: "$itemName" }
             }
         }];
         let docs = await logs.aggregate(pipelines).toArray();

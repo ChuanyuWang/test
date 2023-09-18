@@ -77,8 +77,8 @@ module.exports = {
       request.then((response) => {
         this.contentList = (response.data || []).map((value, index, array) => {
           return {
-            itemName: value._id.itemName,
-            contentId: value._id.fromContentId
+            itemName: value.itemName,
+            contentId: value._id
           }
         });
         this.contentList.push({ itemName: "全部", contentId: "" })
