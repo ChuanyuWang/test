@@ -83,6 +83,7 @@ async function getTenantInfo(req, res, next) {
         res.locals.tenant_addressLink = tenant.addressLink || '#';
         res.locals.tenant_contact = tenant.contact || "";
         res.locals.tenant_systemMessage = tenant.systemMessage || "";
+        res.locals.wechat_appId = tenant?.wechat?.app_id || ""; // only return appId to front end
         return next();
     } catch (err) {
         let error = new Error("get tenant fails");
