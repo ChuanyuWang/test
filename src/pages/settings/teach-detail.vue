@@ -57,10 +57,9 @@ module.exports = {
     data: Object // teacher object
   },
   data: function() {
-    var settings = common.getTenantSetting();
+    var settings = common.getTenantConfig();
     return {
       item: jQuery.extend(true, {}, this.data || {}),
-      setting: settings,
       timeFilter: "this_month",
       totalCost: 0,
       columns: [

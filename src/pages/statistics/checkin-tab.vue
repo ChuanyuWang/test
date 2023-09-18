@@ -45,7 +45,7 @@ module.exports = {
   props: {},
   data: function() {
     // load the setting of tenant from html root-level elements
-    var setting = common.getTenantSetting();
+    var setting = common.getTenantConfig();
     return {
       timeFilter: 'today',
       flagFilter: 'red',

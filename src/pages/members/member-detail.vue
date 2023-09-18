@@ -150,7 +150,7 @@ module.exports = {
     "member-contracts": memberContracts
   },
   data: function() {
-    var tenantSetting = common.getTenantSetting();
+    var tenantSetting = common.getTenantConfig();
     return {
       tenantConfig: {},
       memberData: {
