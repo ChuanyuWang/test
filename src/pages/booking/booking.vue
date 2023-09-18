@@ -113,7 +113,7 @@ module.exports = {
   data: function() {
     return {
       tenantName: common.getTenantName(),
-      tenantConfig: {},
+      tenantConfig: common.getTenantConfig(),
       loading: false,
       errorMessage: "",
       successMessage: "",
@@ -406,9 +406,7 @@ module.exports = {
       this.scrollToToday();
     }
   },
-  created: function() {
-    this.tenantConfig = _getTenantConfig();
-  },
+  created: function() { },
   mounted: function() {
     this.updateSchedule("today");
   }

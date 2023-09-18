@@ -13,8 +13,8 @@ if (ua.indexOf('micromessenger') > -1) { // we are within wechat
     // OAuth authentication refer to https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
     var code = common.getParam("code");
     if (!code) {
-        // TODO, get appID from tenant if wechat integration is enabled
-        var appID = "wxe4283737fc91496e";
+        var tenantConfig = common.getTenantConfig();
+        var appID = tenantConfig.wechat_appId || "wxe4283737fc91496e";
         var localURL = location.href;
         // parameter state will be appened to redirect_uri
         location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appID + "&redirect_uri=" + encodeURIComponent(localURL) + "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
