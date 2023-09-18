@@ -48,6 +48,13 @@ div.row(style="margin-top:15px")
               option(value='book') 绘本
             p.form-control-static(v-else) {{selectedTenant.feature}}
         div.form-group
+          label.col-sm-3.control-label WeChat AppID:
+          div.col-sm-6
+            div.input-group
+              input.form-control(type="text" v-model.trim="selectedTenant.wechat.app_id")
+              span.input-group-btn
+                button.btn.btn-success(type="button" @click="") Save
+        div.form-group
           label.col-sm-3.control-label System Message:
           div.col-sm-6
             div.input-group
@@ -147,7 +154,9 @@ module.exports = {
       });
     },
     selectedTenant: function() {
-      return this.selectedIndex > -1 ? this.tenants[this.selectedIndex] : {};
+      var res = this.selectedIndex > -1 ? this.tenants[this.selectedIndex] : {};
+      res.wechat = res.wechat || {};
+      return res;
     }
   },
   filters: {
