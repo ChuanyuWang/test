@@ -1,6 +1,11 @@
 extends vuetifylayout
 
 block append js
+  if ENV_DEVELOPMENT
+    // load echarts ondemand
+    script(src=CDN_FILES.echarts_dev)
+  else
+    script(src=CDN_FILES.echarts)
   script(src='/js/cockpit.js')
 
 block content
