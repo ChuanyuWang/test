@@ -350,7 +350,7 @@ router.get('/bytenant', async function(req, res, next) {
 router.get('/bydate', async function(req, res, next) {
     //[Default] get the current year by month
     let queryDate = moment();
-    let startOfDate, endOfDate, duration = 0;
+    let startOfDate, endOfDate, duration = 10; // default 10 minutes
     if (req.query.hasOwnProperty("year")) {
         queryDate = moment(req.query.year, "YYYY"); // "2023"
     }
