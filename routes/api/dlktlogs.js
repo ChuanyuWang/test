@@ -364,7 +364,7 @@ router.get('/bydate', async function(req, res, next) {
     let query = {
         "_timestamp": {
             // // exclude dirty data before 2023-03-01
-            $gte: startOfDate.year() === 2023 ? new Date("2023-03-01") : startOfMonth.toDate(),
+            $gte: startOfDate.year() === 2023 ? new Date("2023-03-01") : startOfDate.toDate(),
             $lte: endOfDate.toDate()
         },
         "duration": {
