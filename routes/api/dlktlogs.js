@@ -347,6 +347,69 @@ router.get('/bytenant', async function(req, res, next) {
     }
 });
 
+router.get('/bydate', async function(req, res, next) {
+    //[Default] get the current year by month
+    let queryDate = moment();
+    let startOfDate, endOfDate, duration = 0;
+    if (req.query.hasOwnProperty("year")) {
+        queryDate = moment(req.query.year, "YYYY"); // "2023"
+    }
+    startOfDate = queryDate.startOf("year");
+    endOfDate = queryDate.endOf("year");
+
+    if (req.query.hasOwnProperty("duration")) {
+        duration = parseInt(req.query.duration || 0);
+    }
+
+    let query = {
+        "_timestamp": {
+            // // exclude dirty data before 2023-03-01
+            $gte: startOfDate.year() === 2023 ? new Date("2023-03-01") : startOfMonth.toDate(),
+            $lte: endOfDate.toDate()
+        },
+        "duration": {
+            $gte: duration * 60, // convert to seconds
+        },
+        "fromContentId": { $exists: true }
+    };
+
+    if (req.query.contentId) {
+        query.fromContentId = parseInt(req.query.contentId);
+    }
+
+    if (req.query.tenantId) {
+        query.tenantId = parseInt(req.query.tenantId);
+    }
+
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let pipelines = [{
+            $match: query
+        }, {
+            $project: {
+                //week: { $week: "$_timestamp" },
+                month: { $month: "$_timestamp" },
+                //year: { $year: "$_timestamp" },
+                tenantId: 1,
+                tenantName: 1
+            }
+        }, {
+            $group: {
+                _id: "$month",
+                total: { $sum: 1 }
+            }
+        }];
+        let docs = await logs.aggregate(pipelines).toArray();
+
+        console.log("analyze dlketang logs by date: %s", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("analyze dlketang logs by date fails", error));
+    }
+});
+
 router.get('/query', async function(req, res, next) {
     //[Default] query the data from yesterday
     let this_date = moment().subtract(1, 'day').format("YYYY-MM-DD");
