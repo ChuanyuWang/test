@@ -7,7 +7,7 @@ v-container
     v-spacer
     span 选择门店:
     v-col(cols="auto")
-      v-select.fit(:items="tenantList" item-text="tenantName" item-value="tenantId"
+      v-autocomplete(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
         @click.once="fetchTenantList" v-model="selectedTenant" @change="refresh")
     v-slider.align-center.me-3(v-model="duration" step="1" min="0" max="180" thumb-label="always" thumb-size="24" 
       dense label="播放时长" hide-details)
