@@ -8,7 +8,7 @@ v-container
     span 选择片源:
     v-col(cols="auto")
       v-autocomplete(:items="contentList" item-text="itemName" item-value="contentId" clearable
-        @click.once="fetchContentList" v-model="selectedContent" @change="refresh")
+        @focus.once="fetchContentList" v-model="selectedContent" @change="refresh")
     v-slider.align-center.me-3(v-model="duration" step="1" min="0" max="180" thumb-label="always" thumb-size="24" 
       dense label="播放时长" hide-details)
       template(v-slot:append)
@@ -91,4 +91,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
