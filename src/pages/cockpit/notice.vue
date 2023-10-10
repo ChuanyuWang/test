@@ -138,6 +138,9 @@ module.exports = {
       request.then((response) => {
         this.rawData = response.data && response.data.rows || [];
         this.totalNotice = response.data && response.data.total || 0;
+      }).catch((error) => {
+        this.message = "加载公告失败";
+        this.snackbar = true;
       });
       request.finally(() => {
         this.isLoading = false;
