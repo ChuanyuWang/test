@@ -44,7 +44,8 @@ module.exports = {
         { name: "门店统计", icon: "mdi-store", value: "/store" },
         { name: "分析功能", icon: "mdi-chart-bar", value: "/statistics" },
         { name: "数据查询", icon: "mdi-database-search", value: "/query" },
-        { name: "公告管理", icon: "mdi-bullhorn-variant", value: "/notice" }
+        { name: "公告管理", icon: "mdi-bullhorn-variant", value: "/notice" },
+        { name: "片源定价", icon: "mdi-currency-cny", value: "/pricing" }
       ],
       drawer: true
     }

@@ -10,6 +10,7 @@ var store = require('./store.vue').default;
 var query = require('./query.vue').default;
 var notice = require('./notice.vue').default;
 var statistics = require('./statistics.vue').default;
+var pricing = require('./pricing.vue').default;
 
 // DOM Ready =============================================================
 init(function() {
@@ -19,7 +20,8 @@ init(function() {
         { path: '/store', component: store, meta: { title: '光影故事屋门店统计' } },
         { path: '/query', component: query, meta: { title: '光影故事屋数据查询' } },
         { path: '/notice', component: notice, meta: { title: '公告管理' } },
-        { path: '/statistics', component: statistics, meta: { title: '光影故事屋播放统计' } }
+        { path: '/statistics', component: statistics, meta: { title: '光影故事屋播放统计' } },
+        { path: '/pricing', component: pricing, meta: { title: '片源定价' } }
     ];
     var router = new VueRouter({
         routes // short for `routes: routes`
