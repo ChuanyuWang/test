@@ -13,7 +13,8 @@
         "SharedArrayBuffer": "readonly"
     },
     "parserOptions": {
-        "ecmaVersion": 2018,
+        // check node.js version against https://node.green/#ES2021
+        "ecmaVersion": 2021,
         "sourceType": "module"
     },
     "rules": {
