@@ -16,6 +16,7 @@ v-container
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="当日无数据")
     template(v-slot:item._timestamp="{ item }") {{ new Date(item._timestamp).toLocaleString() }}
     template(v-slot:item.duration="{ item }") {{ humanize(item.duration) }}
+    template(v-slot:item.attendance="{ item }") {{ item.attendance || "没有数据" }}
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
@@ -40,6 +41,7 @@ module.exports = {
         { text: '片源', value: 'itemName' },
         { text: '片源ID', value: 'fromContentId' },
         { text: '播放时长(秒)', value: 'duration' },
+        { text: '使用人数', value: 'attendance' }
       ],
       rawData: []
     }
