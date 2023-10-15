@@ -474,6 +474,73 @@ router.patch('/tasks', async function(req, res, next) {
     }
 });
 
+router.get('/prices', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let pipelines = [{
+            $match: {
+                "_timestamp": {
+                    $gte: new Date("2023-03-01") // exclude dirty data before 2023-03-01
+                },
+                "fromContentId": { $exists: true }
+            }
+        }, {
+            $group: {
+                _id: "$fromContentId",
+                itemName: { $last: "$itemName" }
+            }
+        }, {
+            $lookup: {
+                from: 'prices',
+                let: { contentID: "$_id" },
+                pipeline: [{
+                    $match: {
+                        $expr: { $eq: ["$$contentID", "$_fromContentId"] }
+                    }
+                }, {
+                    $project: { _id: 0, price: 1 }
+                }],
+                as: 'prices'
+            }
+        }];
+        let docs = await logs.aggregate(pipelines).toArray();
+
+        console.log("get price of dlketang contents: %s", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("fail to get prices of dlketang content", error));
+    }
+});
+
+/**
+ * {_fromContentId: 50524832, price: 5000, modify_time: "2023-10-14T12:11:41.000Z"}
+ */
+router.put('/prices/:contentID', async function(req, res, next) {
+    let priceDoc = {
+        _fromContentId: parseInt(req.params.contentID),
+        price: parseInt(req.body.price ?? 0), // expect 0.01 ==> 1
+        modify_time: new Date()
+    };
+    if (isNaN(priceDoc._fromContentId)) {
+        return next(new ParamError(`contentID ${req.params.contentID} not valid`));
+    }
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let prices = logs_db.collection("prices");
+
+        let result = await prices.updateOne({ _fromContentId: priceDoc._fromContentId }, {
+            $set: priceDoc
+        }, { upsert: true });
+
+        console.log(`Set price of ${priceDoc._fromContentId} to ${priceDoc.price / 100}`);
+        res.json(result.result);
+    } catch (error) {
+        return next(new InternalServerError("fail to set price of dlketang content", error));
+    }
+});
+
 /**
  * combine data of year and month, m_result and y_result have the same structure
  * {_id: integer, tenantName: String, total: integer}
