@@ -143,4 +143,26 @@ describe('MongoDB driver 3.7+', function() {
         expect(result).to.have.property("insertedCount");
         expect(result).to.have.property("insertedId");
     });
+
+    it('test updateOne result with upsert is true', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.updateOne({ name: "456" }, {
+            $set: { cost: 2 }
+        }, { upsert: true });
+        // result.result is {"n":1,"ok":1,"nModified":1|0, "upserted": undefined|Object}
+        // result.modifiedCount is 1
+        // result.matchedCount is 1
+        // result.upsertedCount is 0 if modified
+        // result.upsertedId is { index: 0, _id: 652b82b1b71aad3df29d31f2 } if inserted; otherwise is null
+        // console.log(result);
+        expect(result).to.be.exist;
+        result.should.be.a('object');
+        expect(result).to.have.property("result");
+        assert.deepEqual(result.result, { n: 1, ok: 1, nModified: 1 });
+        expect(result).to.have.property("upsertedCount");
+        expect(result).to.have.property("upsertedId");
+        expect(result).to.have.property("matchedCount");
+        expect(result).to.have.property("modifiedCount");
+    });
 });
