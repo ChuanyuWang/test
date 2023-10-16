@@ -484,7 +484,7 @@ router.get('/prices', async function(req, res, next) {
                 "_timestamp": {
                     $gte: new Date("2023-03-01") // exclude dirty data before 2023-03-01
                 },
-                "fromContentId": { $exists: true }
+                "fromContentId": req.query.fromContentId ? parseInt(req.query.fromContentId) : { $exists: true }
             }
         }, {
             $group: {
