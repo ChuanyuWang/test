@@ -534,7 +534,7 @@ router.put('/prices/:contentID', async function(req, res, next) {
             $set: priceDoc
         }, { upsert: true });
 
-        console.log(`Set price of ${priceDoc._fromContentId} to ${priceDoc.price / 100}`);
+        console.log(`Set price of content ${priceDoc._fromContentId} to ${priceDoc.price / 100}`);
         res.json(result.result);
     } catch (error) {
         return next(new InternalServerError("fail to set price of dlketang content", error));
