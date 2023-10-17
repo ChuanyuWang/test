@@ -589,6 +589,23 @@ router.get('/deposits', async function(req, res, next) {
     }
 });
 
+router.get('/deposits/:tenantID', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let deposits = logs_db.collection("deposits");
+
+        let cursor = deposits.find({
+            "tenantId": parseInt(req.params.tenantID)
+        });
+        let docs = await cursor.toArray();
+
+        console.log(`get deposits of dlketang tenant ${req.params.tenantID}: %s`, docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("fail to get deposits of dlketang tenants", error));
+    }
+});
+
 /**
  * { 
  *    tenantId: Int,
@@ -619,7 +636,7 @@ router.post('/deposits/:tenantID', async function(req, res, next) {
 
         let result = await deposits.insertOne(depositDoc);
 
-        console.log(`Add deposit to tenant ${depositDoc.tenantId} (received: ${depositDoc.received / 100} / donate: ${depositDoc.donate / 100})`);
+        console.log(`add deposit to tenant ${depositDoc.tenantId} (received: ${depositDoc.received / 100} / donate: ${depositDoc.donate / 100})`);
         res.json(result.result);
     } catch (error) {
         return next(new InternalServerError("fail to add deposit to tenant", error));
