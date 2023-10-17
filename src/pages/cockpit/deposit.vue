@@ -22,12 +22,11 @@ v-container
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
   v-dialog(v-model="dialog1" max-width="500")
     v-card
-      v-card-title 门店充值
+      v-card-title {{ depositItem.name }}
+      v-card-subtitle 门店充值
       v-card-text
         v-form(v-model="valid" ref="depositForm")
           v-row
-            v-col(sm="4")
-              v-text-field(v-model="depositItem.name" readonly label="门店")
             v-col(sm="4")
               v-select(v-model="depositItem.method" label="支付方式" :items="methods")
             v-col(sm="4")
@@ -51,7 +50,26 @@ v-container
       v-card-actions
         v-spacer
         v-btn(text color="primary" @click="dialog1 = false") 关闭
-        v-btn(text color="primary" @click="addDeposit" :disabled="!valid") 充值
+        v-btn(text color="primary" @click="addDeposit" :disabled="!valid" :loading="dialog1_loading") 充值
+  v-dialog(v-model="dialog2" max-width="60%")
+    v-card
+      v-card-title {{ depositItem.name }}
+      v-card-subtitle 门店充值记录
+      v-card-text
+        v-data-table(:headers="records_headers" dense :items="records" disable-pagination hide-default-footer :loading="isLoadingRecords" no-data-text="无充值记录")
+          template(v-slot:item.pay_date="{ item }") {{ item.pay_date | dateFormatter }}
+          template(v-slot:item.method="{ item }") {{ item.method | methodFormatter}}
+          template(v-slot:item.received="{ item }") {{ item.received/100 }}元
+          template(v-slot:item.donate="{ item }") {{ item.donate/100 }}元
+          template(v-slot:body.append="{ headers }")
+            tr
+              td(v-for="(header,i) in headers" :key="i")
+                div(v-if="header.value =='received'") <b>{{ receivedTotal }}元</b>
+                div(v-if="header.value =='donate'") <b>{{ donateTotal }}元</b>
+                div(v-else)
+      v-card-actions
+        v-spacer
+        v-btn(text color="primary" @click="dialog2 = false") 关闭
 </template>
 
 <script>
@@ -68,13 +86,15 @@ module.exports = {
       headers: [
         { text: '门店ID', value: 'tenantId', sortable: false },
         { text: '门店名称', value: 'tenantName', sortable: false },
-        { text: '累计充值金额', value: 'total', sortable: false },
+        { text: '累计充值金额（含赠送）', value: 'total', sortable: false },
         { text: '操作', value: 'actions', sortable: false }
       ],
       rawData: [],
       depositItem: { received: 0, donate: 0, comment: "" },
       selectedIndex: -1,
       dialog1: false,
+      dialog1_loading: false,
+      dialog2: false,
       valid: true,
       rules: {
         required: value => value !== "" || '金额不能为空',
@@ -86,12 +106,48 @@ module.exports = {
         { text: "现金", value: "cash" },
         { text: "移动支付", value: "mobilepayment" }
       ],
-      menu2: false
+      menu2: false,
+      isLoadingRecords: true,
+      records: [],
+      records_headers: [
+        { text: '充值日期', value: 'pay_date', sortable: false },
+        { text: '付款方式', value: 'method', sortable: false },
+        { text: '充值', value: 'received', sortable: false },
+        { text: '赠送', value: 'donate', sortable: false },
+        { text: '备注', value: 'comment', sortable: false }
+      ]
     }
   },
   computed: {
     depositTotal() {
       return ((this.depositItem.received || 0) + (this.depositItem.donate || 0));
+    },
+    receivedTotal() {
+      return (this.records || []).reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.received;
+      }, 0) / 100;
+    },
+    donateTotal() {
+      return (this.records || []).reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.donate;
+      }, 0) / 100;
+    }
+  },
+  filters: {
+    methodFormatter(value) {
+      switch (value) {
+        case "cash":
+          return "现金";
+        case "bankcard":
+          return "银行卡";
+        case "mobilepayment":
+          return "移动支付"
+        default:
+          return null;
+      }
+    },
+    dateFormatter(value) {
+      return moment(value).format("ll");
     }
   },
   methods: {
@@ -100,8 +156,6 @@ module.exports = {
       // refresh table data
       var request = axios.get("/api/dlktlogs/deposits", { params: { tenantId: this.selectedTenant } });
       request.then((response) => {
-        //this.rawData = response.data || [];
-
         this.rawData = (response.data || []).map((value, index, array) => {
           return {
             tenantId: value._id,
@@ -129,27 +183,37 @@ module.exports = {
       })
     },
     addDeposit() {
-      var newPrice = parseInt(this.depositItem.price * 100);
+      this.dialog1_loading = true;
       var request = axios.post("/api/dlktlogs/deposits/" + this.depositItem.tenantId, {
         method: this.depositItem.method,
-        received: this.depositItem.received * 100,
-        donate: this.depositItem.donate * 100,
+        received: Math.round(this.depositItem.received * 100),
+        donate: Math.round(this.depositItem.donate * 100),
         pay_date: moment(this.depositItem.pay_date).toDate().toISOString(),
         comment: this.depositItem.comment
       });
       request.then((response) => {
-        if (this.editedIndex > -1) {
-          Object.assign(this.priceList[this.editedIndex], { price: newPrice })
+        if (this.selectedIndex > -1) {
+          this.rawData[this.selectedIndex].total += Math.round(this.depositItem.received * 100 + this.depositItem.donate * 100);
         }
         this.message = "门店充值成功";
         this.snackbar = true;
       });
       request.finally(() => {
         this.dialog1 = false;
+        this.dialog1_loading = false;
       });
     },
-    openHistory() {
-
+    openHistory(item) {
+      this.depositItem.name = item.tenantName;
+      this.isLoadingRecords = true;
+      this.dialog2 = true;
+      var request = axios.get("/api/dlktlogs/deposits/" + item.tenantId, { params: {} });
+      request.then((response) => {
+        this.records = response.data || [];
+      });
+      request.finally(() => {
+        this.isLoadingRecords = false;
+      });
     },
     fetchTenantList() {
       var request = axios.get("/api/dlktlogs/tenant/list");
