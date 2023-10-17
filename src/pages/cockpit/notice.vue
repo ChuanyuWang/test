@@ -2,7 +2,7 @@
 v-container
   v-subheader
     p 光影故事屋播放器端公告管理，发布公告后可以推送到所有播放器端
-  v-row.mt-1(dense align="center" justify="end")
+  v-row(dense align="center" justify="end")
     v-btn.ml-2(color='primary' @click.stop="openCreateNoticeDialog()") 创建公告
     v-spacer
     v-btn(color='primary' @click.stop="refresh") 刷新

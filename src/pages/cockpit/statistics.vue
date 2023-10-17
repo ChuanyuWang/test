@@ -3,7 +3,7 @@ v-container
   v-subheader
     p 光影故事屋播放统计和分析功能，选择日期并查看统计数据（含全国门店）。
       |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
-  v-row.mt-1(dense align="center" justify="end")
+  v-row(dense align="center" justify="end")
     v-spacer
     span 选择日期:
     v-col(cols="auto")

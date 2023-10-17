@@ -3,7 +3,7 @@ v-container
   v-subheader
     p 光影故事屋浏览日志查询，选择日期并查看当天的播放记录（含全国门店）。
       |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
-  v-row.mt-1(dense align="center" justify="end")
+  v-row(dense align="center" justify="end")
     v-btn.ml-2(@click="reload") 重新提取当天日志
     v-spacer
     span 选择日期:
