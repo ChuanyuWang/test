@@ -23,6 +23,7 @@ const PaymentSchema = new SchemaValidator({
         },
         required: true
     },
+    //amount: Number, // TODO
     contractId: { type: ObjectId, required: true },
     contractNo: { type: String, required: true },
     memberId: { type: ObjectId, required: true },
