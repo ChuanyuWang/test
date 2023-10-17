@@ -1,0 +1,174 @@
+<template lang="pug">
+v-container
+  v-subheader
+    p 光影故事屋门店充值管理，
+      |所有门店信息来源于叮聆课堂浏览日志，新增门店可能不显示，已经关闭的门店也会出现在列表中
+  v-row.mt-1(dense align="center" justify="end")
+    v-col(cols="auto")
+      span.ml-2 选择门店:
+    v-col(cols="auto")
+      v-autocomplete(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
+        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh")
+    v-spacer
+    v-col(cols="auto")
+      v-btn(color='primary' @click="refresh") 刷新
+  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
+    template(v-slot:item.total="{ item }") {{ item.total/100 }}元
+    template(v-slot:item.actions="{ item }")
+      v-btn(small rounded color="primary" @click.stop="openDeposit(item)") 充值
+      v-btn.ml-1(small rounded @click.stop="openHistory(item)") 记录
+  v-snackbar.mb-12(v-model="snackbar") {{ message }}
+    template(v-slot:action="{ attrs }")
+      v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
+  v-dialog(v-model="dialog1" max-width="500")
+    v-card
+      v-card-title 门店充值
+      v-card-text
+        v-form(v-model="valid" ref="depositForm")
+          v-row
+            v-col(sm="4")
+              v-text-field(v-model="depositItem.name" readonly label="门店")
+            v-col(sm="4")
+              v-select(v-model="depositItem.method" label="支付方式" :items="methods")
+            v-col(sm="4")
+              v-menu(v-model="menu2" :close-on-content-click="false" :nudge-bottom="-20" offset-y min-width="auto")
+                template(v-slot:activator="{ on, attrs }")
+                  v-text-field(v-model="depositItem.pay_date" label="充值日期" readonly v-bind="attrs" v-on="on")
+                v-date-picker(v-model="depositItem.pay_date" @input="menu2 = false")
+          v-row
+            v-col(sm="4")
+              v-text-field(type="number" v-model.number="depositItem.received" label="充值金额" suffix="元"
+                :rules="[rules.required]" hint="实际收款金额" persistent-hint)
+            v-col(sm="4")
+              v-text-field(type="number" v-model.number="depositItem.donate" label="赠送金额" suffix="元"
+                :rules="[rules.required, rules.positive]")
+            v-col(sm="4")
+              v-text-field(readonly v-model.number="depositTotal" label="总计" suffix="元" hint="=充值+赠送" persistent-hint)
+          v-row
+            v-col(sm="12")
+              v-textarea(v-model.trim="depositItem.comment" label="备注" rows="3" counter="500" no-resize
+                hint="备注内容会显示在客户端，提交后无法修改" :rules="[rules.textRequired]" persistent-hint)
+      v-card-actions
+        v-spacer
+        v-btn(text color="primary" @click="dialog1 = false") 关闭
+        v-btn(text color="primary" @click="addDeposit" :disabled="!valid") 充值
+</template>
+
+<script>
+
+module.exports = {
+  name: "deposit",
+  data() {
+    return {
+      snackbar: false,
+      message: "",
+      tenantList: [],
+      selectedTenant: "",
+      isLoading: true,
+      headers: [
+        { text: '门店ID', value: 'tenantId', sortable: false },
+        { text: '门店名称', value: 'tenantName', sortable: false },
+        { text: '累计充值金额', value: 'total', sortable: false },
+        { text: '操作', value: 'actions', sortable: false }
+      ],
+      rawData: [],
+      depositItem: { received: 0, donate: 0, comment: "" },
+      selectedIndex: -1,
+      dialog1: false,
+      valid: true,
+      rules: {
+        required: value => value !== "" || '金额不能为空',
+        positive: value => value >= 0 || '金额不能为负',
+        textRequired: value => value && value.trim() !== "" || '必填'
+      },
+      methods: [
+        { text: "银行卡", value: "bankcard" },
+        { text: "现金", value: "cash" },
+        { text: "移动支付", value: "mobilepayment" }
+      ],
+      menu2: false
+    }
+  },
+  computed: {
+    depositTotal() {
+      return ((this.depositItem.received || 0) + (this.depositItem.donate || 0));
+    }
+  },
+  methods: {
+    refresh() {
+      this.isLoading = true;
+      // refresh table data
+      var request = axios.get("/api/dlktlogs/deposits", { params: { tenantId: this.selectedTenant } });
+      request.then((response) => {
+        //this.rawData = response.data || [];
+
+        this.rawData = (response.data || []).map((value, index, array) => {
+          return {
+            tenantId: value._id,
+            tenantName: value.tenantName,
+            total: value.deposits.length > 0 ? value.deposits[0].total : 0
+          }
+        });
+      });
+      request.finally(() => {
+        this.isLoading = false;
+      });
+    },
+    openDeposit(item) {
+      this.selectedIndex = this.rawData.indexOf(item);
+      this.depositItem.tenantId = item.tenantId;
+      this.depositItem.name = item.tenantName;
+      this.depositItem.pay_date = moment().format("YYYY-MM-DD");
+      this.depositItem.method = "bankcard";
+      this.depositItem.received = "";
+      this.depositItem.donate = 0;
+      this.depositItem.comment = "";
+      this.dialog1 = true;
+      this.$nextTick(() => {
+        this.$refs.depositForm.validate(); // force validate for the first time
+      })
+    },
+    addDeposit() {
+      var newPrice = parseInt(this.depositItem.price * 100);
+      var request = axios.post("/api/dlktlogs/deposits/" + this.depositItem.tenantId, {
+        method: this.depositItem.method,
+        received: this.depositItem.received * 100,
+        donate: this.depositItem.donate * 100,
+        pay_date: moment(this.depositItem.pay_date).toDate().toISOString(),
+        comment: this.depositItem.comment
+      });
+      request.then((response) => {
+        if (this.editedIndex > -1) {
+          Object.assign(this.priceList[this.editedIndex], { price: newPrice })
+        }
+        this.message = "门店充值成功";
+        this.snackbar = true;
+      });
+      request.finally(() => {
+        this.dialog1 = false;
+      });
+    },
+    openHistory() {
+
+    },
+    fetchTenantList() {
+      var request = axios.get("/api/dlktlogs/tenant/list");
+      request.then((response) => {
+        this.tenantList = (response.data || []).map((value, index, array) => {
+          return {
+            tenantName: value.tenantName,
+            tenantId: value._id
+          }
+        });
+        this.tenantList.push({ tenantName: "全部", tenantId: "" })
+      });
+    }
+  },
+  mounted() {
+    this.refresh();
+  }
+}
+</script>
+
+<style lang="less">
+</style>
