@@ -13,26 +13,29 @@ v-container
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="priceList" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
-    template(v-slot:item.price="{ item }") {{ item.price / 100 }}元
-      v-icon.ml-1(small @click.stop="editPrice(item)") mdi-pencil
+    template(v-slot:item.price="{ item }") 
+      div(v-if="isNaN(item.price)") <i>未设置</i>
+        v-icon.ml-1(small @click.stop="editPrice(item)") mdi-pencil
+      div(v-else) {{ item.price /100}}元
+        v-icon.ml-1(small @click.stop="editPrice(item)") mdi-pencil
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
-  v-dialog(v-model="dialog" max-width="450")
+  v-dialog(v-model="dialog" max-width="400")
     v-card
-      v-card-title 修改片源价格
+      v-card-title {{editedItem.name}}
+      v-card-subtitle 修改片源价格
       v-card-text
-        v-form(v-model="valid")
+        v-form(ref="priceForm" v-model="valid")
           v-row
-            v-col(sm="8")
-              v-text-field(v-model="editedItem.name" readonly label="名称")
-            v-col(sm="4")
+            v-col(sm="6")
               v-text-field(type="number" v-model.number="editedItem.price" label="价格" suffix="元"
-                :rules="[rules.required, rules.positive]")
+                :rules="[rules.required, rules.positive]" hint="修改好价格后，请点击保存")
       v-card-actions
+        small.caption 价格保存后立即生效，无法撤消
         v-spacer
         v-btn(text color="primary" @click="dialog = false") 关闭
-        v-btn(text color="primary" @click="updatePrice" :disabled="!valid") 保存
+        v-btn(text color="primary" @click="updatePrice" :disabled="!valid" :loading="dialogLoading") 保存
 </template>
 
 <script>
@@ -55,6 +58,7 @@ module.exports = {
       editedItem: {},
       editedIndex: -1,
       dialog: false,
+      dialogLoading: false,
       valid: true,
       rules: {
         required: value => value !== "" || '价格不能为空',
@@ -73,7 +77,7 @@ module.exports = {
           return {
             contentId: value._id,
             itemName: value.itemName,
-            price: value.prices.length > 0 ? value.prices[0].price : 0
+            price: value.prices.length > 0 ? value.prices[0].price : NaN
           }
         });
       });
@@ -85,10 +89,14 @@ module.exports = {
       this.editedIndex = this.priceList.indexOf(item);
       this.editedItem.fromContentId = item.contentId;
       this.editedItem.name = item.itemName;
-      this.editedItem.price = item.price / 100;
+      this.editedItem.price = isNaN(item.price) ? "" : item.price / 100;
       this.dialog = true;
+      this.$nextTick(() => {
+        this.$refs.priceForm.validate(); // force validate for the first time
+      });
     },
     updatePrice() {
+      this.dialogLoading = true;
       var newPrice = Math.round(this.editedItem.price * 100);
       var request = axios.put("/api/dlktlogs/prices/" + this.editedItem.fromContentId, {
         price: newPrice
@@ -102,6 +110,7 @@ module.exports = {
       });
       request.finally(() => {
         this.dialog = false;
+        this.dialogLoading = false;
       });
     },
     fetchContentList() {

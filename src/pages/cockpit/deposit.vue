@@ -180,7 +180,7 @@ module.exports = {
       this.dialog1 = true;
       this.$nextTick(() => {
         this.$refs.depositForm.validate(); // force validate for the first time
-      })
+      });
     },
     addDeposit() {
       this.dialog1_loading = true;
