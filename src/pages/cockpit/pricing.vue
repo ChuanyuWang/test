@@ -89,7 +89,7 @@ module.exports = {
       this.dialog = true;
     },
     updatePrice() {
-      var newPrice = parseInt(this.editedItem.price * 100);
+      var newPrice = Math.round(this.editedItem.price * 100);
       var request = axios.put("/api/dlktlogs/prices/" + this.editedItem.fromContentId, {
         price: newPrice
       });
@@ -123,4 +123,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
