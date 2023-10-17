@@ -510,7 +510,7 @@ router.get('/prices', async function(req, res, next) {
         console.log("get price of dlketang contents: %s", docs ? docs.length : 0);
         res.json(docs);
     } catch (error) {
-        return next(new InternalServerError("fail to get prices of dlketang content", error));
+        return next(new InternalServerError("fail to get prices of dlketang contents", error));
     }
 });
 
@@ -538,6 +538,91 @@ router.put('/prices/:contentID', async function(req, res, next) {
         res.json(result.result);
     } catch (error) {
         return next(new InternalServerError("fail to set price of dlketang content", error));
+    }
+});
+
+/**
+ * {}
+ */
+router.get('/deposits', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let pipelines = [{
+            $match: {
+                "fromContentId": { $exists: true },
+                "tenantId": req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
+            }
+        }, {
+            $group: {
+                _id: "$tenantId",
+                tenantName: { $last: "$tenantName" }
+            }
+        }, {
+            $lookup: {
+                from: 'deposits',
+                let: { tenantID: "$_id" },
+                pipeline: [{
+                    $match: {
+                        $expr: { $eq: ["$$tenantID", "$tenantId"] }
+                    }
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: { $add: ["$received", "$donate"] }
+                        }
+                    },
+                }, {
+                    $project: { _id: 0 }
+                }],
+                as: 'deposits'
+            }
+        }];
+        let docs = await logs.aggregate(pipelines).toArray();
+
+        console.log("get deposits of dlketang tenants: %s", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("fail to get deposits of dlketang tenants", error));
+    }
+});
+
+/**
+ * { 
+ *    tenantId: Int,
+ *    createDate: Date,   
+ *    method: "bankcard|cash|mobilepayment",
+ *    received: Number,
+ *    donate: Number,
+ *    payDate: Date,
+ *    comment: String
+ * }
+ */
+router.post('/deposits/:tenantID', async function(req, res, next) {
+    let depositDoc = {
+        tenantId: parseInt(req.params.tenantID),
+        create_date: new Date(),
+        method: req.body.method, // TODO validate
+        received: parseInt(req.body.received ?? 0), // expect 0.01 ==> 1
+        donate: parseInt(req.body.donate ?? 0), // expect 0.01 ==> 1
+        pay_date: new Date(req.body.pay_date),
+        comment: req.body.comment ?? ""
+    };
+    if (isNaN(depositDoc.tenantId)) {
+        return next(new ParamError(`tenant ID ${req.params.tenantId} not valid`));
+    }
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let deposits = logs_db.collection("deposits");
+
+        let result = await deposits.insertOne(depositDoc);
+
+        console.log(`Add deposit to tenant ${depositDoc.tenantId} (received: ${depositDoc.received / 100} / donate: ${depositDoc.donate / 100})`);
+        res.json(result.result);
+    } catch (error) {
+        return next(new InternalServerError("fail to add deposit to tenant", error));
     }
 });
 
