@@ -3,20 +3,18 @@ v-container
   v-subheader
     p 光影故事屋门店充值管理，
       |所有门店信息来源于叮聆课堂浏览日志，新增门店可能不显示，已经关闭的门店也会出现在列表中
-  v-row.mt-1(dense align="center" justify="end")
+  v-row(dense align="center" justify="end")
     v-col(cols="auto")
-      span.ml-2 选择门店:
-    v-col(cols="auto")
-      v-autocomplete(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
-        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh")
+      v-autocomplete.ml-3(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
+        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh" hide-details label="选择门店")
     v-spacer
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.actions="{ item }")
-      v-btn(small rounded color="primary" @click.stop="openDeposit(item)") 充值
-      v-btn.ml-1(small rounded @click.stop="openHistory(item)") 记录
+      v-btn(x-small elevation="0" color="primary" @click.stop="openDeposit(item)") 充值
+      v-btn.ml-1(x-small elevation="0" @click.stop="openHistory(item)") 记录
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
