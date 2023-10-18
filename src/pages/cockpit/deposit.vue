@@ -13,8 +13,8 @@ v-container
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.actions="{ item }")
-      v-btn(x-small elevation="0" color="primary" @click.stop="openDeposit(item)") 充值
-      v-btn.ml-1(x-small elevation="0" @click.stop="openHistory(item)") 记录
+      v-btn(small elevation="0" color="primary" @click.stop="openDeposit(item)") 充值
+      v-btn.ml-1(small elevation="0" @click.stop="openHistory(item)") 记录
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
@@ -232,4 +232,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
