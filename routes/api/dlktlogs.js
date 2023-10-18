@@ -618,10 +618,13 @@ router.get('/deposits/:tenantID', async function(req, res, next) {
  * }
  */
 router.post('/deposits/:tenantID', async function(req, res, next) {
+    if (["cash", "bankcard", "mobilepayment"].indexOf(req.body.method) === -1) {
+        return next(new ParamError(`pay method ${req.body.method} not valid`));
+    }
     let depositDoc = {
         tenantId: parseInt(req.params.tenantID),
         create_date: new Date(),
-        method: req.body.method, // TODO validate
+        method: req.body.method,
         received: parseInt(req.body.received ?? 0), // expect 0.01 ==> 1
         donate: parseInt(req.body.donate ?? 0), // expect 0.01 ==> 1
         pay_date: new Date(req.body.pay_date),
