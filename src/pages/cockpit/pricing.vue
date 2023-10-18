@@ -5,7 +5,7 @@ v-container
       |所有片源信息来源于叮聆课堂浏览日志，新片源可能不显示，已经下架或删除片源也会出现在列表中
   v-row(dense align="center" justify="end")
     v-col(cols="auto")
-      v-autocomplete.ml-3(:items="contentList" item-text="itemName" item-value="contentId" clearable
+      v-autocomplete.ml-3(:items="contentList" item-text="itemName" dense item-value="contentId" clearable
         @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" label="选择片源")
     v-spacer
     v-col(cols="auto")
@@ -130,5 +130,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

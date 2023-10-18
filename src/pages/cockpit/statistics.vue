@@ -5,12 +5,9 @@ v-container
       |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
   v-row(dense align="center" justify="end")
     v-spacer
-    span 选择日期:
     v-col(cols="auto")
-      v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu" disabled)
-        template(v-slot:activator="{ on, attrs }")
-          v-text-field(solo dense readonly v-model="selectedDate" hide-details prepend-icon="mdi-calendar" v-bind="attrs" v-on="on")
-        v-date-picker(v-model="selectedDate" locale="zh" @change="refresh" active-picker="YEAR" picker-date="year")
+      v-autocomplete(:items="[2023, 2024, 2025, 2026, 2027]" dense
+        v-model="selectedYear" @change="refresh" label="选择年份" hide-details)
     v-btn(color='primary' :disabled="isLoading" @click="refresh") 刷新
   v-row
     v-col(md="6")
@@ -35,7 +32,7 @@ module.exports = {
       message: "重新提取当天日志，请等待5分钟，不要重复刷新",
       yesterday: moment().subtract(1, 'day'),
       menu: false,
-      selectedDate: moment().format("YYYY"),
+      selectedYear: new Date().getFullYear(),
       isLoading: true,
       rawData: []
     }
@@ -54,10 +51,10 @@ module.exports = {
       if (this.controller1) this.controller1.abort("abort by user");
       else this.controller1 = new AbortController();
       // refresh table data
-      var request = axios.get("/api/dlktlogs//bydate", { params: { year: 2023 }, signal: this.controller1.signal });
+      var request = axios.get("/api/dlktlogs//bydate", { params: { year: this.selectedYear }, signal: this.controller1.signal });
       request.then((response) => {
         this.rawData = response.data || [];
-        this.drawChart1(this.rawData, 2023, "月");
+        this.drawChart1(this.rawData, this.selectedYear, "月");
       });
       request.finally(() => {
         delete this.controller1;
@@ -161,5 +158,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

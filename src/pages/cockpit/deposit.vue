@@ -5,7 +5,7 @@ v-container
       |所有门店信息来源于叮聆课堂浏览日志，新增门店可能不显示，已经关闭的门店也会出现在列表中
   v-row(dense align="center" justify="end")
     v-col(cols="auto")
-      v-autocomplete.ml-3(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
+      v-autocomplete.ml-3(:items="tenantList" dense item-text="tenantName" item-value="tenantId" clearable
         @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh" hide-details label="选择门店")
     v-spacer
     v-col(cols="auto")
@@ -232,5 +232,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
