@@ -42,7 +42,7 @@ module.exports = {
      * 1. https://cdnjs.com/
      * 2. https://www.staticfile.org/
      * 3. https://docs.microsoft.com/en-us/aspnet/ajax/cdn/overview
-     * 4. http://www.bootcdn.cn/ rename to https://cdn.bootcdn.net/
+     * 4. http://www.bootcdn.cn/
      * 5. https://unpkg.com/
      * 6. https://www.jsdelivr.com/
      * 7. http://cdn.bytedance.com/
@@ -79,10 +79,10 @@ module.exports = {
         blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js',
         axios: 'https://cdn.bootcdn.net/ajax/libs/axios/1.3.4/axios.min.js',
         axios_dev: 'https://cdn.bootcdn.net/ajax/libs/axios/1.3.4/axios.js',
-        vuetify: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.min.js',
-        vuetify_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.js',
-        vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.min.css',
-        vuetify_css_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.6.14/vuetify.css',
+        vuetify: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.js',
+        vuetify_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.js',
+        vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.css',
+        vuetify_css_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.css',
         vue_router: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.min.js',
         vue_router_dev: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.js'
     }
