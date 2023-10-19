@@ -13,6 +13,9 @@ var statistics = require('./statistics.vue').default;
 var pricing = require('./pricing.vue').default;
 var deposit = require('./deposit.vue').default;
 
+// Translation provided by Vuetify (javascript)
+var zhHans = require('./zh-Hans');
+
 // DOM Ready =============================================================
 init(function() {
 
@@ -38,6 +41,10 @@ init(function() {
     });
 
     var vuetify = new Vuetify({
+        lang: {
+            locales: { zhHans },
+            current: i18next.languages.langth > 0 ? i18next.languages[0].split("-")[0] : "en"
+        },
         // https://material.io/resources/color/#!/?view.left=0&view.right=1&primary.color=2196F3&secondary.color=FFEE58
         theme: {
             themes: {
