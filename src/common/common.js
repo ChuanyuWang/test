@@ -134,5 +134,20 @@ module.exports = {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
         var param = window.location.search.substring(1).match(reg);
         return param ? decodeURI(param[2]) : null;
+    },
+    loadScript: function(src) {
+        return new Promise(function(resolve, reject) {
+            var s;
+            s = document.createElement('script');
+            s.type = 'text/javascript';
+            s.src = src;
+            // Dynamic scripts behave as "async" by default. Set it as false to respect the added order
+            s.async = false;
+            s.onload = resolve;
+            s.onerror = reject;
+            //s.addEventListener('load', resolve);
+            //s.addEventListener('error', reject);
+            document.head.appendChild(s);
+        });
     }
 };

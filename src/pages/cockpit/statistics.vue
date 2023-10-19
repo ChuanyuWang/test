@@ -21,6 +21,7 @@ v-container
 <script>
 
 var waldenTheme = require("./walden.json");
+var common = require("../../common/common.js");
 
 module.exports = {
   name: "statistics",
@@ -39,6 +40,17 @@ module.exports = {
   },
   computed: {},
   methods: {
+    init() {
+      echarts.registerTheme("walden", waldenTheme);
+      this.chart1 = echarts.init(
+        this.$refs.chart1,
+        "walden"
+      );
+      window.onresize = () => {
+        this.chart1.resize();
+      };
+      this.refresh();
+    },
     refresh() {
       // close menu
       this.menu = false;
@@ -144,16 +156,16 @@ module.exports = {
       return chartData;
     }
   },
+
   mounted() {
-    echarts.registerTheme("walden", waldenTheme);
-    this.chart1 = echarts.init(
-      this.$refs.chart1,
-      "walden"
-    );
-    window.onresize = () => {
-      this.chart1.resize();
-    };
-    this.refresh();
+    if (typeof echarts === "object") return this.init();
+    var result = common.loadScript("https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.min.js");
+    result.then((event) => {
+      this.init();
+    });
+    result.catch((error) => {
+      console.error("fail to load echarts")
+    });
   }
 }
 </script>
