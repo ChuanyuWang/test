@@ -187,7 +187,7 @@ router.get('/bycontent', async function(req, res, next) {
         this_month = req.query.month;
     }
     if (req.query.hasOwnProperty("duration")) {
-        duration = parseInt(req.query.duration || 0);
+        duration = parseInt(req.query.duration) || 0;
     }
 
     startOfMonth = moment(this_month);
@@ -274,7 +274,7 @@ router.get('/bytenant', async function(req, res, next) {
     endOfMonth = moment(this_month).endOf("month");
 
     if (req.query.hasOwnProperty("duration")) {
-        duration = parseInt(req.query.duration || 0);
+        duration = parseInt(req.query.duration) || 0;
     }
 
     let query = {
