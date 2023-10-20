@@ -7,18 +7,19 @@ v-container
     v-spacer
     v-col(cols="auto")
       v-autocomplete(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
-        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh" dense hide-details label="选择门店")
-    v-slider.align-center.me-3(v-model="duration" step="1" min="0" max="180" thumb-label="always" thumb-size="24" 
-      dense label="播放时长" hide-details)
-      template(v-slot:append)
-        v-text-field(v-model="duration" type="number" style="width: 60px" suffix="分")
-    span 选择月份:
+        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh" 
+        dense hide-details label="选择门店" prepend-icon="mdi-store")
     v-col(cols="auto")
-      v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
+      v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
+        suffix="分" hide-details dense prepend-icon="mdi-clock-time-eight")
+    v-col(cols="auto")
+      v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu" min-width="auto")
         template(v-slot:activator="{ on, attrs }")
-          v-text-field(solo dense readonly v-model="selectedMonth" hide-details prepend-icon="mdi-calendar" v-bind="attrs" v-on="on")
+          v-text-field(dense readonly v-model="selectedMonth" hide-details 
+            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择月份")
         v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh" min="2023-03")
-    v-btn(color='primary' @click="refresh") 刷新
+    v-col(cols="auto")
+      v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading")
 </template>
 
@@ -49,7 +50,7 @@ module.exports = {
         { text: '当年累计播放次数', value: 'year_total' }
       ],
       rawData: [],
-      tenantList: [],
+      tenantList: [{ tenantName: "全部", tenantId: "" }],
       selectedTenant: ""
     }
   },
@@ -61,7 +62,7 @@ module.exports = {
       this.isLoading = true;
       // refresh table data
       var request = axios.get("/api/dlktlogs/bycontent", {
-        params: { month: this.selectedMonth, duration: this.duration, tenantId: this.selectedTenant }
+        params: { month: this.selectedMonth, duration: this.duration, tenantId: this.selectedTenant || "" }
       });
       request.then((response) => {
         this.rawData = response.data || [];

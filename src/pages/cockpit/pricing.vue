@@ -4,10 +4,11 @@ v-container
     p 光影故事屋片源定价管理，
       |所有片源信息来源于叮聆课堂浏览日志，新片源可能不显示，已经下架或删除片源也会出现在列表中
   v-row(dense align="center" justify="end")
-    v-col(cols="auto")
-      v-autocomplete.ml-3(:items="contentList" item-text="itemName" dense item-value="contentId" clearable
-        @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" label="选择片源")
     v-spacer
+    v-col(cols="auto")
+      v-autocomplete.ml-3(:items="contentList" item-text="itemName" dense item-value="contentId" 
+        clearable @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" 
+        hide-details label="选择片源" prepend-icon="mdi-movie-roll")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="priceList" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
@@ -44,7 +45,7 @@ module.exports = {
     return {
       snackbar: false,
       message: "",
-      contentList: [],
+      contentList: [{ itemName: "全部", contentId: "" }],
       selectedContent: "",
       isLoading: true,
       headers: [
@@ -130,4 +131,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>

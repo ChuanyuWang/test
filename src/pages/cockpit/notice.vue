@@ -3,9 +3,11 @@ v-container
   v-subheader
     p 光影故事屋播放器端公告管理，发布公告后可以推送到所有播放器端
   v-row(dense align="center" justify="end")
-    v-btn.ml-2(color='primary' @click.stop="openCreateNoticeDialog()") 创建公告
+    v-col(cols="auto")
+      v-btn.ml-3(color='primary' @click.stop="openCreateNoticeDialog()") 创建公告
     v-spacer
-    v-btn(color='primary' @click.stop="refresh") 刷新
+    v-col(cols="auto")
+      v-btn(color='primary' @click.stop="refresh") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :server-items-length="totalNotice" 
     :loading="isLoading" no-data-text="没有公告" :options.sync="options" :footer-props="{'items-per-page-options': [10,20,50,100]}")
     template(v-slot:item.create_time="{ item }") {{ new Date(item.create_time).toLocaleDateString() }}

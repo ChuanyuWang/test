@@ -8,7 +8,8 @@ v-container
     v-col(cols="auto")
       v-autocomplete(:items="[2023, 2024, 2025, 2026, 2027]" dense
         v-model="selectedYear" @change="refresh" label="选择年份" hide-details)
-    v-btn(color='primary' :disabled="isLoading" @click="refresh") 刷新
+    v-col(cols="auto")
+      v-btn(color='primary' :disabled="isLoading" @click="refresh") 刷新
   v-row
     v-col(md="6")
       v-card(outlined)
@@ -170,4 +171,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>

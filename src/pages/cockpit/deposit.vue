@@ -4,10 +4,11 @@ v-container
     p 光影故事屋门店充值管理，
       |所有门店信息来源于叮聆课堂浏览日志，新增门店可能不显示，已经关闭的门店也会出现在列表中
   v-row(dense align="center" justify="end")
-    v-col(cols="auto")
-      v-autocomplete.ml-3(:items="tenantList" dense item-text="tenantName" item-value="tenantId" clearable
-        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh" hide-details label="选择门店")
     v-spacer
+    v-col(cols="auto")
+      v-autocomplete.ml-3(:items="tenantList" dense item-text="tenantName" item-value="tenantId" 
+        clearable @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh"
+        hide-details label="选择门店" prepend-icon="mdi-store")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
@@ -78,7 +79,7 @@ module.exports = {
     return {
       snackbar: false,
       message: "",
-      tenantList: [],
+      tenantList: [{ tenantName: "全部", tenantId: "" }],
       selectedTenant: "",
       isLoading: true,
       headers: [
