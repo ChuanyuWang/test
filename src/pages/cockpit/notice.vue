@@ -7,7 +7,7 @@ v-container
       v-btn.ml-3(color='primary' @click.stop="openCreateNoticeDialog()") 创建公告
     v-spacer
     v-col(cols="auto")
-      v-btn(color='primary' @click.stop="refresh") 刷新
+      v-btn(color='primary' @click.stop="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :server-items-length="totalNotice" 
     :loading="isLoading" no-data-text="没有公告" :options.sync="options" :footer-props="{'items-per-page-options': [10,20,50,100]}")
     template(v-slot:item.create_time="{ item }") {{ new Date(item.create_time).toLocaleDateString() }}

@@ -10,7 +10,7 @@ v-container
         clearable @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" 
         hide-details label="选择片源" prepend-icon="mdi-video-vintage")
     v-col(cols="auto")
-      v-btn(color='primary' @click="refresh") 刷新
+      v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="priceList" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
     template(v-slot:item.price="{ item }") 
       div(v-if="isNaN(item.price)") <i>未设置</i>

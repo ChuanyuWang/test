@@ -10,7 +10,7 @@ v-container
         clearable @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh"
         hide-details label="选择门店" prepend-icon="mdi-store")
     v-col(cols="auto")
-      v-btn(color='primary' @click="refresh") 刷新
+      v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.actions="{ item }")

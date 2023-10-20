@@ -19,7 +19,7 @@ v-container
             prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择月份")
         v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh" min="2023-03")
     v-col(cols="auto")
-      v-btn(color='primary' @click="refresh") 刷新
+      v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading")
 </template>
 
