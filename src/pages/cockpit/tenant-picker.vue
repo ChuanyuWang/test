@@ -24,8 +24,7 @@ module.exports = {
   },
   data: function() {
     return {
-      tenantList: [{ tenantName: "全部", tenantId: "" }],
-      selectedTenant: ""
+      tenantList: [{ tenantName: "全部", tenantId: "" }]
     };
   },
   mounted: function() { },
