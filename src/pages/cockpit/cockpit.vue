@@ -40,7 +40,7 @@ module.exports = {
     return {
       selectedItem: 0,
       menuItems: [
-        { name: "片源统计", icon: "mdi-movie-open", value: "/" },
+        { name: "片源统计", icon: "mdi-video-vintage", value: "/" },
         { name: "门店统计", icon: "mdi-store", value: "/store" },
         { name: "分析功能", icon: "mdi-chart-bar", value: "/statistics" },
         { name: "数据查询", icon: "mdi-database-search", value: "/query" },

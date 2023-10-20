@@ -8,7 +8,7 @@ v-container
     v-col(cols="auto")
       v-autocomplete(:items="contentList" item-text="itemName" item-value="contentId" clearable
         @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" 
-        dense hide-details label="选择片源" prepend-icon="mdi-movie-roll")
+        dense hide-details label="选择片源" prepend-icon="mdi-video-vintage")
     v-col(cols="auto")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于"
         suffix="分" hide-details dense prepend-icon="mdi-clock-time-eight")
