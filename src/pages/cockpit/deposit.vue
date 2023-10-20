@@ -6,9 +6,7 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
-      v-autocomplete.ml-3(:items="tenantList" dense item-text="tenantName" item-value="tenantId" 
-        clearable @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh"
-        hide-details label="选择门店" prepend-icon="mdi-store")
+      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
@@ -72,9 +70,13 @@ v-container
 </template>
 
 <script>
+var tenantPicker = require("./tenant-picker.vue").default;
 
 module.exports = {
   name: "deposit",
+  components: {
+    tenantPicker
+  },
   data() {
     return {
       snackbar: false,

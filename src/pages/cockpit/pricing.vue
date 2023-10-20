@@ -6,7 +6,7 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
-      v-autocomplete.ml-3(:items="contentList" item-text="itemName" dense item-value="contentId" 
+      v-autocomplete(:items="contentList" item-text="itemName" dense item-value="contentId" 
         clearable @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" 
         hide-details label="选择片源" prepend-icon="mdi-video-vintage")
     v-col(cols="auto")

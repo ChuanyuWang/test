@@ -6,9 +6,7 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
-      v-autocomplete(:items="tenantList" item-text="tenantName" item-value="tenantId" clearable
-        @focus.once="fetchTenantList" v-model="selectedTenant" @change="refresh" 
-        dense hide-details label="选择门店" prepend-icon="mdi-store")
+      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
     v-col(cols="auto")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
         suffix="分" hide-details dense prepend-icon="mdi-clock-time-eight")
@@ -24,9 +22,13 @@ v-container
 </template>
 
 <script>
+var tenantPicker = require("./tenant-picker.vue").default;
 
 module.exports = {
   name: "home",
+  components: {
+    tenantPicker
+  },
   data() {
     return {
       yesterday: moment().subtract(1, 'day'),
