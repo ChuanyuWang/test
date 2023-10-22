@@ -11,7 +11,7 @@ v-container
         dense hide-details label="选择片源" prepend-icon="mdi-video-vintage")
     v-col(cols="auto")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于"
-        suffix="分" hide-details dense prepend-icon="mdi-clock-time-eight")
+        suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
     v-col(cols="auto")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu" min-width="auto")
         template(v-slot:activator="{ on, attrs }")
