@@ -14,7 +14,7 @@ var pricing = require('./pricing.vue').default;
 var deposit = require('./deposit.vue').default;
 
 // Translation provided by Vuetify (javascript)
-var zhHans = require('./zh-Hans');
+var zhHans = require('../../locales/vuetify/zh-Hans');
 
 // DOM Ready =============================================================
 init(function() {
