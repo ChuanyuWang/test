@@ -41,12 +41,12 @@ module.exports.checkUser = function(userName) {
     }
 };
 
-module.exports.checkTenant = function(tenantName) {
+module.exports.checkUserTenant = function(tenantName) {
     return function(req, res, next) {
-        if (!req.tenant || !req.tenant.name) {
+        if (req.isUnauthenticated()) {
             req.flash('error', '用户未登录或连接超时');
             res.redirect('/');
-        } else if (req.teant.name !== tenantName) {
+        } else if (req.user.tenant !== tenantName) {
             res.redirect('/');
         } else {
             next();
