@@ -86,8 +86,8 @@ router.post('/query', util.validateSign, async function(req, res, next) {
 
 // below API are avaiable to internal user
 router.use(function(req, res, next) {
-    // only accessible to user admin@bqsq
-    if (req.isAuthenticated() && req.user.username === "admin@bqsq") {
+    // only accessible to tenant bqsq-admin
+    if (req.isAuthenticated() && req.user.tenant === "bqsq-admin") {
         next();
     } else {
         res.status(401).send('Unauthorized Request');
