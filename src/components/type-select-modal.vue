@@ -9,7 +9,7 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 
           |{{item.name}} 
           span.label.label-primary(v-show="item.visible!==false" style="opacity:0.8") 开放预约
   template(v-slot:helpText)
-    p.small(style='color:#777;float:left;margin-top:7px') 若需要同时选择两个或多个课程，请创建多份合约，一份合约对应一种课程
+    p.small(style='color:#777;float:left;margin-top:7px') 若需要选择两个或多个课程，请创建多份合约，一份合约对应一种课程
 </template>
 
 <script>
