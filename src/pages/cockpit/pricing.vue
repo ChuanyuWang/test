@@ -51,7 +51,7 @@ module.exports = {
       headers: [
         { text: '片源ID', value: 'contentId', sortable: false },
         { text: '片源名称', value: 'itemName', sortable: false },
-        { text: '价格', value: 'price', sortable: false }
+        { text: '价格', value: 'price', sortable: true }
       ],
       priceList: [],
       editedItem: {},

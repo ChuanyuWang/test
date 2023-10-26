@@ -87,7 +87,7 @@ module.exports = {
       headers: [
         { text: '门店ID', value: 'tenantId', sortable: false },
         { text: '门店名称', value: 'tenantName', sortable: false },
-        { text: '累计充值金额（含赠送）', value: 'total', sortable: false },
+        { text: '累计充值金额（含赠送）', value: 'total', sortable: true },
         { text: '操作', value: 'actions', sortable: false }
       ],
       rawData: [],
