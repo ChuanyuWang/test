@@ -31,11 +31,14 @@ if (app.get('env') === 'production') {
         server.close(function(err) {
             if (err) {
                 console.error(err)
-                process.exit(1)
+                console.log("...app end with exit code 1");
+                return process.exit(1)
             }
+            console.log("server is closed successfully");
 
             // close database connection and exit with success (0 code)
             app.stop();
+            console.log("...app end");
             process.exit(0)
         })
     })

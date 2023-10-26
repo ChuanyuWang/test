@@ -83,14 +83,22 @@ process.on('SIGINT', function() {
     // close the database connection
     if (mongoClient) {
         mongoClient.close(err => {
-            if (err) return console.error(err);
+            if (err) {
+                console.error(err);
+                return process.exit(1);
+            }
             console.log(`database connection is closed.`);
+
+            // close database connection and exit with success (0 code)
+            console.log("...worker end");
+            process.exit();
         });
         mongoClient = null;
+    } else {
+        // close database connection and exit with success (0 code)
+        console.log("...worker end");
+        process.exit();
     }
-
-    // close database connection and exit with success (0 code)
-    console.log("...worker end");
 })
 
 function connectionURI(database, config) {
