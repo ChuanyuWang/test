@@ -211,7 +211,6 @@ div.container
 </template>
 <script>
 
-var type_select_modal = require("../../components/type-select-modal.vue").default;
 var messageAlert = require("../../components/message-alert.vue").default;
 var serviceUtil = require("../../services/util");
 var commonUtil = require("../../common/common");
@@ -229,7 +228,6 @@ module.exports = {
   },
   components: {
     "BootstrapTable": BootstrapTable,
-    "type-select-modal": type_select_modal,
     "contract-comments": contractComments,
     "contract-history": contractHistory,
     "modify-contract-dialog": modifyContractDialog,
