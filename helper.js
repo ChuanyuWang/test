@@ -41,6 +41,19 @@ module.exports.checkUser = function(userName) {
     }
 };
 
+module.exports.checkTenant = function(tenantName) {
+    return function(req, res, next) {
+        if (!req.tenant || !req.tenant.name) {
+            req.flash('error', '用户未登录或连接超时');
+            res.redirect('/');
+        } else if (req.teant.name !== tenantName) {
+            res.redirect('/');
+        } else {
+            next();
+        }
+    }
+};
+
 module.exports.hasTenant = function(req, res, next) {
     if (!req.tenant || !req.tenant.name) {
         let error = new Error("tenant is not defined");
