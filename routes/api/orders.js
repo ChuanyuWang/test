@@ -54,7 +54,7 @@ var NORMAL_FIELDS = {
 
 const wxpay = bent('https://api.mch.weixin.qq.com/pay', 'POST', 200);
 
-router.use(helper.checkTenant);
+router.use(helper.hasTenant);
 
 router.post('/', validateCreateOrderRequest, findMember, findClass, async function(req, res, next) {
     //TODO, find existing notpay order

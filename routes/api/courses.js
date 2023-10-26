@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongojs = require('mongojs');
 const { ObjectId } = require("mongodb");
-const { isAuthenticated, checkTenant, requireRole } = require('../../helper');
+const { isAuthenticated, hasTenant: checkTenant, requireRole } = require('../../helper');
 const { check, findAvailableContract } = require('./lib/reservation');
 const { ParamError, RuntimeError, asyncMiddlewareWrapper } = require('./lib/basis');
 

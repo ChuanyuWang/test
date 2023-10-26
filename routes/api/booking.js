@@ -7,7 +7,7 @@ const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { ParamError, asyncMiddlewareWrapper, RuntimeError } = require("./lib/basis");
 
-router.use(helper.checkTenant);
+router.use(helper.hasTenant);
 
 /**
  * Get the member list who booked the class

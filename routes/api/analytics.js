@@ -7,7 +7,7 @@ const moment = require('moment');
 
 
 /// Below APIs are visible to authenticated users only
-router.use(helper.checkTenant, helper.isAuthenticated);
+router.use(helper.hasTenant, helper.isAuthenticated);
 
 router.get('/consumption', function(req, res, next) {
     //[Default] get the current year consumption by month

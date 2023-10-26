@@ -41,7 +41,7 @@ module.exports.checkUser = function(userName) {
     }
 };
 
-exports.checkTenant = function(req, res, next) {
+module.exports.hasTenant = function(req, res, next) {
     if (!req.tenant || !req.tenant.name) {
         let error = new Error("tenant is not defined");
         error.status = 400;
