@@ -1,5 +1,5 @@
 <template lang="pug">
-modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 选择课程
+modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 选择一个课程
   template(v-slot:body)
     a.btn.btn-sm.btn-success.mb-7(href='../setting?activetab=types',target='_blank') 添加课程类型
     template(v-for='item in types')
@@ -8,6 +8,8 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 
           input(type="radio",name="typeOptions",:value="item.id",v-model="selectedTypeId")
           |{{item.name}} 
           span.label.label-primary(v-show="item.visible!==false" style="opacity:0.8") 开放预约
+  template(v-slot:helpText)
+    p.small(style='color:#777;float:left;margin-top:7px') 若需要同时选择两个或多个课程，请创建多份合约，一份合约对应一种课程
 </template>
 
 <script>
