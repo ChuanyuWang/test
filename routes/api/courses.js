@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongojs = require('mongojs');
 const { ObjectId } = require("mongodb");
-const { isAuthenticated, hasTenant: checkTenant, requireRole } = require('../../helper');
+const { isAuthenticated, hasTenant, requireRole } = require('../../helper');
 const { check, findAvailableContract } = require('./lib/reservation');
 const { ParamError, RuntimeError, asyncMiddlewareWrapper } = require('./lib/basis');
 
@@ -88,7 +88,7 @@ router.get('/:courseID/members',
 
 const postM = asyncMiddlewareWrapper("add course's members fails");
 router.post('/:courseID/members',
-    checkTenant,
+    hasTenant,
     postM(getAddedMembers),
     postM(addMembers2Course),
     postM(getClasses),
