@@ -25,7 +25,7 @@ div.container
         div.progress-bar.progress-bar-primary(:style="consumedWidth")
         div.progress-bar.progress-bar-success(:style="plannedWidth")
       div.d-flex(style="justify-content:space-between")
-        span.text-primary 消{{contract.credit - contract.actualRemaining | toFixed1}}
+        span.text-primary 消{{consumedTotalCredit - contract.unStartedClassCredit | toFixed1}}
         span.text-success 排{{contract.unStartedClassCredit | toFixed1}}
         span.text-muted 余{{remainingCredit | toFixed1}}
   div.row.form-condensed
@@ -73,7 +73,7 @@ div.container
         div.form-group
           label.col-xs-6.col-sm-5.col-md-4.control-label 剩余课时:
           div.col-xs-6.col-sm-7.col-md-8
-            p.form-control-static {{contract.actualRemaining | toFixed1}}课时
+            p.form-control-static {{actualRemaining | toFixed1}}课时
               a.small.ms-3(style="color: #777" data-toggle="tooltip" title="剩余课时=排+余; 是指可用课时和已经排课但尚未开始的课时")
                 i.glyphicon.glyphicon-info-sign
         div.form-group
@@ -356,20 +356,23 @@ module.exports = {
       return Math.round((this.contract.total - this.contract.discount) * this.remainingCredit / this.contract.credit) / 100;
     },
     consumedTotalCredit() {
-      return this.contract.consumedCredit + this.contract.expendedCredit || 0;
+      return this.contract.consumedCredit + (this.contract.expendedCredit || 0);
     },
     consumedFee() {
       return Math.round((this.contract.total - this.contract.discount) * this.consumedTotalCredit / this.contract.credit) / 100;
     },
+    actualRemaining() {
+      return this.remainingCredit + (this.contract.unStartedClassCredit || 0);
+    },
     consumedWidth() {
       return {
-        width: (this.contract.credit - this.contract.actualRemaining) * 100 / this.contract.credit + "%",
+        width: (this.consumedTotalCredit - (this.contract.unStartedClassCredit || 0)) * 100 / this.contract.credit + "%",
         "min-width": "1rem"
       }
     },
     plannedWidth() {
       return {
-        width: (this.contract.actualRemaining - this.remainingCredit) * 100 / this.contract.credit + "%"
+        width: (this.contract.unStartedClassCredit || 0) * 100 / this.contract.credit + "%"
       }
     },
     isExpired() {
@@ -492,7 +495,8 @@ module.exports = {
     modifyContract(updatedContract) {
       var request = serviceUtil.patchJSON("/api/contracts/" + this.contractId, updatedContract);
       request.done((data, textStatus, jqXHR) => {
-        this.contract = data || {};
+        // keep addtional fields during update, e.g. unStartedClassCredit
+        Object.assign(this.contract, data || {});
         this.$refs.historySection.refresh();
         this.$refs.messager.showSuccessMessage("修改完成");
       });
@@ -509,7 +513,6 @@ module.exports = {
       }
     },
     showAndRefreshClassesSection(e) {
-      console.log(e);
       $('#classesSection').show(600);
       this.$refs.classesTable.refresh({ url: '/api/classes' });
     },
