@@ -96,11 +96,9 @@ div.row(style="margin-top:15px")
                   td {{user.role || 'user'}} 
                     span.text-info.glyphicon.glyphicon-edit(@click="setRole(user.username)" style="cursor:pointer")
                   td
-                    a.text-danger
-                      i.glyphicon.glyphicon-remove
+                    span.text-danger.glyphicon.glyphicon-remove(style="cursor:pointer")
                   td
-                    a.text-info(@click='setPassword(user.username)')
-                      i.glyphicon.glyphicon-edit
+                    span.text-info.glyphicon.glyphicon-edit(@click='setPassword(user.username)' style="cursor:pointer")
                   td
                     input(type='checkbox',v-model='user.active',style="margin:0",@change='updateStatus(user)')
         div.form-group
