@@ -93,7 +93,8 @@ div.row(style="margin-top:15px")
                 tr(v-for='user in users')
                   td {{user.username}}
                   td {{user.displayName}}
-                  td {{user.role || 'user'}}
+                  td {{user.role || 'user'}} 
+                    span.text-info.glyphicon.glyphicon-edit(@click="setRole(user.username)" style="cursor:pointer")
                   td
                     a.text-danger
                       i.glyphicon.glyphicon-remove
@@ -257,6 +258,43 @@ module.exports = {
           request.done(function(data, textStatus, jqXHR) {
             console.log(data);
             alert("Set user password successfully");
+          });
+        }
+      });
+    },
+    setRole(username) {
+      bootbox.prompt({
+        size: "small",
+        title: "Set new role",
+        inputType: "select",
+        inputOptions: [{
+          text: 'choose a role...',
+          value: '',
+        }, {
+          text: 'admin',
+          value: 'admin',
+        }, {
+          text: 'user',
+          value: 'user',
+        }],
+        callback: function(result) {
+          /* result = String containing user input if OK clicked or null if Cancel clicked */
+          if (!result) return;
+          var request = $.ajax("/admin/api/user/" + username, {
+            type: "PATCH",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+              role: result.trim()
+            }),
+            dataType: "json"
+          });
+          request.fail(function(jqXHR, textStatus, errorThrown) {
+            console.error("set user role fails", jqXHR);
+            alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
+          });
+          request.done(function(data, textStatus, jqXHR) {
+            console.log(data);
+            alert("Set user role successfully");
           });
         }
       });

@@ -127,6 +127,11 @@ router.patch('/api/user/:userID', isAuthenticated, async function(req, res, next
             sanitizedUser.active = req.body.active;
             await sanitizedUser.save();
             return res.status(200).json({ message: `active is set to "${req.body.active}" ` });
+        } else if (typeof (req.body.role) === "string") {
+            // update new role
+            sanitizedUser.role = req.body.role;
+            await sanitizedUser.save();
+            return res.status(200).json({ message: `role is set to "${req.body.role}" ` });
         }
     } catch (err) {
         let error = new Error(`Fail to update user ${req.params.userID}`);
