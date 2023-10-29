@@ -6,6 +6,7 @@ const { RuntimeError, ParamError, BaseError, BadRequestError } = require('./lib/
 const moment = require('moment');
 const { SchemaValidator } = require("./lib/schema_validator");
 const util = require('./lib/util');
+const { hasRole } = require('../../helper');
 
 const NoticeSchema = new SchemaValidator({
     status: {
@@ -94,7 +95,7 @@ router.use(function(req, res, next) {
     }
 });
 
-router.post('/', validateNotice, async function(req, res, next) {
+router.post('/', hasRole('admin'), validateNotice, async function(req, res, next) {
     let notice = {
         status: "open",
         title: req.body.title,
@@ -209,7 +210,7 @@ router.get('/', async function(req, res, next) {
     }
 });
 
-router.patch('/:noticeID', async function(req, res, next) {
+router.patch('/:noticeID', hasRole('admin'), async function(req, res, next) {
     try {
         if (!ObjectId.isValid(req.params.noticeID)) return next(new BadRequestError(`notice ID ${req.params.noticeID} is invalid`));
 
@@ -253,7 +254,7 @@ router.patch('/:noticeID', async function(req, res, next) {
     }
 });
 
-router.delete('/:noticeID', async function(req, res, next) {
+router.delete('/:noticeID', hasRole('admin'), async function(req, res, next) {
     try {
         if (!ObjectId.isValid(req.params.noticeID)) return next(new BadRequestError(`notice ID ${req.params.noticeID} is invalid`));
         let config_db = await db_utils.connect("config");

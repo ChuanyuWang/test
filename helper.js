@@ -65,7 +65,7 @@ module.exports.hasTenant = function(req, res, next) {
 };
 
 /**
- * Return an Express middleware to check user is authenticated with sepcific role. 
+ * Return an Express middleware to check user is authenticated with sepcific role and access according tenant
  * Continue to next middleware if user is authenticated with sepcific role;
  * Otherwise respond with error message and status 403.
  * 
@@ -91,16 +91,27 @@ module.exports.requireRole = function(role) {
 };
 
 /**
- * Check if the user of request has specific role
+ * Return an Express middleware to check user is authenticated with sepcific role. 
+ * Continue to next middleware if user is authenticated with sepcific role;
+ * Otherwise respond with error message and status 403.
  * 
- * @param {Object} req http request
  * @param {String} role user role
  */
-module.exports.hasRole = function(req, role) {
-    if (req.isAuthenticated() && req.user.role === role) {
-        return true;
-    }
-    return false;
+module.exports.hasRole = function(role) {
+    return function(req, res, next) {
+        if (req.isUnauthenticated()) {
+            var err = new Error("Unauthorized Request");
+            err.status = 401;
+            next(err);
+        } else if (req.user.role === role)
+            // success
+            next();
+        else {
+            var err = new Error("没有权限执行此操作");
+            err.status = 403;
+            next(err);
+        }
+    };
 };
 
 /**

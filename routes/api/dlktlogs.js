@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db_utils = require('../../server/databaseManager');
 const { InternalServerError, ParamError } = require('./lib/basis');
+const { hasRole } = require('../../helper');
 const moment = require('moment');
 const { LOGS_SCHEMA } = require('../../server/logFetcher');
 const util = require('./lib/util');
@@ -439,7 +440,7 @@ router.get('/query', async function(req, res, next) {
     }
 });
 
-router.patch('/tasks', async function(req, res, next) {
+router.patch('/tasks', hasRole('admin'), async function(req, res, next) {
     let this_date = moment().subtract(1, 'day').startOf('day');
     if (!req.body.hasOwnProperty("date")) {
         return next(new ParamError());
@@ -517,7 +518,7 @@ router.get('/prices', async function(req, res, next) {
 /**
  * {_fromContentId: 50524832, price: 5000, modify_time: "2023-10-14T12:11:41.000Z"}
  */
-router.put('/prices/:contentID', async function(req, res, next) {
+router.put('/prices/:contentID', hasRole('admin'), async function(req, res, next) {
     let priceDoc = {
         _fromContentId: parseInt(req.params.contentID),
         price: parseInt(req.body.price ?? 0), // expect 0.01 ==> 1
@@ -617,7 +618,7 @@ router.get('/deposits/:tenantID', async function(req, res, next) {
  *    comment: String
  * }
  */
-router.post('/deposits/:tenantID', async function(req, res, next) {
+router.post('/deposits/:tenantID', hasRole('admin'), async function(req, res, next) {
     if (["cash", "bankcard", "mobilepayment"].indexOf(req.body.method) === -1) {
         return next(new ParamError(`pay method ${req.body.method} not valid`));
     }
