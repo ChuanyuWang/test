@@ -79,8 +79,11 @@ module.exports = {
             price: value.prices.length > 0 ? value.prices[0].price : NaN
           }
         });
-      });
-      request.finally(() => {
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "获取价格失败";
+        this.snackbar = true;
+      }).finally(() => {
         this.isLoading = false;
       });
     },
@@ -106,8 +109,11 @@ module.exports = {
         }
         this.message = "价格修改成功";
         this.snackbar = true;
-      });
-      request.finally(() => {
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "价格修改失败";
+        this.snackbar = true;
+      }).finally(() => {
         this.dialog = false;
         this.dialogLoading = false;
       });
@@ -123,6 +129,7 @@ module.exports = {
         });
         this.contentList.push({ itemName: "全部", contentId: "" })
       });
+      // TODO, catch the exception
     }
   },
   mounted() {

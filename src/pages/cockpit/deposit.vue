@@ -164,8 +164,11 @@ module.exports = {
             total: value.deposits.length > 0 ? value.deposits[0].total : 0
           }
         });
-      });
-      request.finally(() => {
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "刷新门店失败";
+        this.snackbar = true;
+      }).finally(() => {
         this.isLoading = false;
       });
     },
@@ -198,8 +201,11 @@ module.exports = {
         }
         this.message = "门店充值成功";
         this.snackbar = true;
-      });
-      request.finally(() => {
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "门店充值失败";
+        this.snackbar = true;
+      }).finally(() => {
         this.dialog1 = false;
         this.dialog1_loading = false;
       });
@@ -211,21 +217,12 @@ module.exports = {
       var request = axios.get("/api/dlktlogs/deposits/" + item.tenantId, { params: {} });
       request.then((response) => {
         this.records = response.data || [];
-      });
-      request.finally(() => {
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "查看历史记录失败";
+        this.snackbar = true;
+      }).finally(() => {
         this.isLoadingRecords = false;
-      });
-    },
-    fetchTenantList() {
-      var request = axios.get("/api/dlktlogs/tenant/list");
-      request.then((response) => {
-        this.tenantList = (response.data || []).map((value, index, array) => {
-          return {
-            tenantName: value.tenantName,
-            tenantId: value._id
-          }
-        });
-        this.tenantList.push({ tenantName: "全部", tenantId: "" })
       });
     }
   },

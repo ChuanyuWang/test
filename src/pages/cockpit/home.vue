@@ -73,18 +73,6 @@ module.exports = {
       }).finally(() => {
         this.isLoading = false;
       });
-    },
-    fetchTenantList() {
-      var request = axios.get("/api/dlktlogs/tenant/list");
-      request.then((response) => {
-        this.tenantList = (response.data || []).map((value, index, array) => {
-          return {
-            tenantName: value.tenantName,
-            tenantId: value._id
-          }
-        });
-        this.tenantList.push({ tenantName: "全部", tenantId: "" })
-      });
     }
   },
   mounted() {
