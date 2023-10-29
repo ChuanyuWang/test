@@ -42,6 +42,7 @@ module.exports = {
         });
         this.tenantList.push({ tenantName: "全部", tenantId: "" })
       });
+      // TODO, catch the exception
     }
   }
 };

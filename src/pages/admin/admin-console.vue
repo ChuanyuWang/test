@@ -291,6 +291,7 @@ module.exports = {
             alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
           });
           request.done(function(data, textStatus, jqXHR) {
+            // TODO, update the user table
             console.log(data);
             alert("Set user role successfully");
           });
@@ -311,6 +312,7 @@ module.exports = {
         alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
       request.done(function(data, textStatus, jqXHR) {
+        // TODO, update the user table
         console.log(data);
         alert("Set user status successfully");
       });

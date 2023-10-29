@@ -161,6 +161,7 @@ module.exports = {
         this.snackbar = true;
         this.refresh();
       }).catch((error) => {
+        // TODO, append the error message returned from server
         this.message = "创建公告失败";
         this.snackbar = true;
       });
@@ -180,6 +181,7 @@ module.exports = {
         this.snackbar = true;
         this.refresh();
       }).catch((error) => {
+        // TODO, append the error message returned from server
         this.message = "修改公告失败";
         this.snackbar = true;
       });
@@ -193,6 +195,7 @@ module.exports = {
         this.snackbar = true;
         this.refresh();
       }).catch((error) => {
+        // TODO, append the error message returned from server
         this.message = "删除公告失败";
         this.snackbar = true;
       });
