@@ -94,7 +94,7 @@ div.row(style="margin-top:15px")
                   td {{user.username}}
                   td {{user.displayName}}
                   td {{user.role || 'user'}} 
-                    span.text-info.glyphicon.glyphicon-edit(@click="setRole(user.username)" style="cursor:pointer")
+                    span.text-info.glyphicon.glyphicon-edit(@click="setRole(user)" style="cursor:pointer")
                   td
                     span.text-danger.glyphicon.glyphicon-remove(style="cursor:pointer")
                   td
@@ -260,7 +260,7 @@ module.exports = {
         }
       });
     },
-    setRole(username) {
+    setRole(user) {
       bootbox.prompt({
         size: "small",
         title: "Set new role",
@@ -278,7 +278,7 @@ module.exports = {
         callback: function(result) {
           /* result = String containing user input if OK clicked or null if Cancel clicked */
           if (!result) return;
-          var request = $.ajax("/admin/api/user/" + username, {
+          var request = $.ajax("/admin/api/user/" + user.username, {
             type: "PATCH",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify({
@@ -291,8 +291,8 @@ module.exports = {
             alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
           });
           request.done(function(data, textStatus, jqXHR) {
-            // TODO, update the user table
             console.log(data);
+            user.role = result.trim();
             alert("Set user role successfully");
           });
         }
@@ -312,7 +312,6 @@ module.exports = {
         alert(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);
       });
       request.done(function(data, textStatus, jqXHR) {
-        // TODO, update the user table
         console.log(data);
         alert("Set user status successfully");
       });
