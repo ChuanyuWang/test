@@ -430,7 +430,8 @@ router.get('/query', async function(req, res, next) {
             "_timestamp": {
                 $gte: startOfDay.toDate(),
                 $lt: endOfDay.toDate()
-            }
+            },
+            "tenantId": req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
         });
         let docs = await cursor.toArray();
 

@@ -8,6 +8,8 @@ v-container
       v-btn.ml-3(@click="reload") 重新提取当天日志
     v-spacer
     v-col(cols="auto")
+      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
+    v-col(cols="auto")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(dense readonly v-model="selectedDate" hide-details 
@@ -26,8 +28,13 @@ v-container
 
 <script>
 
+var tenantPicker = require("./tenant-picker.vue").default;
+
 module.exports = {
   name: "query",
+  components: {
+    tenantPicker
+  },
   data() {
     return {
       snackbar: false,
@@ -45,7 +52,8 @@ module.exports = {
         { text: '播放时长(秒)', value: 'duration' },
         { text: '使用人数', value: 'attendance' }
       ],
-      rawData: []
+      rawData: [],
+      selectedTenant: ""
     }
   },
   computed: {},
@@ -56,7 +64,12 @@ module.exports = {
       this.isLoading = true;
       var fromDate = moment(this.selectedDate).toISOString();
       // refresh table data
-      var request = axios.get("/api/dlktlogs/query", { params: { from: fromDate } });
+      var request = axios.get("/api/dlktlogs/query", {
+        params: {
+          from: fromDate,
+          tenantId: this.selectedTenant || ""
+        }
+      });
       request.then((response) => {
         this.rawData = response.data || [];
       });
@@ -110,4 +123,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
