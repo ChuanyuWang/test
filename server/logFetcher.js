@@ -101,7 +101,8 @@ async function proceedData(mongoClient, task, data) {
         if (!item.fromContentId) {
             item.fromContentId = item.itemId;
         }
-        item._timestamp = new Date(item.behaviorTime);
+        // append the time zone for parsing
+        item._timestamp = new Date(item.behaviorTime + "+0800");
         // filter logs from 光影 client and behavior type is 3 (stands for open)
         return item.clientAppId && item.bhvType === 3;
     });
