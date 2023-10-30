@@ -52,7 +52,6 @@ module.exports = {
         { text: '当年累计播放次数', value: 'year_total' }
       ],
       rawData: [],
-      tenantList: [{ tenantName: "全部", tenantId: "" }],
       selectedTenant: ""
     }
   },

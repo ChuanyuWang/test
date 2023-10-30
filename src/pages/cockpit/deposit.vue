@@ -81,7 +81,6 @@ module.exports = {
     return {
       snackbar: false,
       message: "",
-      tenantList: [{ tenantName: "全部", tenantId: "" }],
       selectedTenant: "",
       isLoading: true,
       headers: [
