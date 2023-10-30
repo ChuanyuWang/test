@@ -40,10 +40,17 @@ init(function() {
         next();
     });
 
+    vuetify_lang = "en";
+    if (i18next.languages.length > 0) {
+        var lang = i18next.languages[0].split("-")[0];
+        // zhHans indicate Chinese simplified in vuetify; zhHant indicate Chinese Traditional
+        vuetify_lang = lang === "zh" ? "zhHans" : lang;
+    }
+
     var vuetify = new Vuetify({
         lang: {
             locales: { zhHans },
-            current: i18next.languages.langth > 0 ? i18next.languages[0].split("-")[0] : "en"
+            current: vuetify_lang
         },
         // https://material.io/resources/color/#!/?view.left=0&view.right=1&primary.color=2196F3&secondary.color=FFEE58
         theme: {
