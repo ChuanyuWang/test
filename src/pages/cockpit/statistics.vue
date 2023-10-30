@@ -6,6 +6,8 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
+      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
+    v-col(cols="auto")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
         suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
     v-col(cols="auto")
@@ -26,9 +28,13 @@ v-container
 
 var waldenTheme = require("./walden.json");
 var common = require("../../common/common.js");
+var tenantPicker = require("./tenant-picker.vue").default;
 
 module.exports = {
   name: "statistics",
+  components: {
+    tenantPicker
+  },
   data() {
     return {
       chart1: null,
@@ -38,6 +44,7 @@ module.exports = {
       yesterday: moment().subtract(1, 'day'),
       menu: false,
       selectedYear: new Date().getFullYear(),
+      selectedTenant: "",
       duration: 10,
       isLoading: true,
       rawData: []
@@ -71,7 +78,8 @@ module.exports = {
       var request = axios.get("/api/dlktlogs//bydate", {
         params: {
           year: this.selectedYear,
-          duration: this.duration
+          duration: this.duration,
+          tenantId: this.selectedTenant
         }, signal: this.controller1.signal
       });
       request.then((response) => {
