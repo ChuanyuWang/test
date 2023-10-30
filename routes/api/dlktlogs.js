@@ -359,7 +359,7 @@ router.get('/bydate', async function(req, res, next) {
     endOfDate = queryDate.endOf("year");
 
     if (req.query.hasOwnProperty("duration")) {
-        duration = parseInt(req.query.duration || 0);
+        duration = parseInt(req.query.duration) || 0;
     }
 
     let query = {

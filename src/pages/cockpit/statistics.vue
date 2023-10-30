@@ -6,7 +6,10 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
-      v-autocomplete(:items="[2023, 2024, 2025, 2026, 2027]" dense
+      v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
+        suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
+    v-col(cols="auto")
+      v-autocomplete(:items="[2023, 2024, 2025, 2026, 2027]" dense prepend-icon="mdi-calendar"
         v-model="selectedYear" @change="refresh" label="选择年份" hide-details)
     v-col(cols="auto")
       v-btn(color='primary' :disabled="isLoading" @click="refresh") 刷新
@@ -35,6 +38,7 @@ module.exports = {
       yesterday: moment().subtract(1, 'day'),
       menu: false,
       selectedYear: new Date().getFullYear(),
+      duration: 10,
       isLoading: true,
       rawData: []
     }
@@ -64,10 +68,15 @@ module.exports = {
       if (this.controller1) this.controller1.abort("abort by user");
       else this.controller1 = new AbortController();
       // refresh table data
-      var request = axios.get("/api/dlktlogs//bydate", { params: { year: this.selectedYear }, signal: this.controller1.signal });
+      var request = axios.get("/api/dlktlogs//bydate", {
+        params: {
+          year: this.selectedYear,
+          duration: this.duration
+        }, signal: this.controller1.signal
+      });
       request.then((response) => {
         this.rawData = response.data || [];
-        this.drawChart1(this.rawData, this.selectedYear, "月");
+        this.drawChart1(this.rawData, this.selectedYear, "月", this.duration);
       });
       request.finally(() => {
         delete this.controller1;
@@ -75,14 +84,14 @@ module.exports = {
         this.chart1.hideLoading();
       });
     },
-    drawChart1: function(rawData, year, unitName) {
+    drawChart1: function(rawData, year, unitName, duration) {
       // prepare the data
       var data = this.assembleOneSeriesData(rawData, unitName);
       // define the options of charts
       var option = {
         title: {
           text: (this.unit === 'year' ? "每" : year) + "年播放次数统计",
-          subtext: "仅统计播放时间大于10分钟的次数",
+          subtext: "仅统计播放时间大于" + duration + "分钟的次数",
           top: "top",
           left: "center"
         },
