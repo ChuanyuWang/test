@@ -101,8 +101,8 @@ async function proceedData(mongoClient, task, data) {
         if (!item.fromContentId) {
             item.fromContentId = item.itemId;
         }
-        // append the time zone for parsing
-        item._timestamp = new Date(item.behaviorTime + "+0800");
+        // append the time zone for parsing, it's important to add space before 'GMT'
+        item._timestamp = new Date(item.behaviorTime + " GMT+0800");
         // filter logs from 光影 client and behavior type is 3 (stands for open)
         return item.clientAppId && item.bhvType === 3;
     });
