@@ -413,22 +413,23 @@ router.get('/bydate', async function(req, res, next) {
 
 router.get('/query', async function(req, res, next) {
     //[Default] query the data from yesterday
-    let this_date = moment().subtract(1, 'day').format("YYYY-MM-DD");
-    let startOfDay, endOfDay;
-    if (req.query.hasOwnProperty("date")) {
-        this_date = req.query.date;
+    // Caution: the moment() return the date according to system time zone,
+    // it could be different date than expectation
+    let startOfDay = moment().subtract(1, 'day').startOf('day');
+    if (req.query.hasOwnProperty("from")) {
+        startOfDay = moment(req.query.from);
     }
-    startOfDay = moment(this_date);
-    endOfDay = moment(this_date).endOf("day");
+    // query one day by default
+    let endOfDay = moment(startOfDay).add(24, 'hours');
 
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let logs = logs_db.collection("logList");
 
         let cursor = logs.find({
-            "_timestamp": { // query one day
+            "_timestamp": {
                 $gte: startOfDay.toDate(),
-                $lte: endOfDay.toDate()
+                $lt: endOfDay.toDate()
             }
         });
         let docs = await cursor.toArray();

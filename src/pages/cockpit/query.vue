@@ -54,11 +54,13 @@ module.exports = {
       // close menu
       this.menu = false;
       this.isLoading = true;
+      var fromDate = moment(this.selectedDate).toISOString();
       // refresh table data
-      var request = axios.get("/api/dlktlogs/query", { params: { date: this.selectedDate } });
+      var request = axios.get("/api/dlktlogs/query", { params: { from: fromDate } });
       request.then((response) => {
         this.rawData = response.data || [];
       });
+      // TODO, catch the exception
       request.finally(() => {
         this.isLoading = false;
       });
@@ -69,6 +71,7 @@ module.exports = {
       request.then((response) => {
         this.snackbar = true;
       });
+      // TODO, catch the exception
     },
     humanize(value) {
       if (value === 0) return moment.localeData().relativeTime(0, true, 'ss', true);
@@ -107,5 +110,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
