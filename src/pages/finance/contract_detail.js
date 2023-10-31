@@ -13,7 +13,7 @@ $(document).ready(function() {
 
     new Vue({
         el: '#app',
-        components: { app: contractDetail }
+        components: { 'app': contractDetail }
     });
 });
 

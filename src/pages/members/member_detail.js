@@ -14,7 +14,7 @@ $(document).ready(function() {
 
     new Vue({
         el: '#app',
-        components: { app: memberDetail }
+        components: { 'app': memberDetail }
     });
 });
 
