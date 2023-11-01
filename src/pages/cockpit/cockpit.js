@@ -41,8 +41,8 @@ init(function() {
     });
 
     vuetify_lang = "en";
-    if (i18next.languages.length > 0) {
-        var lang = i18next.languages[0].split("-")[0];
+    if (i18next.language > 0) {
+        var lang = i18next.language.split("-")[0];
         // zhHans indicate Chinese simplified in vuetify; zhHant indicate Chinese Traditional
         vuetify_lang = lang === "zh" ? "zhHans" : lang;
     }
