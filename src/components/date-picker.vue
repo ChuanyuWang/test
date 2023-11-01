@@ -98,7 +98,7 @@ module.exports = {
      *
      * @param newValue
      */
-    value: function(newValue) {
+    value: function(newValue, oldValue) {
       if (this.dp) {
         // if the new value is null, clear the input text manually, because date(null) function doesn't clear previous value
         if (newValue === null) this.dp.clear();
@@ -117,15 +117,17 @@ module.exports = {
   methods: {
     /**
      * Update v-model upon change triggered by date-picker itself
-     * Or when value property is set
      *
      * @param event
      */
     onChange: function(event) {
+      // do not emit 'input' event when value property is set from parent component
+      if (moment(event.date).isSame(this.value)) return;
       this.$emit('input', event.date || null);
     }
   }
 };
 </script>
 
-<style lang='less'></style>
+<style lang='less'>
+</style>
