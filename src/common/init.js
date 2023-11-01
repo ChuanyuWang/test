@@ -17,6 +17,12 @@ module.exports = function(fn) {
         i18next.on('languageChanged', lng => {
             console.log(`language changed to ${lng}`);
             typeof moment === 'function' && moment.locale(lng);
+
+            if (typeof bootbox === 'object') {
+                var lang = lng.split("-")[0]; // parse the two digit language code, e.g. "en", "fr", "zh"
+                // zh_CN indicate Chinese simplified in bootbox; zh_TW indicate Chinese Traditional
+                bootbox.setLocale(lang === "zh" ? "zh_CN" : lang);
+            }
         });
 
         // load the i18next plugin to Vue, and detect the language of browser
