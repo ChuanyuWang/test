@@ -54,7 +54,7 @@ module.exports = {
   data: function() {
     var classrooms = _getTenantConfig().classrooms || [];
     return {
-      date: moment(), // moment date object
+      date: moment().startOf('day'), // moment date object
       // [ "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日" ]
       columns: moment.weekdays(true),
       sections: [
@@ -124,7 +124,7 @@ module.exports = {
       this.date = moment(this.monday).subtract(7, "days");
     },
     thisWeek: function() {
-      this.date = moment();
+      this.date = moment().startOf('day');
     },
     nextWeek: function() {
       // create a new moment object to trigger the data binding
