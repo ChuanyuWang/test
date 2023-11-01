@@ -3,12 +3,12 @@
 div.input-group.date(:id="id",:class="inputClass")
   span.input-group-addon(v-if="label") {{label}}
   input.form-control(type="text",
-        :name="name",
-        :placeholder="placeholder",
-        :required="required",
-        :readOnly="readOnly",
-        :disabled="disabled",
-        autocomplete="off")
+    :name="name",
+    :placeholder="placeholder",
+    :required="required",
+    :readOnly="readOnly",
+    :disabled="disabled",
+    autocomplete="off")
   span.input-group-addon
     span.glyphicon.glyphicon-calendar
 </template>
@@ -36,7 +36,7 @@ module.exports = {
     // http://eonasdan.github.io/bootstrap-datetimepicker/Options/
     config: {
       type: Object,
-      default: function() { return { "format": "ll", "locale": "zh-CN" } }
+      default: function() { return { "format": "ll" } }
     },
     placeholder: {
       type: String,
@@ -128,5 +128,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>
