@@ -3,12 +3,11 @@
  * main.js Home page main entry module
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var calendar = require('./class-calendar.vue').default;
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
+init(function() {
 
     // bootstrap the class calendar page
     new Vue({
@@ -19,12 +18,3 @@ $(document).ready(function() {
 });
 
 // Functions =============================================================
-
-function init() {
-    console.log("welcome~~~");
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-
-    moment.locale('zh-CN');
-    bootbox.setLocale('zh_CN');
-}
