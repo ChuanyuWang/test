@@ -4,14 +4,11 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var membersPage = require('./member-overview.vue').default;
-var formatPlugin = require('../../common/format');
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-
+init(function() {
     new Vue({
         el: '#app',
         components: { membersPage },
@@ -21,9 +18,3 @@ $(document).ready(function() {
 
 // Functions =============================================================
 
-function init() {
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-    Vue.use(i18nextplugin);
-    Vue.use(formatPlugin);
-}

@@ -1,15 +1,13 @@
 /**
  * --------------------------------------------------------------------------
- * setting.js setting page main entry module
+ * finace.js page main entry module
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var financePage = require('./finance.vue').default;
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-
+init(function() {
     new Vue({
         el: '#app',
         components: { financePage },
@@ -18,11 +16,3 @@ $(document).ready(function() {
 });
 
 // Functions =============================================================
-
-function init() {
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-}

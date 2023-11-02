@@ -4,14 +4,11 @@
  * Entry module of view class page
  * --------------------------------------------------------------------------
  */
-
-var i18nextplugin = require('../../locales/i18nextplugin');
+var init = require('../../common/init');
 var classView = require('./class-detail.vue').default;
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-
+init(function() {
     new Vue({
         el: '#app',
         components: { 'app': classView }
@@ -19,12 +16,3 @@ $(document).ready(function() {
 });
 
 // Functions =============================================================
-
-function init() {
-    console.log("class_view moudle init...");
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-    //TODO, localization 
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-}
