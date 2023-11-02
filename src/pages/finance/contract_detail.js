@@ -3,14 +3,11 @@
  * contract_detail.js contract detail page main entry module
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
-var formatPlugin = require('../../common/format');
+var init = require('../../common/init');
 var contractDetail = require('./contract-detail.vue').default;
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-
+init(function() {
     new Vue({
         el: '#app',
         components: { 'app': contractDetail }
@@ -18,11 +15,3 @@ $(document).ready(function() {
 });
 
 // Functions =============================================================
-
-function init() {
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-    Vue.use(formatPlugin);
-}
