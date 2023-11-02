@@ -8,5 +8,10 @@
     "total": "Total",
     "no_record": "No record",
     "other_self_booking": "Self-help booking sessions",
-    "deleted_course": "<deleted class>"
+    "deleted_course": "<deleted class>",
+    "previous_week": "Previous Week",
+    "this_week": "This Week",
+    "next_week": "Next Week",
+    "time": "Time",
+    "classroom": "Classroom"
 }
