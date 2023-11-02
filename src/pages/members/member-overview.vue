@@ -20,7 +20,7 @@ div
         span.input-group-btn
           button#jumpToButton.btn.btn-default(type="button",@click="jumpToPage") 跳转
       button.btn.btn-primary.btn-sm.ms-3(type='button',@click='displayOutOfCredit') 临期学员
-  bootstrap-table.table-striped(ref='memberTable',:columns='tableColumns',:options='tableOptions')
+  bootstrap-table.table-striped(ref='memberTable',:columns='tableColumns')
 
   modal-dialog(ref='expireMemberDialog',buttons="ok",@ok="") 临期学员
     template(v-slot:body)
@@ -369,9 +369,11 @@ module.exports = {
     // set message for global usage
     Vue.prototype.$messager = this.$refs.messager;
     this.$refs.memberTable.updateFormatText("formatSearch", "搜索姓名或联系方式");
+    // Reload options to fix bug of refresh button size,
+    // it turns out that method 'updateFormatText' will reset the size of refresh button
+    this.$refs.memberTable.refreshOptions(this.tableOptions);
   }
 }
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>
