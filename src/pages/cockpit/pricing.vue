@@ -50,7 +50,7 @@ module.exports = {
       isLoading: true,
       headers: [
         { text: '片源ID', value: 'contentId', sortable: false },
-        { text: '片源名称', value: 'itemName', sortable: false },
+        { text: '片源名称', value: 'itemName', sortable: true },
         { text: '价格', value: 'price', sortable: true }
       ],
       priceList: [],
@@ -138,5 +138,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
