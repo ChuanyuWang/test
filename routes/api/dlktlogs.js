@@ -500,10 +500,18 @@ router.get('/prices', async function(req, res, next) {
                 let: { contentID: "$_id" },
                 pipeline: [{
                     $match: {
-                        $expr: { $eq: ["$$contentID", "$_fromContentId"] }
+                        $expr: {
+                            $and: [{
+                                $eq: ["$$contentID", "$_fromContentId"]
+                            }, {
+                                $gte: [new Date(), "$effective_date"]
+                            }]
+                        }
                     }
                 }, {
-                    $project: { _id: 0, price: 1 }
+                    $project: { _id: 0, price: 1, effective_date: 1 }
+                }, {
+                    $sort: { effective_date: -1 }
                 }],
                 as: 'prices'
             }
