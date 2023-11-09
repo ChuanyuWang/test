@@ -107,7 +107,7 @@ module.exports = {
         { text: '创建时间', value: 'create_time' },
         { text: '发布时间', value: 'issue_time' },
         { text: '状态', value: 'status' },
-        { text: '操作', value: 'actions', sortable: false }
+        { text: '操作', value: 'actions', sortable: false, align: 'center' }
       ],
       options: {},
       rawData: [],
