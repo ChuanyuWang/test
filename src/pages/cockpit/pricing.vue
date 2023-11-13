@@ -190,8 +190,6 @@ module.exports = {
         this.snackbar = true;
       }).finally(() => {
         this.isAddingPrice = false;
-        //this.editedItem.price = "";
-        //this.editedItem.effective_date = null;
         this.$nextTick(() => {
           this.$refs.priceForm.validate(); // force validate current effective date/price
         });
@@ -207,7 +205,6 @@ module.exports = {
         // remove deleted price
         var index = this.priceHistory.indexOf(this.delete_price)
         this.priceHistory.splice(index, 1);
-        // this.priceHistory.push(newPrice);
         this.message = "删除价格成功";
         this.snackbar = true;
       }).catch((error) => {
