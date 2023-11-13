@@ -525,30 +525,63 @@ router.get('/prices', async function(req, res, next) {
     }
 });
 
+router.get('/prices/:contentID', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let prices = logs_db.collection("prices");
+
+        let cursor = prices.find({
+            "_fromContentId": parseInt(req.params.contentID)
+        });
+        let docs = await cursor.toArray();
+
+        console.log(`query prices of content ${req.params.contentID}: %s`, docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError(`fail to get prices of content ${req.params.contentID}`, error));
+    }
+});
+
 /**
- * {_fromContentId: 50524832, price: 5000, modify_time: "2023-10-14T12:11:41.000Z"}
+ * {_fromContentId: 50524832, price: 5000, modify_time: "2023-10-14T12:11:41.000Z", 
+ * effective_date: "2023-10-14T12:11:41.000Z"}
  */
-router.put('/prices/:contentID', hasRole('admin'), async function(req, res, next) {
+router.post('/prices', hasRole('admin'), async function(req, res, next) {
     let priceDoc = {
-        _fromContentId: parseInt(req.params.contentID),
+        _fromContentId: parseInt(req.body.contentId),
         price: parseInt(req.body.price ?? 0), // expect 0.01 ==> 1
-        modify_time: new Date()
+        modify_time: new Date(),
+        effective_date: new Date(req.body.effective_date)
     };
+    if (isNaN(priceDoc.effective_date.valueOf()) || priceDoc.effective_date < new Date()) {
+        return next(new ParamError(`Effective date ${req.body.effective_date} not valid`));
+    }
     if (isNaN(priceDoc._fromContentId)) {
-        return next(new ParamError(`contentID ${req.params.contentID} not valid`));
+        return next(new ParamError(`contentID ${req.body.contentId} not valid`));
     }
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let prices = logs_db.collection("prices");
 
-        let result = await prices.updateOne({ _fromContentId: priceDoc._fromContentId }, {
-            $set: priceDoc
-        }, { upsert: true });
+        //let result = await prices.insertOne(priceDoc);
+        let result = await prices.updateOne({
+            _fromContentId: priceDoc._fromContentId,
+            effective_date: priceDoc.effective_date
+        }, {
+            $setOnInsert: priceDoc
+        }, {
+            upsert: true
+        });
 
-        console.log(`Set price of content ${priceDoc._fromContentId} to ${priceDoc.price / 100}`);
-        res.json(result.result);
+        if (result.upsertedCount === 1) {
+            console.log(`Add price of content ${priceDoc._fromContentId} to ${priceDoc.price / 100}`);
+        } else {
+            return next(new ParamError(`Effective date ${req.body.effective_date} already exist`));
+        }
+        // result.upsertedId is "{ index: 0, _id: 6552361ae21b20219729c74b }"
+        res.json(result.upsertedId);
     } catch (error) {
-        return next(new InternalServerError("fail to set price of dlketang content", error));
+        return next(new InternalServerError("fail to add price of dlketang content", error));
     }
 });
 
