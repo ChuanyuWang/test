@@ -31,7 +31,7 @@ v-container
           template(v-slot:item.effective_date="{ item }") {{ item.effective_date ? new Date(item.effective_date).toLocaleDateString() : null }}
           template(v-slot:item.price="{ item }") {{ item.price /100 }}元
           template(v-slot:item.actions="{ item }")
-            v-btn(icon small v-if="new Date() < new Date(item.effective_date)" @click="removePrice")
+            v-btn(icon small v-if="new Date() < new Date(item.effective_date)" @click="confirmDeletePrice(item)")
               v-icon(small) mdi-delete
           template(v-slot:item.isEffective="{ item }")
             v-chip(small v-if="item.price === current_price.price && item.effective_date === current_price.effective_date" color="success") 生效中
@@ -54,6 +54,15 @@ v-container
         small.caption 无法修改已失效或生效中的价格
         v-spacer
         v-btn(text color="primary" @click="dialog = false" :loading="isHisotryLoading") 关闭
+  v-dialog(v-model="dialogDeletePrice" persistent max-width="300px")
+    v-card
+      v-card-title
+        span.text-h5 删除价格
+      v-card-text 确定删除该价格吗？删除操作无法撤销
+      v-card-actions
+        v-spacer
+        v-btn(text @click="dialogDeletePrice = false") 取消
+        v-btn(text color="error" @click="removePrice") 删除
 </template>
 
 <script>
@@ -101,7 +110,9 @@ module.exports = {
         { text: '价格', value: 'price', sortable: false },
         { text: '是否有效', value: 'isEffective', sortable: false },
         { text: '操作', value: 'actions', sortable: false, align: 'center' }
-      ]
+      ],
+      dialogDeletePrice: false,
+      delete_price: {}
     }
   },
   computed: {},
@@ -179,12 +190,37 @@ module.exports = {
         this.snackbar = true;
       }).finally(() => {
         this.isAddingPrice = false;
-        this.editedItem.price = "";
-        this.editedItem.effective_date = null;
+        //this.editedItem.price = "";
+        //this.editedItem.effective_date = null;
+        this.$nextTick(() => {
+          this.$refs.priceForm.validate(); // force validate current effective date/price
+        });
       });
     },
-    removePrice(item) {
-      // TODO, remove selected price
+    confirmDeletePrice(item) {
+      this.delete_price = item;
+      this.dialogDeletePrice = true;
+    },
+    removePrice() {
+      var request = axios.delete("/api/dlktlogs/prices/" + this.delete_price._id, { data: this.delete_price });
+      request.then((response) => {
+        // remove deleted price
+        var index = this.priceHistory.indexOf(this.delete_price)
+        this.priceHistory.splice(index, 1);
+        // this.priceHistory.push(newPrice);
+        this.message = "删除价格成功";
+        this.snackbar = true;
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "删除价格失败";
+        this.snackbar = true;
+      }).finally(() => {
+        this.delete_price = {};
+        this.dialogDeletePrice = false;
+        this.$nextTick(() => {
+          this.$refs.priceForm.validate(); // force validate current effective date/price
+        });
+      });
     },
     findEffectivePrice(prices) {
       this.current_price = {};

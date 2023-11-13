@@ -6,6 +6,7 @@ const { hasRole } = require('../../helper');
 const moment = require('moment');
 const { LOGS_SCHEMA } = require('../../server/logFetcher');
 const util = require('./lib/util');
+const { ObjectId } = require('mongodb');
 
 /** log item sample from dlketang logs
  * 
@@ -582,6 +583,33 @@ router.post('/prices', hasRole('admin'), async function(req, res, next) {
         res.json(result.upsertedId);
     } catch (error) {
         return next(new InternalServerError("fail to add price of dlketang content", error));
+    }
+});
+
+router.delete('/prices/:Id', hasRole('admin'), async function(req, res, next) {
+    if (!ObjectId.isValid(req.params.Id)) {
+        return next(new ParamError(`Price Id ${req.params.Id} not valid`));
+    }
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let prices = logs_db.collection("prices");
+
+        let query = {
+            _id: ObjectId(req.params.Id),
+            effective_date: { $gt: new Date() } // only not effective can be deleted
+        };
+
+        let result = await prices.deleteOne(query);
+        // result.result is {"n":1,"ok":1}
+        if (result.result.n === 1) {
+            console.log(`Remove price of content ${req.body._fromContentId} successfully`);
+        } else {
+            return next(new ParamError(`Not able to delete effective price`));
+        }
+
+        res.json(result.result);
+    } catch (error) {
+        return next(new InternalServerError("fail to remove price", error));
     }
 });
 
