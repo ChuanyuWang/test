@@ -187,7 +187,8 @@ module.exports = {
     },
     addDeposit() {
       this.dialog1_loading = true;
-      var request = axios.post("/api/dlktlogs/deposits/" + this.depositItem.tenantId, {
+      var request = axios.post("/api/dlktlogs/deposits", {
+        tenantId: this.depositItem.tenantId,
         method: this.depositItem.method,
         received: Math.round(this.depositItem.received * 100),
         donate: Math.round(this.depositItem.donate * 100),

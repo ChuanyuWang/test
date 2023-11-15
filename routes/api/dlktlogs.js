@@ -690,13 +690,12 @@ router.get('/deposits/:tenantID', async function(req, res, next) {
  *    comment: String
  * }
  */
-router.post('/deposits/:tenantID', hasRole('admin'), async function(req, res, next) {
+router.post('/deposits', hasRole('admin'), async function(req, res, next) {
     if (["cash", "bankcard", "mobilepayment"].indexOf(req.body.method) === -1) {
         return next(new ParamError(`pay method ${req.body.method} not valid`));
     }
-    // TODO, remove params "tenantID"
     let depositDoc = {
-        tenantId: parseInt(req.params.tenantID),
+        tenantId: parseInt(req.body.tenantId),
         create_date: new Date(),
         method: req.body.method,
         received: parseInt(req.body.received ?? 0), // expect 0.01 ==> 1
@@ -705,7 +704,7 @@ router.post('/deposits/:tenantID', hasRole('admin'), async function(req, res, ne
         comment: req.body.comment ?? ""
     };
     if (isNaN(depositDoc.tenantId)) {
-        return next(new ParamError(`tenant ID ${req.params.tenantId} not valid`));
+        return next(new ParamError(`tenant ID ${req.body.tenantId} not valid`));
     }
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
