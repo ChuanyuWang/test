@@ -534,6 +534,7 @@ router.get('/prices/:contentID', async function(req, res, next) {
         let cursor = prices.find({
             "_fromContentId": parseInt(req.params.contentID)
         });
+        // TODO, sort by effective date
         let docs = await cursor.toArray();
 
         console.log(`query prices of content ${req.params.contentID}: %s`, docs ? docs.length : 0);
@@ -693,6 +694,7 @@ router.post('/deposits/:tenantID', hasRole('admin'), async function(req, res, ne
     if (["cash", "bankcard", "mobilepayment"].indexOf(req.body.method) === -1) {
         return next(new ParamError(`pay method ${req.body.method} not valid`));
     }
+    // TODO, remove params "tenantID"
     let depositDoc = {
         tenantId: parseInt(req.params.tenantID),
         create_date: new Date(),
