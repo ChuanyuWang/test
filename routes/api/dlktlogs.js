@@ -8,6 +8,8 @@ const { LOGS_SCHEMA } = require('../../server/logFetcher');
 const util = require('./lib/util');
 const { ObjectId } = require('mongodb');
 
+const LOG_BEGIN_DATE = new Date("2023-03-01 GMT+0800");
+
 /** log item sample from dlketang logs
  * 
   "tenantId": 135219,
@@ -137,7 +139,7 @@ router.get('/content/list', async function(req, res, next) {
         let pipelines = [{
             $match: {
                 "_timestamp": {
-                    $gte: new Date("2023-03-01") // exclude dirty data before 2023-03-01
+                    $gte: LOG_BEGIN_DATE // exclude dirty data before 2023-03-01
                 },
                 "fromContentId": { $exists: true }
             }
@@ -237,7 +239,7 @@ router.get('/bycontent', async function(req, res, next) {
 
         query["_timestamp"] = { // query whole year
             // exclude dirty data before 2023-03-01
-            $gte: startOfMonth.year() === 2023 ? new Date("2023-03-01") : startOfMonth.startOf("year").toDate(),
+            $gte: startOfMonth.year() === 2023 ? LOG_BEGIN_DATE : startOfMonth.startOf("year").toDate(),
             $lte: endOfMonth.endOf("year").toDate()
         };
         pipelines = [{
@@ -320,7 +322,7 @@ router.get('/bytenant', async function(req, res, next) {
 
         query["_timestamp"] = { // query whole year
             // exclude dirty data before 2023-03-01
-            $gte: startOfMonth.year() === 2023 ? new Date("2023-03-01") : startOfMonth.startOf("year").toDate(),
+            $gte: startOfMonth.year() === 2023 ? LOG_BEGIN_DATE : startOfMonth.startOf("year").toDate(),
             $lte: endOfMonth.endOf("year").toDate()
         };
         pipelines = [{
@@ -366,7 +368,7 @@ router.get('/bydate', async function(req, res, next) {
     let query = {
         "_timestamp": {
             // // exclude dirty data before 2023-03-01
-            $gte: startOfDate.year() === 2023 ? new Date("2023-03-01") : startOfDate.toDate(),
+            $gte: startOfDate.year() === 2023 ? LOG_BEGIN_DATE : startOfDate.toDate(),
             $lte: endOfDate.toDate()
         },
         "duration": {
@@ -486,7 +488,7 @@ router.get('/prices', async function(req, res, next) {
         let pipelines = [{
             $match: {
                 "_timestamp": {
-                    $gte: new Date("2023-03-01") // exclude dirty data before 2023-03-01
+                    $gte: LOG_BEGIN_DATE // exclude dirty data before 2023-03-01
                 },
                 "fromContentId": req.query.fromContentId ? parseInt(req.query.fromContentId) : { $exists: true }
             }
