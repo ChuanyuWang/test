@@ -18,6 +18,7 @@ v-container
         v-icon.ml-1(small @click.stop="openHistory(item)") mdi-pencil
       div(v-else) {{ item.price /100}}元
         v-icon.ml-1(small @click.stop="openHistory(item)") mdi-pencil
+    template(v-slot:item.next_price="{ item }") {{ item.next_price ? item.next_price/100 + "元" : null}}
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
@@ -80,7 +81,8 @@ module.exports = {
         { text: '片源ID', value: 'contentId', sortable: false },
         { text: '片源名称', value: 'itemName', sortable: true },
         { text: '生效日期', value: 'effective_date', sortable: true },
-        { text: '当前价格', value: 'price', sortable: true }
+        { text: '当前价格', value: 'price', sortable: true },
+        { text: '以后价格', value: 'next_price', sortable: true }
       ],
       priceList: [],
       editedItem: {},
@@ -127,6 +129,7 @@ module.exports = {
             contentId: value._id,
             itemName: value.itemName,
             price: value.prices.length > 0 ? value.prices[0].price : NaN,
+            next_price: value.prices.length > 1 ? value.prices[1].price : NaN,
             effective_date: value.prices.length > 0 ? value.prices[0].effective_date : null
           }
         });
