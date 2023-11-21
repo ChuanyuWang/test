@@ -439,6 +439,7 @@ router.get('/query', async function(req, res, next) {
         let docs = await cursor.toArray();
 
         console.log("query dlketang logs: %s", docs ? docs.length : 0);
+        // TODO, support pagination
         res.json(docs);
     } catch (error) {
         return next(new InternalServerError("query dlketang logs fails", error));
@@ -718,6 +719,109 @@ router.post('/deposits', hasRole('admin'), async function(req, res, next) {
         res.json(result.result);
     } catch (error) {
         return next(new InternalServerError("fail to add deposit to tenant", error));
+    }
+});
+
+router.get('/costs', async function(req, res, next) {
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let logs = logs_db.collection("logList");
+
+        let begin_date = LOG_BEGIN_DATE;
+
+        let pipelines = [{
+            $match: {
+                fromContentId: { $exists: true },
+                _timestamp: { $gte: begin_date },
+                // more than 10 mins
+                duration: { $gte: 600 },
+                tenantId: req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
+            }
+        }, {
+            $lookup: {
+                from: 'prices',
+                let: {
+                    contentID: '$fromContentId',
+                    play_date: '$_timestamp'
+                },
+                pipeline: [{
+                    $match: {
+                        $expr: {
+                            $and: [{
+                                $eq: ['$$contentID', '$_fromContentId']
+                            }, {
+                                $gte: ['$$play_date', '$effective_date']
+                            }]
+                        }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        price: 1,
+                        effective_date: 1
+                    }
+                }, {
+                    $sort: { effective_date: -1 }
+                }],
+                as: 'prices'
+            }
+        }, {
+            $addFields: {
+                first_price: {
+                    $ifNull: [{
+                        $arrayElemAt: ['$prices.price', 0]
+                    }, 0]
+                },
+                times: {
+                    $ceil: { $divide: ['$duration', 3599] }
+                }
+            }
+        }, {
+            $group: {
+                _id: '$tenantId',
+                total: {
+                    $sum: {
+                        $multiply: ['$first_price', '$times']
+                    }
+                },
+                play: { $sum: 1 },
+                tenantName: { $last: '$tenantName' }
+            }
+        }, {
+            $lookup: {
+                from: 'deposits',
+                let: { tenantID: '$_id' },
+                pipeline: [{
+                    $match: {
+                        $expr: {
+                            $eq: ['$$tenantID', '$tenantId']
+                        }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        received: 1,
+                        donate: 1
+                    }
+                }],
+                as: 'deposit'
+            }
+        }, {
+            $addFields: {
+                deposit: {
+                    $add: [
+                        { $sum: '$deposit.received' },
+                        { $sum: '$deposit.donate' }
+                    ]
+                }
+            }
+        }];
+        let docs = await logs.aggregate(pipelines).toArray();
+
+        console.log("get cost of dlketang tenants: %s", docs ? docs.length : 0);
+        res.json(docs);
+    } catch (error) {
+        return next(new InternalServerError("fail to get cost of dlketang tenants", error));
     }
 });
 

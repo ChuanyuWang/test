@@ -45,8 +45,9 @@ module.exports = {
         { name: "分析功能", icon: "mdi-chart-bar", value: "/statistics" },
         { name: "数据查询", icon: "mdi-database-search", value: "/query" },
         { name: "公告管理", icon: "mdi-bullhorn-variant", value: "/notice" },
-        { name: "片源定价", icon: "mdi-currency-cny", value: "/pricing" },
-        { name: "门店充值", icon: "mdi-gas-station", value: "/deposit" }
+        { name: "片源定价", icon: "mdi-tag", value: "/pricing" },
+        { name: "门店充值", icon: "mdi-gas-station", value: "/deposit" },
+        { name: "门店费用", icon: "mdi-currency-cny", value: "/cost" }
       ],
       drawer: true
     }

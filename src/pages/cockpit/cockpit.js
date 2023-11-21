@@ -12,6 +12,7 @@ var notice = require('./notice.vue').default;
 var statistics = require('./statistics.vue').default;
 var pricing = require('./pricing.vue').default;
 var deposit = require('./deposit.vue').default;
+var cost = require('./cost.vue').default;
 
 // Translation provided by Vuetify (javascript)
 var zhHans = require('../../locales/vuetify/zh-Hans');
@@ -26,7 +27,8 @@ init(function() {
         { path: '/notice', component: notice, meta: { title: '公告管理' } },
         { path: '/statistics', component: statistics, meta: { title: '光影故事屋播放统计' } },
         { path: '/pricing', component: pricing, meta: { title: '片源定价' } },
-        { path: '/deposit', component: deposit, meta: { title: '门店充值' } }
+        { path: '/deposit', component: deposit, meta: { title: '门店充值' } },
+        { path: '/cost', component: cost, meta: { title: '门店费用' } }
     ];
     var router = new VueRouter({
         routes // short for `routes: routes`
