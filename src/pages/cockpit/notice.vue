@@ -118,6 +118,7 @@ module.exports = {
   watch: {
     options: {
       handler() {
+        // will be called when page loaded
         this.refresh();
       },
       deep: true
@@ -215,9 +216,7 @@ module.exports = {
       this.publishNoticeDialog = false;
     }
   },
-  mounted() {
-    this.refresh();
-  }
+  mounted() { }
 }
 </script>
 
