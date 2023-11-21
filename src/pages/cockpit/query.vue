@@ -62,11 +62,13 @@ module.exports = {
       // close menu
       this.menu = false;
       this.isLoading = true;
-      var fromDate = moment(this.selectedDate).toISOString();
+      var fromDate = moment(this.selectedDate);
+      var endDate = moment(fromDate).add(24, 'hours');
       // refresh table data
       var request = axios.get("/api/dlktlogs/query", {
         params: {
-          from: fromDate,
+          from: fromDate.toISOString(),
+          to: endDate.toISOString(),
           tenantId: this.selectedTenant || undefined
         }
       });
@@ -123,4 +125,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
