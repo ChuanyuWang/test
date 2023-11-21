@@ -154,7 +154,7 @@ module.exports = {
     refresh() {
       this.isLoading = true;
       // refresh table data
-      var request = axios.get("/api/dlktlogs/deposits", { params: { tenantId: this.selectedTenant || "" } });
+      var request = axios.get("/api/dlktlogs/deposits", { params: { tenantId: this.selectedTenant || undefined } });
       request.then((response) => {
         this.rawData = (response.data || []).map((value, index, array) => {
           return {
@@ -232,5 +232,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

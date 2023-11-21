@@ -67,7 +67,7 @@ module.exports = {
       var request = axios.get("/api/dlktlogs/query", {
         params: {
           from: fromDate,
-          tenantId: this.selectedTenant || ""
+          tenantId: this.selectedTenant || undefined
         }
       });
       request.then((response) => {
@@ -123,5 +123,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
