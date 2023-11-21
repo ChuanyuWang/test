@@ -415,7 +415,12 @@ router.get('/bydate', async function(req, res, next) {
 });
 
 router.get('/query', async function(req, res, next) {
-    //[Default] query the data from yesterday
+    let pipelines = [];
+    let query = {
+        "tenantId": req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
+    };
+
+    // [Default] query the data from yesterday
     // Caution: the moment() return the date according to system time zone,
     // it could be different date than expectation
     let startOfDay = moment().subtract(1, 'day').startOf('day');
@@ -428,22 +433,48 @@ router.get('/query', async function(req, res, next) {
         endOfDay = moment(req.query.to);
     }
 
+    query["_timestamp"] = {
+        $gte: startOfDay.toDate(),
+        $lt: endOfDay.toDate()
+    };
+
+    pipelines.push({ $match: query });
+
+    // support sorting
+    if (req.query.sort) {
+        let sort = {};
+        let sortField = req.query.sort;
+        sort[sortField] = req.query.order == 'asc' ? 1 : -1;
+        pipelines.push({ $sort: sort });
+    }
+
+    // support pagination
+    let skip = parseInt(req.query.offset) || 0;
+    if (skip < 0) {
+        console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);
+        skip = 0;
+    }
+    pipelines.push({ $skip: skip });
+
+    let pageSize = parseInt(req.query.limit) || 100;
+    if (pageSize > 100 || pageSize < 0) {
+        console.warn(`Page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
+        pageSize = 100;
+    }
+    pipelines.push({ $limit: pageSize });
+
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let logs = logs_db.collection("logList");
+        let cursor = logs.find(query);
+        let total = await cursor.count();
+        let docs = await logs.aggregate(pipelines).toArray();
 
-        let cursor = logs.find({
-            "_timestamp": {
-                $gte: startOfDay.toDate(),
-                $lt: endOfDay.toDate()
-            },
-            "tenantId": req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
+        console.log(`query ${docs.length} dlketang logs from ${total} in total`);
+        return res.json({
+            total: total,
+            rows: docs
         });
-        let docs = await cursor.toArray();
-
-        console.log("query dlketang logs: %s", docs ? docs.length : 0);
-        // TODO, support pagination
-        res.json(docs);
     } catch (error) {
         return next(new InternalServerError("query dlketang logs fails", error));
     }

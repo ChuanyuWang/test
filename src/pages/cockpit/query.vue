@@ -17,7 +17,9 @@ v-container
         v-date-picker(v-model="selectedDate" type="date" locale="zh" @change="refresh" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
-  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="当日无数据")
+  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" 
+    no-data-text="当日无数据" :server-items-length="total" :options.sync="options"
+    :footer-props="{'items-per-page-options': [10,20,50,100]}")
     template(v-slot:item._timestamp="{ item }") {{ new Date(item._timestamp).toLocaleString() }}
     template(v-slot:item.duration="{ item }") {{ humanize(item.duration) }}
     template(v-slot:item.attendance="{ item }") {{ item.attendance || "没有数据" }}
@@ -52,11 +54,21 @@ module.exports = {
         { text: '播放时长(秒)', value: 'duration' },
         { text: '使用人数', value: 'attendance' }
       ],
+      options: {},
       rawData: [],
+      total: 0,
       selectedTenant: ""
     }
   },
   computed: {},
+  watch: {
+    options: {
+      handler() {
+        this.refresh();
+      },
+      deep: true
+    }
+  },
   methods: {
     refresh() {
       // close menu
@@ -64,16 +76,25 @@ module.exports = {
       this.isLoading = true;
       var fromDate = moment(this.selectedDate);
       var endDate = moment(fromDate).add(24, 'hours');
+
+      // support pagination and sorting
+      const { sortBy, sortDesc, page, itemsPerPage } = this.options;
+      var params = {
+        offset: (page - 1) * itemsPerPage,
+        limit: itemsPerPage,
+        from: fromDate.toISOString(),
+        to: endDate.toISOString(),
+        tenantId: this.selectedTenant || undefined
+      };
+      if (sortBy.length === 1 && sortDesc.length === 1) {
+        params.sort = sortBy[0];
+        params.order = sortDesc[0] === false ? "asc" : "desc";
+      }
       // refresh table data
-      var request = axios.get("/api/dlktlogs/query", {
-        params: {
-          from: fromDate.toISOString(),
-          to: endDate.toISOString(),
-          tenantId: this.selectedTenant || undefined
-        }
-      });
+      var request = axios.get("/api/dlktlogs/query", { params });
       request.then((response) => {
-        this.rawData = response.data || [];
+        this.rawData = response.data && response.data.rows || [];
+        this.total = response.data && response.data.total || 0;
       });
       // TODO, catch the exception
       request.finally(() => {
@@ -119,9 +140,7 @@ module.exports = {
         .join(' ');
     }
   },
-  mounted() {
-    this.refresh();
-  }
+  mounted() { }
 }
 </script>
 
