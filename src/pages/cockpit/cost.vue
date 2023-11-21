@@ -1,7 +1,7 @@
 <template lang="pug">
 v-container
   v-subheader(style="height:auto")
-    p 光影故事屋门店费用统计，门店费用基本叮聆课堂播放日志和片源价格进行统计，未设置价格的片源不参与统计，播放时间小于10分钟亦不参与统计。
+    p 光影故事屋门店费用统计，门店费用基于叮聆课堂播放日志和片源价格进行统计，未设置价格的片源不参与统计，播放时间小于10分钟亦不参与统计。
       | 所有门店信息来源于叮聆课堂播放日志，每日00:00同步前一天的播放日志，统计数据有24小时的延迟。
       | 新增门店可能不显示，已经关闭的门店也会出现在列表中
   v-row(dense align="center" justify="end")
@@ -53,7 +53,7 @@ module.exports = {
       ],
       rawData: [],
       menu: false,
-      begin_date: ""
+      begin_date: "2023-11-01"
     }
   },
   computed: {},
