@@ -424,6 +424,9 @@ router.get('/query', async function(req, res, next) {
     }
     // query one day by default
     let endOfDay = moment(startOfDay).add(24, 'hours');
+    if (req.query.hasOwnProperty("to")) {
+        endOfDay = moment(req.query.to);
+    }
 
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
