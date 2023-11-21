@@ -728,6 +728,9 @@ router.get('/costs', async function(req, res, next) {
         let logs = logs_db.collection("logList");
 
         let begin_date = LOG_BEGIN_DATE;
+        if (req.query.from) {
+            begin_date = new Date(req.query.from);
+        }
 
         let pipelines = [{
             $match: {

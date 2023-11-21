@@ -9,6 +9,12 @@ v-container
     v-col(cols="auto")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
     v-col(cols="auto")
+      v-menu(:close-on-content-click="false" offset-y v-model="menu")
+        template(v-slot:activator="{ on, attrs }")
+          v-text-field(dense readonly v-model="begin_date" hide-details 
+            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="费用开始日期")
+        v-date-picker(v-model="begin_date" type="date" locale="zh" @change="refresh" min="2023-03-01")
+    v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
@@ -45,16 +51,26 @@ module.exports = {
         { text: '剩余金额', value: 'remaining', sortable: true },
         { text: '操作', value: 'actions', sortable: false, align: 'center' }
       ],
-      rawData: []
+      rawData: [],
+      menu: false,
+      begin_date: ""
     }
   },
   computed: {},
   filters: {},
   methods: {
     refresh() {
+      // close menu
+      this.menu = false;
       this.isLoading = true;
       // refresh table data
-      var request = axios.get("/api/dlktlogs/costs", { params: { tenantId: this.selectedTenant || "" } });
+      var request = axios.get("/api/dlktlogs/costs", {
+        params: {
+          tenantId: this.selectedTenant || undefined,
+          //from: this.begin_date ? new Date(this.begin_date).toISOString() : undefined // new Date("2023-11-10") will ignore system time zone
+          from: this.begin_date ? moment(this.begin_date).toISOString() : undefined
+        }
+      });
       request.then((response) => {
         this.rawData = response.data || [];
       }).catch((error) => {
