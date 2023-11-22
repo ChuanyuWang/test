@@ -22,10 +22,23 @@ v-container
     template(v-slot:item.remaining="{ item }") {{ item.remaining/100 }}元
     template(v-slot:item.actions="{ item }")
       v-btn(small color="primary" @click="notImplemented") 提醒
-      v-btn.ml-1(small @click="notImplemented") 详细
+      v-btn.ml-1(small @click="showDetails(item)") 详细
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
+  v-dialog(v-model="dialog1" max-width="60%")
+    v-card
+      v-card-title {{ clickedTenant.tenantName }}
+      v-card-subtitle 门店播放记录
+      v-card-text
+        v-data-table(:headers="details_headers" dense :items="play_logs" :loading="isLoadingDetails" 
+          no-data-text="无播放充值记录" :footer-props="{'items-per-page-options': [10,20,50,100]}"
+          :options.sync="options" :server-items-length="play_logs_total" :items-per-page="10")
+          template(v-slot:item._timestamp="{ item }") {{ item._timestamp | dateFormatter }}
+          template(v-slot:item.duration="{ item }") {{ item.duration | humanize }}
+      v-card-actions
+        v-spacer
+        v-btn(text color="primary" @click="dialog1 = false") 关闭
 </template>
 
 <script>
@@ -53,11 +66,66 @@ module.exports = {
       ],
       rawData: [],
       menu: false,
-      begin_date: "2023-11-01"
+      begin_date: "2023-11-01",
+      clickedTenant: {},
+      dialog1: false,
+      isLoadingDetails: false,
+      details_headers: [
+        { text: '播放日期', value: '_timestamp', sortable: false },
+        { text: '片源ID', value: 'fromContentId', sortable: false },
+        { text: '片源名称', value: 'itemName', sortable: false },
+        { text: '播放时长', value: 'duration', sortable: false },
+        { text: '人数', value: 'attendance', sortable: false }
+      ],
+      options: {},
+      play_logs: [],
+      play_logs_total: 0
     }
   },
   computed: {},
-  filters: {},
+  watch: {
+    options: {
+      handler() {
+        this.fetchDetails();
+      },
+      deep: true
+    }
+  },
+  filters: {
+    dateFormatter(value) {
+      return moment(value).format("lll");
+    },
+    humanize(value) {
+      if (value === 0) return moment.localeData().relativeTime(0, true, 'ss', true);
+
+      var units = [
+        { unit: 'y', key: 'yy' },
+        { unit: 'M', key: 'MM' },
+        { unit: 'd', key: 'dd' },
+        { unit: 'h', key: 'hh' },
+        { unit: 'm', key: 'mm' },
+        { unit: 's', key: 'ss' },
+      ];
+      let beginFilter = false;
+      let componentCount = 0;
+
+      return units
+        .map(({ unit, key }) => ({ value: moment.duration(value, 'seconds').get(unit), key }))
+        .filter(({ value, key }) => {
+          if (beginFilter === false) {
+            if (value === 0) {
+              return false;
+            }
+            beginFilter = true;
+          }
+          componentCount++;
+          return value !== 0 && componentCount <= 2; //	29 分钟 2 秒 or	1 小时 4 分钟
+        })
+        .map(({ value, key }) => ({ value: value, key: value === 1 ? key[0] : key }))
+        .map(({ value, key }) => moment.localeData().relativeTime(value, true, key, true))
+        .join(' ');
+    }
+  },
   methods: {
     refresh() {
       // close menu
@@ -84,6 +152,47 @@ module.exports = {
         this.isLoading = false;
       });
     },
+    showDetails(item) {
+      this.clickedTenant = item;
+      this.dialog1 = true;
+      this.fetchDetails();
+    },
+    fetchDetails() {
+      if (!this.clickedTenant._id) return;
+
+      this.isLoadingDetails = true;
+      var fromDate = moment(this.begin_date);
+
+      // support pagination and sorting
+      const { sortBy, sortDesc, page, itemsPerPage } = this.options;
+      // the options is not initialized (sync) yet
+      if (itemsPerPage === undefined) return;
+
+      var params = {
+        offset: (page - 1) * itemsPerPage,
+        limit: itemsPerPage,
+        duration: 600,
+        from: fromDate.toISOString(),
+        tenantId: this.clickedTenant._id || undefined
+      };
+
+      if (sortBy.length === 1 && sortDesc.length === 1) {
+        params.sort = sortBy[0];
+        params.order = sortDesc[0] === false ? "asc" : "desc";
+      }
+
+      var request = axios.get("/api/dlktlogs/query", { params });
+      request.then((response) => {
+        this.play_logs = response.data && response.data.rows || [];
+        this.play_logs_total = response.data && response.data.total || 0;
+      }).catch((error) => {
+        // TODO, append the error message returned from server
+        this.message = "查看播放记录失败";
+        this.snackbar = true;
+      }).finally(() => {
+        this.isLoadingDetails = false;
+      });
+    },
     notImplemented() {
       this.message = "此功能尚不支持";
       this.snackbar = true;
@@ -95,4 +204,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
