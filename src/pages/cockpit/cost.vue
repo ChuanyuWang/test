@@ -19,7 +19,7 @@ v-container
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.deposit="{ item }") {{ item.deposit/100 }}元
-    template(v-slot:item.remaining="{ item }") {{ (item.deposit - item.total)/100 }}元
+    template(v-slot:item.remaining="{ item }") {{ item.remaining/100 }}元
     template(v-slot:item.actions="{ item }")
       v-btn(small color="primary" @click="notImplemented") 提醒
       v-btn.ml-1(small @click="notImplemented") 详细
@@ -72,7 +72,10 @@ module.exports = {
         }
       });
       request.then((response) => {
-        this.rawData = response.data || [];
+        this.rawData = (response.data || []).map((value, index, array) => {
+          value.remaining = value.deposit - value.total;
+          return value;
+        });
       }).catch((error) => {
         // TODO, append the error message returned from server
         this.message = "刷新门店失败";
