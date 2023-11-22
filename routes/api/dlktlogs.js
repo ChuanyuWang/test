@@ -417,26 +417,26 @@ router.get('/bydate', async function(req, res, next) {
 router.get('/query', async function(req, res, next) {
     let pipelines = [];
     let query = {
-        "tenantId": req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
+        fromContentId: { $exists: true },
+        tenantId: req.query.tenantId ? parseInt(req.query.tenantId) : { $exists: true }
     };
 
-    // [Default] query the data from yesterday
-    // Caution: the moment() return the date according to system time zone,
+    // Caution: the moment("2023-11-01") return the date according to system time zone,
     // it could be different date than expectation
-    let startOfDay = moment().subtract(1, 'day').startOf('day');
-    if (req.query.hasOwnProperty("from")) {
-        startOfDay = moment(req.query.from);
-    }
-    // query one day by default
-    let endOfDay = moment(startOfDay).add(24, 'hours');
-    if (req.query.hasOwnProperty("to")) {
-        endOfDay = moment(req.query.to);
+    if (moment(req.query.from || "").isValid() && moment(req.query.to || "").isValid()) {
+        query._timestamp = {
+            $gte: new Date(req.query.from),
+            $lt: new Date(req.query.to)
+        };
+    } else if (moment(req.query.from || "").isValid()) {
+        query._timestamp = { $gte: new Date(req.query.from) };
+    } else if (moment(req.query.to || "").isValid()) {
+        query._timestamp = { $lt: new Date(req.query.to) };
     }
 
-    query["_timestamp"] = {
-        $gte: startOfDay.toDate(),
-        $lt: endOfDay.toDate()
-    };
+    if (req.query.hasOwnProperty("duration")) {
+        query.duration = { $gte: parseInt(req.query.duration) || 0 };
+    }
 
     pipelines.push({ $match: query });
 
