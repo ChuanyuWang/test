@@ -121,7 +121,9 @@ module.exports = {
           componentCount++;
           return value !== 0 && componentCount <= 2; //	29 分钟 2 秒 or	1 小时 4 分钟
         })
-        .map(({ value, key }) => ({ value: value, key: value === 1 ? key[0] : key }))
+        // comment out the below code line for more accurate humanize, 
+        // e.g. 2101 seconds will be display as 35mins 1second, instead of 35mins a few seconds
+        //.map(({ value, key }) => ({ value: value, key: value === 1 ? key[0] : key }))
         .map(({ value, key }) => moment.localeData().relativeTime(value, true, key, true))
         .join(' ');
     }
@@ -135,7 +137,8 @@ module.exports = {
       var request = axios.get("/api/dlktlogs/costs", {
         params: {
           tenantId: this.selectedTenant || undefined,
-          //from: this.begin_date ? new Date(this.begin_date).toISOString() : undefined // new Date("2023-11-10") will ignore system time zone
+          //from: this.begin_date ? new Date(this.begin_date).toISOString() : undefined 
+          // new Date("2023-11-10") will ignore system time zone
           from: this.begin_date ? moment(this.begin_date).toISOString() : undefined
         }
       });

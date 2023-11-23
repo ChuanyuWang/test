@@ -21,7 +21,7 @@ v-container
     no-data-text="当日无数据" :server-items-length="total" :options.sync="options"
     :footer-props="{'items-per-page-options': [10,20,50,100]}")
     template(v-slot:item._timestamp="{ item }") {{ new Date(item._timestamp).toLocaleString() }}
-    template(v-slot:item.duration="{ item }") {{ humanize(item.duration) }}
+    template(v-slot:item.duration="{ item }") {{ item.duration | humanize }}
     template(v-slot:item.attendance="{ item }") {{ item.attendance || "没有数据" }}
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
@@ -69,6 +69,40 @@ module.exports = {
       deep: true
     }
   },
+  filters: {
+    humanize(value) {
+      if (value === 0) return moment.localeData().relativeTime(0, true, 'ss', true);
+
+      var units = [
+        { unit: 'y', key: 'yy' },
+        { unit: 'M', key: 'MM' },
+        { unit: 'd', key: 'dd' },
+        { unit: 'h', key: 'hh' },
+        { unit: 'm', key: 'mm' },
+        { unit: 's', key: 'ss' },
+      ];
+      let beginFilter = false;
+      let componentCount = 0;
+
+      return units
+        .map(({ unit, key }) => ({ value: moment.duration(value, 'seconds').get(unit), key }))
+        .filter(({ value, key }) => {
+          if (beginFilter === false) {
+            if (value === 0) {
+              return false;
+            }
+            beginFilter = true;
+          }
+          componentCount++;
+          return value !== 0 && componentCount <= 2; //	29 分钟 2 秒 or	1 小时 4 分钟
+        })
+        // comment out the below code line for more accurate humanize, 
+        // e.g. 2101 seconds will be display as 35mins 1second, instead of 35mins a few seconds
+        //.map(({ value, key }) => ({ value: value, key: value === 1 ? key[0] : key }))
+        .map(({ value, key }) => moment.localeData().relativeTime(value, true, key, true))
+        .join(' ');
+    }
+  },
   methods: {
     refresh() {
       // close menu
@@ -108,36 +142,6 @@ module.exports = {
         this.snackbar = true;
       });
       // TODO, catch the exception
-    },
-    humanize(value) {
-      if (value === 0) return moment.localeData().relativeTime(0, true, 'ss', true);
-
-      var units = [
-        { unit: 'y', key: 'yy' },
-        { unit: 'M', key: 'MM' },
-        { unit: 'd', key: 'dd' },
-        { unit: 'h', key: 'hh' },
-        { unit: 'm', key: 'mm' },
-        { unit: 's', key: 'ss' },
-      ];
-      let beginFilter = false;
-      let componentCount = 0;
-
-      return units
-        .map(({ unit, key }) => ({ value: moment.duration(value, 'seconds').get(unit), key }))
-        .filter(({ value, key }) => {
-          if (beginFilter === false) {
-            if (value === 0) {
-              return false;
-            }
-            beginFilter = true;
-          }
-          componentCount++;
-          return value !== 0 && componentCount <= 2; //	29 分钟 2 秒 or	1 小时 4 分钟
-        })
-        .map(({ value, key }) => ({ value: value, key: value === 1 ? key[0] : key }))
-        .map(({ value, key }) => moment.localeData().relativeTime(value, true, key, true))
-        .join(' ');
     }
   },
   mounted() { }
