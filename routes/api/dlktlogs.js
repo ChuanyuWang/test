@@ -449,17 +449,23 @@ router.get('/query', async function(req, res, next) {
     }
 
     // support pagination
-    let skip = parseInt(req.query.offset) || 0;
-    if (skip < 0) {
-        console.warn(`Page "offset" should be a positive integer, but get ${skip} in run-time`);
-        skip = 0;
+    let skip = 0; // default value
+    if (req.query.hasOwnProperty('offset')) {
+        let skip = parseInt(req.query.offset);
+        if (skip < 0 || isNaN(skip)) {
+            console.warn(`Page "offset" should be a positive integer, but get ${req.query.offset} in run-time`);
+            skip = 0;
+        }
     }
     pipelines.push({ $skip: skip });
 
-    let pageSize = parseInt(req.query.limit) || 100;
-    if (pageSize > 100 || pageSize < 0) {
-        console.warn(`Page "limit" should be a positive integer less than 100, but get ${pageSize} in run-time`);
-        pageSize = 100;
+    let pageSize = 100; // default value
+    if (req.query.hasOwnProperty('limit')) {
+        let pageSize = parseInt(req.query.limit);
+        if (pageSize > 100 || pageSize < 0 || isNaN(pageSize)) {
+            console.warn(`Page "limit" should be a positive integer less than 100, but get ${req.query.limit} in run-time`);
+            pageSize = 100;
+        }
     }
     pipelines.push({ $limit: pageSize });
 
