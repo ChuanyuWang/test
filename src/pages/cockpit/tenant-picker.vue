@@ -24,7 +24,7 @@ module.exports = {
   },
   data: function() {
     return {
-      tenantList: [{ tenantName: "全部", tenantId: "" }]
+      tenantList: []
     };
   },
   mounted: function() { },
@@ -40,7 +40,6 @@ module.exports = {
             tenantId: value._id
           }
         });
-        this.tenantList.push({ tenantName: "全部", tenantId: "" })
       });
       // TODO, catch the exception
     }
