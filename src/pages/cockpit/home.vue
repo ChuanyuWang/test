@@ -6,19 +6,21 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
-      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
+      v-text-field(v-model="search" prepend-icon="mdi-magnify" label="搜索片源"  hide-details dense clearable)
     v-col(cols="auto")
+      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
+    v-col(cols="2")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
         suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
-    v-col(cols="auto")
+    v-col(cols="2")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu" min-width="auto")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(dense readonly v-model="selectedMonth" hide-details 
             prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择月份")
-        v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh" min="2023-03")
+        v-date-picker(v-model="selectedMonth" type="month" @change="refresh" min="2023-03")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
-  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading")
+  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" :search="search")
 </template>
 
 <script>
@@ -41,6 +43,7 @@ module.exports = {
         { text: "年", value: "year" },
         { text: "月", value: "month" }
       ],
+      search: "",
       headers: [
         {
           text: '片源名称',
@@ -63,7 +66,7 @@ module.exports = {
       this.isLoading = true;
       // refresh table data
       var request = axios.get("/api/dlktlogs/bycontent", {
-        params: { month: this.selectedMonth, duration: this.duration, tenantId: this.selectedTenant || "" }
+        params: { month: this.selectedMonth, duration: this.duration, tenantId: this.selectedTenant || undefined }
       });
       request.then((response) => {
         this.rawData = response.data || [];

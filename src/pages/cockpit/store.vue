@@ -6,21 +6,23 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
+      v-text-field(v-model="search" prepend-icon="mdi-magnify" label="搜索门店"  hide-details dense clearable)
+    v-col(cols="auto")
       v-autocomplete(:items="contentList" item-text="itemName" item-value="contentId" clearable
         @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" 
         dense hide-details label="选择片源" prepend-icon="mdi-video-vintage")
-    v-col(cols="auto")
+    v-col(cols="2")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于"
         suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
-    v-col(cols="auto")
+    v-col(cols="2")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu" min-width="auto")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(dense readonly v-model="selectedMonth" hide-details 
             prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择月份")
-        v-date-picker(v-model="selectedMonth" type="month" locale="zh" @change="refresh" min="2023-03")
+        v-date-picker(v-model="selectedMonth" type="month" @change="refresh" min="2023-03")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
-  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading")
+  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" :search="search")
 </template>
 
 <script>
@@ -39,6 +41,7 @@ module.exports = {
         { text: "年", value: "year" },
         { text: "月", value: "month" }
       ],
+      search: "",
       headers: [
         {
           text: '门店名称',
@@ -50,7 +53,7 @@ module.exports = {
         { text: '当年累计播放次数', value: 'year_total' }
       ],
       rawData: [],
-      contentList: [{ itemName: "全部", contentId: "" }],
+      contentList: [],
       selectedContent: ""
     }
   },
@@ -62,7 +65,7 @@ module.exports = {
       this.isLoading = true;
       // refresh table data
       var request = axios.get("/api/dlktlogs/bytenant", {
-        params: { month: this.selectedMonth, duration: this.duration, contentId: this.selectedContent || "" }
+        params: { month: this.selectedMonth, duration: this.duration, contentId: this.selectedContent || undefined }
       });
       request.then((response) => {
         this.rawData = response.data || [];
@@ -81,7 +84,6 @@ module.exports = {
             contentId: value._id
           }
         });
-        this.contentList.push({ itemName: "全部", contentId: "" })
       });
     }
   },
