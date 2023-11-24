@@ -35,7 +35,7 @@ v-container
       v-card-text
         v-data-table(:headers="details_headers" dense :items="play_logs" :loading="isLoadingDetails" 
           no-data-text="无播放充值记录" :footer-props="{'items-per-page-options': [10,20,50,100]}"
-          :options.sync="options" :server-items-length="play_logs_total" :items-per-page="10")
+          :options.sync="options" :server-items-length="play_logs_total" :items-per-page="10" :page.sync="page")
           template(v-slot:item._timestamp="{ item }") {{ item._timestamp | dateFormatter }}
           template(v-slot:item.duration="{ item }") {{ item.duration | humanize }}
       v-card-actions
@@ -71,6 +71,7 @@ module.exports = {
       clickedTenant: {},
       dialog1: false,
       isLoadingDetails: false,
+      page: 1,
       details_headers: [
         { text: '播放日期', value: '_timestamp', sortable: false },
         { text: '片源ID', value: 'fromContentId', sortable: false },
@@ -159,7 +160,12 @@ module.exports = {
     showDetails(item) {
       this.clickedTenant = item;
       this.dialog1 = true;
-      this.fetchDetails();
+      // handle the case when page is not the first page
+      if (this.page !== 1) {
+        this.page = 1;
+      } else {
+        this.fetchDetails();
+      }
     },
     fetchDetails() {
       if (!this.clickedTenant._id) return;
