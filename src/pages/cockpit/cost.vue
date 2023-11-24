@@ -7,6 +7,8 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
+      v-text-field(v-model="search" prepend-icon="mdi-magnify" label="搜索门店"  hide-details dense clearable)
+    //v-col(cols="auto")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
     v-col(cols="auto")
       v-menu(:close-on-content-click="false" offset-y v-model="menu")
@@ -16,7 +18,7 @@ v-container
         v-date-picker(v-model="begin_date" type="date" locale="zh" @change="refresh" min="2023-03-01")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
-  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
+  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据" :search="search")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.deposit="{ item }") {{ item.deposit/100 }}元
     template(v-slot:item.remaining="{ item }") {{ item.remaining/100 }}元
@@ -42,19 +44,17 @@ v-container
 </template>
 
 <script>
-var tenantPicker = require("./tenant-picker.vue").default;
 
 module.exports = {
   name: "cost",
-  components: {
-    tenantPicker
-  },
+  components: {},
   data() {
     return {
       snackbar: false,
       message: "",
       selectedTenant: "",
       isLoading: true,
+      search: "",
       headers: [
         { text: '门店ID', value: '_id', sortable: false },
         { text: '门店名称', value: 'tenantName', sortable: false },
