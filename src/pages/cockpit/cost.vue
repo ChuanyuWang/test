@@ -60,6 +60,7 @@ module.exports = {
         { text: '门店名称', value: 'tenantName', sortable: false },
         { text: '门店费用', value: 'total', sortable: true },
         { text: '播放次数', value: 'play', sortable: true },
+        { text: '播放人次', value: 'attendance', sortable: true },
         { text: '累计充值金额（含赠送）', value: 'deposit', sortable: true },
         { text: '剩余金额', value: 'remaining', sortable: true },
         { text: '操作', value: 'actions', sortable: false, align: 'center' }

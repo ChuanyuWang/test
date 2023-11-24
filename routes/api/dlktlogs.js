@@ -28,7 +28,8 @@ const LOG_BEGIN_DATE = new Date("2023-03-01 GMT+0800");
   "addressDesc": "广东省佛山市南海区灯湖东路20号 113.70.216.7",
   "macAddress": "74:86:E2:14:E2:3F",
   "clientAppId": "75145625871",
-  "requestId": "10e116ee-a42d-4b82-8386-9007d5f09478"
+  "requestId": "10e116ee-a42d-4b82-8386-9007d5f09478",
+  "attendance": 0
  * 
  */
 
@@ -451,7 +452,7 @@ router.get('/query', async function(req, res, next) {
     // support pagination
     let skip = 0; // default value
     if (req.query.hasOwnProperty('offset')) {
-        let skip = parseInt(req.query.offset);
+        skip = parseInt(req.query.offset);
         if (skip < 0 || isNaN(skip)) {
             console.warn(`Page "offset" should be a positive integer, but get ${req.query.offset} in run-time`);
             skip = 0;
@@ -461,7 +462,7 @@ router.get('/query', async function(req, res, next) {
 
     let pageSize = 100; // default value
     if (req.query.hasOwnProperty('limit')) {
-        let pageSize = parseInt(req.query.limit);
+        pageSize = parseInt(req.query.limit);
         if (pageSize > 100 || pageSize < 0 || isNaN(pageSize)) {
             console.warn(`Page "limit" should be a positive integer less than 100, but get ${req.query.limit} in run-time`);
             pageSize = 100;
@@ -828,6 +829,7 @@ router.get('/costs', async function(req, res, next) {
                     }
                 },
                 play: { $sum: 1 },
+                attendance: { $sum: '$attendance' },
                 tenantName: { $last: '$tenantName' }
             }
         }, {
