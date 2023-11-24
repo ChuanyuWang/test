@@ -6,12 +6,15 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
+      v-text-field(v-model="search" prepend-icon="mdi-magnify" label="搜索片源"  hide-details dense clearable)
+    //v-col(cols="auto")
       v-autocomplete(:items="contentList" item-text="itemName" dense item-value="contentId" 
         clearable @focus.once="fetchContentList" v-model="selectedContent" @change="refresh" 
         hide-details label="选择片源" prepend-icon="mdi-video-vintage")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
-  v-data-table(:headers="headers" :items="priceList" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
+  v-data-table(:headers="headers" :items="priceList" :items-per-page="10" :loading="isLoading" 
+    no-data-text="无数据" :search="search")
     template(v-slot:item.effective_date="{ item }") {{ item.effective_date ? new Date(item.effective_date).toLocaleDateString() : null }}
     template(v-slot:item.price="{ item }") 
       div(v-if="isNaN(item.price)") <i>未设置</i>
@@ -73,9 +76,9 @@ module.exports = {
     return {
       snackbar: false,
       message: "",
-      contentList: [{ itemName: "全部", contentId: "" }],
       selectedContent: "",
       isLoading: true,
+      search: "",
       headers: [
         { text: '片源ID', value: 'contentId', sortable: false },
         { text: '片源名称', value: 'itemName', sortable: true },
@@ -229,19 +232,6 @@ module.exports = {
           this.current_price = value;
         }
       });
-    },
-    fetchContentList() {
-      var request = axios.get("/api/dlktlogs/content/list");
-      request.then((response) => {
-        this.contentList = (response.data || []).map((value, index, array) => {
-          return {
-            itemName: value.itemName,
-            contentId: value._id
-          }
-        });
-        this.contentList.push({ itemName: "全部", contentId: "" })
-      });
-      // TODO, catch the exception
     }
   },
   mounted() {
