@@ -79,7 +79,7 @@ module.exports = {
         params: {
           year: this.selectedYear,
           duration: this.duration,
-          tenantId: this.selectedTenant
+          tenantId: this.selectedTenant || undefined
         }, signal: this.controller1.signal
       });
       request.then((response) => {

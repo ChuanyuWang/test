@@ -123,7 +123,7 @@ module.exports = {
     refresh() {
       this.isLoading = true;
       // refresh table data
-      var request = axios.get("/api/dlktlogs/prices", { params: { fromContentId: this.selectedContent } });
+      var request = axios.get("/api/dlktlogs/prices", { params: { fromContentId: this.selectedContent || undefined } });
       request.then((response) => {
         this.priceList = (response.data || []).map((value, index, array) => {
           return {
