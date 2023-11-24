@@ -16,10 +16,14 @@ module.exports = function(fn) {
         // MUST listen to the "languageChanged" event before loading i18nextplugin
         i18next.on('languageChanged', lng => {
             console.log(`language changed to ${lng}`);
-            typeof moment === 'function' && moment.locale(lng);
+            var lang = lng.split("-")[0]; // parse the two digit language code, e.g. "en", "fr", "zh"
+
+            if (typeof moment === 'function') {
+                // zh_CN indicate Chinese simplified in moment.js; zh_TW indicate Chinese Traditional
+                moment.locale(lang === "zh" ? "zh_CN" : lang);
+            }
 
             if (typeof bootbox === 'object') {
-                var lang = lng.split("-")[0]; // parse the two digit language code, e.g. "en", "fr", "zh"
                 // zh_CN indicate Chinese simplified in bootbox; zh_TW indicate Chinese Traditional
                 bootbox.setLocale(lang === "zh" ? "zh_CN" : lang);
             }
