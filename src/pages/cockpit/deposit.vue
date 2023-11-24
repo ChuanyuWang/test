@@ -6,10 +6,12 @@ v-container
   v-row(dense align="center" justify="end")
     v-spacer
     v-col(cols="auto")
+      v-text-field(v-model="search" prepend-icon="mdi-magnify" label="搜索门店"  hide-details dense clearable)
+    //v-col(cols="auto")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
-  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据")
+  v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据" :search="search")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.actions="{ item }")
       v-btn(small color="primary" @click.stop="openDeposit(item)") 充值
@@ -70,19 +72,17 @@ v-container
 </template>
 
 <script>
-var tenantPicker = require("./tenant-picker.vue").default;
 
 module.exports = {
   name: "deposit",
-  components: {
-    tenantPicker
-  },
+  components: {},
   data() {
     return {
       snackbar: false,
       message: "",
       selectedTenant: "",
       isLoading: true,
+      search: "",
       headers: [
         { text: '门店ID', value: 'tenantId', sortable: false },
         { text: '门店名称', value: 'tenantName', sortable: false },
@@ -232,4 +232,5 @@ module.exports = {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+</style>
