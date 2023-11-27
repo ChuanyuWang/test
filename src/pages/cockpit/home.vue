@@ -45,12 +45,8 @@ module.exports = {
       ],
       search: "",
       headers: [
-        {
-          text: '片源名称',
-          align: 'start',
-          sortable: false,
-          value: 'name',
-        },
+        { text: '片源ID', value: 'contentId', sortable: false, },
+        { text: '片源名称', value: 'name', sortable: false, },
         { text: '当月累计播放次数 (可选择月份)', value: 'month_total' },
         { text: '当年累计播放次数', value: 'year_total' }
       ],
