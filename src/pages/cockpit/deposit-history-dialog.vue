@@ -70,11 +70,11 @@ module.exports = {
     }
   },
   methods: {
-    open(tenant) {
-      this.tenantName = tenant.tenantName;
+    open(tenantId, tenantName) {
+      this.tenantName = tenantName;
       this.isLoadingRecords = true;
       this.dialog = true;
-      var request = axios.get("/api/dlktlogs/deposits/" + tenant.tenantId, { params: {} });
+      var request = axios.get("/api/dlktlogs/deposits/" + tenantId, { params: {} });
       request.then((response) => {
         this.records = response.data || [];
       }).catch((error) => {
