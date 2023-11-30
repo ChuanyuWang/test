@@ -10,12 +10,12 @@ v-container
     //v-col(cols="auto")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
     v-col(cols="auto")
-      v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
+      v-btn(color='primary' @click.stop="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据" :search="search")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
     template(v-slot:item.actions="{ item }")
       v-btn(small color="primary" @click.stop="openDeposit(item)") 充值
-      v-btn.ml-1(small @click.stop="openHistory(item)") 记录
+      v-btn.ml-1(small @click.stop="$refs.historyDlg.open(item)") 记录
   v-snackbar.mb-12(v-model="snackbar") {{ message }}
     template(v-slot:action="{ attrs }")
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
@@ -50,32 +50,15 @@ v-container
         v-spacer
         v-btn(text color="primary" @click="dialog1 = false") 关闭
         v-btn(text color="primary" @click="addDeposit" :disabled="!valid" :loading="dialog1_loading") 充值
-  v-dialog(v-model="dialog2" max-width="60%")
-    v-card
-      v-card-title {{ depositItem.name }}
-      v-card-subtitle 门店充值记录
-      v-card-text
-        v-data-table(:headers="records_headers" dense :items="records" disable-pagination hide-default-footer :loading="isLoadingRecords" no-data-text="无充值记录")
-          template(v-slot:item.pay_date="{ item }") {{ item.pay_date | dateFormatter }}
-          template(v-slot:item.method="{ item }") {{ item.method | methodFormatter}}
-          template(v-slot:item.received="{ item }") {{ item.received/100 }}元
-          template(v-slot:item.donate="{ item }") {{ item.donate/100 }}元
-          template(v-slot:body.append="{ headers }")
-            tr
-              td(v-for="(header,i) in headers" :key="i")
-                div(v-if="header.value =='received'") <b>{{ receivedTotal }}元</b>
-                div(v-if="header.value =='donate'") <b>{{ donateTotal }}元</b>
-                div(v-else)
-      v-card-actions
-        v-spacer
-        v-btn(text color="primary" @click="dialog2 = false") 关闭
+  deposit-history-dialog(ref="historyDlg")
 </template>
 
 <script>
+var depositHistoryDialog = require("./deposit-history-dialog.vue").default;
 
 module.exports = {
   name: "deposit",
-  components: {},
+  components: { depositHistoryDialog },
   data() {
     return {
       snackbar: false,
@@ -94,7 +77,6 @@ module.exports = {
       selectedIndex: -1,
       dialog1: false,
       dialog1_loading: false,
-      dialog2: false,
       valid: true,
       rules: {
         required: value => value !== "" || '金额不能为空',
@@ -106,50 +88,15 @@ module.exports = {
         { text: "现金", value: "cash" },
         { text: "移动支付", value: "mobilepayment" }
       ],
-      menu2: false,
-      isLoadingRecords: true,
-      records: [],
-      records_headers: [
-        { text: '充值日期', value: 'pay_date', sortable: false },
-        { text: '付款方式', value: 'method', sortable: false },
-        { text: '充值', value: 'received', sortable: false },
-        { text: '赠送', value: 'donate', sortable: false },
-        { text: '备注', value: 'comment', sortable: false }
-      ]
+      menu2: false
     }
   },
   computed: {
     depositTotal() {
       return ((this.depositItem.received || 0) + (this.depositItem.donate || 0));
-    },
-    receivedTotal() {
-      return (this.records || []).reduce((accumulator, currentValue) => {
-        return accumulator + currentValue.received;
-      }, 0) / 100;
-    },
-    donateTotal() {
-      return (this.records || []).reduce((accumulator, currentValue) => {
-        return accumulator + currentValue.donate;
-      }, 0) / 100;
     }
   },
-  filters: {
-    methodFormatter(value) {
-      switch (value) {
-        case "cash":
-          return "现金";
-        case "bankcard":
-          return "银行卡";
-        case "mobilepayment":
-          return "移动支付"
-        default:
-          return null;
-      }
-    },
-    dateFormatter(value) {
-      return moment(value).format("ll");
-    }
-  },
+  filters: {},
   methods: {
     refresh() {
       this.isLoading = true;
@@ -209,21 +156,6 @@ module.exports = {
         this.dialog1 = false;
         this.dialog1_loading = false;
       });
-    },
-    openHistory(item) {
-      this.depositItem.name = item.tenantName;
-      this.isLoadingRecords = true;
-      this.dialog2 = true;
-      var request = axios.get("/api/dlktlogs/deposits/" + item.tenantId, { params: {} });
-      request.then((response) => {
-        this.records = response.data || [];
-      }).catch((error) => {
-        // TODO, append the error message returned from server
-        this.message = "查看历史记录失败";
-        this.snackbar = true;
-      }).finally(() => {
-        this.isLoadingRecords = false;
-      });
     }
   },
   mounted() {
@@ -232,5 +164,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
