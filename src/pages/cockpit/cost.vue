@@ -14,7 +14,7 @@ v-container
       v-menu(:close-on-content-click="false" offset-y v-model="menu")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(dense readonly v-model="begin_date" hide-details 
-            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="费用开始日期")
+            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="计费开始日期")
         v-date-picker(v-model="begin_date" type="date" locale="zh" @change="refresh" min="2023-03-01")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
@@ -214,5 +214,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
