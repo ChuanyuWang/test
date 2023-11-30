@@ -20,7 +20,9 @@ v-container
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" no-data-text="无数据" :search="search")
     template(v-slot:item.total="{ item }") {{ item.total/100 }}元
-    template(v-slot:item.deposit="{ item }") {{ item.deposit/100 }}元
+    template(v-slot:item.deposit="{ item }") 
+      div {{ item.deposit/100 }}元
+        v-icon.ml-1(small @click.stop="$refs.historyDlg.open(item._id, item.tenantName)") mdi-magnify
     template(v-slot:item.remaining="{ item }") {{ item.remaining/100 }}元
     template(v-slot:item.actions="{ item }")
       v-btn(small color="primary" @click="notImplemented") 提醒
@@ -41,13 +43,16 @@ v-container
       v-card-actions
         v-spacer
         v-btn(text color="primary" @click="dialog1 = false") 关闭
+  deposit-history-dialog(ref="historyDlg")
 </template>
 
 <script>
 
+var depositHistoryDialog = require("./deposit-history-dialog.vue").default;
+
 module.exports = {
   name: "cost",
-  components: {},
+  components: { depositHistoryDialog },
   data() {
     return {
       snackbar: false,
