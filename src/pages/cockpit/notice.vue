@@ -25,48 +25,43 @@ v-container
       v-btn(color="primary" text v-bind="attrs" @click="snackbar = false") 关闭
   v-dialog(v-model="createNoticeDialog" persistent max-width="600px")
     v-card
-      v-card-title
-        span.text-h5 创建公告
-      v-card-text.pb-0
+      v-card-title 创建公告
+      v-card-text
         v-form(v-model="valid")
-          v-container 
-            v-row
-              v-col(cols="12")
-                v-text-field(label="标题" required autofocus v-model="title" counter="128"
-                  :rules="[() => !!title || '标题必填']")
-            v-row
-              v-col(cols="12")
-                v-textarea(label="内容" rows="3" outlined required v-model="content" counter="512"
-                  :rules="[() => !!content || '内容必填']")
-            div.caption 公告创建后默认状态为“未发布”，点击“发布”按钮进行发布，发布后无法编辑
+          v-row
+            v-col(cols="12")
+              v-text-field(label="标题" required autofocus v-model="title" counter="128"
+                :rules="[() => !!title || '标题必填']")
+          v-row
+            v-col(cols="12")
+              v-textarea(label="内容" rows="3" no-resize required v-model="content" counter="512"
+                :rules="[() => !!content || '内容必填']")
       v-card-actions
+        small.caption 公告创建后默认状态为“未发布”，点击“发布”按钮进行发布，发布后无法编辑
         v-spacer
         v-btn(text @click="createNoticeDialog = false") 取消
         v-btn(text color="info" @click="createNotice" :disabled="!valid") 创建
   v-dialog(v-model="editNoticeDialog" persistent max-width="600px")
     v-card
-      v-card-title
-        span.text-h5 修改公告
-      v-card-text.pb-0
+      v-card-title 修改公告
+      v-card-text
         v-form(v-model="isEditValid")
-          v-container 
-            v-row
-              v-col(cols="12")
-                v-text-field(label="标题" required autofocus v-model="title" counter="128"
-                  :rules="[() => !!title || '标题必填']")
-            v-row
-              v-col(cols="12")
-                v-textarea(label="内容" rows="3" outlined required v-model="content" counter="512"
-                  :rules="[() => !!content || '内容必填']")
-            div.caption 公告发布前可以无限次编辑修改，发布后无法编辑
+          v-row
+            v-col(cols="12")
+              v-text-field(label="标题" required autofocus v-model="title" counter="128"
+                :rules="[() => !!title || '标题必填']")
+          v-row
+            v-col(cols="12")
+              v-textarea(label="内容" rows="3" no-resize required v-model="content" counter="512"
+                :rules="[() => !!content || '内容必填']")
       v-card-actions
+        small.caption 公告发布前可以无限次编辑修改，发布后无法编辑
         v-spacer
         v-btn(text @click="editNoticeDialog = false") 取消
         v-btn(text color="info" @click="editNotice" :disabled="!isEditValid") 修改
   v-dialog(v-model="publishNoticeDialog" persistent max-width="300px")
     v-card
-      v-card-title
-        span.text-h5 发布公告
+      v-card-title 发布公告
       v-card-text 确定发布该公告吗？发布后无法编辑
       v-card-actions
         v-spacer
@@ -74,8 +69,7 @@ v-container
         v-btn(text color="info" @click="publishNotice") 发布
   v-dialog(v-model="deleteNoticeDialog" persistent max-width="300px")
     v-card
-      v-card-title
-        span.text-h5 删除公告
+      v-card-title 删除公告
       v-card-text 确定删除该公告吗？删除操作无法撤销
       v-card-actions
         v-spacer
@@ -220,5 +214,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>
