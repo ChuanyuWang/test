@@ -82,7 +82,7 @@ module.exports = {
         vuetify: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.js',
         vuetify_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.js',
         vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.css',
-        vuetify_css_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.css',
+        vuetify_css_dev: 'https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.7.1/vuetify.css',
         vue_router: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.min.js',
         vue_router_dev: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.js'
     }
