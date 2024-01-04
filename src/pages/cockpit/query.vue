@@ -8,17 +8,17 @@ v-container
       v-btn.ml-3(@click="reload") 重新提取当天日志
     v-spacer
     v-col(cols="auto")
-      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
+      tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh(true)")
     v-col(cols="auto")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(dense readonly v-model="selectedDate" hide-details 
             prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择日期")
-        v-date-picker(v-model="selectedDate" type="date" locale="zh" @change="refresh" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
+        v-date-picker(v-model="selectedDate" type="date" locale="zh" @change="refresh(true)" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" 
-    no-data-text="当日无数据" :server-items-length="total" :options.sync="options"
+    no-data-text="当日无数据" :server-items-length="total" :options.sync="options" :page.sync="page"
     :footer-props="{'items-per-page-options': [10,20,50,100]}")
     template(v-slot:item._timestamp="{ item }") {{ new Date(item._timestamp).toLocaleString() }}
     template(v-slot:item.duration="{ item }") {{ item.duration | humanize }}
@@ -55,6 +55,7 @@ module.exports = {
         { text: '使用人数', value: 'attendance' }
       ],
       options: {},
+      page: 1,
       rawData: [],
       total: 0,
       selectedTenant: ""
@@ -104,10 +105,17 @@ module.exports = {
     }
   },
   methods: {
-    refresh() {
+    refresh(resetPageNo) {
       // close menu
       this.menu = false;
       this.isLoading = true;
+
+      // handle the case when page is not the first page
+      if (resetPageNo && this.page !== 1) {
+        this.page = 1;
+        return;
+      }
+
       var fromDate = moment(this.selectedDate);
       var endDate = moment(fromDate).add(24, 'hours');
 
