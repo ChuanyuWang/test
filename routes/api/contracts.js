@@ -197,6 +197,12 @@ router.get('/', async function(req, res, next) {
         query['status'] = { $ne: "deleted" };
     }
 
+    // query contracts by goods
+    let goods = req.query.goods || "";
+    if (goods) {
+        query['goods'] = goods;
+    }
+
     // query contracts by member
     let memberId = req.query.memberId || "";
     if (memberId && ObjectId.isValid(memberId)) {

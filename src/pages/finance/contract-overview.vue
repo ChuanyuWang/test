@@ -3,7 +3,7 @@ div
   div#contracts_toolbar
     div.d-flex.align-items-center.flex-wrap
       a.btn.btn-success.btn-sm.me-3(type="button" href="contract/create") 创建
-      div.input-group.input-group-sm
+      div.input-group.input-group-sm.me-3
         span.input-group-addon {{ $t('status') }}
         select.form-control(v-model="filter" @change="refresh")
           //"open|outstanding|paid|closed",
@@ -14,6 +14,12 @@ div
           option(value="closed") 完成
           option(value="" disabled) ------
           option(value="deleted") 作废
+      div.input-group.input-group-sm
+        span.input-group-addon {{ $t('class') }}
+        select.form-control(v-model="selectedTypeId" @change="refresh")
+          //"open|outstanding|paid|closed",
+          option(value="") {{ $t('all') }}
+          option(v-for="item in types" :value="item.id") {{ item.name }}
       date-picker.input-group-sm(v-model="from" placeholder="签约日期" style="width: 160px; margin-left: 4px")
       i.glyphicon.glyphicon-minus
       date-picker.input-group-sm(v-model="to" placeholder="结束" style="width: 160px", :class="{ 'has-error': errors.to }")
@@ -36,6 +42,7 @@ module.exports = {
       tenantConfig: {},
       types: [],
       filter: "",
+      selectedTypeId: "",
       from: null,
       to: null,
       columns: [{
@@ -191,6 +198,7 @@ module.exports = {
     customQuery(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
       params.status = this.filter; // add the status filter
+      params.goods = this.selectedTypeId; // add the type filter
       params.from = this.from && this.from.startOf('day').toISOString();
       params.to = this.to && this.to.endOf('day').toISOString();
       return params;
