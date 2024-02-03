@@ -80,7 +80,7 @@ module.exports = {
         axios: 'https://cdn.bootcdn.net/ajax/libs/axios/1.3.4/axios.min.js',
         axios_dev: 'https://cdn.bootcdn.net/ajax/libs/axios/1.3.4/axios.js',
         vuetify: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.js',
-        vuetify_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.js',
+        vuetify_dev: 'https://cdn.staticfile.org/vuetify/2.7.1/vuetify.js',
         vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.css',
         vuetify_css_dev: 'https://cdn.staticfile.org/vuetify/2.7.1/vuetify.css',
         vue_router: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.min.js',
