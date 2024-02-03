@@ -9,6 +9,9 @@ v-container
     v-spacer
     v-col(cols="auto")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh(true)")
+    v-col(cols="2")
+      v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
+        suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
     v-col(cols="auto")
       v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
         template(v-slot:activator="{ on, attrs }")
@@ -43,6 +46,7 @@ module.exports = {
       message: "重新提取当天日志，请等待5分钟，不要重复刷新",
       yesterday: moment().subtract(1, 'day'),
       menu: false,
+      duration: 0,
       selectedDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
       isLoading: true,
       headers: [
@@ -132,6 +136,7 @@ module.exports = {
         params.sort = sortBy[0];
         params.order = sortDesc[0] === false ? "asc" : "desc";
       }
+      params.duration = parseInt(this.duration * 60);
       // refresh table data
       var request = axios.get("/api/dlktlogs/query", { params });
       request.then((response) => {
