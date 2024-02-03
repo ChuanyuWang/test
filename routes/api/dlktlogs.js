@@ -359,8 +359,8 @@ router.get('/bydate', async function(req, res, next) {
     if (req.query.hasOwnProperty("year")) {
         queryDate = moment(req.query.year, "YYYY"); // "2023"
     }
-    startOfDate = queryDate.startOf("year");
-    endOfDate = queryDate.endOf("year");
+    startOfDate = queryDate.startOf("year").toDate();
+    endOfDate = queryDate.endOf("year").toDate();
 
     if (req.query.hasOwnProperty("duration")) {
         duration = parseInt(req.query.duration) || 0;
@@ -369,8 +369,8 @@ router.get('/bydate', async function(req, res, next) {
     let query = {
         "_timestamp": {
             // // exclude dirty data before 2023-03-01
-            $gte: startOfDate.year() === 2023 ? LOG_BEGIN_DATE : startOfDate.toDate(),
-            $lte: endOfDate.toDate()
+            $gte: queryDate.year() === 2023 ? LOG_BEGIN_DATE : startOfDate,
+            $lte: endOfDate
         },
         "duration": {
             $gte: duration * 60, // convert to seconds
