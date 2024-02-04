@@ -7,10 +7,10 @@ v-container
     v-spacer
     v-col(cols="auto")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh")
-    v-col(cols="auto")
+    v-col(cols="2")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
         suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
-    v-col(cols="auto")
+    v-col(cols="2")
       v-autocomplete(:items="[2023, 2024, 2025, 2026, 2027]" dense prepend-icon="mdi-calendar"
         v-model="selectedYear" @change="refresh" label="选择年份" hide-details)
     v-col(cols="auto")
