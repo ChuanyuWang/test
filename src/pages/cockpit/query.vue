@@ -5,7 +5,7 @@ v-container
       |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
   v-row(dense align="center" justify="end")
     //v-col(cols="auto")
-      v-btn.ml-3(@click="reload") 重新提取当天日志
+      v-btn.ml-3(@click="reload") {{"重新提取" + fromDate + "日志"}}
     v-spacer
     v-col(cols="2")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh(true)")
