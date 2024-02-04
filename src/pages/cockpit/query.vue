@@ -4,20 +4,20 @@ v-container
     p 光影故事屋浏览日志查询，选择日期并查看当天的播放记录（含全国门店）。
       |所有数据来源于叮聆课堂浏览日志，从2023年3月份开始统计，数据同步需要<b>24</b>小时，以下统计的数据截止到 <b>{{ yesterday.format("ll") }}</b>
   v-row(dense align="center" justify="end")
-    v-col(cols="auto")
+    //v-col(cols="auto")
       v-btn.ml-3(@click="reload") 重新提取当天日志
     v-spacer
-    v-col(cols="auto")
+    v-col(cols="2")
       tenant-picker(label="选择门店" v-model="selectedTenant" @change="refresh(true)")
     v-col(cols="2")
       v-text-field(type="number" v-model.number="duration" label="播放时长大于" 
         suffix="分钟" hide-details dense prepend-icon="mdi-clock-time-eight")
-    v-col(cols="auto")
-      v-menu(ref="menu" :close-on-content-click="false" offset-y v-model="menu")
+    v-col(cols="2")
+      v-menu(:close-on-content-click="false" offset-y v-model="menu1")
         template(v-slot:activator="{ on, attrs }")
-          v-text-field(dense readonly v-model="selectedDate" hide-details 
+          v-text-field(dense readonly v-model="fromDate" hide-details 
             prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择日期")
-        v-date-picker(v-model="selectedDate" type="date" locale="zh" @change="refresh(true)" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
+        v-date-picker(v-model="fromDate" type="date" locale="zh" @change="refresh(true)" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" 
@@ -45,9 +45,9 @@ module.exports = {
       snackbar: false,
       message: "重新提取当天日志，请等待5分钟，不要重复刷新",
       yesterday: moment().subtract(1, 'day'),
-      menu: false,
+      menu1: false,
       duration: 0,
-      selectedDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
+      fromDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
       isLoading: true,
       headers: [
         { text: '时间', value: '_timestamp' },
@@ -111,7 +111,7 @@ module.exports = {
   methods: {
     refresh(resetPageNo) {
       // close menu
-      this.menu = false;
+      this.menu1 = false;
       this.isLoading = true;
 
       // handle the case when page is not the first page
@@ -120,7 +120,7 @@ module.exports = {
         return;
       }
 
-      var fromDate = moment(this.selectedDate);
+      var fromDate = moment(this.fromDate);
       var endDate = moment(fromDate).add(24, 'hours');
 
       // support pagination and sorting
@@ -150,7 +150,7 @@ module.exports = {
     },
     reload() {
       // refresh table data
-      var request = axios.patch("/api/dlktlogs/tasks", { date: this.selectedDate });
+      var request = axios.patch("/api/dlktlogs/tasks", { date: this.fromDate });
       request.then((response) => {
         this.snackbar = true;
       });
