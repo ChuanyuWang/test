@@ -16,8 +16,14 @@ v-container
       v-menu(:close-on-content-click="false" offset-y v-model="menu1")
         template(v-slot:activator="{ on, attrs }")
           v-text-field(dense readonly v-model="fromDate" hide-details 
-            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="选择日期")
+            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="起始日期")
         v-date-picker(v-model="fromDate" type="date" locale="zh" @change="refresh(true)" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
+    v-col(cols="2")
+      v-menu(:close-on-content-click="false" offset-y v-model="menu2")
+        template(v-slot:activator="{ on, attrs }")
+          v-text-field(dense readonly v-model="endDate" hide-details 
+            prepend-icon="mdi-calendar" v-bind="attrs" v-on="on" label="结束日期")
+        v-date-picker(v-model="endDate" type="date" locale="zh" @change="refresh(true)" :max="yesterday.format('YYYY-MM-DD')" min="2023-03-01")
     v-col(cols="auto")
       v-btn(color='primary' @click="refresh" :disabled="isLoading") 刷新
   v-data-table(:headers="headers" :items="rawData" :items-per-page="10" :loading="isLoading" 
@@ -46,8 +52,10 @@ module.exports = {
       message: "重新提取当天日志，请等待5分钟，不要重复刷新",
       yesterday: moment().subtract(1, 'day'),
       menu1: false,
+      menu2: false,
       duration: 0,
       fromDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
+      endDate: moment().subtract(1, 'day').format("YYYY-MM-DD"),
       isLoading: true,
       headers: [
         { text: '时间', value: '_timestamp' },
@@ -112,6 +120,7 @@ module.exports = {
     refresh(resetPageNo) {
       // close menu
       this.menu1 = false;
+      this.menu2 = false;
       this.isLoading = true;
 
       // handle the case when page is not the first page
@@ -121,7 +130,7 @@ module.exports = {
       }
 
       var fromDate = moment(this.fromDate);
-      var endDate = moment(fromDate).add(24, 'hours');
+      var endDate = moment(this.endDate).endOf("day"); // include the date of end day
 
       // support pagination and sorting
       const { sortBy, sortDesc, page, itemsPerPage } = this.options;
