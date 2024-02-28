@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var common = require('../../common/common');
+//var common = require('../../common/common');
 var i18nextplugin = require('../../locales/i18nextplugin');
 var bookingApp = require('./booking.vue').default;
 
@@ -69,7 +69,7 @@ function init() {
     document.addEventListener('touchmove', handleMove, true);
     */
 }
-
+/*
 function getOpenId(code) {
     var tenant = common.getTenantName();
     $.ajax("/api/getOpenID", {
@@ -87,3 +87,4 @@ function getOpenId(code) {
         dataType: "json"
     });
 }
+*/
