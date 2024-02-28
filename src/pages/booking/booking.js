@@ -8,6 +8,7 @@ var common = require('../../common/common');
 var i18nextplugin = require('../../locales/i18nextplugin');
 var bookingApp = require('./booking.vue').default;
 
+/* Not able to get user openid as 订阅号
 var ua = navigator.userAgent.toLowerCase();
 if (ua.indexOf('micromessenger') > -1) { // we are within wechat
     // OAuth authentication refer to https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
@@ -22,6 +23,7 @@ if (ua.indexOf('micromessenger') > -1) { // we are within wechat
         getOpenId(code);
     }
 }
+*/
 
 //getOpenId("071wHvFa1DEwVz00lsIa1XQYSn0wHvF6"); // testing only
 
