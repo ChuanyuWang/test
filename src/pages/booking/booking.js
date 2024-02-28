@@ -27,14 +27,14 @@ if (ua.indexOf('micromessenger') > -1) { // we are within wechat
 
 //getOpenId("071wHvFa1DEwVz00lsIa1XQYSn0wHvF6"); // testing only
 
-var app = null;
+//var app = null;
 // DOM Ready =============================================================
 $(document).ready(function() {
     init();
 
     // load the i18next plugin to Vue
     Vue.use(i18nextplugin);
-    app = new Vue({
+    new Vue({
         el: '#app',
         components: { bookingApp },
         data: { openID: "" },
