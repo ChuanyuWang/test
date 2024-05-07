@@ -121,6 +121,8 @@ module.exports = {
     remainingCredit() {
       return this.user.contracts.map(value => {
         var remaining = value.credit - value.expendedCredit - value.consumedCredit;
+        // A better way of 'toFixed(1)'
+        remaining = Math.round(remaining * 10) / 10;
         var typeName = this.getTypeName(value.goods);
         return `${typeName}${remaining}课时`;
       }).join(", ");
