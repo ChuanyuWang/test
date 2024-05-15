@@ -282,8 +282,7 @@ module.exports = {
     remainingFormatter(value, row, index) {
       return [
         '<b>',
-        // A better way of 'toFixed(1)'
-        Math.round(value * 10) / 10,
+        this.$toFixed1(value),
         '</b> <small>(<i>',
         this.getCredit(row.membership) || 0,
         '/',
