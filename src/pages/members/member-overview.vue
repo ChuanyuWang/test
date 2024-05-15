@@ -328,9 +328,7 @@ module.exports = {
     getCredit(memberships) {
       var card = memberships && memberships[0];
       if (card) {
-        var credit = card.credit || 0;
-        var n = Math.round(credit * 10) / 10;
-        return n === 0 ? 0 : n; // handle the "-0" case
+        return this.$toFixed1(card.credit || 0);
       } else {
         return undefined;
       }
