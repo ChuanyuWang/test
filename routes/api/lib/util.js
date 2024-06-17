@@ -71,6 +71,8 @@ exports.getKey = function(user_id) {
 /**
  * Express middleware to validate the signature from request body
  * 
+ * MD5 is used to validate sign by default
+ * 
  * the property "sign" will be deleted from request body after validation
  * @param {Object} req express request
  * @param {Object} res express response
