@@ -122,6 +122,55 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
     }
 });
 
+router.post('/play/start', util.validateSign, async function(req, res, next) {
+    //[Default] get the current year by month
+    let play_date = moment();
+    if (req.body.hasOwnProperty("query_date")) {
+        if (!moment(req.body.query_date).isValid()) {
+            return next(new ParamError("开始播放时间格式不正确", 1106));
+        }
+        play_date = moment(req.body.query_date);
+    } else {
+        return next(new ParamError("缺少参数query_date", 1105));
+    }
+
+    if (!req.body.hasOwnProperty("contentId")) {
+        return next(new ParamError("缺少参数contentId", 1107));
+    }
+
+    if (!req.body.hasOwnProperty("tenantId")) {
+        return next(new ParamError("缺少参数tenantId", 1103));
+    }
+
+    let query = {
+        nonce: req.body.nonce_str,
+        tenantId: req.body.tenantId || null,
+        contentId: req.body.contentId || null
+    };
+
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let playLogs = logs_db.collection("playLogs");
+
+        let result = await playLogs.updateOne(query, {
+            $set: { play_timestamp: play_date.toDate() }
+        }, { upsert: true });
+
+        if (result.upsertedCount === 0) {
+            // existed document has been updated, which is not expected.
+            console.warn(`tenant ${query.tenantId} play content ${query.contentId} multi times`);
+        }
+
+        console.log("tenant %s play content %s at %s", query.tenantId, query.contentId, play_date.format());
+        res.json({
+            code: 0,
+            message: "success"
+        });
+    } catch (error) {
+        return next(new InternalServerError(`start playing content ${req.body.contentId} of tenant ${req.body.tenantId} fails`, error));
+    }
+});
+
 // below API are avaiable to internal user
 router.use(function(req, res, next) {
     // only accessible to tenant bqsq-admin
