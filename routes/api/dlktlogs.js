@@ -123,15 +123,14 @@ router.post('/play/query', util.validateSign, async function(req, res, next) {
 });
 
 router.post('/play/start', util.validateSign, async function(req, res, next) {
-    //[Default] get the current year by month
-    let play_date = moment();
-    if (req.body.hasOwnProperty("query_date")) {
-        if (!moment(req.body.query_date).isValid()) {
+    let play_date = null;
+    if (req.body.hasOwnProperty("play_date")) {
+        if (!moment(req.body.play_date).isValid()) {
             return next(new ParamError("开始播放时间格式不正确", 1106));
         }
-        play_date = moment(req.body.query_date);
+        play_date = moment(req.body.play_date);
     } else {
-        return next(new ParamError("缺少参数query_date", 1105));
+        return next(new ParamError("缺少参数play_date", 1105));
     }
 
     if (!req.body.hasOwnProperty("contentId")) {
@@ -168,6 +167,61 @@ router.post('/play/start', util.validateSign, async function(req, res, next) {
         });
     } catch (error) {
         return next(new InternalServerError(`start playing content ${req.body.contentId} of tenant ${req.body.tenantId} fails`, error));
+    }
+});
+
+router.post('/play/verify', util.validateSign, async function(req, res, next) {
+    let actual_play_date = moment();
+    if (req.body.hasOwnProperty("play_date")) {
+        if (!moment(req.body.play_date).isValid()) {
+            return next(new ParamError("开始播放时间格式不正确", 1106));
+        }
+        actual_play_date = moment(req.body.play_date);
+    } else {
+        return next(new ParamError("缺少参数play_date", 1105));
+    }
+
+    if (!req.body.hasOwnProperty("contentId")) {
+        return next(new ParamError("缺少参数contentId", 1107));
+    }
+
+    if (!req.body.hasOwnProperty("tenantId")) {
+        return next(new ParamError("缺少参数tenantId", 1103));
+    }
+
+    let query = {
+        nonce: req.body.nonce_str,
+        tenantId: req.body.tenantId || null,
+        contentId: req.body.contentId || null
+    };
+
+    try {
+        let logs_db = await db_utils.connect(LOGS_SCHEMA);
+        let playLogs = logs_db.collection("playLogs");
+
+        let doc = await playLogs.findOne(query);
+        let result = "OK"
+        if (!doc) {
+            result = "播放失败，没有找到播放记录，请从客户端中点击播放";
+        } else if (moment(doc.play_timestamp).isValid()) {
+            let expire_date = moment(doc.play_timestamp).add(2, 'hour'); // default expire time is 120 mins
+            if (moment(doc.play_timestamp).isBefore(actual_play_date) && actual_play_date.isBefore(expire_date)) {
+                result = "OK"
+            } else {
+                result = "播放失败，片源尚未开始播放或已经超过2小时"
+            }
+        } else {
+            return next(new InternalServerError(`Fail to verify playing content, play_date ${doc.play_timestamp} is invalid`));
+        }
+
+        console.log("Verify tenant %s play content %s with result '%s'", query.tenantId, query.contentId, result);
+        res.json({
+            code: 0,
+            message: "success",
+            result: result
+        });
+    } catch (error) {
+        return next(new InternalServerError(`Verify playing content ${req.body.contentId} of tenant ${req.body.tenantId} fails`, error));
     }
 });
 
