@@ -11,8 +11,7 @@ var membersPage = require('./member-overview.vue').default;
 init(function() {
     new Vue({
         el: '#app',
-        components: { membersPage },
-        template: '<members-page/>'
+        render: function(h) { return h(membersPage) }
     });
 });
 

@@ -12,8 +12,7 @@ init(function() {
     // bootstrap the class calendar page
     new Vue({
         el: '#app',
-        components: { calendar },
-        template: '<calendar/>'
+        render: function(h) { return h(calendar) }
     });
 });
 

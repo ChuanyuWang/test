@@ -9,8 +9,8 @@ var statisticsPage = require('./statistics-page.vue').default;
 // DOM Ready =============================================================
 init(function() {
     new Vue({
-        el: '#statistics-app',
-        components: { 'statistics-page': statisticsPage }
+        el: '#app',
+        render: function(h) { return h(statisticsPage) }
     });
 });
 

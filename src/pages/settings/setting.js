@@ -10,8 +10,7 @@ var settingsPage = require('./settings.vue').default;
 init(function() {
     new Vue({
         el: '#app',
-        components: { settingsPage },
-        template: '<settings-page/>'
+        render: function(h) { return h(settingsPage) }
     });
 });
 

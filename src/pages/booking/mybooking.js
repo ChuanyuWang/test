@@ -17,8 +17,7 @@ $(document).ready(function() {
     Vue.use(i18nextplugin);
     new Vue({
         el: '#app',
-        components: { myBooking },
-        template: '<my-booking/>'
+        render: function(h) { return h(myBooking) }
     });
 });
 

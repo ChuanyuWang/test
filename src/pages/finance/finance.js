@@ -10,8 +10,7 @@ var financePage = require('./finance.vue').default;
 init(function() {
     new Vue({
         el: '#app',
-        components: { financePage },
-        template: '<finance-page/>'
+        render: function(h) { return h(financePage) }
     });
 });
 

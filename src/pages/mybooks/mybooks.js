@@ -15,8 +15,7 @@ $(document).ready(function() {
     Vue.use(i18nextplugin);
     new Vue({
         el: '#app',
-        components: { readBooks },
-        template: '<read-books/>'
+        render: function(h) { return h(readBooks) }
     });
 });
 
