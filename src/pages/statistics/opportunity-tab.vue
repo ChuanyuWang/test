@@ -21,6 +21,7 @@ module.exports = {
       columns: [
         {
           field: "status",
+          title: "",
           formatter: this.statusFormatter,
           align: "center",
           events: { "click .phone": this.changePhone }
@@ -123,5 +124,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>
