@@ -63,6 +63,8 @@ module.exports = {
          */
         vue: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.min.js',
         vue_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.js',
+        vue_runtime: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.runtime.min.js',
+        vue_runtime_dev: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.runtime.js',
         i18next: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/i18next/20.2.4/i18next.min.js',
         i18next_dev: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/i18next/20.2.4/i18next.js',
         bootstrap_table_css: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap-table/1.15.5/bootstrap-table.min.css',
