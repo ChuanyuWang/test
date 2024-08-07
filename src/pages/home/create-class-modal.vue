@@ -18,14 +18,14 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
             div.col-sm-8
               input#cls_name.form-control(type='text',placeholder='课程描述',autofocus,v-model='name')
           div.form-group(:class='{"has-error": errors.cost}',:title='errors.cost')
-            label.control-label.col-sm-3(for='cost') 课时:
+            label.control-label.col-sm-3(for='cls_cost') 课时:
             div.col-sm-3
-              input.form-control(type='number',name='cost',min='0',step='0.1',v-model.number='cost')
+              input#cls_cost.form-control(type='number',min='0',step='0.1',v-model.number='cost')
           div.form-group(:class='{"has-error": errors.price}',:title='errors.price')
-            label.control-label.col-sm-3(for='price') 价格:
+            label.control-label.col-sm-3(for='cls_price') 价格:
             div.col-sm-3
               div.input-group
-                input.form-control(type='number',name='price',min='0',step='1',v-model.number='price')
+                input#cls_price.form-control(type='number',min='0',step='1',v-model.number='price')
                 label.input-group-addon 元
           div.form-group
             label.control-label.col-sm-3 时间:
@@ -173,6 +173,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>
