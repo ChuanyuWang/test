@@ -71,17 +71,20 @@ init(function() {
     //new Vue({ el: '#app', extends: cockpit, router, vuetify });
 
     // Either way is ok in below to mount root component
-    /*
+
     new Vue({
+        el: '#app',
         render: h => h(cockpit),
         router,
         vuetify
-    }).$mount('#app');
-    */
+    });
+
+    /*
     new Vue({
         el: '#app',
         components: { app: cockpit },
         router,
         vuetify
     });
+    */
 });

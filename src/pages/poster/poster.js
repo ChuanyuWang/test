@@ -27,16 +27,19 @@ init(function() {
     //new Vue({ el: '#app', extends: mobilePortal, router, vuetify });
 
     // Either way is ok in below to mount root component
-    /*
+
     new Vue({
-        render: h => h(mobilePortal),
-        router,
+        el: '#app',
+        render: h => h(poster),
+        //router,
         vuetify
-    }).$mount('#app');
-    */
+    });
+
+    /*
     new Vue({
         el: '#app',
         components: { app: poster },
         vuetify
     });
+    */
 });
