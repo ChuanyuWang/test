@@ -10,7 +10,7 @@ const hotMiddlewareScript = 'webpack-hot-middleware/client?path=/__webpack_hmr&t
 module.exports = {
     mode: process.env.NODE_ENV || 'development',
     target: "web",
-    devtool: "eval-source-map",
+    devtool: "source-map",
     // The base directory, an absolute path, for resolving entry points and loaders
     context: path.resolve(__dirname, 'src'),
     entry: {
