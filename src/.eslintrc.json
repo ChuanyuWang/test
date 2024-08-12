@@ -8,6 +8,7 @@
     },
     "extends": [
         "plugin:compat/recommended",
+        // "plugin:vue/vue3-recommended" // Use this if you are using Vue.js 3.x.
         "plugin:vue/recommended"
     ],
     "globals": {
