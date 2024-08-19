@@ -5,6 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const pkg = require('./package.json');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 
 module.exports = {
@@ -175,7 +176,8 @@ module.exports = {
 
                     return banner;
                 }
-            })
+            }),
+            new OptimizeCssAssetsPlugin()
         ],
     },
     performance: {
