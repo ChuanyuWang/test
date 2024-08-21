@@ -47,6 +47,8 @@ module.exports = {
      * 6. https://www.jsdelivr.com/
      * 7. http://cdn.bytedance.com/
      * 8. https://www.staticaly.com
+     * 9. https://unpkg.zhimg.com or https://unpkg.zhihu.com
+     * 10. https://npm.elemecdn.com
      */
     cdnlibs: {
         jquery: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.5.1/jquery.min.js',
