@@ -15,6 +15,7 @@ const passport = require('passport');
 const config = require('./config');
 const i18n = require('i18n');
 const helmet = require('helmet');
+const fs = require('fs');
 
 async function createServer() {
 
@@ -94,26 +95,38 @@ async function createServer() {
     // Use gzip compression
     app.use(compression());
 
-    // Load the webpack-dev-middleware to support hot reload if it's enabled
+    // Load the vite-server-middleware to support hot reload if it's enabled
     if (app.locals.ENV_DEVELOPMENT && process.env.HOTRELOAD === "true") {
-        console.log("[HotReload] webpack-dev-middleware is loaded");
-        const webpack = require('webpack');
-        const webpackDevMiddleware = require('webpack-dev-middleware');
-        const config = require('./webpack.config.js'); // load dev webpack configuration
-        const compiler = webpack(config);
-        app.use(webpackDevMiddleware(compiler, {
-            // router "/js/*" requset to this middleware (in-memory)
-            publicPath: config.output.publicPath,
-        }));
+        console.log("[HotReload] vite-middleware is loaded");
 
-        /**
-         * path - The path which the middleware will serve the event stream on, must match the client setting
-         * heartbeat - How often to send heartbeat updates to the client to keep the connection alive. Should be less than the client's timeout setting - usually set to half its value.
-         */
-        app.use(require("webpack-hot-middleware")(compiler, {
-            log: console.log, path: '/__webpack_hmr', heartbeat: 1000
-        }));
+        const { createServer: createViteServer } = require('vite');
+        // Create Vite server in middleware mode
+        let vite = await createViteServer({
+            server: { middlewareMode: true },
+            appType: 'custom'
+        });
+
+        // Use vite's connect instance as middleware
+        app.use(vite.middlewares);
     }
+
+    // Helper function to get the correct asset path
+    const manifestFilePath = path.join(__dirname, 'public', 'manifest.json');
+    let manifest = {};
+    if (fs.existsSync(manifestFilePath)) {
+        manifest = JSON.parse(fs.readFileSync(manifestFilePath, 'utf-8'));
+    }
+    app.locals.getAssetPath = function(filename) {
+        if (app.locals.ENV_DEVELOPMENT) {
+            return `/${filename}`;
+        }
+        if (manifest[filename])
+            return `/${manifest[filename].file}`;
+        else {
+            console.error(`Entry ${filename} not exist in manifest file`)
+            return `/${filename}`;
+        }
+    };
 
     app.use(express.static(path.join(__dirname, 'public')));
     /**
