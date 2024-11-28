@@ -1,57 +1,61 @@
 #!/usr/bin/env node
-var app = require('../app');
+const serverPromise = require('../app');
 
-if (app.get('env') === 'production') {
-    var https = require('https');
-    var fs = require('fs');
+serverPromise.then(app => {
+    if (app.get('env') === 'production') {
+        var https = require('https');
+        var fs = require('fs');
 
-    var hskey = fs.readFileSync('bin/12502486.key');
-    var hscert = fs.readFileSync('bin/12502486.pem');
-    var options = {
-        key: hskey,
-        cert: hscert
-    };
+        var hskey = fs.readFileSync('bin/12502486.key');
+        var hscert = fs.readFileSync('bin/12502486.pem');
+        var options = {
+            key: hskey,
+            cert: hscert
+        };
 
-    app.set('port', process.env.PORT || 443);
-    var server = https.createServer(options, app).listen(app.get('port'), function() {
-        console.log('Express server listening on port ' + server.address().port);
-        // send event "ready" to external process manager tool (PM2)
-        // So that the application process is considered as online status
-        //process.send('ready');
-    });
+        app.set('port', process.env.PORT || 443);
+        var server = https.createServer(options, app).listen(app.get('port'), function() {
+            console.log('Express server listening on port ' + server.address().port);
+            // send event "ready" to external process manager tool (PM2)
+            // So that the application process is considered as online status
+            //process.send('ready');
+        });
 
-    // intercept the SIGINT signal (emitted by pm2 stop) for Graceful Shutdown
-    // By default, pm2 waits 1600ms before sending SIGKILL signal if the applications doesn’t exit itself.
-    // pm2 will try to kill the old process by every 100ms until sending SIGKILL signal
-    // Change the default value by option "kill_timeout: 1600"
-    process.on('SIGINT', function() {
-        console.log('SIGINT signal received.')
+        // intercept the SIGINT signal (emitted by pm2 stop) for Graceful Shutdown
+        // By default, pm2 waits 1600ms before sending SIGKILL signal if the applications doesn’t exit itself.
+        // pm2 will try to kill the old process by every 100ms until sending SIGKILL signal
+        // Change the default value by option "kill_timeout: 1600"
+        process.on('SIGINT', function() {
+            console.log('SIGINT signal received.')
 
-        // Stops the server from accepting new connections and finishes existing connections.
-        server.close(function(err) {
-            if (err) {
-                console.error(err)
-                console.log("...app end with exit code 1");
-                return process.exit(1)
-            }
-            console.log("server is closed successfully");
+            // Stops the server from accepting new connections and finishes existing connections.
+            server.close(function(err) {
+                if (err) {
+                    console.error(err)
+                    console.log("...app end with exit code 1");
+                    return process.exit(1)
+                }
+                console.log("server is closed successfully");
 
-            // close database connection and exit with success (0 code)
-            app.stop();
-            console.log("...app end");
-            process.exit(0)
+                // close database connection and exit with success (0 code)
+                app.stop();
+                console.log("...app end");
+                process.exit(0)
+            })
         })
-    })
-} else {
-    var http = require('http');
-    app.set('port', process.env.PORT || 3000);
-    var server = http.createServer(app).listen(app.get('port'), function() {
-        console.log('Express server listening on port ' + server.address().port);
-        // send event "ready" to external process manager tool (PM2)
-        // So that the application process is considered as online status
-        //process.send('ready');
-    });
-}
+    } else {
+        var http = require('http');
+        app.set('port', process.env.PORT || 3000);
+        var server = http.createServer(app).listen(app.get('port'), function() {
+            console.log('Express server listening on port ' + server.address().port);
+            // send event "ready" to external process manager tool (PM2)
+            // So that the application process is considered as online status
+            //process.send('ready');
+        });
+    }
+}).catch(err => {
+    console.error('Failed to start server:', err);
+});
 
 /*
 var server = app.listen(app.get('port'), function() {

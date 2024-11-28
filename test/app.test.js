@@ -1,15 +1,17 @@
 const chai = require('chai');
 const request = require('supertest');
-const app = require('../app');
+const serverPromise = require('../app');
 
 //enable assertion styles, include Assert, Expect and Should
 const assert = chai.assert;
 const expect = chai.expect;
 chai.should(); //actually enable should style assertions
+let app = null;
 
-describe('App', function() {
-    before(function() {
+describe('Start App', function() {
+    before(async function() {
         // runs once before the first test in this block
+        app = await serverPromise;
     });
 
     after(function() {
