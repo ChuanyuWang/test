@@ -23,10 +23,11 @@ async function createServer() {
     const app = express();
     app.locals.CDN_FILES = config.cdnlibs;
 
-    // app.get('env') returns 'development' if NODE_ENV is not defined. 
+    // app.get('env') returns NODE_ENV environment variable or “development” if NODE_ENV is not set. 
     const env = app.get('env');
     app.locals.ENV = env;
     app.locals.ENV_DEVELOPMENT = env == 'development';
+    app.locals.ENV_HOTRELOAD = process.env.HOTRELOAD === 'true';
 
     // set the main logging by log4js
     const log4js = require('log4js');
@@ -96,7 +97,7 @@ async function createServer() {
     app.use(compression());
 
     // Load the vite-server-middleware to support hot reload if it's enabled
-    if (app.locals.ENV_DEVELOPMENT && process.env.HOTRELOAD === "true") {
+    if (app.locals.ENV_DEVELOPMENT && app.locals.ENV_HOTRELOAD) {
         console.log("[HotReload] vite-middleware is loaded");
 
         const { createServer: createViteServer } = require('vite');
@@ -117,7 +118,7 @@ async function createServer() {
         manifest = JSON.parse(fs.readFileSync(manifestFilePath, 'utf-8'));
     }
     app.locals.getAssetPath = function(filename) {
-        if (app.locals.ENV_DEVELOPMENT) {
+        if (app.locals.ENV_HOTRELOAD) {
             return `/${filename}`;
         }
         if (manifest[filename])
