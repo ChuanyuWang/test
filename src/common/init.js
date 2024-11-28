@@ -3,14 +3,14 @@
  * init.js
  * --------------------------------------------------------------------------
  */
-var i18nextPlugin = require('../locales/i18nextplugin');
-var formatPlugin = require('./format');
+import i18nextPlugin from '../locales/i18nextplugin';
+import formatPlugin from './format';
 
 /**
  * initialize utility function
  * @param {function} fn callback function when DOM ready
  */
-module.exports = function(fn) {
+function init(fn) {
     // initialize modules
     function initialize() {
         // MUST listen to the "languageChanged" event before loading i18nextplugin
@@ -78,3 +78,5 @@ module.exports = function(fn) {
         document.addEventListener('DOMContentLoaded', initialize);
     }
 };
+
+export default init;

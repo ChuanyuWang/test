@@ -60,12 +60,12 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('../../components/date-picker.vue').default;
-var serviceUtil = require("../../services/util");
+import datePicker from "../../components/date-picker.vue";
+import serviceUtil from "../../services/util";
 
-module.exports = {
+export default {
   components: {
-    'date-picker': date_picker
+    'date-picker': datePicker
   },
   props: {},
   data() {

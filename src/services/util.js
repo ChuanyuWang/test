@@ -84,4 +84,4 @@ function ajax(url, data, method) {
     return request;
 };
 
-module.exports = util;
+export default util;

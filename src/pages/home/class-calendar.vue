@@ -38,17 +38,20 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
-var class_service = require("../../services/classes");
-var messageAlert = require("../../components/message-alert.vue").default;
+import common from "../../common/common";
+import class_service from "../../services/classes";
+import messageAlert from "../../components/message-alert.vue";
+import datePicker from "../../components/date-picker.vue";
+import classList from "./class-list.vue";
+import createClassDlg from "./create-class-modal.vue"
 
-module.exports = {
+export default {
   name: "app",
   components: {
-    "date-picker": require("../../components/date-picker.vue").default,
-    "class-list": require("./class-list.vue").default,
+    "date-picker": datePicker,
+    "class-list": classList,
     "message-alert": messageAlert,
-    "create-class-modal": require("./create-class-modal.vue").default
+    "create-class-modal": createClassDlg
   },
   props: {},
   data: function() {
@@ -84,8 +87,11 @@ module.exports = {
       //set the time to the very beginning of day
       return _date.startOf('day');
     },
+    // TODO, should not mutate component data
+    // https://eslint.vuejs.org/rules/no-side-effects-in-computed-properties.html
     sortedClasses: function() {
-      return this.classes.sort(function(a, b) {
+      var classes = this.classes || [];
+      return classes.sort(function(a, b) {
         if (moment(a.date).isSameOrBefore(b.date)) return -1;
         else return 1;
       });

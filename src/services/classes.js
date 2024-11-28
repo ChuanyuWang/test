@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var util = require('./util');
+import util from './util';
 
 var service = {};
 
@@ -183,4 +183,4 @@ service.absent = function(classID, memberID) {
     return putCheckinStatus(classID, memberID, 'absent');
 };
 
-module.exports = service;
+export default service;

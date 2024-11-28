@@ -31,19 +31,24 @@ div
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
-  props: {
-    data: Array // array of class object
-  },
-  data: function() {
-    return {};
-  },
-  computed: {},
+ export default {
   filters: {
     displayTime: function(date) {
       return moment(date).format('HH:mm');
     }
   },
+  props: {
+    data: {
+      type: Array, // array of class object
+      default() {
+        return []
+      }
+    }
+  },
+  data: function() {
+    return {};
+  },
+  computed: {},
   methods: {
     reservation: function(cItem) {
       if (cItem) {

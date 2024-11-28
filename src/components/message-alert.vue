@@ -7,10 +7,10 @@ transition(name="alert-fade")
 </template>
 
 <script>
-module.exports = {
+export default {
   name: "message-alert",
-  props: {},
   components: {},
+  props: {},
   data() {
     return {
       timeoutID: null,

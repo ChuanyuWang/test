@@ -4,14 +4,16 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextBrowserLanguageDetector = require('./i18nextBrowserLanguageDetector');
+import i18nextBrowserLanguageDetector from 'i18next-browser-languagedetector';
+import en_lang from './en.json';
+import zh_ang from './zh_CN.json';
 
 var resources = {
-    'en': { translation: require('./en') },
-    'zh': { translation: require('./zh_CN') }
+    'en': { translation: en_lang },
+    'zh': { translation: zh_ang }
 };
 
-module.exports = {
+export default {
     install: function(Vue, options) {
         if (i18next) {
             // more options refer to https://www.i18next.com/configuration-options.html
