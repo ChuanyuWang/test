@@ -1,6 +1,7 @@
 node_modules/
 public/components
 public/js
+public/manifest.*
 .sass-cache
 logs/
 /config.db.js
@@ -8,3 +9,4 @@ logs/
 .eslintcache
 /public/css/
 .VSCodeCounter/
+
