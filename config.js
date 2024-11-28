@@ -82,12 +82,12 @@ module.exports = {
         echarts_dev: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.js',
         blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js',
         axios: 'https://cdn.bootcdn.net/ajax/libs/axios/1.3.4/axios.min.js',
-        axios_dev: 'https://cdn.bootcdn.net/ajax/libs/axios/1.3.4/axios.js',
+        axios_dev: 'https://unpkg.zhimg.com/axios@1.3.4/dist/axios.js',
         vuetify: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.js',
-        vuetify_dev: 'https://cdn.staticfile.org/vuetify/2.7.1/vuetify.js',
+        vuetify_dev: 'https://unpkg.zhimg.com/vuetify@2.7.1/dist/vuetify.js',
         vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.css',
-        vuetify_css_dev: 'https://cdn.staticfile.org/vuetify/2.7.1/vuetify.css',
+        vuetify_css_dev: 'https://unpkg.zhimg.com/vuetify@2.7.1/dist/vuetify.css',
         vue_router: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.min.js',
-        vue_router_dev: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.6.5/vue-router.js'
+        vue_router_dev: 'https://unpkg.zhimg.com/vue-router@3.6.5/dist/vue-router.js'
     }
 };
