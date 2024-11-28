@@ -74,7 +74,7 @@ div
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .class-item-div {
   border-bottom: 1px solid #ddd;
   padding: 8px;

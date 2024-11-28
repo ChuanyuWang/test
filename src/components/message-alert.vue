@@ -42,6 +42,8 @@ export default {
       }
     }
   },
+  mounted() { },
+  created() { },
   methods: {
     closeAlert() {
       this.message = "";
@@ -71,12 +73,10 @@ export default {
       this.showMessage(message, "warning", fadeOut === undefined ? false : fadeOut);
     },
   },
-  mounted() { },
-  created() { }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .alert-bottom-center {
   position: fixed;
   left: 50%;

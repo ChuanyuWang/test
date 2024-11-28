@@ -67,6 +67,7 @@ export default {
   components: {
     'date-picker': datePicker
   },
+  filters: {},
   props: {},
   data() {
     return {
@@ -84,11 +85,6 @@ export default {
       classroom: null,
       types: []
     };
-  },
-  watch: {
-    capacity(value) {
-      this.capacity = parseInt(value);
-    }
   },
   computed: {
     classDate() {
@@ -131,7 +127,20 @@ export default {
       })
     }
   },
-  filters: {},
+  watch: {
+    capacity(value) {
+      this.capacity = parseInt(value);
+    }
+  },
+  mounted() {
+    //var vm = this;
+  },
+  created() {
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
+    });
+  },
   methods: {
     show: function(classTime, classroom) {
       this.name = '';
@@ -161,15 +170,6 @@ export default {
       $(this.$el).modal('hide');
     }
   },
-  mounted() {
-    //var vm = this;
-  },
-  created() {
-    var request = serviceUtil.getJSON("/api/setting/types");
-    request.done((data, textStatus, jqXHR) => {
-      this.types = data || [];
-    });
-  }
 };
 </script>
 

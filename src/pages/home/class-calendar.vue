@@ -280,7 +280,7 @@ export default {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .class-table {
   table-layout: fixed;
 
