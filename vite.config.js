@@ -11,6 +11,7 @@ export default defineConfig({
         outDir: 'public', // outDir is the same with publicDir 
         emptyOutDir: false, // outDir is same with publicDir, DO NOT clean before build
         copyPublicDir: false, // outDir is same with publicDir, no need to copy
+        manifest: true,
         rollupOptions: {
             input: {
                 style: resolve(__dirname, 'src/css/style.less'),
