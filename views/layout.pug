@@ -7,7 +7,10 @@ html
     meta(name='author', content='Chuanyu.Wang@hotmail.com')
     title= title
     block css
-      link(rel='stylesheet', href='/css/style.css')
+      if ENV_DEVELOPMENT
+        link(rel='stylesheet', href='/src/css/style.less')
+      else
+        link(rel='stylesheet', href='/css/style.css')
       //link(rel='icon', href='favicon.ico')
       link(rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png")
       link(rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png")
