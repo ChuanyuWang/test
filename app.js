@@ -63,13 +63,6 @@ async function createServer() {
 
     // Add super admin - TODO
 
-    // view engine setup
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'pug');
-    app.locals.pretty = true; // output the pretty html for consistency 
-
-    // app.use(favicon(__dirname + '/public/img/favicon.ico'));
-
     // Log all http requests and responds by morgan
     morgan.token('pid', function getPid(req) {
         return process.pid;
@@ -90,6 +83,13 @@ async function createServer() {
     } else {
         app.use(morgan('[:date[iso]] [:pid] :remote-addr - :tenant :method :url :status :res[content-length] - :response-time ms'));
     }
+
+    // view engine setup
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'pug');
+    app.locals.pretty = true; // output the pretty html for consistency 
+
+    // app.use(favicon(__dirname + '/public/img/favicon.ico'));
 
     // Use gzip compression
     app.use(compression());
