@@ -8,6 +8,7 @@
     "dev": "nodemon",
     "lint": "eslint . --ext .js,.vue",
     "build": "webpack --config webpack.config.prod.js",
+    "vbuild": "vite build",
     "start": "node ./bin/www",
     "test": "mocha --require ./test/hooks.cjs --recursive",
     "worker": "node ./bin/worker"
@@ -46,6 +47,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.12",
     "@babel/preset-env": "^7.17.12",
+    "@vitejs/plugin-vue2": "^2.3.3",
     "babel-loader": "^8.2.5",
     "chai": "^4.3.6",
     "css-loader": "^4.3.0",
@@ -61,6 +63,7 @@
     "optimize-css-assets-webpack-plugin": "^6.0.1",
     "pug-plain-loader": "^1.1.0",
     "supertest": "^6.1.3",
+    "vite": "^3.2.11",
     "vue-loader": "^15.11.1",
     "vue-template-compiler": "2.6.14",
     "webpack": "^4.47.0",
