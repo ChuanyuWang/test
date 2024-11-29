@@ -18,7 +18,7 @@ export default defineConfig({
             input: {
                 style: resolve(__dirname, 'src/css/style.less'),
                 main: resolve(__dirname, pagesPath, 'home/main.js'),
-                class_view: resolve(__dirname, pagesPath, 'home/class_view.js'),
+                class_detail: resolve(__dirname, pagesPath, 'home/class_view.js'),
                 member: resolve(__dirname, pagesPath, 'members/member.js'),
                 member_detail: resolve(__dirname, pagesPath, 'members/member_detail.js'),
             },
