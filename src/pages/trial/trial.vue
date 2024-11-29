@@ -62,10 +62,10 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import common from "../../common/common";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "users-setting",
   props: {},
   data: function() {
@@ -239,6 +239,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

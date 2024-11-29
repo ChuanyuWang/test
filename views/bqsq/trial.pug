@@ -9,7 +9,7 @@ block append js
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue_runtime)
   script(src="//g.alicdn.com/sd/nch5/index.js?t=2015052012")
-  script(src='/js/trial.js')
+  script(type="module" src=getModulePath('trial/trial.js'))
 block content
   // display log in the top
   div.container

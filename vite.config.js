@@ -24,6 +24,7 @@ export default defineConfig({
                 booking: resolve(__dirname, pagesPath, 'booking/booking.js'),
                 mybooking: resolve(__dirname, pagesPath, 'booking/mybooking.js'),
                 mybooks: resolve(__dirname, pagesPath, 'mybooks/mybooks.js'),
+                trial: resolve(__dirname, pagesPath, 'trial/trial.js'),
             },
             output: {
                 format: 'es',
