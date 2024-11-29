@@ -15,6 +15,7 @@ export default defineConfig({
         copyPublicDir: false, // outDir is same with publicDir, no need to copy
         manifest: true,
         rollupOptions: {
+            // No way to disable shared chunk https://github.com/rollup/rollup/issues/2756
             input: {
                 style: resolve(__dirname, 'src/css/style.less'),
                 main: resolve(__dirname, pagesPath, 'home/main.js'),
@@ -23,17 +24,16 @@ export default defineConfig({
                 format: 'es',
                 entryFileNames: 'js/[name].js',
                 assetFileNames: 'css/[name].[ext]',
-                // banner: (chunk) => {
-                //     console.log(chunk); // chunk is undefined in vite v3.2.11
-                //     return "";
-                // },
-                // need to mark the comment as important by using /*! */ instead of /* */
-                banner: `
-                    /*!
-                    * Version: ${process.env.npm_package_version || '1.0.0'}
-                    * Copyright ©2017-${new Date().getFullYear()} Chuanyu Wang
-                    * File: [name]
-                    */`
+                // manualChunks: {},
+                banner: (chunk) => {
+                    // need to mark the comment as important by using /*! */ instead of /* */
+                    return `
+                        /*!
+                        * Version: ${process.env.npm_package_version || '1.0.0'}
+                        * Copyright ©2017-${new Date().getFullYear()} Chuanyu Wang
+                        * File: ${chunk.fileName}
+                        */`;
+                }
             }
         },
         /**
