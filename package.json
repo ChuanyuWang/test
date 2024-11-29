@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "nodemon",
     "lint": "eslint . --ext .js,.vue",
-    "build": "webpack --config webpack.config.prod.js",
-    "vbuild": "vite build",
+    "build": "vite build",
     "start": "node ./bin/www",
     "test": "mocha --require ./test/hooks.cjs --recursive",
     "worker": "node ./bin/worker"
