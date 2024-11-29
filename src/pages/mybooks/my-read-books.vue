@@ -125,7 +125,7 @@ module.exports = {
     showMyBooks: function() {
       var vm = this;
       var query = {
-        memberid: memberid,
+        memberid: this.user._id,
         from: moment(0).toISOString(),
         to: moment().add(1, 'years').toISOString(),
         order: 'desc',
@@ -169,8 +169,8 @@ module.exports = {
       request.done(function(data, textStatus, jqXHR) {
         if (data) {
           try {
-            // cache the member id in global variable before access localStorage
-            localStorage._memberid = memberid = data._id;
+            // cache the member id in localStorage
+            localStorage._memberid = data._id;
             localStorage._name = data.name;
             localStorage._contact = data.contact;
           } catch (oException) {
@@ -218,6 +218,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>
