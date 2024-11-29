@@ -27,7 +27,7 @@ v-container
 
 <script>
 
-module.exports = {
+export default {
   name: "store",
   data() {
     return {
@@ -89,5 +89,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

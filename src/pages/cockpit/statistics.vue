@@ -26,11 +26,11 @@ v-container
 
 <script>
 
-var waldenTheme = require("./walden.json");
-var common = require("../../common/common.js");
-var tenantPicker = require("./tenant-picker.vue").default;
+import waldenTheme from "./walden.json";
+import common from "../../common/common.js";
+import tenantPicker from "./tenant-picker.vue";
 
-module.exports = {
+export default {
   name: "statistics",
   components: {
     tenantPicker
@@ -188,5 +188,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

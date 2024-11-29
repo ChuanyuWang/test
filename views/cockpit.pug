@@ -6,7 +6,7 @@ block append js
     //script(defer src=CDN_FILES.echarts_dev)
   else
     //script(defer src=CDN_FILES.echarts)
-  script(src='/js/cockpit.js')
+  script(type="module" src=getModulePath('cockpit/cockpit.js'))
 
 block content
   div#app

@@ -48,9 +48,9 @@ v-container
 
 <script>
 
-var depositHistoryDialog = require("./deposit-history-dialog.vue").default;
+import depositHistoryDialog from "./deposit-history-dialog.vue";
 
-module.exports = {
+export default {
   name: "cost",
   components: { depositHistoryDialog },
   data() {

@@ -3,19 +3,19 @@
  * cockpit.js
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var cockpit = require('./cockpit.vue').default;
-var home = require('./home.vue').default;
-var store = require('./store.vue').default;
-var query = require('./query.vue').default;
-var notice = require('./notice.vue').default;
-var statistics = require('./statistics.vue').default;
-var pricing = require('./pricing.vue').default;
-var deposit = require('./deposit.vue').default;
-var cost = require('./cost.vue').default;
+import init from '../../common/init';
+import cockpit from './cockpit.vue';
+import home from './home.vue';
+import store from './store.vue';
+import query from './query.vue';
+import notice from './notice.vue';
+import statistics from './statistics.vue';
+import pricing from './pricing.vue';
+import deposit from './deposit.vue';
+import cost from './cost.vue';
 
 // Translation provided by Vuetify (javascript)
-var zhHans = require('../../locales/vuetify/zh-Hans');
+import zhHans from '../../locales/vuetify/zh-Hans';
 
 // DOM Ready =============================================================
 init(function() {
@@ -42,7 +42,7 @@ init(function() {
         next();
     });
 
-    vuetify_lang = "en";
+    var vuetify_lang = "en";
     if (i18next.language) {
         var lang = i18next.language.split("-")[0];
         vuetify_lang = lang;

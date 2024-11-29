@@ -39,9 +39,9 @@ v-container
 
 <script>
 
-var tenantPicker = require("./tenant-picker.vue").default;
+import tenantPicker from "./tenant-picker.vue";
 
-module.exports = {
+export default {
   name: "query",
   components: {
     tenantPicker
@@ -170,5 +170,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

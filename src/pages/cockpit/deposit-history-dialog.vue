@@ -22,7 +22,7 @@ v-dialog(v-model="dialog" max-width="60%")
 
 <script>
 
-module.exports = {
+export default {
   name: "deposit-history-dialog",
   components: {},
   data() {

@@ -34,7 +34,7 @@ v-app
 </template>
 
 <script>
-module.exports = {
+export default {
   name: "cockpit",
   data() {
     return {

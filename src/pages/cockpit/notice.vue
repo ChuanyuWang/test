@@ -79,7 +79,7 @@ v-container
 
 <script>
 
-module.exports = {
+export default {
   name: "notice",
   data() {
     return {

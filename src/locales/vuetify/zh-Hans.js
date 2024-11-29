@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   badge: '徽章',
   close: '关闭',
   dataIterator: {

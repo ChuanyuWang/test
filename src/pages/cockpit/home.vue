@@ -24,9 +24,9 @@ v-container
 </template>
 
 <script>
-var tenantPicker = require("./tenant-picker.vue").default;
+import tenantPicker from "./tenant-picker.vue";
 
-module.exports = {
+export default {
   name: "home",
   components: {
     tenantPicker
