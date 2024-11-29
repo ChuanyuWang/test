@@ -26,6 +26,7 @@ export default defineConfig({
                 mybooks: resolve(__dirname, pagesPath, 'mybooks/mybooks.js'),
                 trial: resolve(__dirname, pagesPath, 'trial/trial.js'),
                 cockpit: resolve(__dirname, pagesPath, 'cockpit/cockpit.js'),
+                course: resolve(__dirname, pagesPath, 'course/course.js'),
 
                 // below pages under development
                 portal: resolve(__dirname, pagesPath, 'app/mobileportal.js'),
