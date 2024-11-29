@@ -20,7 +20,18 @@ export default defineConfig({
             output: {
                 format: 'es',
                 entryFileNames: 'js/[name].js',
-                assetFileNames: 'css/[name].[ext]'
+                assetFileNames: 'css/[name].[ext]',
+                // banner: (chunk) => {
+                //     console.log(chunk); // chunk is undefined in vite v3.2.11
+                //     return "";
+                // },
+                // need to mark the comment as important by using /*! */ instead of /* */
+                banner: `
+                    /*!
+                    * Version: ${process.env.npm_package_version || '1.0.0'}
+                    * Copyright ©2017-${new Date().getFullYear()} Chuanyu Wang
+                    * File: [name]
+                    */`
             }
         },
         /**
