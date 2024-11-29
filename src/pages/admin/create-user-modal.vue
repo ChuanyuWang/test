@@ -42,7 +42,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
   props: {},
   data: function() {
     return {
