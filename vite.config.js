@@ -15,7 +15,6 @@ export default defineConfig({
         copyPublicDir: false, // outDir is same with publicDir, no need to copy
         manifest: true,
         rollupOptions: {
-            // No way to disable shared chunk https://github.com/rollup/rollup/issues/2756
             input: {
                 style: resolve(__dirname, 'src/css/style.less'),
                 main: resolve(__dirname, pagesPath, 'home/main.js'),
@@ -25,7 +24,8 @@ export default defineConfig({
                 format: 'es',
                 entryFileNames: 'js/[name].js',
                 assetFileNames: 'css/[name].[ext]',
-                // manualChunks: {},
+                // The trick comes from https://github.com/rollup/rollup/issues/2756
+                //manualChunks: () => 'everything.js',
                 banner: (chunk) => {
                     // need to mark the comment as important by using /*! */ instead of /* */
                     return `
@@ -42,6 +42,7 @@ export default defineConfig({
          * Enable/disable CSS code splitting. 
          * When enabled, CSS imported in async JS chunks will be preserved as chunks and fetched together when the chunk is fetched.
          * If disabled, all CSS in the entire project will be extracted into a single CSS file.
+         * Long discussion in https://github.com/vitejs/vite/issues/1579
          */
         cssCodeSplit: false
     },
