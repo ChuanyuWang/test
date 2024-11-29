@@ -4,8 +4,8 @@
  * Entry module of view course page
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var courseView = require('./course-view.vue').default;
+import init from '../../common/init';
+import courseView from './course-view.vue';
 
 // DOM Ready =============================================================
 init(function() {
