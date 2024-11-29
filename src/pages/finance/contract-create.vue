@@ -110,21 +110,22 @@ div.container
 </template>
 <script>
 
-var member_select_modal = require("../../components/member-select-modal.vue").default;
-var type_select_modal = require("../../components/type-select-modal.vue").default;
-var serviceUtil = require("../../services/util");
-var common = require('../../common/common');
-var messageAlert = require("../../components/message-alert.vue").default;
+import member_select_modal from "../../components/member-select-modal.vue";
+import type_select_modal from "../../components/type-select-modal.vue";
+import serviceUtil from "../../services/util";
+import common from '../../common/common';
+import messageAlert from "../../components/message-alert.vue";
+import datePicker from "../../components/date-picker.vue";
 
 
-module.exports = {
+export default {
   name: "contract-create",
   props: {},
   components: {
     "member-select-modal": member_select_modal,
     "type-select-modal": type_select_modal,
     "message-alert": messageAlert,
-    "date-picker": require('../../components/date-picker.vue').default
+    "date-picker": datePicker
   },
   data() {
     return {

@@ -3,8 +3,8 @@
  * contract_create.js creating contract page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var contractCreate = require('./contract-create.vue').default;
+import init from '../../common/init';
+import contractCreate from './contract-create.vue';
 
 // DOM Ready =============================================================
 init(function() {

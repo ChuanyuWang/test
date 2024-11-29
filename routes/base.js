@@ -101,7 +101,7 @@ router.get('/finance', helper.checkTenantUser, function(req, res) {
 router.get('/contract/create', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/pages/detail-page', {
         title: res.__('constracts_create'),
-        entry_module: '/js/contract_create.js',
+        entry_module: 'finance/contract_create.js',
         user: req.user
     });
 });
