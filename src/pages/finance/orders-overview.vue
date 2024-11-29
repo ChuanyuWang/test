@@ -238,5 +238,4 @@ export default {
   mounted() { }
 }
 </script>
-<style lang="less">
-</style>
+<style lang="less"></style>

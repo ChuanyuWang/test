@@ -79,7 +79,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .v-select.fit {
   width: min-content;
   min-width: 50px;

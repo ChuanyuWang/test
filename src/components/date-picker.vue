@@ -131,5 +131,4 @@ div.input-group.date(:id="id",:class="inputClass")
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>

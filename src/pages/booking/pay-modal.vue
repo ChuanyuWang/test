@@ -196,7 +196,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .form-condensed .form-group {
   margin-bottom: 0px;
 }

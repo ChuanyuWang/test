@@ -250,7 +250,7 @@ export default {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .detail-teacher-border {
   border-left: 2px solid #eee;
 }

@@ -456,7 +456,7 @@ export default {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .container .page-header {
   margin: 15px 0;
   padding-bottom: 3px;

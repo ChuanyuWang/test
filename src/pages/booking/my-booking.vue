@@ -355,7 +355,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .class-row {
   margin-left: -7px;
   margin-right: -7px;

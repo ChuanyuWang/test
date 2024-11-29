@@ -549,7 +549,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .container .page-header {
   padding-bottom: 3px;
 }

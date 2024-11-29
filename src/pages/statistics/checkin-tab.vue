@@ -256,7 +256,7 @@ export default {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .flag {
   font-size: larger;
 }

@@ -51,7 +51,7 @@ export default {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .selected-teacher {
   border-right: 4px solid #337ab7;
   color: #337ab7;
