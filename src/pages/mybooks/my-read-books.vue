@@ -65,7 +65,6 @@ export default {
         _id: null,
         name: ""
       },
-      memberid: "",
       errorMessage: "",
       classes: [],
       teachers: {} // Map {"id": "name"}
@@ -126,7 +125,7 @@ export default {
     showMyBooks: function() {
       var vm = this;
       var query = {
-        memberid: this.memberid,
+        memberid: this.user._id,
         from: moment(0).toISOString(),
         to: moment().add(1, 'years').toISOString(),
         order: 'desc',
@@ -171,7 +170,6 @@ export default {
         if (data) {
           try {
             // cache the member id in localStorage
-            vm.memberid = data._id;
             localStorage._memberid = data._id;
             localStorage._name = data.name;
             localStorage._contact = data.contact;
