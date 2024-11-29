@@ -150,15 +150,15 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require("../../components/date-picker.vue").default;
-var teacher_service = require("../../services/teachers");
-var class_service = require("../../services/classes");
-var member_select_modal = require("../../components/member-select-modal.vue").default;
-var add_book_modal = require("./add-book-modal.vue").default;
-var messageAlert = require("../../components/message-alert.vue").default;
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import date_picker from "../../components/date-picker.vue";
+import teacher_service from "../../services/teachers";
+import class_service from "../../services/classes";
+import member_select_modal from "../../components/member-select-modal.vue";
+import add_book_modal from "./add-book-modal.vue";
+import messageAlert from "../../components/message-alert.vue";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "class-detail",
   props: {
     appData: String // the id of class object

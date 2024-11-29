@@ -19,6 +19,7 @@ export default defineConfig({
             input: {
                 style: resolve(__dirname, 'src/css/style.less'),
                 main: resolve(__dirname, pagesPath, 'home/main.js'),
+                class_view: resolve(__dirname, pagesPath, 'home/class_view.js'),
             },
             output: {
                 format: 'es',

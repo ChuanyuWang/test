@@ -14,7 +14,7 @@ append js
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
   script(src=CDN_FILES.bootstrap_table_vue)
-  script(src=entry_module)
+  script(type="module" src=getModulePath(entry_module))
 
 block page
   div(style="padding-top:69px")

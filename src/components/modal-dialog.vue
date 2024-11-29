@@ -23,7 +23,7 @@ div.modal.fade(tabindex='-1',:data-backdrop='backdrop||"static"',role="dialog",a
 </template>
 
 <script>
-module.exports = {
+export default {
   name: "modal-dialog",
   props: {
     backdrop: {

@@ -17,7 +17,7 @@ router.get('/class/:classID', helper.checkTenantUser, function(req, res, next) {
     if (!ObjectId.isValid(req.params.classID)) return next();
     res.render('bqsq/pages/detail-page', {
         title: res.__('view_session'),
-        entry_module: '/js/class_view.js',
+        entry_module: 'home/class_view.js',
         data: req.params.classID,
         user: req.user
     });

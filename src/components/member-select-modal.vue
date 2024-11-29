@@ -21,9 +21,9 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK" @show="lazyRefresh") {
  * member-select-modal.vue component for select one or multi members
  * --------------------------------------------------------------------------
  */
-var modalDialog = require("./modal-dialog.vue").default;
+import modalDialog from "./modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "member-select-dialog",
   props: {
     multiSelection: {
@@ -98,6 +98,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>
