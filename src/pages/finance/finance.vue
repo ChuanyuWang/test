@@ -16,13 +16,13 @@ div
       payments-page(ref="paymentsTab")
 </template>
 <script>
-var common = require('../../common/common');
-var ordersPage = require('./orders-overview.vue').default;
-var contractsPage = require('./contract-overview.vue').default;
-var paymentsPage = require('./payments-overview.vue').default;
+import common from'../../common/common';
+import ordersPage from'./orders-overview.vue';
+import contractsPage from'./contract-overview.vue';
+import paymentsPage from'./payments-overview.vue';
 
-module.exports = {
-  name: "finance",
+export default {
+  name: "finance-page",
   props: {},
   data() {
     return {};

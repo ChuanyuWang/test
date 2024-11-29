@@ -3,8 +3,8 @@
  * finace.js page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var financePage = require('./finance.vue').default;
+import init from '../../common/init';
+import financePage from './finance.vue';
 
 // DOM Ready =============================================================
 init(function() {

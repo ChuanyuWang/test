@@ -28,14 +28,16 @@ div
   bootstrap-table.table-striped(ref="contractTable", :columns="columns", :options="options")
 </template>
 <script>
+import datePicker from "../../components/date-picker.vue";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "contract-overview",
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,
-    "date-picker": require("../../components/date-picker.vue").default,
-    "modal-dialog": require("../../components/modal-dialog.vue").default
+    "date-picker": datePicker,
+    "modal-dialog": modalDialog
   },
   data() {
     return {

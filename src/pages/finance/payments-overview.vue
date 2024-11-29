@@ -16,17 +16,19 @@ div
 </template>
 <script>
 
-var serviceUtil = require("../../services/util");
-var messageAlert = require("../../components/message-alert.vue").default;
+import serviceUtil from "../../services/util";
+import messageAlert from "../../components/message-alert.vue";
+import datePicker from "../../components/date-picker.vue";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "payments-overview",
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,
     "message-alert": messageAlert,
-    "date-picker": require("../../components/date-picker.vue").default,
-    "modal-dialog": require("../../components/modal-dialog.vue").default
+    "date-picker": datePicker,
+    "modal-dialog": modalDialog
   },
   data() {
     return {
