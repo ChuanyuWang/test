@@ -28,9 +28,10 @@ div
 </template>
 <script>
 
-var serviceUtil = require("../../services/util");
+import serviceUtil from "../../services/util";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "contract-comments",
   props: {
     contractId: {
@@ -39,7 +40,7 @@ module.exports = {
     }
   },
   components: {
-    "modal-dialog": require("../../components/modal-dialog.vue").default
+    "modal-dialog": modalDialog
   },
   data() {
     return {

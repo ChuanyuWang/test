@@ -52,7 +52,10 @@ modal-dialog(ref="dialog" buttons="confirm" size="medium" @ok="clickOK", :hasErr
 </template>
 
 <script>
-module.exports = {
+import datePicker from "../../components/date-picker.vue";
+import modalDialog from "../../components/modal-dialog.vue";
+
+export default {
   name: "modify-contract-dialog",
   props: {
     contract: {
@@ -61,8 +64,8 @@ module.exports = {
     }
   },
   components: {
-    "date-picker": require('../../components/date-picker.vue').default,
-    "modal-dialog": require("../../components/modal-dialog.vue").default
+    "date-picker": datePicker,
+    "modal-dialog": modalDialog
   },
   data() {
     return {

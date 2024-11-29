@@ -31,6 +31,7 @@ export default defineConfig({
                 setting: resolve(__dirname, pagesPath, 'settings/setting.js'),
                 statistics: resolve(__dirname, pagesPath, 'statistics/statistics.js'),
                 contracts: resolve(__dirname, pagesPath, 'finance/finance.js'),
+                contract_detail: resolve(__dirname, pagesPath, 'finance/contract_detail.js'),
                 admin: resolve(__dirname, pagesPath, 'admin/admin.js'),
 
                 // below pages under development

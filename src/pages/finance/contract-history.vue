@@ -12,9 +12,9 @@ div
 </template>
 <script>
 
-var commonUtil = require("../../common/common");
+import commonUtil from "../../common/common";
 
-module.exports = {
+export default {
   name: "contract-history",
   props: {
     contractId: {

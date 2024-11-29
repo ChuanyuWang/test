@@ -111,7 +111,7 @@ router.get('/contract/:contractID', helper.checkTenantUser, function(req, res, n
     if (!ObjectId.isValid(req.params.contractID)) return next();
     res.render('bqsq/pages/detail-page', {
         title: res.__('view_contract'),
-        entry_module: '/js/contract_detail.js',
+        entry_module: 'finance/contract_detail.js',
         data: req.params.contractID,
         user: req.user
     });

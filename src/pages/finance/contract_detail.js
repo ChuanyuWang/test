@@ -3,8 +3,8 @@
  * contract_detail.js contract detail page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var contractDetail = require('./contract-detail.vue').default;
+import init from '../../common/init';
+import contractDetail from './contract-detail.vue';
 
 // DOM Ready =============================================================
 init(function() {
