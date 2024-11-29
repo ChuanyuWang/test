@@ -1,7 +1,7 @@
 extends ../../vuetifylayout
 
 block append js
-  script(src='/js/portal.js')
+  script(type="module" src=getModulePath('app/mobileportal.js'))
 
 block content
   div#app

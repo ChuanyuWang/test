@@ -4,7 +4,7 @@ v-container(fluid)
 </template>
 
 <script>
-module.exports = {
+export default {
   name: "appointment",
   data() {
     return {}
