@@ -18,7 +18,7 @@ v-app
 </template>
 
 <script>
-module.exports = {
+export default {
   name: "mobile-portal",
   data() {
     return {

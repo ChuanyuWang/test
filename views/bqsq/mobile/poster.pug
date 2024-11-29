@@ -1,7 +1,7 @@
 extends ../../vuetifylayout
 
 block append js
-  script(src='/js/poster.js')
+  script(type="module" src=getModulePath('poster/poster.js'))
 
 block content
   div#app

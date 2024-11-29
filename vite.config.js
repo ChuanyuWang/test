@@ -28,6 +28,7 @@ export default defineConfig({
 
                 // below pages under development
                 portal: resolve(__dirname, pagesPath, 'app/mobileportal.js'),
+                poster: resolve(__dirname, pagesPath, 'poster/poster.js'),
             },
             output: {
                 format: 'es',
