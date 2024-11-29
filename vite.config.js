@@ -22,6 +22,7 @@ export default defineConfig({
                 member: resolve(__dirname, pagesPath, 'members/member.js'),
                 member_detail: resolve(__dirname, pagesPath, 'members/member_detail.js'),
                 booking: resolve(__dirname, pagesPath, 'booking/booking.js'),
+                mybooking: resolve(__dirname, pagesPath, 'booking/mybooking.js'),
             },
             output: {
                 format: 'es',
