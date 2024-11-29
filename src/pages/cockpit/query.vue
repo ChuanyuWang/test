@@ -42,7 +42,7 @@ v-container
 import tenantPicker from "./tenant-picker.vue";
 
 export default {
-  name: "query",
+  name: "query-tab",
   components: {
     tenantPicker
   },

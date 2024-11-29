@@ -8,7 +8,7 @@ v-container(fluid)
 
 <script>
 export default {
-  name: "trial",
+  name: "trial-tab",
   data() {
     return {}
   },

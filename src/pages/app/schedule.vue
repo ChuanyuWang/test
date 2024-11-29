@@ -36,7 +36,7 @@ v-container.pb-16
 import commonUtil from "../../common/common";
 
 export default {
-  name: "schedule",
+  name: "schedule-tab",
   data() {
     var items = [{
       _id: "1",

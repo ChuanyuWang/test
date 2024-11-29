@@ -80,7 +80,7 @@ v-container
 <script>
 
 export default {
-  name: "notice",
+  name: "notice-tab",
   data() {
     return {
       valid: false,

@@ -57,7 +57,7 @@ v-container
 import depositHistoryDialog from "./deposit-history-dialog.vue";
 
 export default {
-  name: "deposit",
+  name: "deposit-tab",
   components: { depositHistoryDialog },
   data() {
     return {

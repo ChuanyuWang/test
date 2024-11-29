@@ -71,7 +71,7 @@ v-container
 <script>
 
 export default {
-  name: "pricing",
+  name: "pricing-tab",
   data() {
     return {
       snackbar: false,

@@ -31,7 +31,7 @@ import common from "../../common/common.js";
 import tenantPicker from "./tenant-picker.vue";
 
 export default {
-  name: "statistics",
+  name: "statistics-tab",
   components: {
     tenantPicker
   },

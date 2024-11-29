@@ -5,7 +5,7 @@ v-container(fluid)
 
 <script>
 export default {
-  name: "appointment",
+  name: "appointment-tab",
   data() {
     return {}
   },

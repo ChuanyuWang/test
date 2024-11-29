@@ -28,7 +28,7 @@ v-container
 <script>
 
 export default {
-  name: "store",
+  name: "store-tab",
   data() {
     return {
       yesterday: moment().subtract(1, 'day'),

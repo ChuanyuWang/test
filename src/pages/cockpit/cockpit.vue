@@ -35,7 +35,7 @@ v-app
 
 <script>
 export default {
-  name: "cockpit",
+  name: "cockpit-page",
   data() {
     return {
       selectedItem: 0,
