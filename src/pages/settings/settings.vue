@@ -63,7 +63,7 @@ import common from '../../common/common';
 import messageAlert from "../../components/message-alert.vue";
 
 export default {
-  name: "settings",
+  name: "settings-page",
   props: {
   },
   data() {
