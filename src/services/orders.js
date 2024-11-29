@@ -66,4 +66,4 @@ service.delete = function(orderID, fields) {
     return request;
 }
 
-module.exports = service;
+export default service;

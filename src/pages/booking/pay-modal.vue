@@ -57,11 +57,11 @@ modal-dialog(ref="dialog",size="small") 确认订单信息
           button.btn.btn-primary(type="button",@click="openMyBooking") 我的预约
 </template>
 <script>
-var modalDialog = require("../../components/modal-dialog.vue").default;
-var common = require("../../common/common");
-var orders_service = require("../../services/orders");
+import modalDialog from "../../components/modal-dialog.vue";
+import common from "../../common/common";
+import orders_service from "../../services/orders";
 
-module.exports = {
+export default {
   name: "pay-modal",
   props: {
     bookItem: Object,

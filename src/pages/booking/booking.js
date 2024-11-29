@@ -5,8 +5,9 @@
  */
 
 //var common = require('../../common/common');
-var i18nextplugin = require('../../locales/i18nextplugin');
-var bookingApp = require('./booking.vue').default;
+//var i18nextplugin = require('../../locales/i18nextplugin');
+import init from '../../common/init';
+import bookingApp from './booking.vue';
 
 /* Not able to get user openid as 订阅号
 var ua = navigator.userAgent.toLowerCase();
@@ -29,16 +30,13 @@ if (ua.indexOf('micromessenger') > -1) { // we are within wechat
 
 //var app = null;
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
+init(function() {
+    fixScroll();
 
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
     new Vue({
         el: '#app',
-        components: { bookingApp },
         data: { openID: "" },
-        template: '<booking-app :openID="openID"/>'
+        render: function(h) { return h(bookingApp) }
     });
     // Test only
     //app.openID = "o9lk5w_d08t3gW6KY9VkdWU5rnnU";
@@ -46,11 +44,7 @@ $(document).ready(function() {
 
 // Functions =============================================================
 
-function init() {
-    console.log("welcome~~~");
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-
+function fixScroll() {
     /* fix topbar at the top of screen when scroll down
     $(window).scroll(this, function (event) {
         //console.log(event);

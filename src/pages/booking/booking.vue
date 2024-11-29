@@ -97,12 +97,12 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
-var class_service = require("../../services/classes");
-var modalDialog = require("../../components/modal-dialog.vue").default;
-var payDialog = require("./pay-modal.vue").default;
+import common from "../../common/common";
+import class_service from "../../services/classes";
+import modalDialog from "../../components/modal-dialog.vue";
+import payDialog from "./pay-modal.vue";
 
-module.exports = {
+export default {
   name: "booking-app",
   props: {
     openID: {
