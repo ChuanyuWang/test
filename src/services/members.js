@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var util = require('./util');
+import util from './util';
 
 var service = {};
 
@@ -99,4 +99,4 @@ service.getMemberSummary = function(id) {
     return request;
 }
 
-module.exports = service;
+export default service;

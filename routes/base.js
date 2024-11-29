@@ -40,7 +40,7 @@ router.get('/member/:memberID', helper.checkTenantUser, function(req, res, next)
     res.render('bqsq/pages/detail-page', {
         title: res.__('view_member'),
         user: req.user,
-        entry_module: '/js/member_detail.js',
+        entry_module: 'members/member_detail.js',
         data: req.params.memberID,
     });
 });

@@ -123,17 +123,17 @@ div.container
  * member-view.js display details of single member item
  * --------------------------------------------------------------------------
  */
-var date_picker = require('../../components/date-picker.vue').default;
-var modalDialog = require("../../components/modal-dialog.vue").default;
-var comment_dlg = require('./comment-modal.vue').default;
-var messageAlert = require("../../components/message-alert.vue").default;
-var common = require('../../common/common');
-var memberService = require('../../services/members');
-var class_service = require('../../services/classes');
-var memberContracts = require("./member-contracts.vue").default;
+import date_picker from '../../components/date-picker.vue';
+import modalDialog from "../../components/modal-dialog.vue";
+import comment_dlg from './comment-modal.vue';
+import messageAlert from "../../components/message-alert.vue";
+import common from '../../common/common';
+import memberService from '../../services/members';
+import class_service from '../../services/classes';
+import memberContracts from "./member-contracts.vue";
 
 
-module.exports = {
+export default {
   name: "member-view",
   props: {
     appData: {

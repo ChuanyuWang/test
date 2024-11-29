@@ -20,6 +20,7 @@ export default defineConfig({
                 main: resolve(__dirname, pagesPath, 'home/main.js'),
                 class_view: resolve(__dirname, pagesPath, 'home/class_view.js'),
                 member: resolve(__dirname, pagesPath, 'members/member.js'),
+                member_detail: resolve(__dirname, pagesPath, 'members/member_detail.js'),
             },
             output: {
                 format: 'es',

@@ -14,7 +14,7 @@ div
 </template>
 <script>
 
-module.exports = {
+export default {
   name: "member-contracts",
   props: {
     memberId: {
@@ -177,5 +177,4 @@ module.exports = {
   }
 }
 </script>
-<style lang="less">
-</style>
+<style lang="less"></style>
