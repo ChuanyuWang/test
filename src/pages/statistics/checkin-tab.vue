@@ -37,10 +37,10 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
-var class_service = require("../../services/classes");
+import common from "../../common/common";
+import class_service from "../../services/classes";
 
-module.exports = {
+export default {
   name: "checkin-tab",
   props: {},
   data: function() {

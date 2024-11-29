@@ -18,10 +18,10 @@ div
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('../../components/date-picker.vue').default;
-var teacher_service = require("../../services/teachers");
+import date_picker from '../../components/date-picker.vue';
+import teacher_service from "../../services/teachers";
 
-module.exports = {
+export default {
   name: "teacher-tab",
   props: {},
   data: function() {

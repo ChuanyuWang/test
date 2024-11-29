@@ -3,8 +3,8 @@
  * statistics.js page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var statisticsPage = require('./statistics-page.vue').default;
+import init from '../../common/init';
+import statisticsPage from './statistics-page.vue';
 
 // DOM Ready =============================================================
 init(function() {

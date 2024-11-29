@@ -15,9 +15,9 @@ div
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('../../components/date-picker.vue').default;
+import date_picker from '../../components/date-picker.vue';
 
-module.exports = {
+export default {
   name: "member-tab",
   props: {},
   data: function() {

@@ -29,6 +29,7 @@ export default defineConfig({
                 course: resolve(__dirname, pagesPath, 'course/course.js'),
                 course_detail: resolve(__dirname, pagesPath, 'course/course_view.js'),
                 setting: resolve(__dirname, pagesPath, 'settings/setting.js'),
+                statistics: resolve(__dirname, pagesPath, 'statistics/statistics.js'),
 
                 // below pages under development
                 portal: resolve(__dirname, pagesPath, 'app/mobileportal.js'),
