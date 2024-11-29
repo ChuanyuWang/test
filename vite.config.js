@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue2'
 import { resolve } from 'path'
 
+const pagesPath = "src/pages";
+
 // vite.config.js, refer to https://vitejs.dev/config/
 export default defineConfig({
     publicDir: 'public',
@@ -15,7 +17,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 style: resolve(__dirname, 'src/css/style.less'),
-                main: resolve(__dirname, 'src/pages/home/main.js')
+                main: resolve(__dirname, pagesPath, 'home/main.js'),
             },
             output: {
                 format: 'es',

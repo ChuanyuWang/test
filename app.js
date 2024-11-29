@@ -117,15 +117,16 @@ async function createServer() {
     if (fs.existsSync(manifestFilePath)) {
         manifest = JSON.parse(fs.readFileSync(manifestFilePath, 'utf-8'));
     }
-    app.locals.getAssetPath = function(filename) {
+    app.locals.getModulePath = function(filename) {
+        let actualFileName = `src/pages/${filename}`
         if (app.locals.ENV_HOTRELOAD) {
-            return `/${filename}`;
+            return `/${actualFileName}`;
         }
-        if (manifest[filename])
-            return `/${manifest[filename].file}`;
+        if (manifest[actualFileName])
+            return `/${manifest[actualFileName].file}`;
         else {
-            console.error(`Entry ${filename} not exist in manifest file`)
-            return `/${filename}`;
+            console.error(`Entry ${actualFileName} not exist in manifest file`)
+            return `/${actualFileName}`;
         }
     };
 
