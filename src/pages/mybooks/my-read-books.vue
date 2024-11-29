@@ -49,11 +49,11 @@ div.container(style='padding-left:7px;padding-right:7px')
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
-var teachersService = require("../../services/teachers");
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import common from "../../common/common";
+import teachersService from "../../services/teachers";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "my-read-books",
   props: {},
   data: function() {
@@ -65,6 +65,7 @@ module.exports = {
         _id: null,
         name: ""
       },
+      memberid: "",
       errorMessage: "",
       classes: [],
       teachers: {} // Map {"id": "name"}
@@ -125,7 +126,7 @@ module.exports = {
     showMyBooks: function() {
       var vm = this;
       var query = {
-        memberid: memberid,
+        memberid: this.memberid,
         from: moment(0).toISOString(),
         to: moment().add(1, 'years').toISOString(),
         order: 'desc',
@@ -169,8 +170,9 @@ module.exports = {
       request.done(function(data, textStatus, jqXHR) {
         if (data) {
           try {
-            // cache the member id in global variable before access localStorage
-            localStorage._memberid = memberid = data._id;
+            // cache the member id in localStorage
+            vm.memberid = data._id;
+            localStorage._memberid = data._id;
             localStorage._name = data.name;
             localStorage._contact = data.contact;
           } catch (oException) {
@@ -218,6 +220,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>
