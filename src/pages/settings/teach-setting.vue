@@ -11,11 +11,11 @@ div.row
  * --------------------------------------------------------------------------
  */
 
-var teacher_list = require("./teach-list.vue").default;
-var teacher_detail = require("./teach-detail.vue").default;
-var teacher_service = require("../../services/teachers");
+import teacher_list from "./teach-list.vue";
+import teacher_detail from "./teach-detail.vue";
+import teacher_service from "../../services/teachers";
 
-module.exports = {
+export default {
   name: "teacher-setting",
   props: {
     //data: Array // array of teacher object
@@ -87,6 +87,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

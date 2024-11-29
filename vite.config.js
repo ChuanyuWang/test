@@ -28,6 +28,7 @@ export default defineConfig({
                 cockpit: resolve(__dirname, pagesPath, 'cockpit/cockpit.js'),
                 course: resolve(__dirname, pagesPath, 'course/course.js'),
                 course_detail: resolve(__dirname, pagesPath, 'course/course_view.js'),
+                setting: resolve(__dirname, pagesPath, 'settings/setting.js'),
 
                 // below pages under development
                 portal: resolve(__dirname, pagesPath, 'app/mobileportal.js'),

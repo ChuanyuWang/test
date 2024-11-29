@@ -3,8 +3,8 @@
  * setting.js setting page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var settingsPage = require('./settings.vue').default;
+import init from '../../common/init';
+import settingsPage from './settings.vue';
 
 // DOM Ready =============================================================
 init(function() {

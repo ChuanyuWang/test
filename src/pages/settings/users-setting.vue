@@ -32,7 +32,7 @@ div(style='padding:7px')
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
   name: "users-setting",
   props: {},
   data: function() {
@@ -109,5 +109,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>

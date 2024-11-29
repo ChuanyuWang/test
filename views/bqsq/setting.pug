@@ -17,7 +17,7 @@ append js
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue_runtime)
   script(src=CDN_FILES.bootstrap_table_vue)
-  script(src='/js/setting.js')
+  script(type="module" src=getModulePath('settings/setting.js'))
 
 block page
   tenant-url(style='display:none' hostname=hostname tenantUrl=tenantUrl)

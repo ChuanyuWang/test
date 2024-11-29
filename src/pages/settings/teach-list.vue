@@ -29,7 +29,7 @@ div(style="padding-right:0")
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
   props: {
     data: Array // array of teacher object
   },

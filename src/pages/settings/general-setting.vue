@@ -45,9 +45,9 @@ div(style='padding:7px')
  * --------------------------------------------------------------------------
  */
 
-var util = require("../../services/util");
+import util from "../../services/util";
 
-module.exports = {
+export default {
   name: "general-setting",
   props: {},
   data: function() {
@@ -125,6 +125,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>
