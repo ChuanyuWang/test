@@ -19,6 +19,7 @@ export default defineConfig({
                 style: resolve(__dirname, 'src/css/style.less'),
                 main: resolve(__dirname, pagesPath, 'home/main.js'),
                 class_view: resolve(__dirname, pagesPath, 'home/class_view.js'),
+                member: resolve(__dirname, pagesPath, 'members/member.js'),
             },
             output: {
                 format: 'es',
@@ -26,6 +27,11 @@ export default defineConfig({
                 assetFileNames: 'css/[name].[ext]',
                 // The trick comes from https://github.com/rollup/rollup/issues/2756
                 //manualChunks: () => 'everything.js',
+                manualChunks: (id) => {
+                    if (id.includes('src/components') || id.includes('src/common') || id.includes('src/services')) {
+                        return 'common';
+                    }
+                },
                 banner: (chunk) => {
                     // need to mark the comment as important by using /*! */ instead of /* */
                     return `
