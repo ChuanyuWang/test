@@ -31,7 +31,7 @@ div
  * --------------------------------------------------------------------------
  */
 
- export default {
+export default {
   filters: {
     displayTime: function(date) {
       return moment(date).format('HH:mm');
