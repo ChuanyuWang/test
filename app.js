@@ -184,7 +184,6 @@ async function createServer() {
 
     // all kinds of parser
     app.use(express.json());
-    app.use(express.text());
     app.use(bodyParser.xml({
         xmlParseOptions: {
             trim: true, // Trim the whitespace at the beginning and end of text nodes.
@@ -192,6 +191,9 @@ async function createServer() {
             explicitArray: false // Only put nodes in array if >1
         }
     }));
+    // put the text parser after xml parser, reason refer to below link
+    // https://stackoverflow.com/questions/46866282/error-non-whitespace-before-first-tag-in-node-js-body-parser
+    app.use(express.text());
 
     app.use(express.urlencoded({
         extended: true
