@@ -165,4 +165,24 @@ describe('MongoDB driver 3.7+', function() {
         expect(result).to.have.property("matchedCount");
         expect(result).to.have.property("modifiedCount");
     });
+
+    it('test findOneAndDelete result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.findOneAndDelete({ name: "456" });
+        /**
+         * {
+            lastErrorObject: { n: 1 }, // "n" is 0 if no match
+            value: {deleted document}, // "value" is null if no match
+            ok: 1
+            }
+         */
+        //console.log(result);
+        expect(result).to.be.exist;
+        result.should.be.a('object');
+        expect(result).to.have.property("lastErrorObject");
+        assert.deepEqual(result.lastErrorObject, { n: 1 });
+        expect(result).to.have.property("value");
+        expect(result).to.have.property("ok");
+    });
 });

@@ -117,10 +117,10 @@ div.row(style="margin-top:15px")
  * --------------------------------------------------------------------------
  */
 
-var createUserDlg = require("./create-user-modal.vue").default;
-var serviceUtil = require("../../services/util");
+import createUserDlg from "./create-user-modal.vue";
+import serviceUtil from "../../services/util";
 
-module.exports = {
+export default {
   name: "admin-console",
   props: {},
   data: function() {
@@ -385,7 +385,7 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .selected-tenant {
   border-right: 4px solid #337ab7;
   color: #337ab7;

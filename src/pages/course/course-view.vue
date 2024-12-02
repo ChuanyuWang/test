@@ -122,14 +122,14 @@ div.container
  * --------------------------------------------------------------------------
  */
 
-var course_service = require("../../services/courses");
-var add_multi_class_modal = require("./add-multi-class-modal.vue").default;
-var member_select_modal = require("../../components/member-select-modal.vue").default;
-var confirm_delete_modal = require("./confirm-delete-course.vue").default;
-var messageAlert = require("../../components/message-alert.vue").default;
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import course_service from "../../services/courses";
+import add_multi_class_modal from "./add-multi-class-modal.vue";
+import member_select_modal from "../../components/member-select-modal.vue";
+import confirm_delete_modal from "./confirm-delete-course.vue";
+import messageAlert from "../../components/message-alert.vue";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "course-view",
   inheritAttrs: false,
   props: {
@@ -559,7 +559,7 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .container .page-header {
   margin: 15px 0;
   padding-bottom: 3px;

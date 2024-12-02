@@ -49,11 +49,11 @@ div.container(style='padding-left:7px;padding-right:7px')
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
-var teachersService = require("../../services/teachers");
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import common from "../../common/common";
+import teachersService from "../../services/teachers";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "my-read-books",
   props: {},
   data: function() {

@@ -35,10 +35,10 @@ div
  * --------------------------------------------------------------------------
  */
 
-var util = require('../../services/util');
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import util from '../../services/util';
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "classroom-setting",
   props: {},
   data: function() {
@@ -212,5 +212,4 @@ module.exports = {
 };
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

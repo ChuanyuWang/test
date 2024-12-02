@@ -1,6 +1,6 @@
 const chai = require("chai");
 const request = require("supertest");
-const app = require("../app");
+const serverPromise = require("../app");
 const tenant = require("./lib/tenant");
 
 //enable assertion styles, include Assert, Expect and Should
@@ -8,13 +8,15 @@ const assert = chai.assert;
 const expect = chai.expect;
 const should = chai.should(); //actually enable should style assertions
 
-// test agent to the express app
-const agent = request.agent(app);
+let app, agent = null;
 
 describe('POST /api/members', function() {
     before(async function() {
         // runs once before the first test in this block
         await tenant.init(true);
+        app = await serverPromise;
+        // test agent to the express app
+        agent = request.agent(app);
     });
 
     after(async function() {

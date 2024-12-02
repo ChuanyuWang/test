@@ -59,6 +59,15 @@ mongoose.connection.on('error', err => {
 });
 */
 
+//TODO, async function to establish the DB connection
+// this function should be called during the initialization of app
+manager.getClient = async function() {
+    if (mongoClient.topology == null)
+        return mongoClient.connect();
+    else
+        return mongoClient;
+}
+
 manager.connect = async function(database) {
     if (typeof database !== 'string' || !database)
         throw new Error(`database name is not defined`);

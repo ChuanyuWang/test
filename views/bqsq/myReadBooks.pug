@@ -8,7 +8,7 @@ block append js
   else
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue_runtime)
-  script(src='/js/myreadbooks.js')
+  script(type="module" src=getModulePath('mybooks/mybooks.js'))
 
 block content
   img.center-block(src=logoPath,style="padding:0px;width:200px")

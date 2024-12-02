@@ -27,7 +27,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  */
 var noop = function() { };
 
-module.exports = {
+export default {
   props: {},
   data: function() {
     return {
@@ -78,5 +78,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>

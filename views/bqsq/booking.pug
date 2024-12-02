@@ -8,7 +8,7 @@ block append js
   else
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue)
-  script(src='/js/booking.js')
+  script(type="module" src=getModulePath('booking/booking.js'))
 
 block content
   div#app

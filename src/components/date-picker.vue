@@ -20,9 +20,10 @@ div.input-group.date(:id="id",:class="inputClass")
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+ export default {
   props: {
     label: {
+      type: String,
       default: "",
       required: false
     },
@@ -63,34 +64,14 @@ module.exports = {
       default: false
     },
     id: {
-      type: String
+      type: String,
+      default: ""
     },
   },
   data: function() {
     return {
       dp: null,
     };
-  },
-  mounted: function() {
-    // Return early if date-picker is already loaded
-    if (this.dp) return;
-    // Init date-picker
-    var $elem = $(this.$el);
-    $elem.datetimepicker(this.config);
-    // Store data control
-    this.dp = $elem.data('DateTimePicker');
-    // Set initial value
-    this.dp.date(moment(this.value));
-    // Watch for changes
-    $elem.on('dp.change', this.onChange);
-  },
-  beforeDestroy: function() {
-    $(this.$el).off();
-    // Free up memory
-    if (this.dp) {
-      this.dp.destroy();
-      this.dp = null;
-    }
   },
   watch: {
     /**
@@ -114,6 +95,27 @@ module.exports = {
       this.dp && this.dp.options(Object.assign(this.dp.options(), newConfig));
     }
   },
+  mounted: function() {
+    // Return early if date-picker is already loaded
+    if (this.dp) return;
+    // Init date-picker
+    var $elem = $(this.$el);
+    $elem.datetimepicker(this.config);
+    // Store data control
+    this.dp = $elem.data('DateTimePicker');
+    // Set initial value
+    this.dp.date(moment(this.value));
+    // Watch for changes
+    $elem.on('dp.change', this.onChange);
+  },
+  beforeDestroy: function() {
+    $(this.$el).off();
+    // Free up memory
+    if (this.dp) {
+      this.dp.destroy();
+      this.dp = null;
+    }
+  },
   methods: {
     /**
      * Update v-model upon change triggered by date-picker itself
@@ -129,5 +131,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>

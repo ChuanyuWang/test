@@ -17,7 +17,7 @@ append js
     script(src=CDN_FILES.i18next)
     script(src=CDN_FILES.vue_runtime)
   script(src=CDN_FILES.bootstrap_table_vue)
-  script(src='/js/member.js')
+  script(type="module" src=getModulePath('members/member.js'))
 
 block page
   div.container(style={'padding-top': '58px'})

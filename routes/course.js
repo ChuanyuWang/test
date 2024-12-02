@@ -18,7 +18,7 @@ router.get('/:courseID', helper.checkTenantUser, function(req, res, next) {
     res.render('bqsq/pages/detail-page', {
         title: '查看班级',
         user: req.user,
-        entry_module: '/js/course_view.js',
+        entry_module: 'course/course_view.js',
         data: req.params.courseID
     });
 });

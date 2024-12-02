@@ -3,8 +3,8 @@
  * member_detail.js single member view page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var memberDetail = require('./member-detail.vue').default;
+import init from '../../common/init';
+import memberDetail from './member-detail.vue';
 
 // DOM Ready =============================================================
 init(function() {

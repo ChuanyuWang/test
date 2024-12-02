@@ -11,9 +11,9 @@ div
  * --------------------------------------------------------------------------
  */
 
-var common = require("../../common/common");
+import common from "../../common/common";
 
-module.exports = {
+export default {
   name: "opportunity-tab",
   props: {},
   data: function() {

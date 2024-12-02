@@ -13,8 +13,8 @@ append js
   script(src=CDN_FILES.bootbox)
   //script(src=CDN_FILES.bootstrap_table)
   //script(src=CDN_FILES.bootstrap_table_locale_zh_CN)
-  script(src='/js/admin.js')
+  script(type="module" src=getModulePath('admin/admin.js'))
 
 block page
-  div#admin-app.container(style={'padding-top': '58px'})
-    admin-console
+  div.container(style={'padding-top': '58px'})
+    div#app

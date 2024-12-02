@@ -49,10 +49,10 @@ div.detail-teacher-border(style='min-height:300px')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require("../../components/date-picker.vue").default;
-var common = require("../../common/common");
+import date_picker from "../../components/date-picker.vue";
+import common from "../../common/common";
 
-module.exports = {
+export default {
   props: {
     data: Object // teacher object
   },
@@ -250,7 +250,7 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .detail-teacher-border {
   border-left: 2px solid #eee;
 }

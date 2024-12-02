@@ -79,8 +79,8 @@ v-container
 
 <script>
 
-module.exports = {
-  name: "notice",
+export default {
+  name: "notice-tab",
   data() {
     return {
       valid: false,

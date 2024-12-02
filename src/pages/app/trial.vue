@@ -7,8 +7,8 @@ v-container(fluid)
 </template>
 
 <script>
-module.exports = {
-  name: "trial",
+export default {
+  name: "trial-tab",
   data() {
     return {}
   },

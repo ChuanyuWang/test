@@ -40,16 +40,16 @@ div
  * --------------------------------------------------------------------------
  */
 
-var checkinTab = require("./checkin-tab.vue").default;
-var teacherTab = require("./teacher-tab.vue").default;
-var opportunityTab = require("./opportunity-tab.vue").default;
-var consumeTab = require("./consume-tab.vue").default;
-var expenseTab = require("./expense-tab.vue").default;
-var liabilitiesTab = require("./liabilities-tab.vue").default;
-var memberTab = require("./member-tab.vue").default;
-var messageAlert = require("../../components/message-alert.vue").default;
+import checkinTab from "./checkin-tab.vue";
+import teacherTab from "./teacher-tab.vue";
+import opportunityTab from "./opportunity-tab.vue";
+import consumeTab from "./consume-tab.vue";
+import expenseTab from "./expense-tab.vue";
+import liabilitiesTab from "./liabilities-tab.vue";
+import memberTab from "./member-tab.vue";
+import messageAlert from "../../components/message-alert.vue";
 
-module.exports = {
+export default {
   name: "statistics-page",
   props: {},
   data: function() {
@@ -103,6 +103,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

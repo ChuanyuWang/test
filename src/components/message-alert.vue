@@ -7,10 +7,10 @@ transition(name="alert-fade")
 </template>
 
 <script>
-module.exports = {
+export default {
   name: "message-alert",
-  props: {},
   components: {},
+  props: {},
   data() {
     return {
       timeoutID: null,
@@ -42,6 +42,8 @@ module.exports = {
       }
     }
   },
+  mounted() { },
+  created() { },
   methods: {
     closeAlert() {
       this.message = "";
@@ -71,12 +73,10 @@ module.exports = {
       this.showMessage(message, "warning", fadeOut === undefined ? false : fadeOut);
     },
   },
-  mounted() { },
-  created() { }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .alert-bottom-center {
   position: fixed;
   left: 50%;

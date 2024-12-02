@@ -67,19 +67,21 @@ div
  * member-overview.js display overview list of all members
  * --------------------------------------------------------------------------
  */
-var common = require('../../common/common');
-var format = require('../../common/format');
-var serviceUtil = require('../../services/util');
-var messageAlert = require("../../components/message-alert.vue").default;
+import common from '../../common/common';
+import format from '../../common/format';
+import serviceUtil from '../../services/util';
+import messageAlert from "../../components/message-alert.vue";
+import dataPicker from "../../components/date-picker.vue";
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "member-overview",
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,
-    "date-picker": require("../../components/date-picker.vue").default,
+    "date-picker": dataPicker,
     "message-alert": messageAlert,
-    "modal-dialog": require("../../components/modal-dialog.vue").default
+    "modal-dialog": modalDialog
   },
   data: function() {
     return {

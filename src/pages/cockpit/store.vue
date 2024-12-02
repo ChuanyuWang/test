@@ -27,8 +27,8 @@ v-container
 
 <script>
 
-module.exports = {
-  name: "store",
+export default {
+  name: "store-tab",
   data() {
     return {
       yesterday: moment().subtract(1, 'day'),
@@ -89,5 +89,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

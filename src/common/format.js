@@ -16,7 +16,7 @@ function toFixed2(value) {
     return result === 0 ? 0 : result / 100;
 }
 
-module.exports = {
+export default {
     /**
      * 3.00001 ===> 3
      * 3.12 ===> 3.1

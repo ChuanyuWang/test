@@ -70,8 +70,8 @@ v-container
 
 <script>
 
-module.exports = {
-  name: "pricing",
+export default {
+  name: "pricing-tab",
   data() {
     return {
       snackbar: false,
@@ -240,5 +240,4 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
-</style>
+<style lang="less"></style>

@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-var util = require('./util');
+import util from './util';
 
 var service = {};
 
@@ -58,4 +58,4 @@ service.remove = function(id, fields) {
     return request;
 };
 
-module.exports = service;
+export default service;

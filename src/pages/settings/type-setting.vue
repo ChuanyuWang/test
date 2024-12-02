@@ -74,9 +74,10 @@ div
  * type-setting display a panel for type settings
  * --------------------------------------------------------------------------
  */
-var util = require('../../services/util');
+import util from '../../services/util';
+import modalDialog from "../../components/modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "type-setting",
   props: {},
   data() {
@@ -90,7 +91,7 @@ module.exports = {
     };
   },
   components: {
-    "modal-dialog": require("../../components/modal-dialog.vue").default
+    "modal-dialog": modalDialog
   },
   computed: {
     errors: function() {
@@ -225,6 +226,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

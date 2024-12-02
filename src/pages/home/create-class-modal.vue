@@ -60,13 +60,14 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('../../components/date-picker.vue').default;
-var serviceUtil = require("../../services/util");
+import datePicker from "../../components/date-picker.vue";
+import serviceUtil from "../../services/util";
 
-module.exports = {
+export default {
   components: {
-    'date-picker': date_picker
+    'date-picker': datePicker
   },
+  filters: {},
   props: {},
   data() {
     return {
@@ -84,11 +85,6 @@ module.exports = {
       classroom: null,
       types: []
     };
-  },
-  watch: {
-    capacity(value) {
-      this.capacity = parseInt(value);
-    }
   },
   computed: {
     classDate() {
@@ -131,7 +127,20 @@ module.exports = {
       })
     }
   },
-  filters: {},
+  watch: {
+    capacity(value) {
+      this.capacity = parseInt(value);
+    }
+  },
+  mounted() {
+    //var vm = this;
+  },
+  created() {
+    var request = serviceUtil.getJSON("/api/setting/types");
+    request.done((data, textStatus, jqXHR) => {
+      this.types = data || [];
+    });
+  },
   methods: {
     show: function(classTime, classroom) {
       this.name = '';
@@ -161,15 +170,6 @@ module.exports = {
       $(this.$el).modal('hide');
     }
   },
-  mounted() {
-    //var vm = this;
-  },
-  created() {
-    var request = serviceUtil.getJSON("/api/setting/types");
-    request.done((data, textStatus, jqXHR) => {
-      this.types = data || [];
-    });
-  }
 };
 </script>
 

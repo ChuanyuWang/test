@@ -12,9 +12,9 @@ div
 </template>
 <script>
 
-var commonUtil = require("../../common/common");
+import commonUtil from "../../common/common";
 
-module.exports = {
+export default {
   name: "contract-history",
   props: {
     contractId: {
@@ -117,5 +117,4 @@ module.exports = {
   mounted() { }
 }
 </script>
-<style lang="less">
-</style>
+<style lang="less"></style>

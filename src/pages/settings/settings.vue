@@ -54,16 +54,16 @@ div
   message-alert(ref="messager")
 </template>
 <script>
-var teacher_setting = require('./teach-setting.vue').default;
-var users_setting = require('./users-setting.vue').default;
-var general_setting = require('./general-setting.vue').default;
-var classroom_setting = require('./classrooms.vue').default;
-var type_setting = require('./type-setting.vue').default;
-var common = require('../../common/common');
-var messageAlert = require("../../components/message-alert.vue").default;
+import teacher_setting from './teach-setting.vue';
+import users_setting from './users-setting.vue';
+import general_setting from './general-setting.vue';
+import classroom_setting from './classrooms.vue';
+import type_setting from './type-setting.vue';
+import common from '../../common/common';
+import messageAlert from "../../components/message-alert.vue";
 
-module.exports = {
-  name: "settings",
+export default {
+  name: "settings-page",
   props: {
   },
   data() {
@@ -97,5 +97,4 @@ module.exports = {
 }
 </script>
 
-<style>
-</style>
+<style></style>

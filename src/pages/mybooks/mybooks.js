@@ -3,16 +3,13 @@
  * mybooks.js
  * --------------------------------------------------------------------------
  */
-var i18nextplugin = require('../../locales/i18nextplugin');
-var readBooks = require('./my-read-books.vue').default;
+import init from '../../common/init';
+import readBooks from './my-read-books.vue';
 // open id of Weichat user
 //var _openid = undefined;
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
+init(function() {
     new Vue({
         el: '#app',
         render: function(h) { return h(readBooks) }
@@ -20,9 +17,3 @@ $(document).ready(function() {
 });
 
 // Functions =============================================================
-
-function init() {
-    console.log("welcome~~~");
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-}

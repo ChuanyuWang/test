@@ -24,10 +24,10 @@ v-container
 </template>
 
 <script>
-var tenantPicker = require("./tenant-picker.vue").default;
+import tenantPicker from "./tenant-picker.vue";
 
-module.exports = {
-  name: "home",
+export default {
+  name: "home-tab",
   components: {
     tenantPicker
   },
@@ -79,7 +79,7 @@ module.exports = {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .v-select.fit {
   width: min-content;
   min-width: 50px;

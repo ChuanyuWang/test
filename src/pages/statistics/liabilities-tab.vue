@@ -21,15 +21,15 @@ div
  * --------------------------------------------------------------------------
  */
 
-var util = require('../../services/util');
-var date_picker = require('../../components/date-picker.vue').default;
-var waldenTheme = require("./walden.json");
-var westerosTheme = require("./westeros.json");
+import util from '../../services/util';
+import date_picker from '../../components/date-picker.vue';
+import waldenTheme from "./walden.json";
+import westerosTheme from "./westeros.json";
 var request1 = null;
 var request3 = null;
 var request4 = null;
 
-module.exports = {
+export default {
   name: "liabilities-tab",
   props: {},
   data: function() {
@@ -255,6 +255,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

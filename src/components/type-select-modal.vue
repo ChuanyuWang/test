@@ -13,13 +13,14 @@ modal-dialog(ref='dialog',buttons="confirm",@ok="clickOK",:hasError="hasError") 
 </template>
 
 <script>
-var serviceUtil = require("../services/util");
+import serviceUtil from "../services/util";
+import modalDialog from "./modal-dialog.vue";
 
-module.exports = {
+export default {
   name: "type-dialog",
   props: {},
   components: {
-    "modal-dialog": require("./modal-dialog.vue").default
+    "modal-dialog": modalDialog
   },
   data() {
     // type: {id, name, status, visible}

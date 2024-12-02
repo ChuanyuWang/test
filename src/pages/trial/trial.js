@@ -4,15 +4,11 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('../../locales/i18nextplugin');
-var trial = require('./trial.vue').default;
+import init from '../../common/init';
+import trial from './trial.vue';
 
 // DOM Ready =============================================================
-$(document).ready(function() {
-    init();
-
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
+init(function() {
     new Vue({
         el: '#app',
         render: function(h) { return h(trial) }
@@ -20,10 +16,3 @@ $(document).ready(function() {
 });
 
 // Functions =============================================================
-
-function init() {
-    console.log("welcome~~~");
-
-    moment.locale('zh-CN');
-    //bootbox.setLocale('zh_CN');
-}

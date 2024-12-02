@@ -25,7 +25,7 @@ div.modal.fade(tabindex='-1',data-backdrop='static')
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
   props: {},
   data: function() {
     return {
@@ -55,5 +55,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>

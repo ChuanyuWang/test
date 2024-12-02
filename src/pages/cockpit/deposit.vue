@@ -54,10 +54,10 @@ v-container
 </template>
 
 <script>
-var depositHistoryDialog = require("./deposit-history-dialog.vue").default;
+import depositHistoryDialog from "./deposit-history-dialog.vue";
 
-module.exports = {
-  name: "deposit",
+export default {
+  name: "deposit-tab",
   components: { depositHistoryDialog },
   data() {
     return {

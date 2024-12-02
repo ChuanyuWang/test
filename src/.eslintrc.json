@@ -20,7 +20,7 @@
     "parserOptions": {
         // async/await supported since 2017
         "ecmaVersion": 2015, // same as 6
-        "sourceType": "script"
+        "sourceType": "module"
     },
     "plugins": [
         "vue", // means eslint-plugin-vue

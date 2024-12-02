@@ -11,7 +11,7 @@ v-autocomplete(:items="tenantList" dense item-text="tenantName" item-value="tena
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
   name: "tenant-picker",
   props: {
     label: {
@@ -47,5 +47,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-</style>
+<style lang='less'></style>

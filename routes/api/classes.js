@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
+const db_utils = require('../../server/databaseManager');
+const { ObjectId } = require('mongodb');
 var mongojs = require('mongojs');
-const mongoist = require('mongoist');
 var helper = require('../../helper');
 const { BadRequestError, RuntimeError } = require('./lib/basis');
 
@@ -60,13 +61,12 @@ var NORMAL_FIELDS = {
     description: 1
 };
 
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
     if (!req.tenant) {
         let error = new Error("tenant is not defined");
         error.status = 400;
         return next(error);
     }
-    let tenantDB = mongoist(req.db);
 
     let query = {};
     if (req.query.hasOwnProperty('from') && req.query.hasOwnProperty('to')) {
@@ -83,19 +83,19 @@ router.get('/', function(req, res, next) {
     }
     // query specific course
     if (req.query.hasOwnProperty('courseID')) {
-        query['courseID'] = req.query.courseID ? mongoist.ObjectId(req.query.courseID) : null;
+        query['courseID'] = req.query.courseID ? ObjectId(req.query.courseID) : null;
     }
     // query classes by specific teacher
     if (req.query.hasOwnProperty('teacher')) {
-        query['teacher'] = req.query.teacher ? mongoist.ObjectId(req.query.teacher) : null;
+        query['teacher'] = req.query.teacher ? ObjectId(req.query.teacher) : null;
     }
     // get all classes booked by this member
     if (req.query.hasOwnProperty('memberid')) {
-        query['booking.member'] = mongoist.ObjectId(req.query.memberid);
+        query['booking.member'] = ObjectId(req.query.memberid);
     }
     // get all classes attached to one contract
     if (req.query.hasOwnProperty('contractId')) {
-        query['booking.contract'] = mongoist.ObjectId(req.query.contractId);
+        query['booking.contract'] = ObjectId(req.query.contractId);
     }
 
     // check if there is at least one filter, it's not supposed to return all classes
@@ -127,16 +127,19 @@ router.get('/', function(req, res, next) {
             { 'age.min': 0 }
         ];
     }
-    var classes = tenantDB.collection("classes");
-    // the return results will always sorted by class date
-    classes.findAsCursor(query, NORMAL_FIELDS).sort({ date: sort }).toArray().then(function(docs) {
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let classes = tenantDB.collection("classes");
+
+        // the return results will always sorted by class date
+        let cursor = classes.find(query, { projection: NORMAL_FIELDS, sort: { date: sort } });
+        let docs = await cursor.toArray();
         console.log("find classes: ", docs ? docs.length : 0);
         return res.json(docs);
-    }).catch(function(err) {
-        var error = new Error("Get classes fails");
-        error.innerError = err;
-        return next(error);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Get classes fails", error));
+    }
 });
 
 /// Below APIs are visible to authenticated users only

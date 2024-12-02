@@ -16,7 +16,7 @@ append js
     script(src=CDN_FILES.vue_runtime)
   script(src=CDN_FILES.bootbox)
   script(src=CDN_FILES.bootstrap_datetimepicker)
-  script(src='/js/main.js')
+  script(type="module" src=getModulePath('home/main.js'))
 
 block page
   div.container(style={'padding-top': '58px'})

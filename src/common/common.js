@@ -4,7 +4,7 @@
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
     /**
      * get the tenant name of current page, e.g.
      * return 'bqsq' from http://localhost:3000/t/bqsq/course/1/view

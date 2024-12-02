@@ -3,8 +3,8 @@
  * main.js Home page main entry module
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var calendar = require('./class-calendar.vue').default;
+import init from '../../common/init';
+import calendar from './class-calendar.vue';
 
 // DOM Ready =============================================================
 init(function() {

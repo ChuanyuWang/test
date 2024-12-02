@@ -4,8 +4,8 @@
  * Entry module of view class page
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var classView = require('./class-detail.vue').default;
+import init from '../../common/init';
+import classView from './class-detail.vue';
 
 // DOM Ready =============================================================
 init(function() {

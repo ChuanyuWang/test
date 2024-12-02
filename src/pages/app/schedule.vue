@@ -33,10 +33,10 @@ v-container.pb-16
 </template>
 
 <script>
-var commonUtil = require("../../common/common");
+import commonUtil from "../../common/common";
 
-module.exports = {
-  name: "schedule",
+export default {
+  name: "schedule-tab",
   data() {
     var items = [{
       _id: "1",

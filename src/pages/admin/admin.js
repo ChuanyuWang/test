@@ -4,32 +4,17 @@
  * --------------------------------------------------------------------------
  */
 
-var i18nextplugin = require('../../locales/i18nextplugin');
-var adminConsole = require('./admin-console.vue').default;
+import init from '../../common/init';
+import adminConsole from './admin-console.vue';
 
 // DOM Ready =============================================================
-$(function() {
-    init();
-
+init(function() {
     // bootstrap the admin console
     new Vue({
-        el: '#admin-app',
+        el: '#app',
         //data: {cls:data},
-        components: { 'admin-console': adminConsole }
-    });
-
-    $('.nav-tabs a').click(function(e) {
-        //e.preventDefault();
-        //$(this).tab('show');
+        render: function(h) { return h(adminConsole) }
     });
 });
 
 // Functions =============================================================
-
-function init() {
-    console.log("welcome~~~ chuanyu");
-    //moment.locale('zh-CN');
-    bootbox.setLocale('zh_CN');
-    // load the i18next plugin to Vue
-    Vue.use(i18nextplugin);
-}

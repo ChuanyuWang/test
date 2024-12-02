@@ -60,13 +60,13 @@ modal-dialog(ref='dialog' buttons="confirm" @ok="handleOK" :hasError="hasError" 
  * --------------------------------------------------------------------------
  */
 
-var date_picker = require('../../components/date-picker.vue').default;
-var modalDialog = require("../../components/modal-dialog.vue").default;
+import date_picker from '../../components/date-picker.vue';
+import modalDialog from "../../components/modal-dialog.vue";
 
-var teacher_service = require('../../services/teachers');
-var serviceUtil = require("../../services/util");
+import teacher_service from '../../services/teachers';
+import serviceUtil from "../../services/util";
 
-module.exports = {
+export default {
   components: {
     'date-picker': date_picker,
     "modal-dialog": modalDialog
@@ -164,6 +164,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

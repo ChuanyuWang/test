@@ -3,11 +3,11 @@
  * portal.js
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var mobilePortal = require('./portal.vue').default;
-var schedule = require('./schedule.vue').default;
-var appointment = require('./myappointments.vue').default;
-var trial = require('./trial.vue').default;
+import init from '../../common/init';
+import mobilePortal from './portal.vue';
+import schedule from './schedule.vue';
+import appointment from './myappointments.vue';
+import trial from './trial.vue';
 
 // DOM Ready =============================================================
 init(function() {

@@ -4,9 +4,9 @@
  * --------------------------------------------------------------------------
  */
 
-var common = require('../../common/common');
-var util = require('../../services/util');
-var course_service = require('../../services/courses');
+import common from '../../common/common';
+import util from '../../services/util';
+import course_service from '../../services/courses';
 
 // DOM Ready =============================================================
 $(document).ready(function() {

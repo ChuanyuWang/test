@@ -26,11 +26,11 @@ div
  * --------------------------------------------------------------------------
  */
 
-var util = require('../../services/util');
-var date_picker = require('../../components/date-picker.vue').default;
-var vintageTheme = require("./vintage.json");
+import util from '../../services/util';
+import date_picker from '../../components/date-picker.vue';
+import vintageTheme from "./vintage.json";
 
-module.exports = {
+export default {
   name: "consume-tab",
   props: {},
   data: function() {
@@ -306,6 +306,4 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
-
-</style>
+<style lang='less'></style>

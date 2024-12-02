@@ -211,14 +211,17 @@ div.container
 </template>
 <script>
 
-var messageAlert = require("../../components/message-alert.vue").default;
-var serviceUtil = require("../../services/util");
-var commonUtil = require("../../common/common");
-var contractComments = require("./contract-comments.vue").default;
-var contractHistory = require("./contract-history.vue").default;
-var modifyContractDialog = require("./modify-contract-modal.vue").default;
+import messageAlert from "../../components/message-alert.vue";
+import serviceUtil from "../../services/util";
+import commonUtil from "../../common/common";
+import contractComments from "./contract-comments.vue";
+import contractHistory from "./contract-history.vue";
+import modifyContractDialog from "./modify-contract-modal.vue";
+import datePicker from "../../components/date-picker.vue";
+import modalDialog from "../../components/modal-dialog.vue";
+import payDialog from "./pay-modal.vue";
 
-module.exports = {
+export default {
   name: "contract-detail",
   props: {
     appData: {
@@ -232,9 +235,9 @@ module.exports = {
     "contract-history": contractHistory,
     "modify-contract-dialog": modifyContractDialog,
     "message-alert": messageAlert,
-    "date-picker": require('../../components/date-picker.vue').default,
-    "modal-dialog": require("../../components/modal-dialog.vue").default,
-    "pay-dialog": require("./pay-modal.vue").default
+    "date-picker": datePicker,
+    "modal-dialog": modalDialog,
+    "pay-dialog": payDialog
   },
   data() {
     return {
@@ -546,7 +549,7 @@ module.exports = {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 .container .page-header {
   padding-bottom: 3px;
 }

@@ -4,8 +4,8 @@
  * --------------------------------------------------------------------------
  */
 
-var init = require('../../common/init');
-var membersPage = require('./member-overview.vue').default;
+import init from '../../common/init';
+import membersPage from './member-overview.vue';
 
 // DOM Ready =============================================================
 init(function() {

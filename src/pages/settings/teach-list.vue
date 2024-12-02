@@ -29,7 +29,7 @@ div(style="padding-right:0")
  * --------------------------------------------------------------------------
  */
 
-module.exports = {
+export default {
   props: {
     data: Array // array of teacher object
   },
@@ -51,7 +51,7 @@ module.exports = {
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .selected-teacher {
   border-right: 4px solid #337ab7;
   color: #337ab7;

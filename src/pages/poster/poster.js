@@ -3,8 +3,8 @@
  * poster.js
  * --------------------------------------------------------------------------
  */
-var init = require('../../common/init');
-var poster = require('./poster.vue').default;
+import init from '../../common/init';
+import poster from './poster.vue';
 
 // DOM Ready =============================================================
 init(function() {
