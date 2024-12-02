@@ -16,7 +16,7 @@
     "@alicloud/pop-core": "^1.7.7",
     "bent": "^7.3.12",
     "body-parser": "^1.19.2",
-    "body-parser-xml": "^2.0.3",
+    "body-parser-xml": "^2.0.5",
     "compression": "^1.7.2",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^3.2.0",
