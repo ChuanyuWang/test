@@ -43,6 +43,7 @@ export default defineConfig({
                 format: 'es',
                 entryFileNames: 'js/[name].js',
                 assetFileNames: 'css/[name].[ext]',
+                chunkFileNames: 'js/[name].js',
                 // The trick comes from https://github.com/rollup/rollup/issues/2756
                 //manualChunks: () => 'everything.js',
                 manualChunks: (id) => {
