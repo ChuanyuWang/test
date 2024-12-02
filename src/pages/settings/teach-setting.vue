@@ -67,7 +67,7 @@ export default {
       }
       var request = teacher_service.remove(id);
       request.done(function(data, textStatus, jqXHR) {
-        if (data.n === 1 && data.ok === 1) {
+        if (data.deletedCount === 1) {
           // teacher is deleted
           vm.data.splice(vm.selectedIndex, 1);
         } else {

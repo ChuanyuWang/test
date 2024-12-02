@@ -24,11 +24,12 @@ router.get('/', function(req, res) {
     }
 });
 
-/* login/logout API */
+//TODO, remove '/login' router it seems not necessary
 router.get('/login', function(req, res) {
     res.redirect('/');
 });
 
+/* login/logout API */
 router.post('/login', loginLimiter, passport.authenticate('local', {
     failureRedirect: '/',
     failureFlash: '用户名或密码不正确'

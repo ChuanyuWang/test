@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
-const mongoist = require('mongoist');
+const db_utils = require('../../server/databaseManager');
+const { ObjectId } = require('mongodb');
+const { BadRequestError, ParamError, RuntimeError } = require('./lib/basis');
 
 var NORMAL_FIELDS = {
     name: 1,
@@ -11,14 +13,11 @@ var NORMAL_FIELDS = {
     note: 1
 };
 
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
     if (!req.tenant) {
-        let error = new Error("tenant is not defined");
-        error.status = 400;
-        return next(error);
+        return next(new BadRequestError("tenant is not defined"));
     }
 
-    const teachers = mongoist(req.db).collection('teachers');
     let query = {};
     if (req.query.hasOwnProperty('name')) {
         query['name'] = req.query.name;
@@ -27,94 +26,104 @@ router.get('/', function(req, res, next) {
     if (req.query.status) {
         query["status"] = req.query.status;
     }
-    teachers.find(query, NORMAL_FIELDS).then(function(docs) {
+
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let teachers = tenantDB.collection("teachers");
+        let cursor = teachers.find(query, { projection: NORMAL_FIELDS });
+        let docs = await cursor.toArray();
         console.log("find teachers: ", docs ? docs.length : 0);
         return res.json(docs);
-    }).catch(function(err) {
-        let error = new Error("Get teachers fails");
-        error.innerError = err;
-        return next(error);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Get teachers fails", error));
+    }
 });
 
 router.use(helper.isAuthenticated);
 
-router.post('/', helper.requireRole("admin"), function(req, res, next) {
+router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     if (!req.body.hasOwnProperty('name')) {
-        var error = new Error("Missing param 'name'");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("Missing param 'name'"));
     }
-
-    const db = mongoist(req.db);
 
     convertDateObject(req.body);
     if (!req.body.hasOwnProperty('status'))
         req.body.status = 'inactive';
     delete req.body._id;
 
-    var teachers = db.collection("teachers");
-    teachers.insert(req.body).then(function(docs) {
-        console.log("teacher is added %j", docs);
-        return res.json(docs);
-    }).catch(function(err) {
-        var error = new Error("fail to add teacher");
-        error.innerError = err;
-        return next(error);
-    });
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let teachers = tenantDB.collection("teachers");
+        let result = await teachers.insertOne(req.body);
+        if (result.insertedCount == 1) {
+            console.log("teacher is added %j", result.ops[0]);
+            return res.json(result.ops[0]);
+        } else {
+            console.warn(`${result.insertedCount} teachers are added to collection`);
+            return res.json(result.ops);
+        }
+    } catch (error) {
+        return next(new RuntimeError("fail to add teacher", error));
+    }
 });
 
-router.patch('/:teacherID', helper.requireRole("admin"), function(req, res, next) {
-    const db = mongoist(req.db);
-    var teachers = db.collection("teachers");
+router.patch('/:teacherID', helper.requireRole("admin"), async function(req, res, next) {
     convertDateObject(req.body);
     delete req.body._id;
 
-    teachers.findAndModify({
-        query: { _id: mongoist.ObjectId(req.params.teacherID) },
-        update: { $set: req.body },
-        fields: NORMAL_FIELDS,
-        new: true
-    }).then(function(updatedDoc) {
-        if (updatedDoc) {
+    try {
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let teachers = tenantDB.collection("teachers");
+        let result = await teachers.findOneAndUpdate({
+            _id: ObjectId(req.params.teacherID)
+        }, {
+            $set: req.body
+        }, {
+            projection: NORMAL_FIELDS,
+            returnDocument: "after"
+        });
+
+        if (result.value) {
             console.log("teacher %s is updated by %j", req.params.teacherID, req.body);
-            return res.json(updatedDoc);
+            return res.json(result.value);
         } else {
-            var err = new Error("Teacher not found");
-            err.status = 400;
-            return next(err);
+            return next(new BadRequestError("Teacher not found"));
         }
-    }).catch(function(err) {
-        var error = new Error("Update teacher fails");
-        error.innerError = err;
-        return next(error);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Update teacher fails"), error);
+    }
 });
 
 router.delete('/:teacherID', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        const db = mongoist(req.db);
-        const doc = await db.classes.findOne({ teacher: mongoist.ObjectId(req.params.teacherID) }, { 'name': 1 });
+        let tenantDB = await db_utils.connect(req.tenant.name);
+        let classes = tenantDB.collection("classes");
+        let teachers = tenantDB.collection("teachers");
+        const doc = await classes.findOne({ teacher: ObjectId(req.params.teacherID) }, { projection: { 'name': 1 } });
         if (doc) {
             // set the teacher's status as 'deleted' if any class exists
-            const deletedOne = await db.teachers.findAndModify({
-                query: { _id: mongoist.ObjectId(req.params.teacherID) },
-                update: { $set: { 'status': "deleted" } },
-                fields: NORMAL_FIELDS,
-                new: true
-            });
-            console.log("teacher %s is marked as deleted", req.params.teacherID);
-            return res.json(deletedOne);
+            let result = await teachers.findOneAndUpdate(
+                { _id: ObjectId(req.params.teacherID) },
+                { $set: { 'status': "deleted" } },
+                { projection: NORMAL_FIELDS, returnDocument: "after" }
+            );
+            // result == {"ok":1, "value":{}, "lastErrorObject":{}}
+            if (result.value) {
+                console.log("teacher %s is marked as deleted", req.params.teacherID);
+                return res.json(result.value);
+            }
         } else {
-            const result = await db.teachers.remove({ _id: mongoist.ObjectId(req.params.teacherID) }, { justOne: true })
-            // result == {"ok":1,"n":1, "deletedCount":1}
-            console.log("teacher %s is deleted", req.params.teacherID);
-            return res.json(result);
+            let result = await teachers.findOneAndDelete({ _id: ObjectId(req.params.teacherID) })
+            // result == {"ok":1, "value":{}, "lastErrorObject":{}}
+            if (result.value) {
+                console.log("teacher %s is deleted", req.params.teacherID);
+                return res.json({ deletedCount: 1 });
+            }
         }
-    } catch (err) {
-        var error = new Error("Delete teacher fails");
-        error.innerError = err;
-        return next(error);
+        console.log("Fail to delete teacher %s, not found", req.params.teacherID);
+        return next(new BadRequestError("Teacher not found"));
+    } catch (error) {
+        return next(new RuntimeError("Delete teacher fails"), error);
     }
 });
 
