@@ -243,7 +243,9 @@ router.post('/classrooms', helper.requireRole("admin"), async function(req, res,
 
             // link all existed classes or events to the only newly added classroom
             if (req.tenant.classroom.length == 1) {
-                await migrateFreeClass(req.body, req.db);
+                // TODO, get db from req object
+                let db = await db_utils.connect(req.tenant.name);
+                await migrateFreeClass(req.body, db);
             }
         } else {
             return next(new BadRequestError("Tenant not found"));
