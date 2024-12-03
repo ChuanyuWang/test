@@ -26,7 +26,7 @@ module.exports = {
         await configDB.collection("accounts").updateOne({ tenant: testDB, username: "2" }, {
             $set: testData.user
         }, { upsert: true });
-        if (insertTestData) {
+        if (insertTestData !== false) {
             let db = await connectionManager.connect(testDB);
             await db.collection("classes").insertMany(testData.classes);
             await db.collection("members").insertMany(testData.members);
