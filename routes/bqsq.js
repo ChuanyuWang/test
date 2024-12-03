@@ -24,22 +24,16 @@ var counter = 1;
 var tenant = null;
 //var api = new API(tenant.appid, tenant.appsecret);
 var api = null;
-// single tenant database connection
-var tenant_db = null;
 
 // all requests to this router will append tenant info
-router.use(function(req, res, next) {
+router.use(async function(req, res, next) {
     // add the tenant database to request object for later usage
-    if (!tenant_db) {
-        var tenant_name = req.baseUrl.split("/")[1];
-        tenant_db = util.mongojsDB(tenant_name);
-    }
-    req.db = tenant_db;
+    req.db = await util.connect("bqsq");
 
     if (!tenant) {
         //load tenant info from database and initialize db and api object
-        var tenant_name = req.baseUrl.split("/")[1];
-        var config_db = util.connect('config');
+        var tenant_name = "bqsq";
+        var config_db = await util.connect('config');
         config_db.collection('tenants').findOne({ name: tenant_name }, function(err, doc) {
             if (err || !doc) {
                 var error = new Error("tenant is not created");
@@ -49,7 +43,6 @@ router.use(function(req, res, next) {
 
             req.tenant = tenant = doc;
             req.api = api = new API(tenant.appid, tenant.appsecret);
-            config_db.close();
             next();
         });
     } else {
