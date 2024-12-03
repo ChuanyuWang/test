@@ -75,7 +75,7 @@ manager.connect = async function(database) {
     if (mongoClient.topology == null)
         await mongoClient.connect();
 
-    //TODO, add 'error' listner to MongoClient when upgrade to mongodb 4.0+
+    //TODO, add 'error' listener to MongoClient when upgrade to mongodb 4.0+
     return mongoClient.db(database);
 }
 

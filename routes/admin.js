@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var Account = require('../account');
 const db_utils = require('../server/databaseManager');
-const { ParamError, InternalServerError, BaseError, BadRequestError } = require("./api/lib/basis");
-var mongojs = require('mongojs');
+const { ObjectId } = require('mongodb');
+const { ParamError, InternalServerError, BaseError, BadRequestError, RuntimeError } = require("./api/lib/basis");
 const helper = require('../helper');
 const { SchemaValidator } = require("./api/lib/schema_validator");
 const { createDefaultClassType, setDefaultTypeForNotStartedClasses, createtDefaultContracts } = require("../server/upgradeFiveUtil");
@@ -33,12 +33,15 @@ const TenantSchema = new SchemaValidator({
     wechat: Object
 });
 
-var VERSION = 6; // current tenant version
-var config_db = null;
+const VERSION = 6; // current tenant version
+let config_db = null; // config database
 // initialize the 'config' database for admin router
 router.use(async function(req, res, next) {
+    // if database already initialized.
+    if (config_db) return next();
+
     try {
-        config_db = await db_utils.mongojsDB('config');
+        config_db = await db_utils.connect('config');
         return next();
     } catch (error) {
         let err = new Error("get config database fails");
@@ -141,46 +144,39 @@ router.patch('/api/user/:userID', isAuthenticated, async function(req, res, next
 });
 
 // list the tenant
-router.get('/api/tenants', isAuthenticated, function(req, res, next) {
-    config_db.collection("tenants").find({}, function(err, docs) {
-        if (err) {
-            var error = new Error("Get tenant list fails");
-            error.innerError = err;
-            return next(error);
-        }
+router.get('/api/tenants', isAuthenticated, async function(req, res, next) {
+    try {
+        let tenants = config_db.collection("tenants");
+        let cursor = tenants.find();
+        let docs = await cursor.toArray();
+
         console.log("Find %d tenants", docs.length);
-        res.send(docs);
-    });
+        return res.send(docs);
+    } catch (error) {
+        return next(RuntimeError("Get tenant list fails"), error)
+    }
 });
 
 // create the tenant
-router.post('/api/tenants', isAuthenticated, function(req, res, next) {
+router.post('/api/tenants', isAuthenticated, async function(req, res, next) {
     if (!req.body.name) {
-        var error = new Error("tenant name is not defined");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("tenant name is not defined"));
     }
 
     if (['config', 'chuanyu', 'admin', 'setting', 'settings', 'api', 'local', 'dlketang_logs'].indexOf(req.body.name) > -1) {
-        var error = new Error("tenant name is illegal");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("tenant name is illegal"));
     }
 
     var namePattern = /^[a-z0-9-]+$/; // only letter or number or "-"
     if (!namePattern.test(req.body.name)) {
-        var error = new Error("tenant name supports only letter and number");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("tenant name supports only letter and number"));
     }
-    var tenants = config_db.collection('tenants');
-    tenants.findOne({
-        name: req.body.name
-    }, function(err, doc) {
-        if (doc) {
-            var error = new Error("find existed tenant, duplicated tenant name");
-            error.status = 400;
-            return next(error);
+
+    try {
+        let tenants = config_db.collection("tenants");
+        let existedOne = await tenants.findOne({ name: req.body.name });
+        if (existedOne) {
+            return next(new ParamError("find existed tenant, duplicated tenant name"));
         }
 
         req.body.version = VERSION;
@@ -191,20 +187,22 @@ router.post('/api/tenants', isAuthenticated, function(req, res, next) {
             mch_id: "",
             api_key: ""
         };
-        tenants.insert(req.body, function(err, doc) {
-            if (err) {
-                var error = new Error("create tenant fails");
-                error.innerError = err;
-                return next(error);
-            }
+
+        let result = await tenants.insertOne(req.body);
+        if (result.insertedCount === 1) {
             console.log("tenant %j is created", req.body);
+            let doc = result.ops[0];
             res.send(doc);
-        });
-    });
+        } else {
+            return next(new RuntimeError(`insert ${result.insertedCount} tenant`));
+        }
+    } catch (error) {
+        return next(new RuntimeError("create tenant fails", error));
+    }
 });
 
 // update the tenant
-router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
+router.patch('/api/tenant/:name', isAuthenticated, async function(req, res, next) {
     if (!TenantSchema.modifyVerify(req.body)) {
         return next(BadRequestError(`Invalid Request to update tenant`))
     }
@@ -214,30 +212,22 @@ router.patch('/api/tenant/:name', isAuthenticated, function(req, res, next) {
     if (req.body.hasOwnProperty("systemMessage")) updateSet.systemMessage = req.body.systemMessage;
     if (req.body.hasOwnProperty("wechat")) updateSet.wechat = req.body.wechat;
 
-    var tenants = config_db.collection('tenants');
-    tenants.findAndModify({
-        query: {
-            name: req.params.name
-        },
-        update: {
-            $set: updateSet
-        },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update tenant fails");
-            error.innerError = err;
-            return next(error);
+    try {
+        let tenants = config_db.collection("tenants");
+        let result = await tenants.findOneAndUpdate(
+            { name: req.params.name },
+            { $set: updateSet },
+            { returnDocument: "after" }
+        );
+        if (result.value) {
+            console.log("tenant %s is updated by %j", req.params.name, req.body);
+            res.send(result.value);
+        } else {
+            return next(BadRequestError(`Tenant ${req.params.name} doesn't exist`));
         }
-        if (!doc) {
-            var error = new Error(`Tenant ${req.params.name} doesn't exist`);
-            error.status = 400;
-            return next(error);
-        }
-
-        console.log("tenant %s is updated by %j", req.params.name, req.body);
-        res.send(doc);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Update tenant fails"));
+    }
 });
 
 // upgrade the tenant
@@ -313,8 +303,7 @@ async function getTenantInfo(req, res, next) {
     try {
         if (req.body.hasOwnProperty('tenant')) {
             let tenantName = req.body.tenant;
-            let config_datebase = await db_utils.connect('config');
-            let tenant = await config_datebase.collection('tenants').findOne({
+            let tenant = await config_db.collection('tenants').findOne({
                 name: tenantName
             });
             if (!tenant) {
@@ -324,7 +313,7 @@ async function getTenantInfo(req, res, next) {
             }
             console.log("Find tenant %j", tenant);
             req.tenant = tenant;
-            req.db = await db_utils.mongojsDB(tenantName);
+            req.db = await db_utils.connect(tenantName);
             return next();
         } else {
             var err = new Error("Missing param 'tenant'");
@@ -338,93 +327,69 @@ async function getTenantInfo(req, res, next) {
     }
 }
 
-function legacyUpgrade(req, res, next) {
+async function legacyUpgrade(req, res, next) {
     // get the tenant to be upgraded
     let doc = req.tenant;
+    let tenants = config_db.collection("tenants");
     if (!doc.version) {
-        upgradeFromZero(req, res, next);
-        doc.version = 1;
-        config_db.collection("tenants").save(doc, function(err, doc) {
-            if (err) {
-                return next(new Error("save tenant version fails"));
-            }
-            //TODO, send the complete message when all data update
-            res.send("Tenant update to 1.0");
-        });
+        await upgradeFromZero(req, res, next);
+        await tenants.updateOne(
+            { _id: doc._id },
+            { $set: { veresion: 1 } });
+        res.send("Tenant update to 1.0");
     } if (doc.version == 1) {
-        upgradeFromOne(req, res, next);
-        doc.version = 2;
-        config_db.collection("tenants").save(doc, function(err, doc) {
-            if (err) {
-                return next(new Error("save tenant version fails"));
-            }
-            //TODO, send the complete message when all data update
-            res.send("Tenant update to 2.0");
-        });
+        await upgradeFromOne(req, res, next);
+        await tenants.updateOne(
+            { _id: doc._id },
+            { $set: { veresion: 2 } });
+        res.send("Tenant update to 2.0");
     } else if (doc.version == 2) {
-        upgradeFromTwo(req, res, next);
-        doc.version = 3;
-        config_db.collection("tenants").save(doc, function(err, doc) {
-            if (err) {
-                return next(new Error("save tenant version fails"));
-            }
-            //TODO, send the complete message when all data update
-            res.send("Tenant update to 3.0");
-        });
+        await upgradeFromTwo(req, res, next);
+        await tenants.updateOne(
+            { _id: doc._id },
+            { $set: { veresion: 3 } });
+        res.send("Tenant update to 3.0");
     } else if (doc.version == 3) {
-        upgradeFromThree(req, res, next);
-        doc.version = 4;
-        config_db.collection("tenants").save(doc, function(err, doc) {
-            if (err) {
-                return next(new Error("save tenant version fails"));
-            }
-            //TODO, send the complete message when all data update
-            res.send("Tenant update to 4.0");
-        });
+        await upgradeFromThree(req, res, next);
+        await tenants.updateOne(
+            { _id: doc._id },
+            { $set: { veresion: 4 } });
+        res.send("Tenant update to 4.0");
     } else if (doc.version == 4) {
-        upgradeFromFour(req, res, next);
-        doc.version = 5;
-        config_db.collection("tenants").save(doc, function(err, doc) {
-            if (err) {
-                return next(new Error("save tenant version fails"));
-            }
-            //TODO, send the complete message when all data update
-            res.send("Tenant update to 5.0");
-        });
+        await upgradeFromFour(req, res, next);
+        await tenants.updateOne(
+            { _id: doc._id },
+            { $set: { veresion: 5 } });
+        res.send("Tenant update to 5.0");
     } else {
         return next();
     }
 }
 
-function upgradeFromZero(req, res, next) {
+async function upgradeFromZero(req, res, next) {
     //TODO, close the connection when all data update done
     let tenant_db = req.db;
 
-    var members = tenant_db.collection('members');
-    members.find({}).forEach(function(err, doc) {
-        if (err) {
-            console.error(err);
-        } else {
-            if (doc && doc.point && !doc.hasOwnProperty('credit')) {
-                doc.credit = 0;
-                if (!isNaN(doc.point.story)) doc.credit += doc.point.story;
-                if (!isNaN(doc.point.event)) doc.credit += doc.point.event * 2;
-                members.save(doc);
-            }
+    let members = tenant_db.collection('members');
+    let cursor = members.find({});
+    await cursor.forEach(async function(doc) {
+        if (doc && doc.point && !doc.hasOwnProperty('credit')) {
+            let credit = 0;
+            if (!isNaN(doc.point.story)) credit += doc.point.story;
+            if (!isNaN(doc.point.event)) credit += doc.point.event * 2;
+            members.save(doc);
+            await members.updateOne({ _id: doc._id }, { $set: { credit: credit } });
         }
     });
 
-    var classes = tenant_db.collection('classes');
-    classes.find({}).forEach(function(err, doc) {
-        if (err) {
-            console.error(err);
-        } else {
-            if (doc && doc.type && !doc.hasOwnProperty('cost')) {
-                doc.cost = 0;
-                if (doc.type == 'story') doc.cost = 1;
-                if (doc.type == 'event') doc.cost = 2;
-                classes.save(doc);
-            }
+    let classes = tenant_db.collection('classes');
+    cursor = classes.find({});
+    await cursor.forEach(async function(doc) {
+        if (doc && doc.type && !doc.hasOwnProperty('cost')) {
+            let cost = 0;
+            if (doc.type == 'story') cost = 1;
+            if (doc.type == 'event') cost = 2;
+            await classes.updateOne({ _id: doc._id }, { $set: { cost: cost } });
         }
     });
 
@@ -456,27 +421,24 @@ function upgradeFromZero(req, res, next) {
     */
 }
 
-function upgradeFromOne(req, res, next) {
+async function upgradeFromOne(req, res, next) {
     //TODO, close the connection when all data update done
     let tenant_db = req.db;
 
-    var members = tenant_db.collection('members');
-    members.find({}).forEach(function(err, doc) {
-        if (err) {
-            console.error(err);
-        } else {
-            if (doc && doc.hasOwnProperty('credit') && !doc.hasOwnProperty('membership')) {
-                doc.membership = [];
-                // assign each member a default member card with no limitation
-                var defaultCard = {
-                    type: "ALL",
-                    room: [],
-                    expire: doc.expire,
-                    credit: doc.credit
-                };
-                doc.membership.push(defaultCard);
-                members.save(doc);
-            }
+    let members = tenant_db.collection('members');
+    const cursor = members.find({});
+    await cursor.forEach(async function(doc) {
+        if (doc && doc.hasOwnProperty('credit') && !doc.hasOwnProperty('membership')) {
+            let membership = [];
+            // assign each member a default member card with no limitation
+            var defaultCard = {
+                type: "ALL",
+                room: [],
+                expire: doc.expire,
+                credit: doc.credit
+            };
+            membership.push(defaultCard);
+            await members.updateOne({ _id: doc._id }, { $set: { membership: membership } });
         }
     });
 }
@@ -486,116 +448,109 @@ function upgradeFromOne(req, res, next) {
  * @param {Object} res 
  * @param {Function} next 
  */
-function upgradeFromTwo(req, res, next) {
+async function upgradeFromTwo(req, res, next) {
     let tenant_db = req.db;
 
-    var members = tenant_db.collection('members');
-    // query matches documents that either contain the status field whose value is null or that do not contain the status field.
-    // assign default status as 'active'
-    members.update({ status: null }, { $set: { status: 'active' } }, { multi: true }, function(err, result) {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log('Upgrade from version 2 successfully');
-            // e.g. { ok: 1, nModified: 3, n: 3 }
-            console.debug(result);
-        }
-    });
+    try {
+        let members = tenant_db.collection('members');
+        // query matches documents that either contain the status field whose value is null or that do not contain the status field.
+        // assign default status as 'active'
+        let result = await members.updateMany(
+            { status: null },
+            { $set: { status: 'active' } });
+
+        console.log('Upgrade from version 2 successfully');
+        // e.g. { ok: 1, nModified: 3, n: 3 }
+        console.debug(result);
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-function upgradeFromThree(req, res, next) {
+async function upgradeFromThree(req, res, next) {
     let tenant_db = req.db;
 
     // Fix the reference field "courseID" and "booking.member" in collection("classes")
-    var classes = tenant_db.collection('classes');
-    var bulk1 = classes.initializeUnorderedBulkOp();
+    let classes = tenant_db.collection('classes');
+    let bulk1 = classes.initializeUnorderedBulkOp();
     // query matches documents that has at least one member reservation
-    classes.find({
+    let cursor1 = classes.find({
         $or: [
             { 'courseID': { $exists: true } },
             { 'booking.0': { $exists: true } }
         ]
-    }, { courseID: 1, booking: 1 }, function(err, docs) {
-        if (err) return console.error(err); // TODO, handle error
-        for (var i = 0; i < docs.length; i++) {
-            var doc = docs[i];
-            //docs.forEach(function(doc) {
-            var query = { $set: {} };
-            if (doc.courseID) {
-                // fix the courseID field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
-                query.$set['courseID'] = mongojs.ObjectId(doc.courseID);
-            }
-            if (doc.booking && doc.booking.length > 0) {
-                // fix the member field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
-                doc.booking.forEach(function(value, index, array) {
-                    query.$set[`booking.${index}.member`] = mongojs.ObjectId(value.member);
-                })
-            }
-            bulk1.find({ _id: doc._id }).updateOne(query);
-        }
-        //});
-        bulk1.execute(function(err, result) {
-            //TODO, handle error
-            if (err) console.error(err);
-            else console.log("update courseID and booking.member in all classes %j", result);
-        });
+    }, {
+        projection: { courseID: 1, booking: 1 }
     });
+
+    await cursor1.forEach(function(doc) {
+        //docs.forEach(function(doc) {
+        var query = { $set: {} };
+        if (doc.courseID) {
+            // fix the courseID field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
+            query.$set['courseID'] = ObjectId(doc.courseID);
+        }
+        if (doc.booking && doc.booking.length > 0) {
+            // fix the member field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
+            doc.booking.forEach(function(value, index, array) {
+                query.$set[`booking.${index}.member`] = ObjectId(value.member);
+            })
+        }
+        bulk1.find({ _id: doc._id }).updateOne(query);
+    });
+    //TODO, handle error
+    let result1 = await bulk1.execute();
+    console.log("update courseID and booking.member in all classes %j", result1)
+
 
     // Fix the reference field "members.id" in collection("courses")
-    var courses = tenant_db.collection('courses');
-    var bulk2 = courses.initializeUnorderedBulkOp();
+    let courses = tenant_db.collection('courses');
+    let bulk2 = courses.initializeUnorderedBulkOp();
     // query matches documents that has at least one member
-    courses.find({
-        'members.0': { $exists: true }
-    }, { members: 1 }, function(err, docs) {
-        if (err) return console.error(err); // TODO, handle error
-        docs.forEach(function(doc) {
-            var query = { $set: {} };
-            // fix the member field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
-            doc.members.forEach(function(value, index, array) {
-                query.$set[`members.${index}.id`] = mongojs.ObjectId(value.id);
-            })
-            bulk2.find({ _id: doc._id }).updateOne(query);
-        });
-        bulk2.execute(function(err, result) {
-            //TODO, handle error
-            if (err) console.error(err);
-            else console.log("update members.id in all courses %j", result);
-        });
+    let cursor2 = courses.find(
+        { 'members.0': { $exists: true } },
+        { projection: { members: 1 } }
+    );
+
+    await cursor2.forEach(function(doc) {
+        var query = { $set: {} };
+        // fix the member field "58328628b18262980c0d2917" ==> ObjectID("58328628b18262980c0d2917")
+        doc.members.forEach(function(value, index, array) {
+            query.$set[`members.${index}.id`] = ObjectId(value.id);
+        })
+        bulk2.find({ _id: doc._id }).updateOne(query);
     });
+    //TODO, handle error
+    let result2 = await bulk2.execute();
+    console.log("update members.id in all courses %j", result2);
 }
 
-function upgradeFromFour(req, res, next) {
+async function upgradeFromFour(req, res, next) {
     let tenant_db = req.db;
 
     // Set all the classes in history with booking status as 'checkin'
-    var classes = tenant_db.collection('classes');
-    var bulk = classes.initializeUnorderedBulkOp();
+    let classes = tenant_db.collection('classes');
+    let bulk = classes.initializeUnorderedBulkOp();
     // query class documents that has booking and be in the past
-    classes.find({
+    let cursor = classes.find({
         date: { $lt: new Date() },
         'booking.status': null,
         'booking.0': { $exists: true }
-    }, { booking: 1 }, function(err, docs) {
-        if (err) return console.error(err); // TODO, handle error
+    }, { projection: { booking: 1 } });
 
-        for (var i = 0; i < docs.length; i++) {
-            var doc = docs[i];
-            var query = { $set: {} };
-            if (doc.booking && doc.booking.length > 0) {
-                // add the status field
-                doc.booking.forEach(function(value, index, array) {
-                    query.$set[`booking.${index}.status`] = 'checkin';
-                })
-            }
-            bulk.find({ _id: doc._id }).updateOne(query);
+    await cursor.forEach(function(doc) {
+        var query = { $set: {} };
+        if (doc.booking && doc.booking.length > 0) {
+            // add the status field
+            doc.booking.forEach(function(value, index, array) {
+                query.$set[`booking.${index}.status`] = 'checkin';
+            })
         }
-        bulk.execute(function(err, result) {
-            //TODO, handle error
-            if (err) console.error(err);
-            else console.log("add status field in all classes %j", result);
-        });
+        bulk.find({ _id: doc._id }).updateOne(query);
     });
+    //TODO, handle error
+    let result = await bulk.execute();
+    console.log("add status field in all classes %j", result);
 }
 
 async function upgradeFromFive(req, res, next) {
