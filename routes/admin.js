@@ -335,31 +335,31 @@ async function legacyUpgrade(req, res, next) {
         await upgradeFromZero(req, res, next);
         await tenants.updateOne(
             { _id: doc._id },
-            { $set: { veresion: 1 } });
+            { $set: { version: 1 } });
         res.send("Tenant update to 1.0");
     } if (doc.version == 1) {
         await upgradeFromOne(req, res, next);
         await tenants.updateOne(
             { _id: doc._id },
-            { $set: { veresion: 2 } });
+            { $set: { version: 2 } });
         res.send("Tenant update to 2.0");
     } else if (doc.version == 2) {
         await upgradeFromTwo(req, res, next);
         await tenants.updateOne(
             { _id: doc._id },
-            { $set: { veresion: 3 } });
+            { $set: { version: 3 } });
         res.send("Tenant update to 3.0");
     } else if (doc.version == 3) {
         await upgradeFromThree(req, res, next);
         await tenants.updateOne(
             { _id: doc._id },
-            { $set: { veresion: 4 } });
+            { $set: { version: 4 } });
         res.send("Tenant update to 4.0");
     } else if (doc.version == 4) {
         await upgradeFromFour(req, res, next);
         await tenants.updateOne(
             { _id: doc._id },
-            { $set: { veresion: 5 } });
+            { $set: { version: 5 } });
         res.send("Tenant update to 5.0");
     } else {
         return next();
@@ -568,8 +568,8 @@ async function upgradeFromFive(req, res, next) {
         // step 3: create contract for all active members, which has remaining credit or classes
         let contracts = await createtDefaultContracts(tenant, defaultType);
 
-        let config_datebase = await db_utils.connect('config');
-        let result = await config_datebase.collection('tenants').findOneAndUpdate({
+        let config_database = await db_utils.connect('config');
+        let result = await config_database.collection('tenants').findOneAndUpdate({
             name: tenant.name,
             version: 5
         }, {
