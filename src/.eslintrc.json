@@ -19,7 +19,7 @@
     },
     "parserOptions": {
         // async/await supported since 2017
-        "ecmaVersion": 2015, // same as 6
+        "ecmaVersion": 2015, // same as ES6
         "sourceType": "module"
     },
     "plugins": [
