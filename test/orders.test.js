@@ -4,8 +4,8 @@ const serverPromise = require("../app");
 const tenant = require("./lib/tenant");
 
 //enable assertion styles, include Assert, Expect and Should
-const assert = chai.assert;
-const expect = chai.expect;
+//const assert = chai.assert;
+//const expect = chai.expect;
 chai.should(); //actually enable should style assertions
 
 let app, agent = null;
@@ -40,7 +40,7 @@ describe('POST /api/orders', function() {
             .expect(200);
     });
 
-    it('should not cancel revervation with order paid', async function() {
+    it('should not cancel reservation with order paid', async function() {
         await agent.delete('/api/booking/6241c5ac95fbe9165c55f5b1')
             .send({ tenant: tenant.name, memberid: "623a8e1c802f1e687c080477" })
             .expect(400);
