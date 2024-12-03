@@ -31,6 +31,7 @@ module.exports = {
             await db.collection("classes").insertMany(testData.classes);
             await db.collection("members").insertMany(testData.members);
             await db.collection("orders").insertMany(testData.orders);
+            await db.collection("opportunities").insertMany(testData.opportunities);
         }
     },
     addClasses: async function(data) {

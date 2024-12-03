@@ -43,5 +43,17 @@ module.exports = {
     ],
     orders: [
         { "name": "John", "contact": "123456789", "status": "success", "classid": ObjectId("6241c5ac95fbe9165c55f5b1"), "memberid": ObjectId("623a8e1c802f1e687c080477"), "prepayid": "prepayid1", "tradeno": "20220331000011t" }
+    ],
+    opportunities: [
+        {
+            _id: ObjectId("60bcde5c2a8a9af97b27a291"),
+            "contact": "13512121115",
+            "name": "John",
+            "birthday": new Date("2011-06-11"),
+            "remark": "remark",
+            "since": new Date("2021-07-11"),
+            "source": null,
+            "status": "open"
+        }
     ]
 }
