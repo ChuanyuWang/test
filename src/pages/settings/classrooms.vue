@@ -119,7 +119,7 @@ export default {
             contentType: "application/json; charset=utf-8",
             data: {},
             success: function(data) {
-              if (data && data.n == 1 && data.ok == 1) {
+              if (data && data.n == 1) {
                 vm.$refs.classroomTable.removeByUniqueId(row.id);
               } else {
                 console.error("remove class room " + row.id + " fails");

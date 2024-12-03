@@ -3,7 +3,7 @@ var router = express.Router();
 var db_utils = require('../../server/databaseManager');
 var helper = require('../../helper');
 const { ObjectId } = require('mongodb');
-const { RuntimeError, asyncMiddlewareWrapper } = require("./lib/basis");
+const { RuntimeError, asyncMiddlewareWrapper, ParamError, BadRequestError } = require("./lib/basis");
 
 /**
  * {
@@ -34,11 +34,11 @@ var TENANT_FIELDS = {
     groups: 1
 };
 
-var config_db = null;
+let config_db = null;
 // initialize the 'config' database for setting router
 router.use(async function(req, res, next) {
     try {
-        config_db = config_db || await db_utils.mongojsDB('config');
+        config_db = config_db || await db_utils.connect('config');
         return next();
     } catch (err) {
         let error = new Error("get config database fails");
@@ -77,62 +77,53 @@ router.get('/groups', function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', function(req, res, next) {
-    var tenants = config_db.collection('tenants');
-    tenants.findOne({
-        name: req.user.tenant
-    }, TENANT_FIELDS, function(err, doc) {
-        if (err) {
-            var error = new Error("Get tenant basic setting fails");
-            error.innerError = err;
-            return next(error);
-        }
+router.get('/', async function(req, res, next) {
+    let tenants = config_db.collection('tenants');
+    try {
+        let doc = await tenants.findOne(
+            { name: req.user.tenant },
+            { projection: TENANT_FIELDS }
+        );
         console.log(`Get tenant ${req.user.tenant} basic settings`);
         res.json(doc);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Get tenant basic setting fails", error));
+    }
 });
 
-router.patch('/basic', helper.requireRole("admin"), function(req, res, next) {
+router.patch('/basic', helper.requireRole("admin"), async function(req, res, next) {
     var body = req.body || {};
     // tenant 'name' field is reserved and unique when created
     if (body.hasOwnProperty('name')) {
-        var error = new Error('tenant "name" field is unique and immutable');
-        error.status = 400;
-        return next(error);
+        return next(new ParamError('tenant "name" field is unique and immutable'));
     }
 
-    var tenants = config_db.collection('tenants');
-    tenants.findAndModify({
-        query: {
-            name: req.user.tenant
-        },
-        update: {
-            $set: body
-        },
-        fields: TENANT_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update tenant basic setting fails");
-            error.innerError = err;
-            return next(error);
+    try {
+        let tenants = config_db.collection('tenants');
+        let result = await tenants.findOneAndUpdate(
+            { name: req.user.tenant },
+            { $set: body },
+            { projection: TENANT_FIELDS, returnDocument: "after" }
+        );
+        if (result.value) {
+            console.log("tenant %s is updated by %j", req.user.tenant, req.body);
+            return res.json(result.value);
+        } else {
+            return next(new BadRequestError('tenant not found'));
         }
-        console.log("tenant %s is updated by %j", req.user.tenant, req.body);
-        res.json(doc);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Update tenant basic setting fails", error));
+    }
 });
 
 router.post('/types', helper.requireRole("admin"), async function(req, res, next) {
     //var newType = {id: String, name: String, status: "open|closed", visible: Boolean};
     if (!req.body.name) {
-        var error = new Error("type name is not defined");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("type name is not defined"));
     }
 
     try {
-        let configDB = await db_utils.connect("config");
-        let tenants = configDB.collection("tenants");
+        let tenants = config_db.collection("tenants");
         let result = await tenants.findOneAndUpdate(
             { name: req.user.tenant },
             {
@@ -149,29 +140,24 @@ router.post('/types', helper.requireRole("admin"), async function(req, res, next
         );
 
         if (!result.value) {
-            return next(new Error("Fail to add new class type"));
+            return next(new BadRequestError("Tenant not found"));
         }
 
-        console.log(`new class type ${req.body.name.trim()} is created`);
+        console.log(`new class type "${req.body.name.trim()}" is created`);
         res.send(result.value);
-    } catch (err) {
-        var error = new Error("创建课程类型失败");
-        error.innerError = err;
-        return next(error);
+    } catch (error) {
+        return next(new RuntimeError("创建课程类型失败", error));
     }
 });
 
 router.patch('/types/:typeId', helper.requireRole("admin"), async function(req, res, next) {
     //var newType = {id: String, name: String, status: "open|closed", visible: Boolean};
     if (!req.body.name || typeof req.body.visible !== "boolean") {
-        var error = new Error("params of updating type is missing");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("params of updating type is missing"));
     }
 
     try {
-        let configDB = await db_utils.connect("config");
-        let tenants = configDB.collection("tenants");
+        let tenants = config_db.collection("tenants");
         let result = await tenants.findOneAndUpdate(
             {
                 name: req.user.tenant,
@@ -188,7 +174,7 @@ router.patch('/types/:typeId', helper.requireRole("admin"), async function(req, 
         );
 
         if (!result.value) {
-            return next(new Error(`Fail to update type ${req.params.typeId}`));
+            return next(new BadRequestError(`Fail to update type ${req.params.typeId}`));
         }
 
         console.log(`update class type ${req.params.typeId}`);
@@ -198,6 +184,7 @@ router.patch('/types/:typeId', helper.requireRole("admin"), async function(req, 
     }
 });
 
+//TODO, it's not necessary to use wrap here, because it will initialize tenant db again
 const deleteT = asyncMiddlewareWrapper("删除课程类型失败");
 router.delete('/types/:typeId', helper.requireRole("admin"), deleteT(checkHasContractsOrClasses), async function(req, res, next) {
     try {
@@ -214,7 +201,7 @@ router.delete('/types/:typeId', helper.requireRole("admin"), deleteT(checkHasCon
         }, { returnDocument: "after" });
 
         if (!result.value) {
-            return next(new Error(`Fail to delete type ${req.params.typeId}`));
+            return next(new BadRequestError(`Fail to delete type ${req.params.typeId}`));
         }
 
         console.log(`update class type ${req.params.typeId}`);
@@ -224,150 +211,127 @@ router.delete('/types/:typeId', helper.requireRole("admin"), deleteT(checkHasCon
     }
 });
 
-router.post('/classrooms', helper.requireRole("admin"), function(req, res, next) {
+router.post('/classrooms', helper.requireRole("admin"), async function(req, res, next) {
     //var newRoom = {id:'abc', name:'', visibility: 'internal'|null};
     if (!req.body.id) {
-        var error = new Error("classroom ID is not defined");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("classroom ID is not defined"));
     }
     var namePattern = /^[a-z0-9]+$/; // only letter or number
     if (!namePattern.test(req.body.id)) {
-        var error = new Error("教室ID包含非法字符，支持小写字母或数字");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("教室ID包含非法字符,支持小写字母或数字"));
     }
 
-    var tenants = config_db.collection('tenants');
-    tenants.findOne({
-        name: req.user.tenant,
-        'classroom.id': req.body.id
-    }, function(err, doc) {
-        if (doc) {
-            var error = new Error("创建教室失败，教室ID重复");
-            error.status = 400;
-            return next(error);
-        }
-
-        tenants.update({
-            name: req.user.tenant
-        }, {
-            $push: {
-                classroom: req.body
-            }
-        }, function(err, result) {
-            if (err) {
-                var error = new Error("创建教室失败");
-                error.innerError = err;
-                return next(error);
-            }
-
-            if (result.n == 1) {
-                console.log("classroom %j is created", req.body);
-                req.tenant.classroom = req.tenant.classroom || [];
-                req.tenant.classroom.push(req.body);
-
-                // link all classes or events to this classroom
-                if (req.tenant.classroom.length == 1) {
-                    migrateFreeClass(req.body, req.db);
-                }
-            } else {
-                console.error("classroom %j fails to create", req.body);
-            }
-            res.send(result);
+    try {
+        let tenants = config_db.collection('tenants');
+        let doc = await tenants.findOne({
+            name: req.user.tenant,
+            'classroom.id': req.body.id
         });
-    });
+        if (doc) {
+            return next(new BadRequestError("创建教室失败,教室ID重复"));
+        }
+        let result = await tenants.findOneAndUpdate(
+            { name: req.user.tenant },
+            { $push: { classroom: req.body } },
+            { returnDocument: "after" }
+        );
+
+        if (result.value) {
+            console.log("classroom %j is created", req.body);
+            // update the classroom field in req.tenant object
+            req.tenant.classroom = result.value.classroom;
+
+            // link all existed classes or events to the only newly added classroom
+            if (req.tenant.classroom.length == 1) {
+                await migrateFreeClass(req.body, req.db);
+            }
+        } else {
+            return next(new BadRequestError("Tenant not found"));
+        }
+        return res.send(result.lastErrorObject);
+    } catch (error) {
+        return next(new RuntimeError("创建教室失败", error));
+    }
 });
 
 router.route('/classrooms/:roomID')
     .all(helper.requireRole("admin"))
     .get(function(req, res, next) {
         //TODO, get a classroom
-        next(new Error('not implemented'));
+        next(new BadRequestError('not implemented'));
     })
-    .delete(function(req, res, next) {
-        var tenants = config_db.collection('tenants');
-        tenants.update({
-            name: req.user.tenant
-        }, {
-            $pull: {
-                classroom: {
-                    id: req.params.roomID
-                }
-            }
-        }, function(err, result) {
-            if (err) {
-                var error = new Error("删除教室失败");
-                error.innerError = err;
-                return next(error);
-            }
+    .delete(async function(req, res, next) {
+        try {
+            let tenants = config_db.collection('tenants');
+            let result = await tenants.findOneAndUpdate(
+                { name: req.user.tenant },
+                {
+                    $pull: {
+                        classroom: {
+                            id: req.params.roomID
+                        }
+                    }
+                },
+                { returnDocument: "after" }
+            );
 
-            if (result.n == 1) {
+            if (result.value) {
                 console.log("classroom %j is delete", req.params.roomID);
 
                 // update the tenant object in cache
-                req.tenant.classroom = req.tenant.classroom || [];
-                for (var i = 0; i < req.tenant.classroom.length; i++) {
-                    var room = req.tenant.classroom[i];
-                    if (room && room.id == req.params.roomID) {
-                        req.tenant.classroom.splice(i, 1);
-                        break;
-                    }
-                }
+                req.tenant.classroom = result.value.classroom;
             } else {
                 console.error("classroom %j fails to be deleted", req.params.roomID);
             }
-            res.json(result);
-        });
+            return res.json(result.lastErrorObject);
+        } catch (error) {
+            return next(new RuntimeError("删除教室失败", error));
+        }
     })
     .put(function(req, res, next) {
         //TODO, update a classroom
-        next(new Error('not implemented'));
+        next(new BadRequestError('not implemented'));
     })
-    .patch(function(req, res, next) {
-        var tenants = config_db.collection('tenants');
-        tenants.findAndModify({
-            query: {
+    .patch(async function(req, res, next) {
+        try {
+            let tenants = config_db.collection('tenants');
+            let result = await tenants.findOneAndUpdate({
                 name: req.user.tenant,
                 'classroom.id': req.params.roomID
-            },
-            update: {
+            }, {
                 $set: {
                     'classroom.$.name': req.body.name,
                     'classroom.$.visibility': req.body.visibility
                 }
-            },
-            new: true
-        }, function(err, doc, lastErrorObject) {
-            if (err) {
-                var error = new Error("update tenant's classroom fails");
-                error.innerError = err;
-                return next(error);
+            }, {
+                returnDocument: "after"
+            });
+            if (result.value) {
+                console.log("update tenant %s classroom %s", req.user.tenant, req.params.roomID);
+                res.json(result.value);
+            } else {
+                return next(new BadRequestError("Tenant or classroom not found"));
             }
-            console.log("update tenant %s classroom %s", req.user.tenant, req.params.roomID);
-            res.json(doc);
-        });
+        } catch (error) {
+            return next(new RuntimeError("Fail to update tenant's classroom", error));
+        }
     });
 
-function migrateFreeClass(room, database) {
-    // https://docs.mongodb.com/manual/tutorial/query-for-null-fields/
-    var classes = database.collection("classes");
-    classes.update({
-        classroom: null
-    }, {
-        $set: {
-            classroom: room.id
-        }
-    }, { multi: true }, function(err, result) {
-        if (err) {
-            var error = new Error("update classes with default classroom fails");
-            error.innerError = err;
-            return console.error(error);
-        }
-        console.log("%d class is/are linked to classroom %s", result.n, room.id);
-    });
+async function migrateFreeClass(room, database) {
+    try {
+        // https://docs.mongodb.com/manual/tutorial/query-for-null-fields/
+        let classes = database.collection("classes");
+        let result = await classes.updateMany(
+            { classroom: null },
+            { $set: { classroom: room.id } }
+        );
+        console.log("%d class is/are linked to classroom %s", result.modifiedCount, room.id);
+    } catch (error) {
+        return console.error(error);
+    }
 }
 
+//TODO, the first parameter db seems duplicated
 async function checkHasContractsOrClasses(db, req, locals) {
     let contracts = db.collection("contracts");
     let doc = await contracts.findOne({ goods: req.params.typeId, status: { $ne: "deleted" } });
