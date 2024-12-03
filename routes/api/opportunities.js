@@ -3,6 +3,7 @@ var router = express.Router();
 var mongojs = require('mongojs');
 var helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
+const { BadRequestError } = require('./lib/basis');
 
 var NORMAL_FIELDS = {
     since: 1,
@@ -98,7 +99,7 @@ router.get('/', async function(req, res, next) {
     }
 });
 
-router.patch('/:opportunityID', helper.requireRole("admin"), function(req, res) {
+router.patch('/:opportunityID', helper.requireRole("admin"), function(req, res, next) {
     var opportunities = req.db.collection("opportunities");
 
     initDateField(req.body);
@@ -116,16 +117,16 @@ router.patch('/:opportunityID', helper.requireRole("admin"), function(req, res) 
         }
         if (result.n == 1) {
             console.log("opportunity %s is updated by %j", req.params.opportunityID, req.body);
+            return res.json(result);
         } else {
-            console.error("opportunity %s update fail by %s", req.params.opportunityID, req.body);
+            return next(new BadRequestError(`opportunity ${req.params.opportunityID} not found`));
         }
-        res.json(result);
     });
 });
 
-router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
+router.delete('/:opportunityID', helper.requireRole("admin"), function(req, res, next) {
     //TODO
-    return next(new Error("Not implementation"));
+    return next(new BadRequestError("Not Implemented"));
 });
 
 // make sure the datetime object is stored as ISODate
