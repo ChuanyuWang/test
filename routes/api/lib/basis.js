@@ -44,7 +44,7 @@ class InternalServerError extends BaseError {
     }
 }
 
-exports.asyncMiddlewareWrapper = function(erorrMessage) {
+exports.asyncMiddlewareWrapper = function(errorMessage) {
     return function(func) {
         return async function(req, res, next) {
             try {
@@ -55,7 +55,7 @@ exports.asyncMiddlewareWrapper = function(erorrMessage) {
                 if (error instanceof ParamError || error instanceof RuntimeError)
                     return next(error);
                 else
-                    return next(new RuntimeError(erorrMessage, error));
+                    return next(new RuntimeError(errorMessage, error));
             }
         }
     }
