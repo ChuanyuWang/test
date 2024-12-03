@@ -226,7 +226,7 @@ router.patch('/api/tenant/:name', isAuthenticated, async function(req, res, next
             return next(BadRequestError(`Tenant ${req.params.name} doesn't exist`));
         }
     } catch (error) {
-        return next(new RuntimeError("Update tenant fails"));
+        return next(new RuntimeError("Update tenant fails", error));
     }
 });
 
