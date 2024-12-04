@@ -126,9 +126,8 @@ describe('MongoDB driver 3.7+', function() {
     it('test insertOne result', async function() {
         let tenantDB = await db_utils.connect(tenant.name);
         let classes = tenantDB.collection("classes");
-        let result = await classes.insertOne({
-            foo: 123
-        });
+        let doc = { foo: 123 };
+        let result = await classes.insertOne(doc);
         // result.result is {"n":1,"ok":1}
         // result.ops is [{}] All the documents inserted
         // result.insertedCount is 1
@@ -142,6 +141,7 @@ describe('MongoDB driver 3.7+', function() {
         assert.typeOf(result.ops, "array");
         expect(result).to.have.property("insertedCount");
         expect(result).to.have.property("insertedId");
+        expect(doc).to.have.property("_id");
     });
 
     it('test updateOne result with upsert is true', async function() {
