@@ -298,10 +298,10 @@ router.post('/', async function(req, res, next) {
     }
     try {
         let classes = req.db.collection("classes");
-        let result = await classes.insertOne(req.body);
+        await classes.insertOne(req.body);
 
-        console.log("class is added %j", result.ops[0]);
-        return res.json(result.ops[0]);
+        console.log("class is added %j", req.body);
+        return res.json(req.body);
     } catch (error) {
         return next(new RuntimeError("create class fails", error));
     }
@@ -314,7 +314,7 @@ router.patch('/:classID', async function(req, res, next) {
     }
 
     // only below fields can be updated
-    var EDIT_FIELDS = {
+    const EDIT_FIELDS = {
         name: 1,
         date: 1,
         capacity: 1,

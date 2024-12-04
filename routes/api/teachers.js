@@ -56,8 +56,8 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
         let teachers = tenantDB.collection("teachers");
         let result = await teachers.insertOne(req.body);
         if (result.insertedCount == 1) {
-            console.log("teacher is added %j", result.ops[0]);
-            return res.json(result.ops[0]);
+            console.log("teacher is added %j", req.body);
+            return res.json(req.body);
         } else {
             console.warn(`${result.insertedCount} teachers are added to collection`);
             return res.json(result.ops);
