@@ -2,9 +2,9 @@ var express = require('express');
 var router = express.Router();
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-var mongojs = require('mongojs');
+//var mongojs = require('mongojs');
 var helper = require('../../helper');
-const { BadRequestError, RuntimeError } = require('./lib/basis');
+const { BadRequestError, RuntimeError, ParamError } = require('./lib/basis');
 
 /**
  * {
@@ -155,7 +155,7 @@ router.use(helper.isAuthenticated);
  *   "rows": []
  * }
  */
-router.get('/checkin', function(req, res, next) {
+router.get('/checkin', async function(req, res, next) {
     var query = {
         "booking.0": { // array size >= 1
             $exists: true
@@ -199,13 +199,12 @@ router.get('/checkin', function(req, res, next) {
     }
     // get all checkin status of this member
     if (req.query.hasOwnProperty('memberid')) {
-        query2['booking.member'] = mongojs.ObjectId(req.query.memberid);
+        query2['booking.member'] = ObjectId(req.query.memberid);
     }
 
-    // be defaul the sort is 'desc'
+    // be default the sort is 'desc'
     var sort = req.query.order == 'asc' ? 1 : -1;
 
-    var classes = req.db.collection("classes");
     // support pagination
     let skip = parseInt(req.query.offset) || 0;
     if (skip < 0) {
@@ -218,7 +217,7 @@ router.get('/checkin', function(req, res, next) {
         pageSize = 100;
     }
 
-    classes.aggregate([
+    let pipelines = [
         {
             $match: query
         }, {
@@ -250,12 +249,12 @@ router.get('/checkin', function(req, res, next) {
                 rows: [{ $skip: skip }, { $limit: pageSize }]
             }
         }
-    ], function(err, docs) {
-        if (err) {
-            var error = new Error("Get class checkin status fails");
-            error.innerError = err;
-            return next(error);
-        }
+    ];
+
+    try {
+        let classes = req.db.collection("classes");
+        let cursor = classes.aggregate(pipelines);
+        let docs = await cursor.toArray();
 
         if (docs && docs.length > 0) {
             let results = docs[0];
@@ -269,51 +268,50 @@ router.get('/checkin', function(req, res, next) {
                 rows: []
             });
         }
-    });
+    } catch (error) {
+        return next(new RuntimeError("Get class checkin status fails", error))
+    }
 });
 
-router.get('/:classID', function(req, res, next) {
-    var classes = req.db.collection("classes");
-    classes.findOne({
-        _id: mongojs.ObjectId(req.params.classID)
-    }, NORMAL_FIELDS, function(err, doc) {
-        if (err) {
-            var error = new Error("Get class fails");
-            error.innerError = err;
-            return next(error);
-        }
+router.get('/:classID', async function(req, res, next) {
+    try {
+        let classes = req.db.collection("classes");
+        let doc = await classes.findOne(
+            { _id: ObjectId(req.params.classID) },
+            { projection: NORMAL_FIELDS }
+        );
+
         console.log("find class %j", doc);
-        res.json(doc);
-    });
+        return res.json(doc);
+    } catch (error) {
+        return next(new RuntimeError("Get class fails", error));
+    }
 });
 
-router.post('/', function(req, res, next) {
-    var classes = req.db.collection("classes");
+router.post('/', async function(req, res, next) {
     convertDateObject(req.body);
     // make sure necessary field existed
     req.body.booking = req.body.booking || [];
     req.body.books = req.body.books || [];
     // save the teacher as reference object
     if (req.body.hasOwnProperty('teacher')) {
-        req.body.teacher = req.body.teacher ? mongojs.ObjectId(req.body.teacher) : null;
+        req.body.teacher = req.body.teacher ? ObjectId(req.body.teacher) : null;
     }
-    classes.insert(req.body, function(err, docs) {
-        if (err) {
-            var error = new Error("create class fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("class is added %j", docs);
-        return res.json(docs);
-    });
+    try {
+        let classes = req.db.collection("classes");
+        let result = await classes.insertOne(req.body);
+
+        console.log("class is added %j", result.ops[0]);
+        return res.json(result.ops[0]);
+    } catch (error) {
+        return next(new RuntimeError("create class fails", error));
+    }
 });
 
-router.patch('/:classID', function(req, res, next) {
+router.patch('/:classID', async function(req, res, next) {
     // booking can only added by post/delete 'api/booking?classID=xxx' 
     if (req.body.hasOwnProperty('booking')) {
-        var error = new Error('booking can only added by API "api/booking?classID=xxx"');
-        error.status = 400;
-        return next(error);
+        return next(new BadRequestError('booking can only added by API "api/booking?classID=xxx"'));
     }
 
     // only below fields can be updated
@@ -331,134 +329,113 @@ router.patch('/:classID', function(req, res, next) {
     //check any invalid field in the body
     for (var field in req.body) {
         if (!(field in EDIT_FIELDS)) {
-            var error = new Error(`Invalid parameter "${field}" in class patch body`);
-            error.status = 400;
-            return next(error);
+            return next(new BadRequestError(`Invalid parameter "${field}" in class patch body`));
         }
     }
 
     convertDateObject(req.body);
     // save the teacher as reference object
     if (req.body.hasOwnProperty('teacher')) {
-        req.body.teacher = req.body.teacher ? mongojs.ObjectId(req.body.teacher) : null;
+        req.body.teacher = req.body.teacher ? ObjectId(req.body.teacher) : null;
     }
     var query = {
-        _id: mongojs.ObjectId(req.params.classID)
+        _id: ObjectId(req.params.classID)
     };
 
-    var classes = req.db.collection("classes");
-    classes.findAndModify({
-        query: query,
-        update: {
-            $set: req.body
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update class fails");
-            error.innerError = err;
-            return next(error);
+    try {
+        let classes = req.db.collection("classes");
+        let result = await classes.findOneAndUpdate(
+            query,
+            { $set: req.body },
+            { projection: NORMAL_FIELDS, returnDocument: "after" }
+        );
+        if (result.value) {
+            console.log("class %s is updated by %j", req.params.classID, req.body);
+            return res.json(result.value);
+        } else {
+            return next(new BadRequestError('课程不存在，或没有权限执行此操作(修改已结束的课程)', 403));
         }
-        if (!doc) {
-            var error = new Error('课程不存在，或没有权限执行此操作(修改已结束的课程)');
-            error.status = 403;
-            return next(error);
-        }
-        console.log("class %s is updated by %j", req.params.classID, req.body);
-        res.json(doc);
-    });
+    } catch (error) {
+        return next(new RuntimeError("Update class fails", error));
+    }
 });
 
 // remove a class or event which there is no booking
-router.delete('/:classID', function(req, res, next) {
-    var classes = req.db.collection("classes");
+router.delete('/:classID', async function(req, res, next) {
     var query = {
-        _id: mongojs.ObjectId(req.params.classID),
+        _id: ObjectId(req.params.classID),
         $or: [
             { booking: { $size: 0 } },
             { booking: null }
         ]
     };
     if (req.user.role !== "admin") {
-        // non-admin could only remove the classes not startted
+        // non-admin could only remove the classes not started
         query.date = {
             $gt: new Date()
         };
     }
-    classes.remove(query, true, function(err, result) {
-        console.log("remove result is %j", result);
-        if (err) {
-            var error = new Error("删除课程失败");
-            error.innerError = err;
-            return next(error);
-        }
-        if (result.n == 1) {
-            // result is {"ok":1,"n":1,"deletedCount":1}
+    try {
+        let classes = req.db.collection("classes");
+        let result = await classes.findOneAndDelete(query);
+        if (result.value) {
             console.log("class %s is deleted", req.params.classID);
-            res.json(result);
+            return res.json(result.lastErrorObject);
         } else {
-            // result is {"ok":1,"n":0,"deletedCount":0}
             console.log("can't find class %s to be deleted", req.params.classID);
-            var error = new Error("不能删除已经预约的课程；店长不能删除已经开始的课程");
-            error.status = 400;
-            return next(error);
+            return next(new BadRequestError("不能删除已经预约的课程；店长不能删除已经开始的课程"));
         }
-    });
+    } catch (error) {
+        return next(new RuntimeError("删除课程失败", error));
+    }
 });
 
-router.post('/:classID/books', function(req, res, next) {
-    let classes = req.db.collection("classes");
+router.post('/:classID/books', async function(req, res, next) {
     let rawbooks = Array.isArray(req.body) ? req.body : [req.body];
     let books = rawbooks.map(function(value, index, array) {
         return {
             title: value.title,
             info: value.info || undefined
         }
-    })
-    classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.classID)
-        },
-        update: {
-            $push: { books: { $each: books } }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("add class's books fails");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("add %j books to class %s", req.body, req.params.classID);
-        res.json(doc);
     });
+    try {
+        let classes = req.db.collection("classes");
+        let result = await classes.findOneAndUpdate(
+            { _id: ObjectId(req.params.classID) },
+            { $push: { books: { $each: books } } },
+            { projection: NORMAL_FIELDS, returnDocument: "after" }
+        );
+
+        if (result.value) {
+            console.log("add %j books to class %s", req.body, req.params.classID);
+            return res.json(result.value);
+        } else {
+            return next(new BadRequestError(`Class ${req.params.classID} not found`));
+        }
+    } catch (error) {
+        return next(new RuntimeError("add class's books fails"), error);
+    }
 });
 
-router.delete('/:classID/books', function(req, res, next) {
-    var classes = req.db.collection("classes");
-    var booktoBeDeleted = req.body || {};
-    classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.classID)
-        },
-        update: {
-            $pull: {
-                books: booktoBeDeleted
-            }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("delete class's books fails");
-            error.innerError = err;
-            return next(error);
+router.delete('/:classID/books', async function(req, res, next) {
+    try {
+        let booktoBeDeleted = req.body || {};
+        let classes = req.db.collection("classes");
+        let result = await classes.findOneAndUpdate(
+            { _id: ObjectId(req.params.classID) },
+            { $pull: { books: booktoBeDeleted } },
+            { projection: NORMAL_FIELDS, returnDocument: "after" }
+        );
+
+        if (result.value) {
+            console.log("delete %j book from class %s", req.body, req.params.classID);
+            return res.json(result.value);
+        } else {
+            return next(new BadRequestError(`Class ${req.params.classID} not found`));
         }
-        console.log("delete %j book from class %s", req.body, req.params.classID);
-        res.json(doc);
-    });
+    } catch (error) {
+        return next(new RuntimeError("delete class's books fails", error));
+    }
 });
 
 /**
@@ -470,62 +447,53 @@ router.delete('/:classID/books', function(req, res, next) {
  *     "flag": null || red || yellow || green
  * }]
  */
-router.put('/:classID/checkin', function(req, res, next) {
-    var classes = req.db.collection("classes");
+router.put('/:classID/checkin', async function(req, res, next) {
     var memberToCheckin = req.body || {};
 
     if (!memberToCheckin.memberid) {
-        var error = new Error('Check in fails due to memberid is missing');
-        error.status = 400;
-        return next(error);
+        return next(new ParamError('Check in fails due to memberid is missing'));
     }
 
-    classes.findOne({
-        _id: mongojs.ObjectId(req.params.classID)
-    }, { date: 1 }, function(err, doc) {
-        if (err) {
-            var error = new Error("Get class fails");
-            error.innerError = err;
-            return next(error);
+    try {
+        let classes = req.db.collection("classes");
+        let doc = await classes.findOne(
+            { _id: ObjectId(req.params.classID) },
+            { projection: { date: 1 } }
+        );
+        if (!doc) {
+            return next(new BadRequestError(`class ${req.params.classID} not found`));
         }
 
-        var now = new Date();
+        let now = new Date();
         if (doc.date > now && req.user.role !== "admin") {
-            var error = new Error("不能在课程开始前签到");
-            error.status = 400;
-            return next(error);
+            return next(new BadRequestError("不能在课程开始前签到"));
         }
 
         now.setHours(now.getHours() - 72);
         if (doc.date < now && req.user.role !== "admin") {
-            var error = new Error("不能在课程开始72小时后签到，请使用管理员进行签到");
-            error.status = 400;
-            return next(error);
+            return next(new BadRequestError("不能在课程开始72小时后签到,请使用管理员进行签到"));
         }
 
-        classes.findAndModify({
-            query: {
-                _id: doc._id,
-                'booking.member': mongojs.ObjectId(memberToCheckin.memberid)
-            },
-            update: {
-                $set: {
-                    'booking.$.status': memberToCheckin.status || 'checkin'
-                }
-            },
-            fields: NORMAL_FIELDS,
-            new: true
-        }, function(err, doc, lastErrorObject) {
-            if (err) {
-                return next(new RuntimeError("class check-in fails", err));
+        let result = await classes.findOneAndUpdate({
+            _id: doc._id,
+            'booking.member': ObjectId(memberToCheckin.memberid)
+        }, {
+            $set: {
+                'booking.$.status': memberToCheckin.status || 'checkin'
             }
-            if (!doc) {
-                return next(BadRequestError('签到失败，学员未参加此课程'));
-            }
-            console.log("class %s check-in by member %s", req.params.classID, memberToCheckin.memberid);
-            res.json(doc);
+        }, {
+            projection: { booking: 1 },
+            returnDocument: "after"
         });
-    });
+
+        if (!result.value) {
+            return next(BadRequestError('签到失败，学员未参加此课程'));
+        }
+        console.log("class %s check-in by member %s", req.params.classID, memberToCheckin.memberid);
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("class check-in fails", error));
+    }
 });
 
 router.put('/:classID/flag', function(req, res, next) {
