@@ -10,7 +10,7 @@ chai.should(); //actually enable should style assertions
 
 let app, agent = null;
 
-describe.only('TEST /api/opportunities', function() {
+describe('TEST /api/opportunities', function() {
     before(async function() {
         // runs once before the first test in this block
         await tenant.init(true);
