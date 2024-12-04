@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { BadRequestError, ParamError, BaseError, RuntimeError } = require('./lib/basis');
 
