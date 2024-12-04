@@ -238,13 +238,14 @@ export default {
     },
     addNewMember() {
       var newMember = {
-        since: moment(),
+        since: moment(), // TODO, add in server side
         name: this.name,
         contact: this.contact,
         birthday: this.birthday,
         note: this.note,
         membership: []
       };
+      //TODO, move below call to members service
       $.ajax("/api/members", {
         type: "POST",
         contentType: "application/json; charset=utf-8",

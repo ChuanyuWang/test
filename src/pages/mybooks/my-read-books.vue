@@ -156,6 +156,7 @@ export default {
       };
 
       var vm = this;
+      //TODO, move below call to members service
       var request = $.ajax("/api/members/validate", {
         type: "POST",
         contentType: "application/json; charset=utf-8",

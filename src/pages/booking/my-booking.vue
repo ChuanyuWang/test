@@ -198,6 +198,7 @@ export default {
         contact: this.contact
       };
 
+      //TODO, move below call to members service
       var request = serviceUtil.postJSON("/api/members/validate", userInfo);
       request.done(function(data, textStatus, jqXHR) {
         if (!data) {
