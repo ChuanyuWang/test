@@ -203,7 +203,7 @@ async function getTenantInfo(req, res, next) {
             return next(error);
         }
         req.tenant = tenant || {};
-        req.db = await db_utils.mongojsDB(tenantName);
+        req.db = await db_utils.connect(tenantName);
         return next();
     } catch (err) {
         let error = new Error("get tenant fails");
