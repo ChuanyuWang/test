@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const mongojs = require('mongojs');
 const helper = require('../../helper');
 const db_utils = require('../../server/databaseManager');
-const { BadRequestError, ParamError, BaseError } = require('./lib/basis');
+const { ObjectId } = require('mongodb');
+const { BadRequestError, ParamError, BaseError, RuntimeError } = require('./lib/basis');
 
 /**
  * {
@@ -63,7 +63,7 @@ router.post('/validate', async function(req, res, next) {
         return next(new ParamError("tenant is not defined"));
     }
 
-    var query = {};
+    let query = {};
     if (req.body.hasOwnProperty('name') && req.body.hasOwnProperty('contact')) {
         query['name'] = req.body.name;
         query['contact'] = req.body.contact;
@@ -72,12 +72,11 @@ router.post('/validate', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let members = tenantDB.collection("members");
+        const members = req.db.collection("members");
         let doc = await members.findOne(query, { projection: NORMAL_FIELDS });
         console.log("validate member: %j", doc);
 
-        let contracts = tenantDB.collection("contracts");
+        const contracts = req.db.collection("contracts");
         if (doc) {
             // return the valid contracts and the same time
             let cursor = contracts.find({
@@ -172,9 +171,7 @@ router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async func
         pageSize = 100;
     }
 
-    // TODO, handle exception from `connect`
-    let tenantDB = await db_utils.connect(req.tenant.name);
-    let members = tenantDB.collection("members");
+    let members = req.db.collection("members");
 
     // get the total of all matched members
     let cursor = members.find(query, { projection: NORMAL_FIELDS });
@@ -265,62 +262,60 @@ router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async func
     }
 });
 
-router.get('/:memberID', function(req, res, next) {
-    var members = req.db.collection("members");
-    members.findOne({
-        _id: mongojs.ObjectId(req.params.memberID)
-    }, NORMAL_FIELDS, function(err, doc) {
-        if (err) {
-            var error = new Error("Get member fails");
-            error.innerError = err;
-            return next(error);
+router.get('/:memberID', async function(req, res, next) {
+    try {
+        let members = req.db.collection("members");
+        let doc = await members.findOne(
+            { _id: ObjectId(req.params.memberID) },
+            { projection: NORMAL_FIELDS }
+        );
+
+        if (!doc) {
+            return next(new BadRequestError(`member ${req.params.memberID} not found`));
         }
         console.log("find member %j", doc);
-        res.json(doc);
-    });
+        return res.json(doc);
+    } catch (error) {
+        return next(new RuntimeError("Get member fails", error));
+    }
 });
 
-router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next) {
-    var members = req.db.collection("members");
-    // no one can change history, even the admin
-    for (var key in req.body) {
-        if (key.indexOf('history') > -1) {
-            var error = new Error('field "history" is not able to be modified');
-            error.status = 400;
-            return next(error);
-        } else if (key.indexOf('membership') > -1) {
-            var error = new Error('field "membership" has to be updated by "/memberships" API');
-            error.status = 400;
-            return next(error);
-        }
-    }
+router.patch('/:memberID', helper.requireRole("admin"), async function(req, res, next) {
     convertDateObject(req.body);
 
-    checkDuplicate(members, req.params.memberID, req.body, function(err, isExisted) {
-        if (isExisted) {
-            var error = new Error("会员姓名和联系方式已经存在，请勿重复");
-            error.status = 400;
-            return next(error);
+    // only below fields can be updated
+    const EDIT_FIELDS = {
+        name: 1,
+        contact: 1,
+        status: 1,
+        note: 1,
+        birthday: 1
+    };
+    //check any invalid field in the body
+    for (let field in req.body) {
+        if (!(field in EDIT_FIELDS)) {
+            return next(new BadRequestError(`Invalid parameter "${field}" in member patch body`));
         }
-        members.findAndModify({
-            query: {
-                _id: mongojs.ObjectId(req.params.memberID)
-            },
-            update: {
-                $set: req.body
-            },
-            fields: NORMAL_FIELDS,
-            new: true
-        }, function(err, doc, lastErrorObject) {
-            if (err) {
-                var error = new Error("Update member fails");
-                error.innerError = err;
-                return next(error);
-            }
-            console.log("member %s is updated by %j", req.params.memberID, req.body);
-            res.json(doc);
-        });
-    });
+    }
+
+    try {
+        let isExisted = await hasSameNameAndContact(req.db, req.params.memberID, req.body);
+        if (isExisted) {
+            return next(new BadRequestError("会员姓名和联系方式已经存在，请勿重复"));
+        }
+
+        const members = req.db.collection("members");
+        let result = await members.findOneAndUpdate(
+            { _id: ObjectId(req.params.memberID) },
+            { $set: req.body },
+            { projection: NORMAL_FIELDS, returnDocument: "after" }
+        );
+
+        console.log("member %s is updated by %j", req.params.memberID, req.body);
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("Update member fails", error));
+    }
 });
 
 /**
@@ -333,33 +328,32 @@ router.patch('/:memberID', helper.requireRole("admin"), function(req, res, next)
  *     "new": 14
  * }]
  */
-router.get('/:memberID/history', function(req, res, next) {
-    var members = req.db.collection("members");
-    members.findOne({
-        _id: mongojs.ObjectId(req.params.memberID)
-    }, { "history": 1 }, function(err, doc) {
-        if (err) {
-            var error = new Error("fail to get member history");
-            error.innerError = err;
-            return next(error);
-        }
-        console.log("get member history");
+router.get('/:memberID/history', async function(req, res, next) {
+    try {
+        const members = req.db.collection("members");
+        let doc = await members.findOne(
+            { _id: ObjectId(req.params.memberID) },
+            { projection: { history: 1 } }
+        );
+
         if (!doc) {
-            var error = new Error("会员不存在");
-            error.status = 400;
-            return next(error);
+            return next(new BadRequestError("会员不存在"));
         }
-        var history = doc.history || []
-        res.json(history.filter(function(val) {
+
+        console.log("get member history");
+        let history = doc.history || []
+        return res.json(history.filter(function(val) {
             if (!val.hasOwnProperty('target')) return false;
             else return val.target.indexOf('credit') > -1 || val.target.indexOf('expire') > -1;
         }));
-    });
+    } catch (error) {
+        return next(new RuntimeError("fail to get member history", error));
+    }
 });
 
 router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        let doc = await addNewMember(req.tenant.name, req.body || {});
+        let doc = await addNewMember(req.db, req.body || {});
         return res.json(doc);
     } catch (err) {
         if (err instanceof BaseError) {
@@ -372,7 +366,7 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     }
 });
 
-async function addNewMember(tenantName, data) {
+async function addNewMember(db, data) {
     if (!data.name || !data.contact) {
         throw new ParamError("Missing param 'name' or 'contact'");
     }
@@ -386,8 +380,7 @@ async function addNewMember(tenantName, data) {
         contact: data.contact
     };
 
-    let tenantDB = await db_utils.connect(tenantName);
-    let members = tenantDB.collection("members");
+    let members = db.collection("members");
     let doc = await members.findOne(query);
     if (doc) {
         throw new BadRequestError("会员已经存在", 2007);
@@ -406,50 +399,45 @@ async function addNewMember(tenantName, data) {
           text: 'This is so bogus ... ' },
        ... ]
  */
-router.post('/:memberID/comments', function(req, res, next) {
-    var members = req.db.collection("members");
+router.post('/:memberID/comments', async function(req, res, next) {
     if (!req.body.text || req.body.text.length <= 0) {
-        var error = new Error("Missing param 'text'");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("Missing param 'text'"));
     }
-    // add comment author
-    req.body.author = req.user.username;
-    // add posted date
-    req.body.posted = new Date();
-    members.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.memberID)
-        },
-        update: {
-            $push: { comments: req.body }
-        },
-        fields: { comments: 1 },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Add comment fails");
-            error.innerError = err;
-            return next(error);
-        }
+
+    try {
+        // add comment author
+        req.body.author = req.user.username;
+        // add posted date
+        req.body.posted = new Date();
+        const members = req.db.collection("members");
+        let result = await members.findOneAndUpdate(
+            { _id: ObjectId(req.params.memberID) },
+            { $push: { comments: req.body } },
+            { projection: { comments: 1 }, returnDocument: "after" }
+        );
         console.log("member %s has 1 new comment: %j", req.params.memberID, req.body);
-        res.json(doc);
-    });
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("Add comment fails", error));
+    }
 });
 
-router.get('/:memberID/comments', function(req, res, next) {
-    var members = req.db.collection("members");
-    members.findOne({
-        _id: mongojs.ObjectId(req.params.memberID)
-    }, { comments: 1 }, function(err, doc) {
-        if (err) {
-            var error = new Error("Get comments fails");
-            error.innerError = err;
-            return next(error);
+router.get('/:memberID/comments', async function(req, res, next) {
+    try {
+        const members = req.db.collection("members");
+        let doc = await members.findOne(
+            { _id: ObjectId(req.params.memberID) },
+            { projection: { comments: 1 } }
+        );
+
+        if (!doc) {
+            return next(new BadRequestError(`member ${req.params.memberID} not found`));
         }
         console.log("Get comments from member %s", req.params.memberID);
-        res.json(doc);
-    });
+        return res.json(doc);
+    } catch (error) {
+        return next(new RuntimeError("Get comments fails", error));
+    }
 });
 
 /**
@@ -460,51 +448,44 @@ router.get('/:memberID/comments', function(req, res, next) {
  *     text: 'This is so bogus ... ' // the updated comment text
  * }
  */
-router.patch('/:memberID/comments/:commentIndex', function(req, res, next) {
-    var members = req.db.collection("members");
+router.patch('/:memberID/comments/:commentIndex', async function(req, res, next) {
     if (!req.body.text || req.body.text.length <= 0) {
-        var error = new Error("Missing param 'text'");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("Missing param 'text'"));
     }
     if (isNaN(parseInt(req.params.commentIndex)) || parseInt(req.params.commentIndex) < 0) {
-        var error = new Error("comment index is 0 based");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("comment index is 0 based"));
     }
 
-    var queryString = {
-        _id: mongojs.ObjectId(req.params.memberID)
+    let queryString = {
+        _id: ObjectId(req.params.memberID)
     };
     // non-admin user can only modify his/her own comment
     if (req.user.role !== 'admin') {
         queryString[`comments.${req.params.commentIndex}.author`] = req.user.username;
     }
-    var updateString = {
+    let updateString = {
         $set: {}
     };
     updateString.$set[`comments.${req.params.commentIndex}.text`] = req.body.text;
     updateString.$set[`comments.${req.params.commentIndex}.updated`] = new Date();
     updateString.$set[`comments.${req.params.commentIndex}.author`] = req.user.username;
-    members.findAndModify({
-        query: queryString,
-        update: updateString,
-        fields: { comments: 1 },
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update comment fails");
-            error.innerError = err;
-            return next(error);
-        }
-        if (!doc) {
-            var error = new Error("不能修改其它人的备忘，请联系管理员");
-            error.status = 400;
-            return next(error);
+
+    try {
+        const members = req.db.collection("members");
+        let result = await members.findOneAndUpdate(
+            queryString,
+            updateString,
+            { projection: { comments: 1 }, returnDocument: "after" }
+        );
+
+        if (!result.value) {
+            return next(new BadRequestError("不能修改其它人的备忘，请联系管理员"));
         }
         console.log("member %s update comment: %j", req.params.memberID, req.body);
-        res.json(doc);
-    });
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("Update comment fails", error));
+    }
 });
 
 router.post('/:memberID/memberships', helper.requireRole('admin'), function(req, res, next) {
@@ -517,11 +498,10 @@ router.patch('/:memberID/memberships/:cardIndex', function(req, res, next) {
     return next(new BadRequestError("会员卡功能已停用"));
 });
 
-router.get('/:memberID/summary', function(req, res, next) {
-    var classes = req.db.collection("classes");
-    classes.aggregate([{
+router.get('/:memberID/summary', async function(req, res, next) {
+    let pipelines = [{
         $match: {
-            "booking.member": mongojs.ObjectId(req.params.memberID)
+            "booking.member": ObjectId(req.params.memberID)
         }
     }, {
         $project: {
@@ -546,42 +526,38 @@ router.get('/:memberID/summary', function(req, res, next) {
                 $sum: 1
             }
         }
-    }], function(err, docs) {
-        if (err) {
-            var error = new Error("get member summary fails");
-            error.innerError = err;
-            return next(error);
-        }
-        var courseList = docs.map(function(value, index, array) {
-            return mongojs.ObjectId(value._id);
+    }];
+    try {
+        const classes = req.db.collection("classes");
+        let docs = await classes.aggregate(pipelines).toArray();
+
+        let courseList = docs.map(function(value, index, array) {
+            return ObjectId(value._id);
         });
 
-        var courses = req.db.collection("courses");
-        courses.find({
-            _id: {
-                $in: courseList
-            }
-        }, { 'name': 1 }, function(err, foundCourses) {
-            if (err) {
-                var error = new Error("Find courses fails when get member's summary");
-                error.innerError = err;
-                return next(error);
-            }
+        const courses = req.db.collection("courses");
 
-            foundCourses.forEach(function(value, index, array) {
-                var courseAgg = docs.find(function(value2, index2, array2) {
-                    return value._id.toString() == value2._id;
-                });
-                courseAgg.courseName = value.name;
+        let foundCourses = await courses.find(
+            { _id: { $in: courseList } },
+            { projection: { name: 1 } }
+        ).toArray();
+
+        foundCourses.forEach(function(value, index, array) {
+            let courseAgg = docs.find(function(value2, index2, array2) {
+                return value._id.toString() == value2._id;
             });
-            console.log("get member summary: ", docs ? docs.length : 0);
-            res.json(docs);
+            courseAgg.courseName = value.name;
         });
-    });
+        console.log("get member summary: ", docs ? docs.length : 0);
+        return res.json(docs);
+
+    } catch (error) {
+        return next(new RuntimeError("get member summary fails", error));
+    }
 });
 
 router.delete('/:memberID', helper.requireRole("admin"), function(req, res, next) {
-    return next(new Error("Not Supported"));
+    return next(new BadRequestError("Not Supported"));
 });
 
 /**
@@ -608,8 +584,8 @@ function convertDateObject(doc) {
         doc.since = new Date(doc.since);
     }
     if (doc.membership && doc.membership.length > 0) {
-        for (var index in doc.membership) {
-            var card = doc.membership[index];
+        for (let index in doc.membership) {
+            let card = doc.membership[index];
             if (card && card.expire) {
                 card.expire = new Date(card.expire);
             }
@@ -619,51 +595,29 @@ function convertDateObject(doc) {
     return doc;
 }
 
-function checkDuplicate(collection, id, query, callback) {
-    var FIELDS = { name: 1, contact: 1 };
-    if (query.hasOwnProperty('name') && query.hasOwnProperty('contact')) {
-        collection.find({
-            name: query.name, contact: query.contact
-        }, FIELDS, function(err, docs) {
-            if (err) return callback(err);
-            if (docs.length > 1) return callback(null, true);
-            else if (docs.length == 1) {
-                if (docs[0]._id.toString() != id) {
-                    return callback(null, true);
-                }
-            }
-            return callback(null, false);
-        });
-    } else if (query.hasOwnProperty('name') || query.hasOwnProperty('contact')) {
-        // only 'name' or 'contact' been updated, E.g. user onlys modify 'name'
-        collection.findOne({
-            _id: mongojs.ObjectId(id)
-        }, FIELDS, function(err, doc) {
-            if (err) return callback(err);
-            if (!doc) return callback(null, false);
+async function hasSameNameAndContact(db, memberId, body) {
+    const FIELDS = { name: 1, contact: 1 };
+    const members = db.collection("members");
+    let doc = await members.findOne(
+        { _id: ObjectId(memberId) },
+        { projection: FIELDS }
+    );
 
-            var search = {
-                name: doc.name,
-                contact: doc.contact
-            };
-            if (query.hasOwnProperty('name')) search.name = query.name;
-            if (query.hasOwnProperty('contact')) search.contact = query.contact;
-
-            collection.find(search, FIELDS, function(err, docs) {
-                if (err) return callback(err);
-                if (docs.length > 1) return callback(null, true);
-                else if (docs.length == 1) {
-                    if (docs[0]._id.toString() != id) {
-                        return callback(null, true);
-                    }
-                }
-                return callback(null, false);
-            });
-        });
-
-    } else {
-        return callback(null, false);
+    if (!doc) {
+        throw new Error(`member ${memberId} not found`);
     }
+
+    let query = {
+        _id: { $ne: doc._id }, // member Id is not same as modified one
+        name: doc.name,
+        contact: doc.contact
+    };
+
+    if (body.hasOwnProperty('name')) query.name = body.name;
+    if (body.hasOwnProperty('contact')) query.contact = body.contact;
+
+    let existedDoc = await members.findOne(query, { projection: FIELDS });
+    return existedDoc ? true : false;
 }
 
 async function queryMembersHasContracts(req, res, next) {
@@ -762,8 +716,7 @@ async function queryMembersHasContracts(req, res, next) {
     }];
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
 
         // [ { metadata: [{total:24}], data: [{x}, {y} ...] } ]
         // [ { metadata: [], data: [] } ] when no data found
