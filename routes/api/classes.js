@@ -496,82 +496,64 @@ router.put('/:classID/checkin', async function(req, res, next) {
     }
 });
 
-router.put('/:classID/flag', function(req, res, next) {
-    var classes = req.db.collection("classes");
-    var memberToFlag = req.body || {};
-
+router.put('/:classID/flag', async function(req, res, next) {
+    let memberToFlag = req.body || {};
     if (!memberToFlag.memberid) {
-        var error = new Error('Flag fails due to memberid is missing');
-        error.status = 400;
-        return next(error);
+        return next(new ParamError('Parameter "memberid" missing'));
     }
 
-    classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.classID),
-            'booking.member': mongojs.ObjectId(memberToFlag.memberid)
-        },
-        update: {
+    try {
+        let classes = req.db.collection("classes");
+        let result = await classes.findOneAndUpdate({
+            _id: ObjectId(req.params.classID),
+            'booking.member': ObjectId(memberToFlag.memberid)
+        }, {
             $set: {
                 'booking.$.flag': memberToFlag.flag || null
             }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Add flag to booking fails");
-            error.innerError = err;
-            return next(error);
+        }, {
+            projection: { booking: 1 },
+            returnDocument: "after"
+        });
+
+        if (!result.value) {
+            return next(new BadRequestError("标旗失败，会员未参加此课"));
         }
-        if (doc) {
-            console.log("class %s flagged by member %s", req.params.classID, memberToFlag.memberid);
-            res.json(doc);
-        } else {
-            var error = new Error('标旗失败，会员未参加此课程');
-            error.status = 400;
-            return next(error);
-        }
-    });
+        console.log("class %s flagged by member %s", req.params.classID, memberToFlag.memberid);
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("Add flag to booking fails", error));
+    }
 });
 
-router.put('/:classID/comment', function(req, res, next) {
-    var classes = req.db.collection("classes");
-    var memberToComment = req.body || {};
-
+router.put('/:classID/comment', async function(req, res, next) {
+    let memberToComment = req.body || {};
     if (!memberToComment.memberid) {
-        var error = new Error('Add comment fails due to memberid is missing');
-        error.status = 400;
-        return next(error);
+        return next(new ParamError('Parameter "memberid" missing'));
     }
 
-    classes.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.classID),
-            'booking.member': mongojs.ObjectId(memberToComment.memberid)
-        },
-        update: {
+    try {
+        let classes = req.db.collection("classes");
+        let result = await classes.findOneAndUpdate({
+            _id: ObjectId(req.params.classID),
+            'booking.member': ObjectId(memberToComment.memberid)
+        }, {
             $set: {
                 'booking.$.comment': memberToComment.comment || ""
             }
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Add comment to booking fails");
-            error.innerError = err;
-            return next(error);
+        }, {
+            projection: { booking: 1 },
+            returnDocument: "after"
+        });
+
+        if (!result.value) {
+            return next(new ParamError("备注失败，会员未参加此课程"));
         }
-        if (doc) {
-            console.log("class %s commented by member %s", req.params.classID, memberToComment.memberid);
-            res.json(doc);
-        } else {
-            var error = new Error('备注失败，会员未参加此课程');
-            error.status = 400;
-            return next(error);
-        }
-    });
+        console.log("class %s commented by member %s", req.params.classID, memberToComment.memberid);
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("Add comment to booking fails", error));
+    }
 });
 
 /**
