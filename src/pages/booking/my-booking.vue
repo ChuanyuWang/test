@@ -211,8 +211,8 @@ export default {
         vm.user = data;
         vm.updateSchedule(false);
         try {
-          // cache the member id in global variable before access localStorage
-          localStorage._memberid = memberid = data._id;
+          // cache the member id in localStorage
+          localStorage._memberid = data._id;
           localStorage._name = data.name;
           localStorage._contact = data.contact;
         } catch (oException) {
