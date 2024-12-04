@@ -1,9 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-//var mongojs = require('mongojs');
-var helper = require('../../helper');
+const helper = require('../../helper');
 const { BadRequestError, RuntimeError, ParamError } = require('./lib/basis');
 
 /**
