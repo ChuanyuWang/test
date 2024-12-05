@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const mongojs = require('mongojs');
 const { ObjectId } = require("mongodb");
 const { isAuthenticated, hasTenant, requireRole } = require('../../helper');
 const { check, findAvailableContract } = require('./lib/reservation');
-const { ParamError, RuntimeError, asyncMiddlewareWrapper } = require('./lib/basis');
+const { ParamError, RuntimeError, asyncMiddlewareWrapper, BadRequestError } = require('./lib/basis');
 
 const NORMAL_FIELDS = {
     name: 1,
@@ -34,8 +33,7 @@ router.use(isAuthenticated);
         ]
     }
  */
-router.get('/', function(req, res, next) {
-    var courses = req.db.collection("courses");
+router.get('/', async function(req, res, next) {
     var query = {};
     if (req.query.hasOwnProperty('name')) {
         query['name'] = req.query.name;
@@ -48,30 +46,30 @@ router.get('/', function(req, res, next) {
             })
         };
     }
-    courses.find(query, NORMAL_FIELDS, function(err, docs) {
-        if (err) {
-            var error = new Error("Get courses fails");
-            error.innerError = err;
-            return next(error);
-        }
+    try {
+        const courses = req.db.collection("courses");
+        let docs = await courses.find(query, { projection: NORMAL_FIELDS }).toArray();
+
         console.log("find courses: ", docs ? docs.length : 0);
-        res.json(docs);
-    });
+        return res.json(docs);
+    } catch (error) {
+        return next(new RuntimeError("Get courses fails", error));
+    }
 });
 
-router.get('/:courseID', function(req, res, next) {
-    var courses = req.db.collection("courses");
-    courses.findOne({
-        _id: mongojs.ObjectId(req.params.courseID)
-    }, NORMAL_FIELDS, function(err, doc) {
-        if (err) {
-            var error = new Error("Get course fails");
-            error.innerError = err;
-            return next(error);
-        }
+router.get('/:courseID', async function(req, res, next) {
+    try {
+        const courses = req.db.collection("courses");
+        let doc = await courses.findOne(
+            { _id: ObjectId(req.params.courseID) },
+            { projection: NORMAL_FIELDS }
+        );
+
         console.log("find course %j", doc);
-        res.json(doc);
-    });
+        return res.json(doc || {});
+    } catch (error) {
+        return next(new RuntimeError(`Fail to get course ${req.params.courseID}`));
+    }
 });
 
 // get the course members with name
@@ -127,33 +125,32 @@ router.post('/:courseID/classes',
     }
 );
 
-router.post('/', function(req, res, next) {
+router.post('/', async function(req, res, next) {
     if (!req.body.hasOwnProperty('name')) {
-        var error = new Error("Missing param 'name'");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError(`Missing param "name"`));
     }
     convertDateObject(req.body);
     req.body.status = 'active';
 
-    var courses = req.db.collection("courses");
-    courses.insert(req.body, function(err, docs) {
-        if (err) {
-            var error = new Error("fail to add course");
-            error.innerError = err;
-            next(error);
+    try {
+        const courses = req.db.collection("courses");
+        let result = await courses.insertOne(req.body);
+        if (result.result.ok) {
+            console.log("course is added %j", req.body);
+            return res.json(req.body);
         } else {
-            console.log("course is added %j", docs);
-            res.json(docs);
+            console.error(`Fail to add course`);
+            return res.json({});
         }
-    });
+    } catch (error) {
+        return next(new RuntimeError("Fail to add course", error));
+    }
 });
 
 /// Below APIs are only visible to authenticated users with 'admin' role
 router.use(requireRole("admin"));
 
-router.patch('/:courseID', function(req, res, next) {
-    var courses = req.db.collection("courses");
+router.patch('/:courseID', async function(req, res, next) {
     convertDateObject(req.body);
 
     // members can only added by post 'courses/:id/members' 
@@ -162,25 +159,23 @@ router.patch('/:courseID', function(req, res, next) {
         error.status = 400;
         return next(error);
     }
+    try {
+        const courses = req.db.collection("courses");
+        let result = await courses.findOneAndUpdate(
+            { _id: ObjectId(req.params.courseID) },
+            { $set: req.body },
+            { projection: NORMAL_FIELDS, returnDocument: "after" }
+        );
 
-    courses.findAndModify({
-        query: {
-            _id: mongojs.ObjectId(req.params.courseID)
-        },
-        update: {
-            $set: req.body
-        },
-        fields: NORMAL_FIELDS,
-        new: true
-    }, function(err, doc, lastErrorObject) {
-        if (err) {
-            var error = new Error("Update course fails");
-            error.innerError = err;
-            return next(error);
+        if (!result.value) {
+            return next(new BadRequestError(`Course ${req.params.courseID} not found`));
         }
+
         console.log("course %s is updated by %j", req.params.courseID, req.body);
-        res.json(doc);
-    });
+        return res.json(result.value);
+    } catch (error) {
+        return next(new RuntimeError("Update course fails", error));
+    }
 });
 
 const deleteC = asyncMiddlewareWrapper("delete course's classes fails");
@@ -192,54 +187,38 @@ router.delete('/:courseID/classes',
     }
 );
 
-router.delete('/:courseID', function(req, res, next) {
-    req.db.collection('classes').find({
-        'courseID': mongojs.ObjectId(req.params.courseID),
-        'cost': { $gt: 0 },
-        'booking.0': { $exists: true }
-    }, { 'booking': 1, 'cost': 1 }, function(err, docs) {
-        if (err) {
-            var error = new Error(`query classes of course ${req.params.courseID} fails`);
-            error.innerError = err;
-            return next(error);
-        }
-
-        if (docs && docs.length > 0) {
-            var error = new Error(`不能删除班级，班级中包含已经预约的付费课程，请取消后再尝试删除`);
-            error.status = 400;
-            return next(error);
-        }
-
-        var courses = req.db.collection("courses");
-        courses.remove({
-            _id: mongojs.ObjectId(req.params.courseID)
-        }, { justOne: true }, function(err, result) {
-            if (err) {
-                var error = new Error("delete course fails");
-                error.innerError = err;
-                return next(error);
-            }
-
-            // remove all classes with courseID
-            req.db.collection("classes").remove({
-                courseID: mongojs.ObjectId(req.params.courseID)
-            }, { justOne: false }, function(err, result) {
-                // result is {"n":0,"ok":1,"deletedCount":0}
-                if (err) console.error("delete course's classes fails");
-                else console.log("delete classes of course %s with result %j", req.params.courseID, result);
-            });
-            // check the result and respond
-            if (result.n == 1) {
-                console.log("course %s is deleted", req.params.courseID);
-                res.json(result);
-            } else {
-                console.log("can't find course %s to be deleted", req.params.courseID);
-                var error = new Error("can't find course to be deleted");
-                error.status = 400;
-                return next(error);
-            }
+router.delete('/:courseID', async function(req, res, next) {
+    try {
+        const classes = req.db.collection("classes");
+        let doc = await classes.findOne({
+            'courseID': ObjectId(req.params.courseID),
+            'cost': { $gt: 0 },
+            'booking.0': { $exists: true }
+        }, {
+            projection: { 'booking': 1, 'cost': 1 }
         });
-    });
+        if (doc) {
+            return next(new BadRequestError("不能删除班级，班级中包含已经预约的付费课程，请取消后再尝试删除"));
+        }
+
+        // remove the course
+        const courses = req.db.collection("courses");
+        let result = await courses.findOneAndDelete({ _id: ObjectId(req.params.courseID) });
+        // result is {"ok":1, "value": {deleted document}, "lastErrorObject":{n:1}}
+        if (!result.value) {
+            return next(new BadRequestError(`Course ${req.params.courseID} not found`));
+        }
+        console.log("course %s is deleted", req.params.courseID);
+
+        // remove all classes with courseID
+        result = await classes.deleteMany({ courseID: ObjectId(req.params.courseID) });
+        // result is { "result": {"n":2,"ok":1},"deletedCount":2}
+        console.log(`delete ${result.deletedCount} classes belong to the course`);
+
+        return res.json({ ok: 1 });
+    } catch (error) {
+        return next(new RuntimeError(`Fail to delete course ${req.params.courseID}`));
+    }
 });
 
 /**
