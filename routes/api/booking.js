@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { check, findAvailableContract } = require('./lib/reservation');
 const helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { ParamError, asyncMiddlewareWrapper, RuntimeError, BadRequestError } = require("./lib/basis");
 
@@ -50,8 +49,7 @@ router.get('/', helper.isAuthenticated, async function(req, res, next) {
     }];
 
     try {
-        const tenantDB = req.db;
-        let classes = tenantDB.collection("classes");
+        let classes = req.db.collection("classes");
         let docs = await classes.aggregate(pipelines).toArray();
 
         if (!docs || docs.length !== 1) {
@@ -106,8 +104,7 @@ router.post('/',
             let cls = res.locals.cls;
             let contract = res.locals.contract;
             let member = res.locals.member;
-            let tenantDB = await db_utils.connect(req.tenant.name);
-            let classes = tenantDB.collection("classes");
+            let classes = req.db.collection("classes");
             //let after_cls = await createNewBook(tenantDB, member, cls, req.body.quantity);
 
             let newbooking = {
@@ -141,7 +138,7 @@ router.post('/',
     }
 );
 
-// remove specfic user's booking info
+// remove specific user's booking info
 // TODO, the delete operation may sent accidentally.
 router.delete('/:classID', async function(req, res, next) {
     if (!req.tenant || !req.tenant.name) {
@@ -154,8 +151,7 @@ router.delete('/:classID', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
+        let classes = req.db.collection("classes");
         let doc = await classes.findOne({
             _id: ObjectId(req.params.classID),
             "booking.member": ObjectId(req.body.memberid)
@@ -216,7 +212,7 @@ router.delete('/:classID', async function(req, res, next) {
         doc = result.value;
         if (doc.cost > 0 && bookingInfo.contract) {
             //TODO, handle the callback when member is inactive.
-            let contracts = tenantDB.collection("contracts");
+            let contracts = req.db.collection("contracts");
             result = await contracts.findOneAndUpdate({
                 _id: bookingInfo.contract
             }, {
