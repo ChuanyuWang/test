@@ -207,4 +207,21 @@ describe('MongoDB driver 3.7+', function() {
         expect(result).to.have.property("value");
         expect(result).to.have.property("ok");
     });
+
+    it('test deleteMany result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.deleteMany({});
+        /**
+         * {
+            result: { n: 2, ok: 1 }, // removed in driver v4.0+
+            deletedCount: 1
+            }
+         */
+        //console.log(result);
+        expect(result).to.be.exist;
+        result.should.be.a('object');
+        expect(result).to.have.property("result");
+        expect(result).to.have.property("deletedCount");
+    });
 });
