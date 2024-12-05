@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const moment = require('moment');
 const mongojs = require('mongojs');
@@ -67,15 +66,14 @@ router.post('/', async function(req, res, next) {
         comment: req.body.comment
     };
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
         // Check the member exist
-        let members = tenantDB.collection("members");
+        let members = req.db.collection("members");
         let memberItem = await members.findOne({ _id: payment.memberId }, { projection: { _id: 1 } });
         if (memberItem == null) {
             return next(new ParamError(`member ${req.body.memberId} doesn't exist`));
         }
         // Check the contract exist and update the field "received"
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         let contractItem = await contracts.findOne({
             _id: payment.contractId,
             status: { $in: ["open", "outstanding"] }
@@ -107,7 +105,7 @@ router.post('/', async function(req, res, next) {
             throw new Error(`contract ${contractItem.serialNo} is updated during incoming payment, please pay again`);
         }
 
-        let payments = tenantDB.collection("payments");
+        let payments = req.db.collection("payments");
         let result = await payments.insertOne(payment);
 
         console.log(`pay ${payment.amount / 100} successfully to contract ${contractItem.serialNo}`);
@@ -194,8 +192,7 @@ router.get('/', async function(req, res, next) {
     }];
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let payments = tenantDB.collection("payments");
+        let payments = req.db.collection("payments");
         // get the total of all matched payments
         let cursor = payments.find(query, { projection: NORMAL_FIELDS });
         let total = await cursor.count();
@@ -215,8 +212,7 @@ router.get('/', async function(req, res, next) {
 
 router.get('/:paymentID', async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let payments = tenantDB.collection("payments");
+        let payments = req.db.collection("payments");
         let doc = await payments.findOne({
             _id: mongojs.ObjectId(req.params.paymentID)
         }, {
@@ -238,9 +234,7 @@ router.patch('/:paymentID', helper.requireRole("admin"), function(req, res, next
 
 router.delete('/:paymentID', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-
-        let payments = tenantDB.collection("payments");
+        let payments = req.db.collection("payments");
         let query = { _id: ObjectId(req.params.paymentID) };
         let payment = await payments.findOne(query);
         if (!payment) {
@@ -248,7 +242,7 @@ router.delete('/:paymentID', helper.requireRole("admin"), async function(req, re
         }
 
         // Check the contract exist and update the field "received"
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
 
         let contractItem = await contracts.findOne({
             _id: payment.contractId,
