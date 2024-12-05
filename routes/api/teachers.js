@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { BadRequestError, ParamError, RuntimeError } = require('./lib/basis');
 
@@ -28,8 +27,7 @@ router.get('/', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let teachers = tenantDB.collection("teachers");
+        let teachers = req.db.collection("teachers");
         let cursor = teachers.find(query, { projection: NORMAL_FIELDS });
         let docs = await cursor.toArray();
         console.log("find teachers: ", docs ? docs.length : 0);
@@ -52,8 +50,7 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     delete req.body._id;
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let teachers = tenantDB.collection("teachers");
+        let teachers = req.db.collection("teachers");
         let result = await teachers.insertOne(req.body);
         if (result.insertedCount == 1) {
             console.log("teacher is added %j", req.body);
@@ -72,8 +69,7 @@ router.patch('/:teacherID', helper.requireRole("admin"), async function(req, res
     delete req.body._id;
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let teachers = tenantDB.collection("teachers");
+        let teachers = req.db.collection("teachers");
         let result = await teachers.findOneAndUpdate({
             _id: ObjectId(req.params.teacherID)
         }, {
@@ -96,9 +92,8 @@ router.patch('/:teacherID', helper.requireRole("admin"), async function(req, res
 
 router.delete('/:teacherID', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
-        let teachers = tenantDB.collection("teachers");
+        let classes = req.db.collection("classes");
+        let teachers = req.db.collection("teachers");
         const doc = await classes.findOne({ teacher: ObjectId(req.params.teacherID) }, { projection: { 'name': 1 } });
         if (doc) {
             // set the teacher's status as 'deleted' if any class exists
