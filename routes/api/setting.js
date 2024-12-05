@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var db_utils = require('../../server/databaseManager');
-var helper = require('../../helper');
+const express = require('express');
+const router = express.Router();
+const db_utils = require('../../server/databaseManager');
+const helper = require('../../helper');
 const { ObjectId } = require('mongodb');
 const { RuntimeError, asyncMiddlewareWrapper, ParamError, BadRequestError } = require("./lib/basis");
 
@@ -188,8 +188,7 @@ router.patch('/types/:typeId', helper.requireRole("admin"), async function(req, 
 const deleteT = asyncMiddlewareWrapper("删除课程类型失败");
 router.delete('/types/:typeId', helper.requireRole("admin"), deleteT(checkHasContractsOrClasses), async function(req, res, next) {
     try {
-        let configDB = await db_utils.connect("config");
-        let tenants = configDB.collection("tenants");
+        let tenants = config_db.collection("tenants");
         let result = await tenants.findOneAndUpdate({
             name: req.user.tenant
         }, {
@@ -243,9 +242,7 @@ router.post('/classrooms', helper.requireRole("admin"), async function(req, res,
 
             // link all existed classes or events to the only newly added classroom
             if (req.tenant.classroom.length == 1) {
-                // TODO, get db from req object
-                let db = await db_utils.connect(req.tenant.name);
-                await migrateFreeClass(req.body, db);
+                await migrateFreeClass(req.body, req.db);
             }
         } else {
             return next(new BadRequestError("Tenant not found"));
