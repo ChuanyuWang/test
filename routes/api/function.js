@@ -1,7 +1,6 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 //var helper = require('../../helper');
-var db_utils = require('../../server/databaseManager');
 //var querystring = require('querystring');
 const https = require("https");
 const HmacSHA1 = require("crypto-js/hmac-sha1");
@@ -73,8 +72,7 @@ async function generateCode(req, res, next) {
         return next(error);
     }
     // check if already submit phone for trial class
-    const db = await db_utils.connect(req.tenant.name);
-    const opportunities = db.collection('opportunities');
+    const opportunities = req.db.collection('opportunities');
     const doc = await opportunities.findOne({ contact: req.body.contact });
     if (doc) {
         var err = new Error(`手机号${req.body.contact}已经报名试听`);
@@ -83,7 +81,7 @@ async function generateCode(req, res, next) {
     }
 
     // check if time is expired, 10 minutes expired
-    const sentCode = db.collection('sent_code');
+    const sentCode = req.db.collection('sent_code');
     let code = await sentCode.findOne({ phone: req.body.contact });
     if (!code) {
         code = {
@@ -186,7 +184,7 @@ function checkRobot(req, res, next) {
     https.get('https://afs.aliyuncs.com/?' + objToUrl(options), (resp) => {
         let data = '';
 
-        // A chunk of data has been recieved.
+        // A chunk of data has been received.
         resp.on('data', (chunk) => {
             data += chunk;
         });
