@@ -153,7 +153,7 @@ router.get('/api/tenants', isAuthenticated, async function(req, res, next) {
         console.log("Find %d tenants", docs.length);
         return res.send(docs);
     } catch (error) {
-        return next(RuntimeError("Get tenant list fails", error))
+        return next(RuntimeError("Get tenant list fails", error));
     }
 });
 
