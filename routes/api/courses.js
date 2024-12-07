@@ -68,7 +68,7 @@ router.get('/:courseID', async function(req, res, next) {
         console.log("find course %j", doc);
         return res.json(doc || {});
     } catch (error) {
-        return next(new RuntimeError(`Fail to get course ${req.params.courseID}`));
+        return next(new RuntimeError(`Fail to get course ${req.params.courseID}`, error));
     }
 });
 
@@ -105,7 +105,7 @@ router.delete('/:courseID/members',
     checkParamId,
     deleteM(removeMembers),
     deleteM(getClasses),
-    deleteM(retoreContracts),
+    deleteM(restoreContracts),
     function(req, res, next) {
         return res.json({ ok: 1 });
     }
@@ -217,7 +217,7 @@ router.delete('/:courseID', async function(req, res, next) {
 
         return res.json({ ok: 1 });
     } catch (error) {
-        return next(new RuntimeError(`Fail to delete course ${req.params.courseID}`));
+        return next(new RuntimeError(`Fail to delete course ${req.params.courseID}`, error));
     }
 });
 
@@ -552,7 +552,7 @@ async function removeMembers(db, req, locals) {
     });
 
     if (!result.value) {
-        console.error("fatal eror occurred: %j", result.lastErrorObject);
+        console.error("fatal error occurred: %j", result.lastErrorObject);
         throw new RuntimeError("fail to remove members from course document");
     }
 
@@ -562,7 +562,7 @@ async function removeMembers(db, req, locals) {
     locals.removed_members = memberIDs;
 }
 
-async function retoreContracts(db, req, locals) {
+async function restoreContracts(db, req, locals) {
     let unStartedClasses = locals.classes;
     let removed_members = locals.removed_members; // [memberId, memberId, memberId]
     if (unStartedClasses.length === 0 || removed_members.length === 0) return locals.errors = [];

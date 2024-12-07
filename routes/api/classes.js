@@ -412,7 +412,7 @@ router.post('/:classID/books', async function(req, res, next) {
             return next(new BadRequestError(`Class ${req.params.classID} not found`));
         }
     } catch (error) {
-        return next(new RuntimeError("add class's books fails"), error);
+        return next(new RuntimeError("add class's books fails", error));
     }
 });
 

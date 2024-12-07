@@ -86,7 +86,7 @@ router.patch('/:teacherID', helper.requireRole("admin"), async function(req, res
             return next(new BadRequestError("Teacher not found"));
         }
     } catch (error) {
-        return next(new RuntimeError("Update teacher fails"), error);
+        return next(new RuntimeError("Update teacher fails", error));
     }
 });
 
@@ -118,7 +118,7 @@ router.delete('/:teacherID', helper.requireRole("admin"), async function(req, re
         console.log("Fail to delete teacher %s, not found", req.params.teacherID);
         return next(new BadRequestError("Teacher not found"));
     } catch (error) {
-        return next(new RuntimeError("Delete teacher fails"), error);
+        return next(new RuntimeError("Delete teacher fails", error));
     }
 });
 

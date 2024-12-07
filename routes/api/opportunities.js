@@ -90,8 +90,8 @@ router.get('/', async function(req, res, next) {
             total: total,
             rows: docs
         });
-    } catch (err) {
-        return next(new RuntimeError("find opportunities fails"));
+    } catch (error) {
+        return next(new RuntimeError("find opportunities fails", error));
     }
 });
 
@@ -162,7 +162,7 @@ async function verifyCode(req, res, next) {
             return next();
         }
     } catch (error) {
-        return next(new RuntimeError("Get verify code fails"));
+        return next(new RuntimeError("Get verify code fails", error));
     }
 }
 
