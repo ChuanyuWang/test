@@ -27,7 +27,7 @@ div
     div.tab-pane(role="tabpanel",id="analytics")
       consume-tab(ref='consumeChart')
     div.tab-pane(role="tabpanel",id="member")
-      member-tab
+      member-tab(ref='memberChart')
     div.tab-pane(role="tabpanel",id="liabilities")
       liabilities-tab(ref='liabilitiesChart')
   message-alert(ref="messager")
@@ -51,11 +51,7 @@ import messageAlert from "../../components/message-alert.vue";
 
 export default {
   name: "statistics-page",
-  props: {},
-  data: function() {
-    return {};
-  },
-  watch: {},
+  filters: {},
   components: {
     "checkin-tab": checkinTab,
     "teacher-tab": teacherTab,
@@ -66,20 +62,23 @@ export default {
     "member-tab": memberTab,
     "message-alert": messageAlert
   },
+  props: {},
+  data: function() {
+    return {};
+  },
   computed: {},
-  filters: {},
-  methods: {},
+  watch: {},
   created: function() { },
   mounted: function() {
     // set message for global usage
     Vue.prototype.$messager = this.$refs.messager;
     var vm = this;
-
+    
     // refresh the chart when user switch to consume tab first time, otherwise width is 0
     $(this.$el).find('a[href="#analytics"]').one('shown.bs.tab', function(e) {
       vm.$refs.consumeChart.firstLoad();
     });
-
+    
     // refresh the chart when user switch to contracts tab first time, otherwise width is 0
     $(this.$el).find('a[href="#contracts"]').one('shown.bs.tab', function(e) {
       vm.$refs.expenseChart.firstLoad();
@@ -90,6 +89,11 @@ export default {
       vm.$refs.passiveChart.refreshPassiveChart();
     });
 
+    // refresh the chart when user switch to member tab first time
+    $(this.$el).find('a[href="#member"]').one('shown.bs.tab', function(e) {
+      vm.$refs.memberChart.refresh();
+    });
+    
     // refresh the chart when user switch to teacher tab first time
     $(this.$el).find('a[href="#teacher"]').one('shown.bs.tab', function(e) {
       vm.$refs.teacherTab.refresh();
@@ -99,7 +103,8 @@ export default {
     $(this.$el).find('a[href="#liabilities"]').one('shown.bs.tab', function(e) {
       vm.$refs.liabilitiesChart.firstLoad();
     });
-  }
+  },
+  methods: {}
 };
 </script>
 
