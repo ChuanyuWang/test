@@ -23,7 +23,7 @@ router.get('/class/:classID', helper.checkTenantUser, function(req, res, next) {
     });
 });
 
-router.get('/class/:classID/printcheckin', getCheckinPage);
+router.get('/class/:classID/printcheckin', helper.checkTenantUser, getCheckinPage);
 
 router.get('/member', helper.checkTenantUser, function(req, res) {
     res.render('bqsq/member', {
