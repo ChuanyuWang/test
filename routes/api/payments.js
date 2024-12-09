@@ -3,7 +3,6 @@ const router = express.Router();
 const helper = require('../../helper');
 const { ObjectId } = require('mongodb');
 const moment = require('moment');
-const mongojs = require('mongojs');
 const { SchemaValidator } = require("./lib/schema_validator");
 const { BadRequestError } = require("./lib/basis");
 
@@ -214,13 +213,13 @@ router.get('/:paymentID', async function(req, res, next) {
     try {
         let payments = req.db.collection("payments");
         let doc = await payments.findOne({
-            _id: mongojs.ObjectId(req.params.paymentID)
+            _id: ObjectId(req.params.paymentID)
         }, {
             projection: NORMAL_FIELDS
         });
 
         console.log("find payment %j", doc);
-        res.json(doc);
+        return res.json(doc);
     } catch (error) {
         var err = new Error("Get payment fails");
         err.innerError = error;
