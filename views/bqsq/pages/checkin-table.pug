@@ -2,18 +2,20 @@ extends ../../layout
 
 block append css
   if ENV_DEVELOPMENT
-    link(rel="stylesheet", href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css")
+    link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
   else
-    link(rel="stylesheet", href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css")
+    link(rel="stylesheet", href=CDN_FILES.bootstrap_css)
 
 block append js
   if ENV_DEVELOPMENT
-    script(src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.js")
+    script(src=CDN_FILES.jquery_dev)
+    script(src=CDN_FILES.bootstrap_dev)
   else
-    script(src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.min.js")
+    script(src=CDN_FILES.jquery)
+    script(src=CDN_FILES.bootstrap)
 
 block content
-  p.d-print-none(style="position:fixed;top:10px;left:10px") 打印说明:请在电脑上打印此页面，打印时隐藏页眉和页脚效果更佳
+  p.hidden-print(style="position:fixed;top:10px;left:10px") 打印说明:请在电脑上打印此页面，打印时隐藏页眉和页脚效果更佳
   img(src=logoPath style="position:fixed;width:200px;right:10px;top:10px")
   div.container-fluid
     h3.text-center(style="padding-top:58px") 上课签到表
@@ -23,7 +25,7 @@ block content
       | 教室: #{classroom.name} <br>
       | 时间: #{class_date} <br>
       | 课时: <b>#{class_cost}</b> <br>
-      | 老师: #{teacher.name} <br>
+      | 老师: #{teacher.name || "n/a"} <br>
     table.table.table-bordered
       thead
         tr
@@ -51,7 +53,5 @@ block content
     address.text-secondary.text-end(style="font-size:50%")
       | <strong>#{navTitle}</strong> <br>
       | #{tenant_address} <br>
-      | <abbr title="电话">P:</abbr> #{tenant_contact} <br>
-      | 打印时间: #{new Date().toString()}
-      
-    
+      | <abbr title="电话">联系方式:</abbr> #{tenant_contact} <br>
+      | 打印时间: #{new Date().toLocaleString()}
