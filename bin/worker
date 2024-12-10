@@ -37,8 +37,8 @@ mongoClient.connect().then(async client => {
     console.error(error);
 });
 
-// worker will check next task by every 5 minutes in slient model
-let slientModel = false;
+// worker will check next task by every 5 minutes in silent model
+let silentModel = false;
 logFetcher.checkYesterdayLog(mongoClient);
 async function processTask() {
     if (logFetcher.isWorking()) {
@@ -51,16 +51,16 @@ async function processTask() {
         if (!hasNext) {
             await logFetcher.checkYesterdayLog(mongoClient);
         }
-        if (hasNext && slientModel) {
+        if (hasNext && silentModel) {
             clearInterval(intervalID);
             intervalID = setInterval(processTask, 3000); // repeat task in 3 second
-            slientModel = false;
+            silentModel = false;
         }
         // increase the interval time if no more task
-        if (!hasNext && !slientModel) {
+        if (!hasNext && !silentModel) {
             clearInterval(intervalID);
             intervalID = setInterval(processTask, 300000); // heartbeat check in 5 minutes
-            slientModel = true;
+            silentModel = true;
         }
     } catch (error) {
         console.error(error);
