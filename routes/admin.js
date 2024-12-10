@@ -189,11 +189,11 @@ router.post('/api/tenants', isAuthenticated, async function(req, res, next) {
         };
 
         let result = await tenants.insertOne(req.body);
-        if (result.insertedCount === 1) {
+        if (result.acknowledged) {
             console.log("tenant %j is created", req.body);
             return res.send(req.body);
         } else {
-            return next(new BadRequestError(`insert ${result.insertedCount} tenant`));
+            return next(new BadRequestError(`Fail to insert tenant`));
         }
     } catch (error) {
         return next(new RuntimeError("create tenant fails", error));
@@ -459,7 +459,6 @@ async function upgradeFromTwo(req, res, next) {
             { $set: { status: 'active' } });
 
         console.log('Upgrade from version 2 successfully');
-        // e.g. { ok: 1, nModified: 3, n: 3 }
         console.debug(result);
     } catch (error) {
         console.error(error);

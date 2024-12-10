@@ -80,11 +80,10 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
     try {
         let orders = req.db.collection("orders");
         order.tradeno = await generateTradeNo(req.app.locals.ENV_DEVELOPMENT);
-        let result = await orders.insertOne(order);
-        // result.result is {"n":1,"ok":1}
+        await orders.insertOne(order);
 
         let prepay_id = await createUnifiedOrder(order, req.tenant.name);
-        result = await orders.findOneAndUpdate(
+        let result = await orders.findOneAndUpdate(
             {
                 _id: order._id,
                 status: "open"

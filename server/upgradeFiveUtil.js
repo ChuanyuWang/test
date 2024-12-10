@@ -54,7 +54,7 @@ exports.setDefaultTypeForNotStartedClasses = async function(tenant, defaultType)
         $set: { type: defaultType.id }
     });
 
-    console.log("set default type to not started classes: %j", result.result);
+    console.log("set default type to not started classes: %j", result);
 }
 
 exports.createtDefaultContracts = async function(tenant, defaultType) {
@@ -180,7 +180,6 @@ async function updateMemberBooking(db, member, contract) {
     }, {
         $set: { "booking.$.contract": contract._id }
     });
-    //result.result is {ok: 1, n: 5, nModified: 5}
 }
 
 async function queryActiveMembers(db) {

@@ -310,7 +310,7 @@ async function createMemberIfNotExist(db, req, locals) {
             openid: req.body.openid || undefined
         };
         let result = await members.insertOne(doc);
-        console.debug("create member successfully with result: %j", result.result);
+        console.debug("create member successfully with result: %j", result);
         console.log("member is created automatically during booking: %j", doc);
     } else {
         console.log("member is found %j", doc);

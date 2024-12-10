@@ -105,10 +105,10 @@ router.post('/', async function(req, res, next) {
         }
 
         let payments = req.db.collection("payments");
-        let result = await payments.insertOne(payment);
+        await payments.insertOne(payment);
 
         console.log(`pay ${payment.amount / 100} successfully to contract ${contractItem.serialNo}`);
-        return res.json(result.ops[0]);
+        return res.json(payment);
     } catch (error) {
         let err = new Error("Create contract fails");
         err.innerError = error;

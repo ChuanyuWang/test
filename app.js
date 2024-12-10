@@ -4,12 +4,12 @@ require('body-parser-xml')(bodyParser);
 const compression = require('compression')
 const path = require('path');
 const mongoose = require('mongoose');
-const connectionManager = require('./server/databaseManager');
+const dbManager = require('./server/databaseManager');
 //const favicon = require('serve-favicon');
 const morgan = require('morgan');
 //const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const passport = require('passport');
 const config = require('./config');
@@ -39,6 +39,9 @@ async function createServer() {
     console.debug = logger.debug.bind(logger);
     console.error = logger.error.bind(logger);
     console.warn = logger.warn.bind(logger);
+
+    // establish database connection when app starts
+    mongoose.connection.setClient(await dbManager.getClient());
 
     //setting various HTTP headers.
     app.use(helmet({
@@ -139,10 +142,11 @@ async function createServer() {
         secret: 'keyboard dog',
         resave: false, //don't save session if unmodified
         saveUninitialized: false, // don't create session until something stored
-        store: new MongoStore({
+        store: MongoStore.create({
             //url: db_utils.connectionURI('config') + '?authSource=admin&w=1',
-            //dbName: 'config',
-            mongooseConnection: mongoose.connection,
+            dbName: 'config',
+            clientPromise: dbManager.getClient(),
+            //mongooseConnection: mongoose.connection, // removed from connect-mongo v4
             touchAfter: 24 * 3600 // time period in seconds
         }),
         cookie: {
@@ -267,7 +271,7 @@ async function createServer() {
     });
 
     app.stop = function() {
-        connectionManager.close();
+        dbManager.close();
         // make sure all logs are written to files when program exits
         log4js.shutdown();
     }

@@ -23,19 +23,18 @@ console.log("worker start...");
 
 let mongoClient = new MongoClient(connectionURI(logFetcher.LOGS_SCHEMA, credentials), {
     authSource: 'admin',
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    poolSize: 3 // Maintain up to 20 socket connections for tenant database
+    maxPoolSize: 3 // Maintain up to 20 socket connections for tenant database
 });
 
 console.log("worker connecting database...");
-mongoClient.connect(async (error, client) => {
-    if (error) return console.error(error);
+mongoClient.connect().then(async client => {
     console.log(`connect to database ${logFetcher.LOGS_SCHEMA}`);
     let log_db = await client.db(logFetcher.LOGS_SCHEMA);
     let logs = log_db.collection("logList");
     let result = await logs.createIndex({ requestId: 1 }, { unique: 1 });
     console.log(`create index to field "requestId" with result: %j`, result);
+}).catch(error => {
+    console.error(error);
 });
 
 // worker will check next task by every 5 minutes in slient model
@@ -82,7 +81,7 @@ process.on('SIGINT', function() {
 
     // close the database connection
     if (mongoClient) {
-        mongoClient.close(err => {
+        mongoClient.close().catch(err => {
             if (err) {
                 console.error(err);
                 return process.exit(1);

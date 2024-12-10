@@ -52,15 +52,14 @@ router.post('/', helper.requireRole("admin"), async function(req, res, next) {
     try {
         let teachers = req.db.collection("teachers");
         let result = await teachers.insertOne(req.body);
-        if (result.insertedCount == 1) {
+        if (result.acknowledged) {
             console.log("teacher is added %j", req.body);
             return res.json(req.body);
         } else {
-            console.warn(`${result.insertedCount} teachers are added to collection`);
-            return res.json(result.ops);
+            return next(new BadRequestError('添加老师失败'));
         }
     } catch (error) {
-        return next(new RuntimeError("fail to add teacher", error));
+        return next(new RuntimeError("添加老师失败", error));
     }
 });
 

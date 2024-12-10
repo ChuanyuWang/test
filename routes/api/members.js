@@ -387,7 +387,7 @@ async function addNewMember(db, data) {
 
     convertDateObject(data);
     let result = await members.insertOne(data);
-    console.debug("create member successfully with result: %j", result.result);
+    console.debug("create member successfully with result: %j", result);
     console.log("member is added %j", data);
     return data;
 }

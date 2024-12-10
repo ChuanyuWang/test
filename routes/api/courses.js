@@ -135,7 +135,7 @@ router.post('/', async function(req, res, next) {
     try {
         const courses = req.db.collection("courses");
         let result = await courses.insertOne(req.body);
-        if (result.result.ok) {
+        if (result.acknowledged) {
             console.log("course is added %j", req.body);
             return res.json(req.body);
         } else {
@@ -212,7 +212,7 @@ router.delete('/:courseID', async function(req, res, next) {
 
         // remove all classes with courseID
         result = await classes.deleteMany({ courseID: ObjectId(req.params.courseID) });
-        // result is { "result": {"n":2,"ok":1},"deletedCount":2}
+        // result is { "acknowledged": true, "deletedCount":2}
         console.log(`delete ${result.deletedCount} classes belong to the course`);
 
         return res.json({ ok: 1 });
@@ -297,12 +297,11 @@ async function removeClasses(db, req, locals) {
             $inc: { "consumedCredit": -c.cost } // assume quantity is always 1
         });
 
-        //result.result is {ok: 1, n: 10, nModified: 5}
-        if (result.result.nModified !== booking.length) {
+        if (result.modifiedCount !== booking.length) {
             console.error(`fatal error occurred when cancel all booking %j`, booking);
         }
 
-        console.log(`return ${c.cost} credit to contracts with result: %j`, result.result);
+        console.log(`return ${c.cost} credit to contracts with result: %j`, result);
     }
 }
 
@@ -618,7 +617,7 @@ async function restoreContracts(db, req, locals) {
             $pull: { booking: { member: m } }
         });
 
-        console.log(`remove the booking of member ${m} from not started classes: %j`, result.result);
+        console.log(`remove the booking of member ${m} from not started classes: %j`, result);
     }
 }
 

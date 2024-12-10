@@ -712,7 +712,6 @@ router.post('/prices', hasRole('admin'), async function(req, res, next) {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let prices = logs_db.collection("prices");
 
-        //let result = await prices.insertOne(priceDoc);
         let result = await prices.updateOne({
             _fromContentId: priceDoc._fromContentId,
             effective_date: priceDoc.effective_date
@@ -857,10 +856,10 @@ router.post('/deposits', hasRole('admin'), async function(req, res, next) {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let deposits = logs_db.collection("deposits");
 
-        let result = await deposits.insertOne(depositDoc);
+        await deposits.insertOne(depositDoc);
 
         console.log(`add deposit to tenant ${depositDoc.tenantId} (received: ${depositDoc.received / 100} / donate: ${depositDoc.donate / 100})`);
-        res.json(result.result);
+        res.json(depositDoc);
     } catch (error) {
         return next(new InternalServerError("fail to add deposit to tenant", error));
     }

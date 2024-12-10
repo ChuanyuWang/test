@@ -128,19 +128,18 @@ describe('MongoDB driver 3.7+', function() {
         let classes = tenantDB.collection("classes");
         let doc = { foo: 123 };
         let result = await classes.insertOne(doc);
-        // result.result is {"n":1,"ok":1}
-        // result.ops is [{}] All the documents inserted
-        // result.insertedCount is 1
+        // result is {"acknowledged":1,"insertedId":ObjectId}
         // result.insertedId is ObjectId, generated ObjectId for the insert operation
         //console.log(result);
         expect(result).to.be.exist;
         result.should.be.a('object');
-        expect(result).to.have.property("result");
-        assert.deepEqual(result.result, { n: 1, ok: 1 });
-        expect(result).to.have.property("ops");
-        assert.typeOf(result.ops, "array");
-        expect(result).to.have.property("insertedCount");
+        //expect(result).to.have.property("result"); // removed from driver v4.0+
+        //assert.deepEqual(result.result, { n: 1, ok: 1 });
+        //expect(result).to.have.property("ops");
+        //assert.typeOf(result.ops, "array");
+        //expect(result).to.have.property("insertedCount");
         expect(result).to.have.property("insertedId");
+        expect(result).to.have.property("acknowledged").is.equals(true);
         expect(doc).to.have.property("_id");
     });
 
@@ -150,16 +149,20 @@ describe('MongoDB driver 3.7+', function() {
         let result = await classes.updateOne({ name: "456" }, {
             $set: { cost: 2 }
         }, { upsert: true });
-        // result.result is {"n":1,"ok":1,"nModified":1|0, "upserted": undefined|Object}
-        // result.modifiedCount is 1
-        // result.matchedCount is 1
-        // result.upsertedCount is 0 if modified
-        // result.upsertedId is { index: 0, _id: 652b82b1b71aad3df29d31f2 } if inserted; otherwise is null
-        // console.log(result);
+        //console.log(result);
+        /**
+         * {
+         *     "acknowledged":1, 
+         *     "modifiedCount": 1|0,
+         *     "insertedId": null|ObjectId, 
+         *     "upsertedCount":0|1, 
+         *     "matchedCount": 1|0
+         * }
+         **/
         expect(result).to.be.exist;
         result.should.be.a('object');
-        expect(result).to.have.property("result");
-        assert.deepEqual(result.result, { n: 1, ok: 1, nModified: 1 });
+        //expect(result).to.have.property("result"); // removed from driver v4.0+
+        //assert.deepEqual(result.result, { n: 1, ok: 1, nModified: 1 });
         expect(result).to.have.property("upsertedCount");
         expect(result).to.have.property("upsertedId");
         expect(result).to.have.property("matchedCount");
@@ -172,16 +175,20 @@ describe('MongoDB driver 3.7+', function() {
         let result = await classes.updateMany({ name: "456" }, {
             $set: { cost: 3 }
         }, { upsert: false }); // upsert default is false
-        // result.result is {"n":1,"ok":1,"nModified":1|0, "upserted": undefined|Object}
-        // result.modifiedCount is 1 // modifiedCount is 0 if the new value is the same as old value
-        // result.matchedCount is 1
-        // result.upsertedCount is 0 if modified
-        // result.upsertedId is { index: 0, _id: 652b82b1b71aad3df29d31f2 } if inserted; otherwise is null
         //console.log(result);
+        /**
+         * {
+         *     "acknowledged":1, 
+         *     "modifiedCount": 1|0,
+         *     "upsertedId": null|ObjectId, 
+         *     "upsertedCount":0|1, 
+         *     "matchedCount": 1|0
+         * }
+         **/
         expect(result).to.be.exist;
         result.should.be.a('object');
-        expect(result).to.have.property("result");
-        assert.deepEqual(result.result, { n: 1, ok: 1, nModified: 1 });
+        // expect(result).to.have.property("result"); // removed from driver v4.0+
+        // assert.deepEqual(result.result, { n: 1, ok: 1, nModified: 1 });
         expect(result).to.have.property("upsertedCount");
         expect(result).to.have.property("upsertedId");
         expect(result).to.have.property("matchedCount");
@@ -212,16 +219,16 @@ describe('MongoDB driver 3.7+', function() {
         let tenantDB = await db_utils.connect(tenant.name);
         let classes = tenantDB.collection("classes");
         let result = await classes.deleteMany({});
+        //console.log(result);
         /**
          * {
-            result: { n: 2, ok: 1 }, // removed in driver v4.0+
+            acknowledged: true,
             deletedCount: 1
             }
          */
-        //console.log(result);
         expect(result).to.be.exist;
         result.should.be.a('object');
-        expect(result).to.have.property("result");
+        //expect(result).to.have.property("result"); // removed from driver v4.0+
         expect(result).to.have.property("deletedCount");
     });
 });
