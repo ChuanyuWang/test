@@ -139,7 +139,7 @@ router.post('/', validateContract, async function(req, res, next) {
         let contracts = req.db.collection("contracts");
         contract.serialNo = await generateContractNo(req.app.locals.ENV_DEVELOPMENT);
         let result = await contracts.insertOne(contract);
-        // result is {"acknowledged":1,"insertedId":ObjectId}
+        // result is {"acknowledged":true, "insertedId":ObjectId}
         // result.insertedId is ObjectId, generated ObjectId for the insert operation
 
         console.log(`Create contract ${contract.serialNo} successfully`);

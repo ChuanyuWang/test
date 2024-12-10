@@ -128,7 +128,7 @@ describe('MongoDB driver 4.17+', function() {
         let classes = tenantDB.collection("classes");
         let doc = { foo: 123 };
         let result = await classes.insertOne(doc);
-        // result is {"acknowledged":1,"insertedId":ObjectId}
+        // result is {"acknowledged":true, "insertedId":ObjectId}
         // result.insertedId is ObjectId, generated ObjectId for the insert operation
         //console.log(result);
         expect(result).to.be.exist;
@@ -171,7 +171,7 @@ describe('MongoDB driver 4.17+', function() {
         //console.log(result);
         /**
          * {
-         *     "acknowledged":1, 
+         *     "acknowledged":true, 
          *     "modifiedCount": 1|0,
          *     "insertedId": null|ObjectId, 
          *     "upsertedCount":0|1, 
@@ -197,7 +197,7 @@ describe('MongoDB driver 4.17+', function() {
         //console.log(result);
         /**
          * {
-         *     "acknowledged":1, 
+         *     "acknowledged":true, 
          *     "modifiedCount": 1|0,
          *     "upsertedId": null|ObjectId, 
          *     "upsertedCount":0|1, 

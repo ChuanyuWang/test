@@ -108,7 +108,7 @@ router.post('/', hasRole('admin'), validateNotice, async function(req, res, next
         let config_db = await db_utils.connect("config");
         let notices = config_db.collection("notices");
         let result = await notices.insertOne(notice);
-        // result is {"acknowledged":1,"insertedId":ObjectId}
+        // result is {"acknowledged":true, "insertedId":ObjectId}
         // result.insertedId is ObjectId, generated ObjectId for the insert operation
 
         console.log(`Create notice ${notice.title} successfully`);
