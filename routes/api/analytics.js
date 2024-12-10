@@ -1,18 +1,17 @@
-var express = require('express');
-var router = express.Router();
-var helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
-const { InternalServerError, BadRequestError } = require('./lib/basis');
+const express = require('express');
+const router = express.Router();
+const helper = require('../../helper');
+const { InternalServerError, BadRequestError, RuntimeError } = require('./lib/basis');
 const moment = require('moment');
 
 
 /// Below APIs are visible to authenticated users only
 router.use(helper.hasTenant, helper.isAuthenticated);
 
-router.get('/consumption', function(req, res, next) {
+router.get('/consumption', async function(req, res, next) {
     //[Default] get the current year consumption by month
-    var year = (new Date()).getFullYear();
-    var unit = 'month';
+    let year = (new Date()).getFullYear();
+    let unit = 'month';
     if (req.query.hasOwnProperty("year")) {
         year = parseInt(req.query.year);
     }
@@ -20,8 +19,7 @@ router.get('/consumption', function(req, res, next) {
         unit = req.query.unit;
     }
 
-    var classes = req.db.collection("classes");
-    classes.aggregate([{
+    let pipelines = [{
         $match: {
             "booking.0": { // array size >= 1
                 $exists: true
@@ -72,22 +70,22 @@ router.get('/consumption', function(req, res, next) {
         $sort: {
             "_id": 1 // have to sort the class by its date, from old to new
         }
-    }], function(err, docs) {
-        if (err) {
-            var error = new Error("analyze consumption fails");
-            error.innerError = err;
-            next(error);
-            return;
-        }
+    }];
+    try {
+        const classes = req.db.collection("classes");
+        let docs = await classes.aggregate(pipelines).toArray();
+
         console.log("analyze consumption: ", docs ? docs.length : 0);
-        res.json(docs);
-    });
+        return res.json(docs);
+    } catch (error) {
+        return next(new RuntimeError("analyze consumption fails", error));
+    }
 });
 
-router.get('/deposit', function(req, res, next) {
+router.get('/deposit', async function(req, res, next) {
     //[Default] get the current year deposit by month
-    var year = (new Date()).getFullYear();
-    var unit = 'month';
+    let year = (new Date()).getFullYear();
+    let unit = 'month';
     if (req.query.hasOwnProperty("year")) {
         year = parseInt(req.query.year);
     }
@@ -95,8 +93,7 @@ router.get('/deposit', function(req, res, next) {
         unit = req.query.unit;
     }
 
-    var members = req.db.collection("members");
-    members.aggregate([{
+    let pipelines = [{
         $unwind: "$history"
     }, {
         $match: {
@@ -132,32 +129,33 @@ router.get('/deposit', function(req, res, next) {
         $sort: {
             "_id": 1 // have to sort the class by its date, from old to new
         }
-    }], function(err, docs) {
-        if (err) {
-            var error = new Error("analyze deposit fails");
-            error.innerError = err;
-            next(error);
-            return;
-        }
+    }];
+
+    try {
+        const members = req.db.collection("members");
+        let docs = await members.aggregate(pipelines).toArray();
+
         console.log("analyze deposit: ", docs ? docs.length : 0);
-        res.json(docs);
-    });
+        return res.json(docs);
+    } catch (error) {
+        return next(new RuntimeError("analyze deposit fails", error));
+    }
 });
 
-router.get('/passive', function(req, res, next) {
-    var now = new Date();
-    var begin = new Date(0);
+router.get('/passive', async function(req, res, next) {
+    let now = new Date();
+    let begin = new Date(0);
     //begin.setFullYear(now.getFullYear() - 1); // last year
     if (req.query.hasOwnProperty("begin")) {
         begin = new Date(req.query.begin);
     }
 
-    var queryValidMembers = {
+    let queryValidMembers = {
         "status": "active",
         "membership.0": { // array size >= 1, has at least one membership card
             $exists: true
         },
-        "membership.credit": { // has more then 0 creidt
+        "membership.credit": { // has more then 0 credit
             $exists: true,
             $gt: 0
         },
@@ -166,55 +164,52 @@ router.get('/passive', function(req, res, next) {
         }
     }
 
-    var members = req.db.collection("members");
-    members.find(queryValidMembers, { name: 1, contact: 1, membership: 1, since: 1 },
-        function(err, users) {
-            if (err) {
-                var error = new Error("find members fails");
-                error.innerError = err;
-                return next(error);
-            }
-            console.log("find effective members: ", users ? users.length : 0);
-            var memberList = users.map(function(value, index, array) {
-                return value._id;
-            });
+    try {
+        const members = req.db.collection("members");
+        let users = await members.find(queryValidMembers, {
+            projection: { name: 1, contact: 1, membership: 1, since: 1 }
+        }).toArray();
 
-            var classes = req.db.collection("classes");
-            classes.aggregate([{
-                $match: {
-                    "booking.0": { // array size >= 1
-                        $exists: true
-                    },
-                    "date": {
-                        $gte: begin
-                    },
-                    "cost": {
-                        $gte: 0
-                    }
+        console.log("find effective members: ", users ? users.length : 0);
+        let memberList = users.map(function(value, index, array) {
+            return value._id;
+        });
+
+        let pipelines = [{
+            $match: {
+                "booking.0": { // array size >= 1
+                    $exists: true
+                },
+                "date": {
+                    $gte: begin
+                },
+                "cost": {
+                    $gte: 0
                 }
-            }, {
-                $unwind: "$booking"
-            }, {
-                $match: {
-                    "booking.member": {
-                        $in: memberList
-                    },
-                    "booking.status": {
-                        $eq: "checkin"
-                    }
+            }
+        }, {
+            $unwind: "$booking"
+        }, {
+            $match: {
+                "booking.member": {
+                    $in: memberList
+                },
+                "booking.status": {
+                    $eq: "checkin"
                 }
-            }, {
-                $group: {
-                    _id: "$booking.member", // group the data according to unit (month or week)
-                    last: {
-                        $max: "$date"
-                    }
+            }
+        }, {
+            $group: {
+                _id: "$booking.member", // group the data according to unit (month or week)
+                last: {
+                    $max: "$date"
                 }
-            }, {
-                $sort: {
-                    "last": -1 // have to sort the class by its date, from old to new
-                }
-            }/*, {
+            }
+        }, {
+            $sort: {
+                "last": -1 // have to sort the class by its date, from old to new
+            }
+        }/*, {
             $limit : 20
         }, {
             $lookup: {
@@ -223,29 +218,22 @@ router.get('/passive', function(req, res, next) {
                 foreignField: "_id",
                 as: "member"
             }
-        }*/], function(err, docs) {
-                if (err) {
-                    var error = new Error("analyze passive fails");
-                    error.innerError = err;
-                    next(error);
-                    return;
-                }
-                console.log("analyze passive: ", docs ? docs.length : 0);
-                res.json({ lastBook: docs, effectiveMembers: users });
-            });
-        });
+    }*/];
+
+        const classes = req.db.collection("classes");
+        let docs = await classes.aggregate(pipelines).toArray();
+
+        console.log("analyze passive: ", docs ? docs.length : 0);
+        return res.json({ lastBook: docs, effectiveMembers: users });
+    } catch (error) {
+        return next(new RuntimeError("analyze passive fails", error));
+    }
 });
 
 router.get("/teacherAnalysis", async function(req, res, next) {
-    let month, classes;
+    let month = moment().startOf('month').toDate();
     if (req.query.hasOwnProperty("targetMonth")) {
         month = new Date(req.query.targetMonth);
-    }
-    try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        classes = tenantDB.collection("classes");
-    } catch (error) {
-        return next(error);
     }
 
     // build query for match
@@ -296,20 +284,19 @@ router.get("/teacherAnalysis", async function(req, res, next) {
     }];
 
     try {
+        const classes = req.db.collection("classes");
         let docs = await classes.aggregate(pipelines).toArray();
         console.log(`find ${docs.length} teachers with their deliver cost`);
         return res.json(docs);
     } catch (error) {
-        let err = new Error("Analysis teacher fails");
-        error.innerError = err;
-        return next(error);
+        return next(new RuntimeError("Analysis teacher fails", error));
     }
 });
 
 router.get("/orders", async function(req, res, next) {
     //[Default] get the current year orders by month
     let year = (new Date()).getFullYear();
-    var unit = 'month';
+    let unit = 'month';
     if (req.query.year) {
         year = parseInt(req.query.year);
     }
@@ -327,14 +314,6 @@ router.get("/orders", async function(req, res, next) {
             $gt: 0
         }
     };
-
-    let orders;
-    try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        orders = tenantDB.collection("orders");
-    } catch (error) {
-        return next(error);
-    }
 
     // build pipelines for aggregate()
     let pipelines = [{
@@ -356,25 +335,23 @@ router.get("/orders", async function(req, res, next) {
     }];
 
     try {
+        const orders = req.db.collection("orders");
         let docs = await orders.aggregate(pipelines).toArray();
         console.log(`Analysis orders by ${unit}`);
         return res.json(docs);
     } catch (error) {
-        let err = new Error("Analysis orders fails");
-        error.innerError = err;
-        return next(error);
+        return next(new RuntimeError("Analysis orders fails", error));
     }
 });
 
-router.get('/memberdata', function(req, res, next) {
+router.get('/memberdata', async function(req, res, next) {
     //[Default] get the current year consumption by month
-    var year = (new Date()).getFullYear();
+    let year = (new Date()).getFullYear();
     if (req.query.hasOwnProperty("year")) {
         year = parseInt(req.query.year);
     }
 
-    var classes = req.db.collection("classes");
-    classes.aggregate([{
+    let pipelines = [{
         $match: {
             "booking.0": { // array size >= 1
                 $exists: true
@@ -429,15 +406,17 @@ router.get('/memberdata', function(req, res, next) {
                 $push: { t: "$total", m: "$_id.month" }
             }
         }
-    }], function(err, docs) {
-        if (err) {
-            var error = new Error("analyze member fails");
-            error.innerError = err;
-            return next(error);
-        }
+    }];
+
+    try {
+        const classes = req.db.collection("classes");
+        let docs = await classes.aggregate(pipelines).toArray();
+
         console.log("analyze member: ", docs ? docs.length : 0);
-        res.json(docs);
-    });
+        return res.json(docs);
+    } catch (error) {
+        return next(new RuntimeError("analyze member fails", error));
+    }
 });
 
 router.get('/classexpense', async function(req, res, next) {
@@ -477,8 +456,7 @@ router.get('/classexpense', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
+        const classes = req.db.collection("classes");
 
         let pipelines = [{
             $match: {
@@ -542,7 +520,7 @@ router.get('/classexpense', async function(req, res, next) {
         let docs = await classes.aggregate(pipelines).toArray();
 
         console.log("analyze expense: ", docs ? docs.length : 0);
-        res.json(docs);
+        return res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analysis class expense fails", error));
     }
@@ -560,8 +538,7 @@ router.get('/classexpense2', async function(req, res, next) {
     let begin = moment(t_date).startOf("day"), end = moment(t_date).endOf("day");
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
+        const classes = req.db.collection("classes");
 
         let pipelines = [{
             $match: {
@@ -619,7 +596,7 @@ router.get('/classexpense2', async function(req, res, next) {
         let docs = await classes.aggregate(pipelines).toArray();
 
         console.log("analyze one day expense: ", docs ? docs.length : 0);
-        res.json(docs);
+        return res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analysis one day class expense fails", error));
     }
@@ -651,12 +628,11 @@ router.get('/remainingclasses', async function(req, res, next) {
                 }
             }
         }];
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
+        const classes = req.db.collection("classes");
         let docs = await classes.aggregate(pipelines).toArray();
 
         console.log("analyze remaining credit by type: ", docs ? docs.length : 0);
-        res.json(docs);
+        return res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analyze remaining credit by type fails", error));
     }
@@ -686,12 +662,11 @@ router.get('/remainingcontracts', async function(req, res, next) {
                 total: { $sum: "$remaining" }
             }
         }];
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        const contracts = req.db.collection("contracts");
         let docs = await contracts.aggregate(pipelines).toArray();
 
         console.log("analyze remaining contracts by type: ", docs ? docs.length : 0);
-        res.json(docs);
+        return res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analyze remaining contracts by type fails", error));
     }
@@ -727,12 +702,11 @@ router.get('/effectivemembers', async function(req, res, next) {
                 totalRemaining: { $sum: "$total" }
             }
         }];
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        const contracts = req.db.collection("contracts");
         let docs = await contracts.aggregate(pipelines).toArray();
 
         console.log("analyze members with effective contracts: ", docs ? docs.length : 0);
-        res.json(docs);
+        return res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analyze members with effective contracts fails", error));
     }
@@ -750,8 +724,7 @@ router.get('/incomingpayment', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let payments = tenantDB.collection("payments");
+        const payments = req.db.collection("payments");
 
         let pipelines = [{
             $match: {
@@ -781,7 +754,7 @@ router.get('/incomingpayment', async function(req, res, next) {
         let docs = await payments.aggregate(pipelines).toArray();
 
         console.log("analyze incoming payments: ", docs ? docs.length : 0);
-        res.json(docs);
+        return res.json(docs);
     } catch (error) {
         return next(new InternalServerError("analysis incoming payments fails", error));
     }

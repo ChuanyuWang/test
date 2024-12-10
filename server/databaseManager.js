@@ -1,5 +1,4 @@
 const util = require('util');
-const mongojs = require('mongojs');
 const { MongoClient } = require('mongodb');
 const mongoose = require('mongoose');
 
@@ -15,7 +14,7 @@ mongoClient.connect(error => {
     mongoose.connection.setClient(mongoClient);
 });
 
-const dbCache = new Map();
+//const dbCache = new Map();
 const manager = {};
 
 function connectionURI(database) {
@@ -75,35 +74,26 @@ manager.connect = async function(database) {
     if (mongoClient.topology == null)
         await mongoClient.connect();
 
+    /* 
+   // https://mongodb.github.io/node-mongodb-native/3.6/reference/unified-topology/
+   // some MongoDB events and options are deprecated, e.g isConnected()
+   db.once("error", err => {
+       console.error(err);
+       dbCache.delete(database);
+   });
+   db.once("timeout", err => {
+       console.error(err);
+       dbCache.delete(database);
+   });
+   
+   db.once("close", err => {
+       console.error(err);
+       dbCache.delete(database);
+   });
+   */
+
     //TODO, add 'error' listener to MongoClient when upgrade to mongodb 4.0+
     return mongoClient.db(database);
-}
-
-manager.mongojsDB = async function(database) {
-    if (dbCache.has(database)) {
-        return dbCache.get(database);
-    }
-    let db = await manager.connect(database);
-    dbCache.set(database, mongojs(db));
-    /* 
-    // https://mongodb.github.io/node-mongodb-native/3.6/reference/unified-topology/
-    // some MongoDB events and options are deprecated, e.g isConnected()
-    db.once("error", err => {
-        console.error(err);
-        dbCache.delete(database);
-    });
-    db.once("timeout", err => {
-        console.error(err);
-        dbCache.delete(database);
-    });
-    
-    db.once("close", err => {
-        console.error(err);
-        dbCache.delete(database);
-    });
-    */
-    // return the mongojs db wrapper
-    return dbCache.get(database);
 }
 
 manager.close = function() {

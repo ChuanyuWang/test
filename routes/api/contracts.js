@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
 const { RuntimeError, ParamError, BaseError, generateContractNo, BadRequestError } = require('./lib/basis');
 const { isEqual } = require('./lib/util');
@@ -137,8 +136,7 @@ router.post('/', validateContract, async function(req, res, next) {
         contract.status = "paid";
     }
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         contract.serialNo = await generateContractNo(req.app.locals.ENV_DEVELOPMENT);
         let result = await contracts.insertOne(contract);
         // result.result is {"n":1,"ok":1}
@@ -294,8 +292,7 @@ router.get('/', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         // get the total of all matched contracts
         // TODO, use collection.countDocuments() instead
         let cursor = contracts.find(query, { projection: NORMAL_FIELDS });
@@ -316,8 +313,7 @@ router.get('/', async function(req, res, next) {
 
 router.get('/:contractID', async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
 
         let pipelines = [{
             $match: { _id: ObjectId(req.params.contractID) }
@@ -384,8 +380,7 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
             return next(new BadRequestError("Fail to update contract due to bad request body"));
         }
 
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         let doc = await contracts.findOne({
             _id: ObjectId(req.params.contractID),
             // can't edit deleted and closed contract
@@ -442,8 +437,7 @@ router.patch('/:contractID', helper.requireRole("admin"), async function(req, re
 router.delete('/:contractID', helper.requireRole("admin"), async function(req, res, next) {
     try {
         if (!ObjectId.isValid(req.params.contractID)) return next(new BadRequestError(`contract ID ${req.params.contractID} is invalid`));
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         // only open status could be deleted
         let query = {
             _id: ObjectId(req.params.contractID),
@@ -455,11 +449,11 @@ router.delete('/:contractID', helper.requireRole("admin"), async function(req, r
         if (isFromLegacyMembership(doc)) return next(new BadRequestError("不能删除系统自动创建的合约"));
 
         // only contract without payments or classes can be deleted.
-        let payments = tenantDB.collection("payments");
+        let payments = req.db.collection("payments");
         let p = await payments.findOne({ contractId: doc._id });
         if (p) return next(new BadRequestError("不能删除已经缴费的合约"));
 
-        let classes = tenantDB.collection("classes");
+        let classes = req.db.collection("classes");
         let c = await classes.findOne({ "booking.contract": doc._id });
         if (c) return next(new BadRequestError("不能删除已经约课的合约"));
 
@@ -491,8 +485,7 @@ router.delete('/:contractID', helper.requireRole("admin"), async function(req, r
  */
 router.post('/:contractID/comments', async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
 
         if (!req.body.text || req.body.text.length <= 0) {
             return new ParamError("Missing param 'text'");
@@ -526,8 +519,7 @@ router.post('/:contractID/comments', async function(req, res, next) {
 
 router.get('/:contractID/comments', async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         let doc = await contracts.findOne({
             _id: ObjectId(req.params.contractID)
         }, {
@@ -547,8 +539,7 @@ router.get('/:contractID/comments', async function(req, res, next) {
 
 router.get('/:contractID/history', async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let contracts = tenantDB.collection("contracts");
+        let contracts = req.db.collection("contracts");
         let doc = await contracts.findOne({
             _id: ObjectId(req.params.contractID)
         }, {
@@ -574,8 +565,7 @@ async function validateContract(req, res, next) {
         }
         let query = { _id: ObjectId(req.body.memberId) };
 
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let members = tenantDB.collection("members");
+        let members = req.db.collection("members");
         let doc = await members.findOne(query, { projection: { name: 1, contact: 1 } });
         if (!doc) {
             return next(new ParamError("member doesn't exist"));

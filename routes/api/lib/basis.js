@@ -48,7 +48,8 @@ exports.asyncMiddlewareWrapper = function(errorMessage) {
     return function(func) {
         return async function(req, res, next) {
             try {
-                let db = await db_utils.connect(req.tenant.name);
+                //let db = await db_utils.connect(req.tenant.name);
+                let db = req.db;
                 await func(db, req, res.locals);
                 return next();
             } catch (error) {

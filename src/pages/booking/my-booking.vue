@@ -198,6 +198,7 @@ export default {
         contact: this.contact
       };
 
+      //TODO, move below call to members service
       var request = serviceUtil.postJSON("/api/members/validate", userInfo);
       request.done(function(data, textStatus, jqXHR) {
         if (!data) {
@@ -229,9 +230,6 @@ export default {
       this.user.name = "";
       this.user.contact = "";
       this.items = [];
-    },
-    queryContracts() {
-
     },
     updateSchedule(showHistory) {
       var vm = this;
@@ -280,11 +278,9 @@ export default {
     },
     cancelBooking(item) {
       var vm = this;
-      var request = $.ajax("/api/booking/" + item._id, {
-        type: "DELETE",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({ memberid: vm.user._id, tenant: common.getTenantName() }),
-        dataType: "json"
+      var request = serviceUtil.deleteJSON("/api/booking/", { 
+        memberid: vm.user._id, 
+        tenant: common.getTenantName() 
       });
       request.done(function(data, textStatus, jqXHR) {
         if (!data) return;

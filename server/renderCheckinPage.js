@@ -1,12 +1,10 @@
 const { ObjectId } = require('mongodb');
-const db_utils = require('./databaseManager');
 const moment = require('moment/min/moment-with-locales');
 
 exports.getCheckinPage = async function(req, res, next) {
     // skip to 404 page if class ID is not valid
     if (!ObjectId.isValid(req.params.classID)) return next();
-    let tenantDB = await db_utils.connect(req.tenant.name);
-    let classes = tenantDB.collection("classes");
+    let classes = req.db.collection("classes");
     let pipelines = [{
         $match: {
             _id: ObjectId(req.params.classID)

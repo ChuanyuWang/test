@@ -78,8 +78,7 @@ router.post('/', validateCreateOrderRequest, findMember, findClass, async functi
         tradetype: req.body.tradeType
     };
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let orders = tenantDB.collection("orders");
+        let orders = req.db.collection("orders");
         order.tradeno = await generateTradeNo(req.app.locals.ENV_DEVELOPMENT);
         let result = await orders.insertOne(order);
         // result.result is {"n":1,"ok":1}
@@ -120,8 +119,7 @@ router.post('/confirmPay', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let orders = tenantDB.collection("orders");
+        let orders = req.db.collection("orders");
         let query = { prepayid: req.body.prepayid };
         let doc = await orders.findOne(query);
         // TODO, check query count
@@ -216,8 +214,7 @@ router.get('/', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let orders = tenantDB.collection("orders");
+        let orders = req.db.collection("orders");
 
         // get the total of all matched members
         let cursor = orders.find(query, { projection: NORMAL_FIELDS });
@@ -242,8 +239,7 @@ router.patch('/:orderID', helper.requireRole("admin"), function(req, res, next) 
 
 router.delete('/:orderID', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let orders = tenantDB.collection("orders");
+        let orders = req.db.collection("orders");
         // only open status could be deleted
         let query = { _id: ObjectId(req.params.orderID), status: "open" };
         let doc = await orders.findOne(query);
@@ -265,8 +261,7 @@ router.delete('/:orderID', helper.requireRole("admin"), async function(req, res,
 
 router.post('/:orderID/close', helper.requireRole("admin"), async function(req, res, next) {
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let orders = tenantDB.collection("orders");
+        let orders = req.db.collection("orders");
         // only open status could be deleted
         let query = { _id: ObjectId(req.params.orderID), status: "notpay" };
         let doc = await orders.findOne(query, { projection: NORMAL_FIELDS });
@@ -330,8 +325,7 @@ async function findMember(req, res, next) {
             openid: req.body.openid
         };
 
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let members = tenantDB.collection("members");
+        let members = req.db.collection("members");
         let doc = await members.findOne(query, { projection: { name: 1 } });
         if (!doc) {
             let error = new Error("无法找到学员信息，请先注册/登录");
@@ -351,8 +345,7 @@ async function findClass(req, res, next) {
     try {
         let query = { _id: ObjectId(req.body.classid) };
 
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
+        let classes = req.db.collection("classes");
         let doc = await classes.findOne(query, { projection: { name: 1, capacity: 1, booking: 1 } });
         if (!doc) {
             let error = new Error("无法找到课程信息，请重新预约");

@@ -52,6 +52,7 @@ div.container(style='padding-left:7px;padding-right:7px')
 import common from "../../common/common";
 import teachersService from "../../services/teachers";
 import modalDialog from "../../components/modal-dialog.vue";
+import serviceUtil from "../../services/util";
 
 export default {
   name: "my-read-books",
@@ -156,12 +157,8 @@ export default {
       };
 
       var vm = this;
-      var request = $.ajax("/api/members/validate", {
-        type: "POST",
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(userInfo),
-        dataType: "json"
-      });
+      //TODO, move below call to members service
+      var request = serviceUtil.postJSON("/api/members/validate", userInfo);
       request.fail(function(jqXHR, textStatus, errorThrown) {
         // handle login error
         console.error(jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText);

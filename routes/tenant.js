@@ -72,7 +72,7 @@ async function getTenantInfo(req, res, next) {
         }
 
         req.tenant = tenant;
-        req.db = await db_utils.mongojsDB(tenant.name);
+        req.db = await db_utils.connect(tenantName);
         // navTitle is the title on the navigation bar
         res.locals.navTitle = tenant.displayName || "";
         res.locals.classrooms = tenant.classroom || [];

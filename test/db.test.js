@@ -126,9 +126,8 @@ describe('MongoDB driver 3.7+', function() {
     it('test insertOne result', async function() {
         let tenantDB = await db_utils.connect(tenant.name);
         let classes = tenantDB.collection("classes");
-        let result = await classes.insertOne({
-            foo: 123
-        });
+        let doc = { foo: 123 };
+        let result = await classes.insertOne(doc);
         // result.result is {"n":1,"ok":1}
         // result.ops is [{}] All the documents inserted
         // result.insertedCount is 1
@@ -142,6 +141,7 @@ describe('MongoDB driver 3.7+', function() {
         assert.typeOf(result.ops, "array");
         expect(result).to.have.property("insertedCount");
         expect(result).to.have.property("insertedId");
+        expect(doc).to.have.property("_id");
     });
 
     it('test updateOne result with upsert is true', async function() {
@@ -206,5 +206,22 @@ describe('MongoDB driver 3.7+', function() {
         assert.deepEqual(result.lastErrorObject, { n: 1 });
         expect(result).to.have.property("value");
         expect(result).to.have.property("ok");
+    });
+
+    it('test deleteMany result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let result = await classes.deleteMany({});
+        /**
+         * {
+            result: { n: 2, ok: 1 }, // removed in driver v4.0+
+            deletedCount: 1
+            }
+         */
+        //console.log(result);
+        expect(result).to.be.exist;
+        result.should.be.a('object');
+        expect(result).to.have.property("result");
+        expect(result).to.have.property("deletedCount");
     });
 });

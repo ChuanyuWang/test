@@ -14,5 +14,6 @@
     "orders": "Orders",
     "constracts": "Contracts",
     "constracts_create": "Create Contract",
-    "view_contract": "View Contract"
+    "view_contract": "View Contract",
+    "checkin_table": "上课签到表"
 }

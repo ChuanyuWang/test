@@ -153,7 +153,7 @@ router.get('/api/tenants', isAuthenticated, async function(req, res, next) {
         console.log("Find %d tenants", docs.length);
         return res.send(docs);
     } catch (error) {
-        return next(RuntimeError("Get tenant list fails"), error)
+        return next(RuntimeError("Get tenant list fails", error));
     }
 });
 
@@ -191,10 +191,9 @@ router.post('/api/tenants', isAuthenticated, async function(req, res, next) {
         let result = await tenants.insertOne(req.body);
         if (result.insertedCount === 1) {
             console.log("tenant %j is created", req.body);
-            let doc = result.ops[0];
-            res.send(doc);
+            return res.send(req.body);
         } else {
-            return next(new RuntimeError(`insert ${result.insertedCount} tenant`));
+            return next(new BadRequestError(`insert ${result.insertedCount} tenant`));
         }
     } catch (error) {
         return next(new RuntimeError("create tenant fails", error));

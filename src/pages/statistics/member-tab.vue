@@ -86,7 +86,7 @@ export default {
         //sortOrder: "desc",
         toolbar: '#member_toolbar',
         queryParams: this.customQuery,
-        url: "/api/analytics/memberdata",
+        //url: "/api/analytics/memberdata",
         //sidePagination: "server",
         search: true,
         showRefresh: true,

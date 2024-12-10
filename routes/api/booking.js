@@ -1,26 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const mongojs = require('mongojs');
 const { check, findAvailableContract } = require('./lib/reservation');
 const helper = require('../../helper');
-const db_utils = require('../../server/databaseManager');
 const { ObjectId } = require('mongodb');
-const { ParamError, asyncMiddlewareWrapper, RuntimeError } = require("./lib/basis");
+const { ParamError, asyncMiddlewareWrapper, RuntimeError, BadRequestError } = require("./lib/basis");
 
 router.use(helper.hasTenant);
 
 /**
  * Get the member list who booked the class
  */
-router.get('/', helper.isAuthenticated, function(req, res, next) {
+router.get('/', helper.isAuthenticated, async function(req, res, next) {
     if (!req.query.classid) {
-        let error = new Error("Missing param 'classid'");
-        error.status = 400;
-        return next(error);
+        return next(new ParamError("Missing param 'classid'"));
     }
 
     let pipelines = [{
-        $match: { _id: mongojs.ObjectId(req.query.classid) }
+        $match: { _id: ObjectId(req.query.classid) }
     }, {
         $project: { booking: 1 }
     }, {
@@ -52,22 +48,13 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
         }
     }];
 
-    const tenantDB = req.db;
-    var classes = tenantDB.collection("classes");
-    classes.aggregate(pipelines, function(err, docs) {
-        if (err) {
-            let error = new Error("get booking fails");
-            error.innerError = err;
-            return next(error);
-        }
+    try {
+        let classes = req.db.collection("classes");
+        let docs = await classes.aggregate(pipelines).toArray();
 
         if (!docs || docs.length !== 1) {
             // docs === [] when the classid is invalid
-            return res.status(400).json({
-                'code': 2002,
-                'message': "没有找到指定课程，请刷新重试",
-                'err': err
-            });
+            return next(new BadRequestError("没有找到指定课程，请刷新重试", 2002));
         }
 
         let booking = docs[0].booking || []; // booking is undefined when there is no booking
@@ -87,8 +74,10 @@ router.get('/', helper.isAuthenticated, function(req, res, next) {
                 }
             }
         }
-        res.json(book_items);
-    });
+        return res.json(book_items);
+    } catch (error) {
+        return next(new RuntimeError("get booking fails", error));
+    }
 });
 
 const postR = asyncMiddlewareWrapper("Fail to book");
@@ -115,8 +104,7 @@ router.post('/',
             let cls = res.locals.cls;
             let contract = res.locals.contract;
             let member = res.locals.member;
-            let tenantDB = await db_utils.connect(req.tenant.name);
-            let classes = tenantDB.collection("classes");
+            let classes = req.db.collection("classes");
             //let after_cls = await createNewBook(tenantDB, member, cls, req.body.quantity);
 
             let newbooking = {
@@ -150,7 +138,7 @@ router.post('/',
     }
 );
 
-// remove specfic user's booking info
+// remove specific user's booking info
 // TODO, the delete operation may sent accidentally.
 router.delete('/:classID', async function(req, res, next) {
     if (!req.tenant || !req.tenant.name) {
@@ -163,8 +151,7 @@ router.delete('/:classID', async function(req, res, next) {
     }
 
     try {
-        let tenantDB = await db_utils.connect(req.tenant.name);
-        let classes = tenantDB.collection("classes");
+        let classes = req.db.collection("classes");
         let doc = await classes.findOne({
             _id: ObjectId(req.params.classID),
             "booking.member": ObjectId(req.body.memberid)
@@ -225,7 +212,7 @@ router.delete('/:classID', async function(req, res, next) {
         doc = result.value;
         if (doc.cost > 0 && bookingInfo.contract) {
             //TODO, handle the callback when member is inactive.
-            let contracts = tenantDB.collection("contracts");
+            let contracts = req.db.collection("contracts");
             result = await contracts.findOneAndUpdate({
                 _id: bookingInfo.contract
             }, {
