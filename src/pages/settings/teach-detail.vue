@@ -153,13 +153,14 @@ export default {
   filters: {},
   methods: {
     refreshHistory: function() {
+      var toDate = this.from ? moment(this.from).add(1, "months") : undefined;
       this.$refs.historyTable.refresh({
         url: "/api/classes",
         query: {
           teacher: this.item._id,
           order: "desc",
           from: this.from && this.from.toISOString() || undefined,
-          to: this.from && this.from.add(1, "months").toISOString() || undefined
+          to: toDate && toDate.toISOString() || undefined
         }
       });
     },
