@@ -100,7 +100,8 @@ exports.createtDefaultContracts = async function(tenant, defaultType) {
     if (contractsToCreate.length > 0) {
         let contracts = db.collection("contracts");
         let result = await contracts.insertMany(contractsToCreate);
-        console.log(`Create default contracts with result: %j`, result.result);
+        // result is {"acknowledged":true, "insertedCount":1, "insertedIds": {}}
+        console.log(`Create ${result.insertedCount} default contracts`);
     }
     return contractsToCreate;
 }

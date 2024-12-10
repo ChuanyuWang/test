@@ -110,7 +110,8 @@ async function proceedData(mongoClient, task, data) {
         try {
             let logList = log_db.collection("logList");
             let result = await logList.insertMany(bqsqLogs, { ordered: false });
-            console.log(`insert log items with result %j`, result.result);
+            // result is {"acknowledged":true, "insertedCount":1, "insertedIds": {'0': ObjectId}}
+            console.log(`insert ${result.insertedCount} log items`);
         } catch (error) {
             if (error.code === 11000) {
                 // BulkWriteError: E11000 duplicate key error collection

@@ -248,9 +248,9 @@ router.delete('/:orderID', helper.requireRole("admin"), async function(req, res,
             return next(error);
         }
         let result = await orders.deleteOne(query);
-        // result.result is {"n":1,"ok":1}
-        console.log(`Order ${doc.tradeno} is deleted with result: %j`, result.result);
-        return res.json(result.result);
+        // result is {"acknowledged":true, "deletedCount":1}
+        console.log(`Order ${doc.tradeno} is deleted with result: %j`, result);
+        return res.json(result);
     } catch (error) {
         let err = new Error("Delete order fails");
         err.innerError = error;

@@ -747,14 +747,14 @@ router.delete('/prices/:Id', hasRole('admin'), async function(req, res, next) {
         };
 
         let result = await prices.deleteOne(query);
-        // result.result is {"n":1,"ok":1}
-        if (result.result.n === 1) {
+        // result is {"acknowledged":true, "deletedCount":1}
+        if (result.deletedCount === 1) {
             console.log(`Remove price of content ${req.body._fromContentId} successfully`);
         } else {
             return next(new ParamError(`Not able to delete effective price`));
         }
 
-        res.json(result.result);
+        return res.json(result);
     } catch (error) {
         return next(new InternalServerError("fail to remove price", error));
     }

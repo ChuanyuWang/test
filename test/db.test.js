@@ -8,7 +8,7 @@ const assert = chai.assert;
 const expect = chai.expect;
 chai.should(); //actually enable should style assertions
 
-describe('MongoDB driver 3.7+', function() {
+describe('MongoDB driver 4.17+', function() {
     before(async function() {
         // runs once before the first test in this block
         await tenant.init(true);
@@ -141,6 +141,25 @@ describe('MongoDB driver 3.7+', function() {
         expect(result).to.have.property("insertedId");
         expect(result).to.have.property("acknowledged").is.equals(true);
         expect(doc).to.have.property("_id");
+    });
+
+    it('test deleteOne result', async function() {
+        let tenantDB = await db_utils.connect(tenant.name);
+        let classes = tenantDB.collection("classes");
+        let doc = { foo: 456 };
+        await classes.insertOne(doc);
+        let result = await classes.deleteOne({ foo: 456 });
+        //console.log(result);
+        /**
+         * {
+            acknowledged: true,
+            deletedCount: 1
+            }
+         */
+        expect(result).to.be.exist;
+        result.should.be.a('object');
+        //expect(result).to.have.property("result"); // removed from driver v4.0+
+        expect(result).to.have.property("deletedCount");
     });
 
     it('test updateOne result with upsert is true', async function() {

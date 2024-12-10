@@ -354,8 +354,8 @@ async function addClasses2Course(db, req, locals) {
 
     let classes = db.collection('classes');
     let result = await classes.insertMany(added_classes);
-    // result is {result: {ok:1, n:1}, ops: [], insertedCount: 1, insertedIds: {'0': ObjectId}}
-    console.log("add %j classes to course %s", result.ops, req.params.courseID);
+    // result is {"acknowledged":true, "insertedCount":1, "insertedIds": {'0': ObjectId}}
+    console.log(`add ${result.insertedCount} classes to course ${req.params.courseID}`);
     locals.classes = added_classes;
 }
 

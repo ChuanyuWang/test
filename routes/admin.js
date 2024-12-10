@@ -287,7 +287,7 @@ async function fixPayment(req, res, next) { // eslint-disable-line
             bulk.find({ _id: doc._id }).updateOne({ $set: { contractNo: serialNo } });
         });
         let result = await bulk.execute();
-        console.log("fix payments with result: %j", result.result);
+        console.log(`fix ${result.modifiedCount} payments`);
 
         res.json(`${docs.length} payments are fixed with contractNo`);
     } catch (error) {

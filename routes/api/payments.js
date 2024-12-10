@@ -275,9 +275,9 @@ router.delete('/:paymentID', helper.requireRole("admin"), async function(req, re
         }
 
         let result = await payments.deleteOne(query);
-        // result.result is {"n":1,"ok":1}
+        // result is {"acknowledged":true, "deletedCount":1}
         console.log(`undo payment ${payment.amount} from contract ${contractItem.serialNo}`);
-        return res.json(result.result);
+        return res.json(result);
     } catch (error) {
         let err = new Error("Delete payment fails");
         err.innerError = error;
