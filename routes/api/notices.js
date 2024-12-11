@@ -67,11 +67,10 @@ router.post('/query', util.validateSign, async function(req, res, next) {
     try {
         let config_db = await db_utils.connect("config");
         let notices = config_db.collection("notices");
-        let cursor = notices.find(query, { projection: NORMAL_FIELDS });
-        let total = await cursor.count();
+        let total = await notices.countDocuments(query);
         let docs = await notices.aggregate(pipelines).toArray();
 
-        console.log(`Find ${docs.length} publish notices from ${total} in total`);
+        console.log(`Find ${docs.length} publish notices out of ${total}`);
         return res.json({
             code: 0,
             message: "success",
@@ -79,13 +78,11 @@ router.post('/query', util.validateSign, async function(req, res, next) {
             rows: docs
         });
     } catch (error) {
-        let err = new Error("Query publish notice fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("Query publish notice fails", error));
     }
 });
 
-// below API are avaiable to internal user
+// below API are available to internal user
 router.use(function(req, res, next) {
     // only accessible to tenant bqsq-admin
     if (req.isAuthenticated() && req.user.tenant === "bqsq-admin") {
@@ -192,8 +189,7 @@ router.get('/', async function(req, res, next) {
     try {
         let config_db = await db_utils.connect("config");
         let notices = config_db.collection("notices");
-        let cursor = notices.find(query, { projection: NORMAL_FIELDS });
-        let total = await cursor.count();
+        let total = notices.countDocuments(query);
         let docs = await notices.aggregate(pipelines).toArray();
 
         console.log(`Find ${docs.length} notices from ${total} in total`);

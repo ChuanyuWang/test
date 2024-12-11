@@ -576,11 +576,10 @@ router.get('/query', async function(req, res, next) {
     try {
         let logs_db = await db_utils.connect(LOGS_SCHEMA);
         let logs = logs_db.collection("logList");
-        let cursor = logs.find(query);
-        let total = await cursor.count();
+        let total = await logs.countDocuments(query);
         let docs = await logs.aggregate(pipelines).toArray();
 
-        console.log(`query ${docs.length} dlketang logs from ${total} in total`);
+        console.log(`Query ${docs.length} dlketang logs out of ${total}`);
         return res.json({
             total: total,
             rows: docs

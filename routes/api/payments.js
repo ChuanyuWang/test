@@ -4,7 +4,7 @@ const helper = require('../../helper');
 const { ObjectId } = require('mongodb');
 const moment = require('moment');
 const { SchemaValidator } = require("./lib/schema_validator");
-const { BadRequestError } = require("./lib/basis");
+const { BadRequestError, RuntimeError } = require("./lib/basis");
 
 const EPSILON = 2e-10;
 
@@ -193,19 +193,16 @@ router.get('/', async function(req, res, next) {
     try {
         let payments = req.db.collection("payments");
         // get the total of all matched payments
-        let cursor = payments.find(query, { projection: NORMAL_FIELDS });
-        let total = await cursor.count();
+        let total = await payments.countDocuments(query);
         let docs = await payments.aggregate(pipelines).toArray();
 
-        console.log(`find ${docs.length} payments from ${total} in total`);
+        console.log(`Get ${docs.length} payments out of ${total}`);
         return res.json({
             total: total,
             rows: docs
         });
     } catch (error) {
-        let err = new Error("query payment fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("Query payment fails", error));
     }
 });
 

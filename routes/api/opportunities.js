@@ -85,7 +85,7 @@ router.get('/', async function(req, res, next) {
         let total = await cursor.count();
         let docs = await cursor.skip(offset).limit(limit).toArray();
         //console.log(`offset is ${offset}, limit is ${limit}, total is ${total}`);
-        console.log("find opportunities: ", docs ? docs.length : 0);
+        console.log(`Get ${docs.length} opportunities out of ${total}`);
         return res.json({
             total: total,
             rows: docs

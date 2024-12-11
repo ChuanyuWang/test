@@ -292,20 +292,16 @@ router.get('/', async function(req, res, next) {
     try {
         let contracts = req.db.collection("contracts");
         // get the total of all matched contracts
-        // TODO, use collection.countDocuments() instead
-        let cursor = contracts.find(query, { projection: NORMAL_FIELDS });
-        let total = await cursor.count();
+        let total = await contracts.countDocuments(query);
         let docs = await contracts.aggregate(pipelines).toArray();
 
-        console.log(`Find ${docs.length} contracts from ${total} in total`);
+        console.log(`Get ${docs.length} contracts out of ${total}`);
         return res.json({
             total: total,
             rows: docs
         });
     } catch (error) {
-        let err = new Error("Query contract fails");
-        err.innerError = error;
-        return next(err);
+        return next(new RuntimeError("Query contract fails", error));
     }
 });
 
