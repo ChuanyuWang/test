@@ -252,8 +252,7 @@ router.get('/checkin', async function(req, res, next) {
 
     try {
         let classes = req.db.collection("classes");
-        let cursor = classes.aggregate(pipelines);
-        let docs = await cursor.toArray();
+        let docs = await classes.aggregate(pipelines).toArray();
 
         if (docs && docs.length > 0) {
             let results = docs[0];
