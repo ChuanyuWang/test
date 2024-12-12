@@ -76,6 +76,7 @@ import modalDialog from "../../components/modal-dialog.vue";
 
 export default {
   name: "member-overview",
+  filters: {},
   props: {},
   components: {
     "BootstrapTable": BootstrapTable,
@@ -115,31 +116,7 @@ export default {
         titleTooltip: "已用课时=消+排\n是指所有已经排课课程的课时合计 (包括已经结束和尚未开始的课程)",
         sortable: false,
         formatter: this.contractsFormatter
-      },/*{
-        field: "allRemaining",
-        title: "剩余总课时<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
-        sortable: true,
-        titleTooltip: "剩余总课时=剩余未使用课时+已使用但未开始的课时\n例如: 50 (40/10) 剩余40课时未使用/已使用但尚未开始的课程共计10课时，剩余总课时为50",
-        formatter: this.remainingFormatter,
-        cellStyle: this.remainingStyle
-      }, {
-        title: "有效期",
-        sortable: true,
-        sortName: "membership.0.expire",
-        formatter: this.expireFormatter,
-        cellStyle: this.expireStyle
-      }, {
-        field: "credit",
-        title: "剩余课时",
-        sortable: true,
-        visible: false,
-        formatter: this.creditFormatter
-      }, {
-        field: "unStartedClassCount",
-        title: "未上课程(节)",
-        sortable: false,
-        visible: true
-      }, */{
+      },{
         field: "note",
         title: "描述",
         visible: false
@@ -182,7 +159,7 @@ export default {
       expireTableOptions: {
         locale: "zh-CN",
         showRefresh: false,
-        //queryParams: this.customQuery,
+        //queryParams: "",
         //url: "/api/members?hasContracts=true",
         uniqueId: "_id",
         sortName: "total",
@@ -217,16 +194,11 @@ export default {
       })
     }
   },
-  filters: {},
   methods: {
     customQuery(params) {
       // params : {search: "", sort: undefined, order: "asc", offset: 0, limit: 15}
-      //var filter = $("#filter_dlg input:checked").val();
-      //params.filter = filter;
       params.status = this.statusFilter;
       params.source = this.sourceFilter;
-      // Append the field 'unStartedClassCount' to returned members
-      params.appendLeft = true;
       return params;
     },
     beforeAddNewMember() {

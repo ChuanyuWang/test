@@ -101,20 +101,13 @@ router.post('/validate', async function(req, res, next) {
 /// Below APIs are visible to authenticated users only
 router.use(helper.isAuthenticated);
 
-router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async function(req, res, next) {
+router.get('/', queryMembersHasContracts, async function(req, res, next) {
     let query = {};
     if (req.query.name) {
         query['name'] = req.query.name;
     }
     if (req.query.contact) {
         query['contact'] = req.query.contact;
-    }
-    // "null" is the keyword indicate display all classrooms
-    if (req.query.filter && req.query.filter != "null") {
-        //TODO, support multi membership card
-        query["membership"] = { $size: 1 };
-        query["membership.type"] = "LIMITED";
-        query["membership.room"] = [req.query.filter];
     }
     // query members by status, the status could be empty string, e.g. status=
     if (req.query.status) {
@@ -170,30 +163,22 @@ router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async func
         pageSize = 100;
     }
 
-    let members = req.db.collection("members");
+    const members = req.db.collection("members");
 
     // get the total of all matched members
     let cursor = members.find(query, { projection: NORMAL_FIELDS });
     let total = await cursor.count();
 
-    if (!req.query.hasOwnProperty('appendLeft')) {
-        try {
-            let docs = await cursor.sort(sort).skip(skip).limit(pageSize).toArray();
-            console.log(`find ${docs.length} members from ${total} in total`);
-            return res.json({
-                total: total,
-                rows: docs
-            });
-        } catch (err) {
-            let error = new Error("Get member list fails");
-            error.innerError = err;
-            return next(error);
-        }
-    }
-
     // build pipelines for aggregate()
     let pipelines = [{
         $match: query
+    }, {
+        // put the $sort at the beginning for better performance
+        $sort: sort
+    }, {
+        $skip: skip
+    }, {
+        $limit: pageSize
     }, {
         $project: NORMAL_FIELDS
     }, {
@@ -226,26 +211,6 @@ router.get('/', queryMembersHasContracts, queryMembersHasNoContracts, async func
             }
         }
     }];
-
-    if (['unStartedClassCount', 'credit', 'allRemaining'].indexOf(field) > -1) {
-        // user sort on calculated field
-        pipelines.push({
-            $sort: sort
-        }, {
-            $skip: skip
-        }, {
-            $limit: pageSize
-        });
-    } else {
-        // put the $sort at the beginning for better performance
-        pipelines.splice(1, 0, {
-            $sort: sort
-        }, {
-            $skip: skip
-        }, {
-            $limit: pageSize
-        });
-    }
 
     try {
         let docs = await members.aggregate(pipelines).toArray();
@@ -732,10 +697,6 @@ async function queryMembersHasContracts(req, res, next) {
         error.innerError = err;
         return next(error);
     }
-}
-
-async function queryMembersHasNoContracts(req, res, next) {
-    return next();
 }
 
 module.exports = router;
