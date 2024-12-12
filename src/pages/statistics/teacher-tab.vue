@@ -48,7 +48,7 @@ export default {
           footerFormatter: value => { return "总计"; }
         }, {
           field: "counter",
-          title: "课次�",
+          title: "课次<sup>&#9432;</sup>",
           sortable: false,
           formatter: value => { return (value || []).length; },
           footerFormatter: function(data) {
@@ -60,7 +60,7 @@ export default {
         }, {
           field: "quantity",
           //title: "人次<i class='small glyphicon glyphicon-info-sign' style='color:#777'/>",
-          title: "人次�",
+          title: "人次<sup>&#9432;</sup>",
           sortable: false,
           //formatter: value => { return (value || []).length; },
           footerFormatter: function(data) {
@@ -71,7 +71,7 @@ export default {
           titleTooltip: "每次课程参与的学员人数总和"
         }, {
           field: "counter",
-          title: "完成课节�",
+          title: "完成课节<sup>&#9432;</sup>",
           sortable: false,
           formatter: this.counterFormatter,
           titleTooltip: "完成课节=每次课程的课时总和, 例如: 完成两次课, 课时分别为1课时和2课时, 则完成课节为3 (1+2)",
@@ -82,7 +82,7 @@ export default {
             return this.$toFixed1(result);
           }
         }, {
-          title: "实际完成课时�",
+          title: "实际完成课时<sup>&#9432;</sup>",
           sortable: false,
           formatter: this.actualFormatter,
           footerFormatter: data => {
