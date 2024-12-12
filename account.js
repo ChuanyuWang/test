@@ -10,6 +10,21 @@ var Account = new Schema({
     active: Boolean
 });
 
+
+/**
+ * Additionally, passport-local-mongoose will add more fields to above Schema
+ *  - username, user name
+ *  - hash, the hashed password
+ *  - salt, the salt value
+ * 
+ * Some methods will also be added to the instance of Account
+ * - setPassword
+ * - changePassword
+ * - authenticate
+ * - resetAttempts
+ * more information refer to https://github.com/saintedlama/passport-local-mongoose#api-documentation
+ */
+
 Account.plugin(passportLocalMongoose, {
     findByUsername: function(model, queryParameters) {
         // Add additional query parameter - AND condition - active: true
