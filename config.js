@@ -81,13 +81,13 @@ module.exports = {
         echarts: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.min.js',
         echarts_dev: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.js',
         blueimp_md5: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/blueimp-md5/2.19.0/js/md5.min.js',
-        axios: 'https://unpkg.zhimg.com/axios@1.3.4/dist/axios.min.js',
+        axios: 'https://unpkg.zhihu.com/axios@1.3.4/dist/axios.min.js',
         axios_dev: 'https://unpkg.zhimg.com/axios@1.3.4/dist/axios.js',
-        vuetify: 'https://unpkg.zhimg.com/vuetify@2.7.1/dist/vuetify.min.js',
+        vuetify: 'https://unpkg.zhihu.com/vuetify@2.7.1/dist/vuetify.min.js',
         vuetify_dev: 'https://unpkg.zhimg.com/vuetify@2.7.1/dist/vuetify.js',
-        vuetify_css: 'https://unpkg.zhimg.com/vuetify@2.7.1/dist/vuetify.min.css',
+        vuetify_css: 'https://unpkg.zhihu.com/vuetify@2.7.1/dist/vuetify.min.css',
         vuetify_css_dev: 'https://unpkg.zhimg.com/vuetify@2.7.1/dist/vuetify.css',
-        vue_router: 'https://unpkg.zhimg.com/vue-router@3.6.5/dist/vue-router.min.js',
+        vue_router: 'https://unpkg.zhihu.com/vue-router@3.6.5/dist/vue-router.min.js',
         vue_router_dev: 'https://unpkg.zhimg.com/vue-router@3.6.5/dist/vue-router.js'
     }
 };
