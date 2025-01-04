@@ -37,7 +37,8 @@ div.input-group.date(:id="id",:class="inputClass")
     // http://eonasdan.github.io/bootstrap-datetimepicker/Options/
     config: {
       type: Object,
-      default: function() { return { "format": "ll" } }
+      // have to set the locale explicitly, because date-picker load default config before moment locale is set
+      default: function() { return {"format": "ll", locale: moment.locale()} }
     },
     placeholder: {
       type: String,
@@ -103,6 +104,10 @@ div.input-group.date(:id="id",:class="inputClass")
     $elem.datetimepicker(this.config);
     // Store data control
     this.dp = $elem.data('DateTimePicker');
+    if (!this.config.locale) {
+      // set locale if not defined
+      this.dp.locale(moment.locale());
+    }
     // Set initial value
     this.dp.date(moment(this.value));
     // Watch for changes

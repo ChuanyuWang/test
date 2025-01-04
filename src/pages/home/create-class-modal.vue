@@ -30,7 +30,7 @@ div.modal.fade(tabindex='-1',role='dialog',data-backdrop='static')
           div.form-group
             label.control-label.col-sm-3 时间:
             div.col-sm-3
-              date-picker(v-model='startTime' :config='{locale: "zh-CN", format: "LT"}')
+              date-picker(v-model='startTime' :config='{format: "LT"}')
             div.col-sm-3
               p.form-control-static {{classDate}}
           div.form-group(:class='{"has-error": errors.age}',:title='errors.age')

@@ -23,7 +23,7 @@ export default {
   data: function() {
     return {
       targetYear: moment().startOf('year'),
-      datePickerConfig: { "format": "YYYY", "locale": "zh-CN", "viewMode": "years" },
+      datePickerConfig: { "format": "YYYY", "viewMode": "years" },
       columns: [
         {
           field: "_id",

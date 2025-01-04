@@ -128,7 +128,7 @@ export default {
       });
     },
     dateFormat: function() {
-      return this.isRepeated ? { 'format': 'LT', "locale": "zh-CN" } : { 'format': 'lll', "locale": "zh-CN" };
+      return this.isRepeated ? { 'format': 'LT' } : { 'format': 'lll' };
     }
   },
   filters: {},

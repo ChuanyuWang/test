@@ -29,7 +29,7 @@ export default {
       tenantSettings: {},
       typeFilter: "",
       targetMonth: moment().startOf('month'),
-      datePickerConfig: { "format": "YYYY-MM", "locale": "zh-CN", "viewMode": "months" },
+      datePickerConfig: { "format": "YYYY-Mo", "viewMode": "months" },
       teacherData: [],
       columns: [
         {

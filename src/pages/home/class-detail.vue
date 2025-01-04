@@ -49,7 +49,7 @@ div.container
         div.form-group(:class='{"has-error": errors.date}')
           label.control-label.col-sm-3.col-xs-4 开课日期:
           div.col-sm-8.col-md-6.col-xs-8(:title="errors.date")
-            date-picker(v-model='cls.date',:config="{format:'lll',locale:'zh-CN',sideBySide: true}")
+            date-picker(v-model='cls.date',:config="{format:'lll',sideBySide: true}")
         div.form-group(:class='{"has-error": errors.age}')
           label.control-label.col-sm-3.col-xs-4 年龄:
           div.col-sm-8.col-md-6.col-xs-8(:title="errors.age")
