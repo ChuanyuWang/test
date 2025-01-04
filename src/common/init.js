@@ -19,8 +19,9 @@ function init(fn) {
             var lang = lng.split("-")[0]; // parse the two digit language code, e.g. "en", "fr", "zh"
 
             if (typeof moment === 'function') {
-                // zh_CN indicate Chinese simplified in moment.js; zh_TW indicate Chinese Traditional
-                moment.locale(lang === "zh" ? "zh_CN" : lang);
+                // zh-CN indicate Chinese simplified in moment.js; zh_TW indicate Chinese Traditional
+                // https://github.com/moment/moment/tree/develop/locale
+                moment.locale(lang === "zh" ? "zh-CN" : lang);
             }
 
             if (typeof bootbox === 'object') {
