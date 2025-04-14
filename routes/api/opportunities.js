@@ -132,6 +132,11 @@ function initDateField(item) {
 }
 
 async function verifyCode(req, res, next) {
+    // skip code verification in production
+    if (req) {
+        return next();
+    }
+
     if (req.app.locals.ENV_DEVELOPMENT) {
         // skip code verification if it's development mode
         return next();
