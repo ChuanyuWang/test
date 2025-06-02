@@ -444,7 +444,7 @@ async function deductContracts(db, req, locals) {
     }
 
     let errors = [];
-    function errorbuilder(m, c, msg) {
+    function createErrorMessage(m, c, msg) {
         return `添加${m.name}到课程${c.name}失败，原因: ${msg}`;
     }
     let contracts = db.collection("contracts");
@@ -472,13 +472,13 @@ async function deductContracts(db, req, locals) {
 
             let error = check(m, c, 1);
             if (error) {
-                errors.push(errorbuilder(m, c, error.message));
+                errors.push(createErrorMessage(m, c, error.message));
                 continue;
             }
 
             let contract2Deduct = findAvailableContract(c, valid_contracts);
             if (!contract2Deduct) {
-                errors.push(errorbuilder(m, c, "未购买课程或合约未生效"));
+                errors.push(createErrorMessage(m, c, "未购买课程或合约未生效"));
                 continue;
             }
 
