@@ -12,7 +12,7 @@ div.container
     div.form-group(:class='{"has-error": errors.contact}')
       label.control-label 手机号:
       input.form-control(type='tel',v-model.trim='contact',placeholder='135xxx')
-    div.form-group(:class='{"has-error": errors.verifyCode}')
+    div.form-group(:class='{"has-error": errors.verifyCode}' v-show="false")
       label.control-label 验证码:
       div.input-group
         input.form-control(type='number',v-model.trim='verifyCode')
@@ -74,7 +74,7 @@ export default {
       tenantConfig: {},
       name: "",
       contact: "",
-      verifyCode: "",
+      verifyCode: "0000",
       birthday: null,
       remark: "",
       nc: null,
