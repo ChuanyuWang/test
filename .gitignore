@@ -10,5 +10,6 @@ logs/
 .eslintcache
 /public/css/
 .VSCodeCounter/
+.co-op-ai/
 
 
