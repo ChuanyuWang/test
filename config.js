@@ -87,7 +87,7 @@ module.exports = {
         vuetify_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.js',
         vuetify_css: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.min.css',
         vuetify_css_dev: 'https://cdn.bootcdn.net/ajax/libs/vuetify/2.7.1/vuetify.css',
-        vue_router: 'https://unpkg.zhimg.com/vue-router@3.6.5/dist/vue-router.min.js',
-        vue_router_dev: 'https://unpkg.zhimg.com/vue-router@3.6.5/dist/vue-router.js'
+        vue_router: 'https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.6.5/vue-router.min.js',
+        vue_router_dev: 'https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.6.5/vue-router.js'
     }
 };
