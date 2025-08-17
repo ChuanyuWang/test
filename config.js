@@ -52,12 +52,12 @@ module.exports = {
      */
     cdnlibs: {
         jquery: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.5.1/jquery.min.js',
-        jquery_dev: 'https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js',
+        jquery_dev: 'https://unpkg.com/jquery@3.5.1/dist/jquery.js',
         bootstrap: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/js/bootstrap.min.js',
         bootstrap_css: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/css/bootstrap.min.css',
-        bootstrap_dev: 'https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.js',
-        momentjs: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/moment.js/2.22.1/moment-with-locales.min.js',
-        momentjs_dev: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/moment.js/2.22.1/moment-with-locales.js',
+        bootstrap_dev: 'https://unpkg.com/bootstrap@3.4.1/dist/js/bootstrap.js',
+        momentjs: 'https://unpkg.com/moment@2.22.2/min/moment-with-locales.min.js',
+        momentjs_dev: 'https://unpkg.com/moment@2.22.2/min/moment-with-locales.js',
         /**
          * Steps of upgrade vue version?
          * 1. Update vue CDN version
