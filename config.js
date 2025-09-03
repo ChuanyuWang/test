@@ -63,9 +63,9 @@ module.exports = {
          * 1. Update vue CDN version
          * 2. Update vue-template-compiler version, the same as vue
          */
-        vue: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.min.js',
-        vue_dev: 'https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.js',
-        vue_runtime: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.runtime.min.js',
+        vue: 'https://unpkg.com/vue@2.6.14/dist/vue.min.js',
+        vue_dev: 'https://unpkg.com/vue@2.6.14/dist/vue.js',
+        vue_runtime: 'https://unpkg.com/vue@2.6.14/dist/vue.runtime.min.js',
         vue_runtime_dev: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.runtime.js',
         i18next: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/i18next/20.2.4/i18next.min.js',
         i18next_dev: 'https://cdn.bootcdn.net/ajax/libs/i18next/20.2.4/i18next.js',
