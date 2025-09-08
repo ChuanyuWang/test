@@ -76,7 +76,7 @@ module.exports = {
         bootstrap_table_export: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap-table/1.15.5/extensions/export/bootstrap-table-export.min.js',
         bootstrap_table_locale_zh_CN: 'https://unpkg.com/bootstrap-table@1.15.5/dist/locale/bootstrap-table-zh-CN.min.js',
         bootstrap_datetimepicker: 'https://unpkg.com/eonasdan-bootstrap-datetimepicker@4.17.49/build/js/bootstrap-datetimepicker.min.js',
-        bootstrap_datetimepicker_css: 'https://unpkg.com/eonasdan-bootstrap-datetimepicker@4.17.47/build/css/bootstrap-datetimepicker.min.css',
+        bootstrap_datetimepicker_css: 'https://unpkg.com/eonasdan-bootstrap-datetimepicker@4.17.49/build/css/bootstrap-datetimepicker.min.css',
         bootbox: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootbox.js/4.4.0/bootbox.min.js',
         echarts: 'https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.min.js',
         echarts_dev: 'https://cdn.bootcdn.net/ajax/libs/echarts/5.3.0/echarts.js',
