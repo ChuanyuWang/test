@@ -77,7 +77,7 @@ export default {
       type: '',
       cost: 1,
       price: 0,
-      capacity: 8,
+      capacity: 12,
       age: { // by year
         min: null,
         max: null

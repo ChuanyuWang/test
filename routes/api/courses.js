@@ -347,7 +347,7 @@ async function addClasses2Course(db, req, locals) {
             value["teacher"] = ObjectId(value["teacher"]);
         }
         value.cost = value.cost || 0;
-        value.capacity = value.capacity || 8;
+        value.capacity = value.capacity || 12;
         value.booking = []; // clear the booking for new added course's classes
         value.books = []; // clear the books for new added course's classes
         return value;
