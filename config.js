@@ -67,7 +67,7 @@ module.exports = {
         vue_dev: 'https://unpkg.com/vue@2.6.14/dist/vue.js',
         vue_runtime: 'https://unpkg.com/vue@2.6.14/dist/vue.runtime.min.js',
         vue_runtime_dev: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.runtime.js',
-        i18next: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/i18next/20.2.4/i18next.min.js',
+        i18next: 'https://unpkg.com/i18next@20.2.4/i18next.min.js',
         i18next_dev: 'https://cdn.bootcdn.net/ajax/libs/i18next/20.2.4/i18next.js',
         bootstrap_table_css: 'https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.15.5/bootstrap-table.min.css',
         table_export: 'https://unpkg.com/tableexport.jquery.plugin@1.10.22/tableExport.min.js',
