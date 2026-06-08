@@ -51,7 +51,7 @@ module.exports = {
      * 10. https://npm.elemecdn.com
      */
     cdnlibs: {
-        jquery: 'https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.5.1/jquery.min.js',
+        jquery: 'https://unpkg.com/jquery@3.5.1/dist/jquery.min.js',
         jquery_dev: 'https://unpkg.com/jquery@3.5.1/dist/jquery.js',
         bootstrap: 'https://unpkg.com/bootstrap@3.4.1/dist/js/bootstrap.min.js',
         bootstrap_css: 'https://unpkg.com/bootstrap@3.4.1/dist/css/bootstrap.min.css',
