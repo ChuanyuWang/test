@@ -691,8 +691,7 @@ async function queryMembersHasContracts(req, res, next) {
             from: 'members',
             let: { 'memberId': '$_id' },
             pipeline: [{
-                $match: { // query active members only
-                    status: 'active',
+                $match: {
                     $expr: { $eq: ['$$memberId', '$_id'] }
                 }
             }, {
