@@ -225,7 +225,7 @@ router.post('/play/verify', util.validateSign, async function(req, res, next) {
     }
 });
 
-// below API are avaiable to internal user
+// below API are available to internal user
 router.use(function(req, res, next) {
     // only accessible to tenant bqsq-admin
     if (req.isAuthenticated() && req.user.tenant === "bqsq-admin") {

@@ -177,7 +177,8 @@ export default {
 
   mounted() {
     if (typeof echarts === "object") return this.init();
-    var result = common.loadScript("https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/echarts/5.3.0/echarts.min.js");
+    // CDN_FILES.echarts always load the min bundle of echarts
+    var result = common.loadScript("https://unpkg.com/echarts@5.3.0/dist/echarts.min.js");
     result.then((event) => {
       this.init();
     });
