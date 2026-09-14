@@ -1,0 +1,25 @@
+name: Deploy to ECS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to girl1 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 139.196.229.232
+          username: jenkins
+          key: ${{ secrets.GIRL1_SSH_KEY }}
+          script: |
+            cd ~/workspace/deploy
+            cp ~/pem/*.* bin
+            cp ~/config/config.db.js .
+            git pull origin master
+            npm install --registry=https://registry.npmmirror.com
+            npm run build
+            mkdir -pv logs
+            pm2 startOrReload process.pm2.json --env production
+            pm2 show eshop
