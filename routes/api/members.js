@@ -692,7 +692,8 @@ async function queryMembersHasContracts(req, res, next) {
             let: { 'memberId': '$_id' },
             pipeline: [{
                 $match: {
-                    $expr: { $eq: ['$$memberId', '$_id'] }
+                    $expr: { $eq: ['$$memberId', '$_id'] },
+                    status: 'active'
                 }
             }, {
                 $project: { name: 1, contact: 1, _id: 0 }
@@ -706,6 +707,8 @@ async function queryMembersHasContracts(req, res, next) {
             remaining: 1,
             member: { $arrayElemAt: ['$members', 0] }
         }
+    }, {
+        $match: { 'member': { $ne: null } }
     }, {
         $facet: {
             metadata: [{ $count: "total" }], // get the total of all matched members
