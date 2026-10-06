@@ -17,9 +17,12 @@ jobs:
             cd ~/workspace/deploy
             cp ~/pem/*.* bin
             cp ~/config/config.db.js .
-            git pull origin master
-            npm install --registry=https://registry.npmmirror.com
-            npm run build
-            mkdir -pv logs
-            pm2 startOrReload process.pm2.json --env production
-            pm2 show eshop
+            git --version
+            # git pull origin master
+            # npm install --registry=https://registry.npmmirror.com
+            # npm run build
+            # mkdir -pv logs
+            # pm2 startOrReload process.pm2.json --env production
+            # pm2 show eshop
+            whoami
+            pwd
